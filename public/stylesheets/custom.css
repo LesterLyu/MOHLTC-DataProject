@@ -1,0 +1,181 @@
+.signupbody {
+    padding-top: 80px;
+    background-color: #FFFFFE;
+}
+
+.box {
+    background-color: #FAFAFA;
+}
+
+.btn {
+    border: 1px solid black;
+    margin-left: 2%;
+}
+
+.signuplabel {
+    font-weight: bold;
+    font-size: 20px;
+    margin-left: 2%;
+}
+
+input {
+    margin-left: 2%;
+    width: 96%;
+}
+
+.loginBox {
+    left: 0;
+    right: 0;
+    background-color: #e7e7e7;
+}
+.profilebody {
+    word-wrap: break-word;
+    background-color : #DCDCDC;
+}
+
+.btn-default a:hover {
+    color: #ecf2f3;
+}
+
+.btnExportC {
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.reportData {
+    width: 91.5%;
+    border: 2px solid black;
+    background-color: #D3D3D3;
+    font-size: calc(10px + (20-10) * (100vw - 300px)/ (2200-300));
+    text-align: left;
+}
+
+strong {
+    padding: 2px;
+    margin-top: 1%;
+    width: 35%;
+    font-size: calc(10px + (20-10) * (100vw - 300px)/ (2200-300));
+}
+
+.header {
+    padding: 0.75%;
+    font-size: 2.6vmax;
+    margin-left: 3.5%;
+}
+.formbody {
+    padding-top: 110px;
+    background-color: #DCDCDC;
+}
+.formheader {
+    margin-top: 0.5%;
+    text-align: center;
+    font-size: 48px;
+    font-weight: bold;
+    display: inline-block;
+    margin-left: 8.5%;
+}
+.jumbotron {
+    background-color: #FAFAFA !important;
+}
+.menu {
+    padding: 0.65% 0 0.15% 0;
+}
+
+.menu a {
+    text-decoration-line: none;
+    color: #c5d6db;
+    font-family: "Arial", "Myriad Pro";
+    margin-left: 4.25%;
+    padding: 0px 5px 5px 5px;
+    padding-top: 1%;
+}
+
+.menu a:hover {
+    padding: 5px 5px 5px 5px;
+    background-image: linear-gradient(#000000 95%, yellow 5%);
+}
+
+#nav {
+    font-size: calc(10px + (20-10) * (100vw - 300px)/ (2200-300));
+}
+
+.top {
+    border: 2px solid black;
+    margin-bottom: 0
+}
+
+.button {
+    border: 2px solid black;
+    background-color: #cfe1f9;
+    margin-left: 4.25%;
+    font-size: calc(9px + (18-9) * (100vw - 300px)/ (2200-300));
+}
+
+.btn {
+    white-space: normal !important;
+}
+
+.table {
+    margin-top: 1.5%;
+    margin-bottom: 7.5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.tdtext {
+    text-align: center;
+}
+
+.header {
+    font-weight: bold;
+    font-size: 32px;
+}
+
+#oldTable td, th {
+    border: 1px solid black;
+    margin-top: 5%;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#oldTableb {
+    margin-top: 2.5%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#formDiv {
+    border: 2px solid black;
+}
+
+#form {
+    margin-top: 2%;
+}
+
+#input-excel {
+    margin-top: 2%;
+}
+
+.loginbody {
+    padding-top: 125px;
+    background-color: #FFFFFE;
+}
+
+.loginlabel {
+    font-size: 16px;
+}
+
+.indexbody {
+    padding-top: 110px;
+    background-color: #FFFFFE;
+}
+.emailbody {
+    padding-top: 80px;
+    word-wrap: break-word;
+    background-color: #FFFFFE;
+}
+
+.singupinput {
+    width: 95%;
+}

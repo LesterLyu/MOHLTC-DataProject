@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang = "en">
+<head>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/custom.css"><!-- custom css -->
+    <title> Password-Reset</title>
+</head>
+<body class="emailbody">
+  <div class = "col-sm-8 col-sm-offset-2 loginBox">
+    <h1 class = "loginText"><span class="fa fa-sign-in"></span> Dynamic Forms </h1>
+  </div>
+  <div id = "topblock" class = "jumbotron text-center col-sm-8 col-sm-offset-2">
+<div id = "thebiggraybox">
+  <h1 style = "text-align: center; font-size: 28px; margin-top: -2%; margin-bottom: 2.5%;"> Reset Password </h1>
+  <br>
+  <p id = "emailthelink"> Please enter the email address associated with your account. We will send you a link to click so you can reset your password</p>
+    <form action= "/emailResetLink" method = "post">
+      <div class="form-group">
+        <label for="usr">Email:</label id = "emailbox">
+        <input type="text" class="form-control" id="email" name = "userEmail">
+     </div>
+        <input type = "submit" class = "btn btn-warning" value = "Submit">
+      <br>
+    </form>
+</div>
+</div>
+</body>
+</html>

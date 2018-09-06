@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
+  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+  <link rel="stylesheet" href="/custom.css"><!-- custom css -->
+</head>
+
+  <body class="profilebody">
+<div class="container">
+    <div class= "top col-sm-10 col-sm-offset-1 well" style= "padding: 1.25% 0.15% 0.65% 1.2%; background-color: 	#FFFFF0" >
+        <header class = "header" >Profile Page <span class="fa fa-anchor"></span></header>
+    </div>
+    <div class= "top col-sm-10 col-sm-offset-1" style = "background-color: #3b7687; margin-bottom: 2%; margin-top: -2px; " >
+    <nav class = "menu">
+      <a style = "color: #FFFFF0" id = "nav"  href="/login">Logout</a>
+
+    </nav>
+  </div>
+  <br>
+    <div class= "col-sm-10 col-sm-offset-1 well" style= "border: 2px solid black; background-color: 	#FFFFF0; ">
+        <h3 style = "font-size: 32px; margin-left: 4.25%;"><span class="fa fa-user"></span> User Information</h3>
+            <p style = 'margin-left: 4.25%; padding: 0.25%;'>
+                <strong>ID: <%= user.ID %> </strong><br>
+                <strong>Username: <%= user.userName %> </strong><br>
+                <strong>Email: <%= user.email %> </strong> <br>
+                <!--
+                <strong>password</strong>: <%//= user.password %>
+                -->
+            </p>
+    </div>
+    <div class= "col-sm-10 col-sm-offset-1 well" style= "border: 2px solid black; background-color: 	#FFFFF0; ">
+      <h3 style = "margin-left: 4.25%; font-size: 32px; " ><span class = "fa fa-user"></span> Forms</h3>
+
+        <h3 style = " font-size: 30px; float: left; margin-left: 4.25%; margin-bottom: 3.5%; "> Empty forms you can fill out </h3> <br>
+          <% for (var i = 0; i < unfilledForms.length; i ++) {%>
+            <a href = "fillForm?formId=<%= unfilledForms[i].Id%>&formGroupNumber=<%= unfilledForms[i].GroupNumber%>" class="btn btn-default reportData" style = "margin-left: 4.25%;"><span class="fa fa-user"></span> <%= unfilledForms[i].Title %> </a>
+          <%}%>
+
+    </div>
+    <div class= "col-sm-10 col-sm-offset-1 well" style= "border: 2px solid black; background-color: 	#FFFFF0; ">
+      <h3 style = "margin-left: 4.25%; font-size: 32px; " ><span class = "fa fa-user"></span> View/Edit Filled Forms</h3>
+      <% for (var i = 0; i < filledForms.length; i ++) {    console.log(filledForms); %>
+        <a href = "viewForm?Title=<%= filledForms[i].Title%>&formID=<%= filledForms[i].Id%>" class="btn btn-default reportData" style = "margin-left: 4.25%;"><span class="fa fa-user"></span> <%= filledForms[i].Title %> </a>
+        <% }%>
+    </div>
+
+        <div style = "margin-bottom: 2%;">
+
+        <!-- LOCAL INFORMATION -->
+        <br>
+        <% if(user.admin==1){%>
+          <div class= "top col-sm-10 col-sm-offset-1 well" style= "padding-bottom: 2%; background-color: 	#FFFFF0" >
+            <h1 style = "margin-left: 4.25%; margin-bottom: 3%; margin-top: -0.25%"> Admin Functionalities: </h1>
+          <a class = "btn btn-success" href="/custom" style = "margin-left: 4.25%;">Create Table</a>
+            <a class = "btn btn-success" href="/createNew" style = "margin-left: 5%;">Create Attributes/Categories</a>
+          </div>
+          <% } %>
+        </div>
+</body>
+</html>

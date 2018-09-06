@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>HTML5 Editable Table</title>
+  <link rel='stylesheet prefetch' href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
+  <link rel='stylesheet prefetch' href='https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css'>
+
+    <link rel="stylesheet" href="stylesheets/dynamictablestyle.css">
+<style>
+.table
+{
+  margin-left: auto;
+  margin-right: auto;
+}
+.table tbody
+{
+  overflow-x: auto; white-space: nowrap;  vertical-align: top;
+}
+.table thead
+{
+ overflow-x: auto; white-space: nowrap;vertical-align: top;
+}
+</style>
+
+<script>
+    function updateRow()
+    {
+      var numberOfRows = document.getElementById('myTable').rows.length;
+
+      var k = document.getElementsByClassName('first-col')
+      for(var i = 0; i < k.length; i ++)
+      if(k[i] != null)
+      {
+        k[i].querySelector("input").setAttribute("name", "Attribute" + String(i+1));
+      }
+    }
+    function updateAllRows()
+    {
+      var ths = document.getElementById('myTable');
+      var allRows = ths.getElementsByTagName('tr')
+      for( var i = 2; i < allRows.length; i++)
+      {
+        var thb = allRows[i].getElementsByTagName('td');
+
+          var k =  thb[0].querySelector("select");
+            console.log(k);
+          if(k != null)
+          {
+            k.setAttribute("name", "attribute" + String(i-1));
+          }
+
+      }
+    }
+
+</script>
+
+</head>
+
+<body style = " background-color: 	#DCDCDC">
+<a href="/profile" class="btn btn-default" style = "font-size: calc(9px + (16-9) * (100vw - 400px)/ (1600-450)); margin-left:19.5%; margin-top: 2%; margin-bottom:1%;"><span class="fa fa-reply "></span> &nbsp; Profile </a>
+  <div class="container" style = "text-align:center">
+  <h1 style = "padding-top: 3%;" > Editable Table Form</h1>
+</div>
+<br>
+  <div id="table" class="table-editable container" style = "text-align:center; background-color:#FFFFF0; padding-top: 2%; overflow-x: auto;">
+    <button id="btnExport" onclick="fnExcelReport();"> EXPORT </button>
+  <button class="table-add-row btn-success" onclick = 'updateRow(), updateAllRows()' > Add Row</button>
+  <button class="table-add-column btn-success" > Add Column </button>
+  <button class="table-delete-column btn-danger" > Delete Column </button>  &nbsp;
+  <br>
+  <form action = "/custom" method = "POST">
+    <br>
+    <div>
+    <label for "groupNumber" style = "float: left; width: 350px;"> Group Number:</label>
+    <input type = "number" name = "groupNumber" placeholder="1" style = "text-align:center; width: 144px; "  required><br>
+    <label for "groupDescription" style  ="float: left; width: 350px;"><b> Group Title</b>:</label>
+      <input type = "text" name = "groupTitle" placeholder="" style = "text-align:center; width: 144px; " required>
+    </div>
+      <% if (messages != "undefined") { %>
+      <% var message = "Duplicate Title!"%>
+      <div class="alert alert-danger"><%= message %></div>
+      <% } %>
+    <br>
+    <br>
+    <br>
+    <table class="table" id ="myTable" >
+      <thead>
+      <tr class = "first-TR" id = "firstTableRow" >
+        <td type = "text" style = "text-align: center;" contenteditable = "false"><b>DATATABLE ID:<b></td>
+        <td style = "text-align: center;" class = "no-delete categoryChooser1 y">
+          <select id = "chooseCategory" name = "category1">
+            <option value="" selected disabled hidden>Choose Category</option>
+          <% for( var i = 0; i < chooseCat.length; i ++) { %>
+            <option value = "<%= chooseCat[i].Description %>" > <%= chooseCat[i].Description %> </option>
+            <% } %>
+          </select>
+        </td>
+
+      </tr>
+    </thead>
+      <!-- This is our clonable table line -->
+      <tbody style = 'white-space: nowrap; '>
+      <tr class="hide">
+        <td style = "text-align: center;" class = "no-delete attributeChooser1 x">
+          <select id = "chooseAttribute" name = "attribute1">
+            <option value="" selected disabled hidden>Choose Attribute</option>
+          <% for( var i = 0; i < chooseAttri.length; i ++) { %>
+            <option value = "<%= chooseAttri[i].Description %>" > <%= chooseAttri[i].Description %> </option>
+            <% } %>
+          </select>
+        </td>
+        <td style = "text-align: center;" class = "no-delete"> <input type = "text" name = "category" placeholder = "undefined" style = "text-align:center"></input></td>
+        <td  class ="no-delete" onclick = "updateAllRows()"><span class="table-remove glyphicon glyphicon-remove" style = "margin-left: 5%;" ></span></td>
+        <td  class = "no-delete"><span class="table-up glyphicon glyphicon-arrow-up" style = "margin-left: 5%;"></span><span class="table-down glyphicon glyphicon-arrow-down" style = "margin-left: 5%;"></span></td>
+
+      </tr>
+    </tbody>
+    </table>
+    <input class="btn btn-warning" id = "submit" type = "submit" value = "Submit">
+    <br>
+    <br>
+  </form>
+
+  </div>
+  <br>
+
+
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
+<script src='https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js'></script>
+
+  <script src = "javascriptsheet/dynamictable.js"></script>
+<script>
+var categoryCounter = 2;
+var attributeCounter =1;
+//Adds column to the table
+$('.table-add-column').click(function(){
+    //finds the td, removes the hide class
+    var $clone = $TABLE.find('td.hide').clone(true).removeClass('hide');
+    var colLength = document.getElementById('firstTableRow').cells.length;
+    var $categoryChooser = $TABLE.find('td.y').clone(true).removeClass("y no-delete");
+    $categoryChooser.find('select').attr('name', "category" + categoryCounter);
+    console.log($categoryChooser.length);
+    //adds the cloned td as a column to the first row
+    $($ACTUALTABLE.find('tr').eq(0).find('td').eq(colLength-1)).after($categoryChooser);
+    categoryCounter ++;
+
+    //goes through each row
+    $ACTUALTABLE.find('tr').each(function(){
+      var currentRow = $(this);
+      var trow = document.getElementById('myTable').rows[0]
+      // trow.index is greater than 2 because it skips the first tr and also a tr that is hidden
+      if(currentRow.index() >0)
+      {
+        //inserts the new column for the current row
+
+        currentRow.find('td').eq(trow.cells.length-2).after('<td id = "firstCol" style = "text-align: center;"> <input type = "text" name = "'+ String(currentRow.index()) + String(trow.cells.length-1) +'"  placeholder = "undefined" style = "text-align:center"> </input></td>');
+      }
+    })
+
+})
+$('.table-add-row').click(function () {
+  var rows = document.getElementById('myTable').rows.length
+  //clones the tr and removes the "hide" class from it so it is visible
+  var $clone = $TABLE.find('tr.hide').clone(true).removeClass('hide table-line');
+  $clone.find('select').attr('name', "attribute" + attributeCounter);
+  attributeCounter++;
+  var rowCounter = $('#firstTableRow td').length;
+  var col = 1;
+  var curRow = 2;
+  for (var x = rowCounter-2; x > 0; x--)
+  { console.log(rowCounter);
+    if( x == rowCounter -1)
+    {
+      col = 1;
+      curRow =2;
+    }
+    //inserts new column into the cloned table row based on size in the right place
+
+      if(col == 1)
+      {
+        $clone.find('td').eq(col).find('input').attr('name', String(rows-1) + String(curRow-1))
+        $clone.find('td').eq(col).after('<td style = "text-align: center;"> <input type = "text" name = "'+ String(rows-1) +  String(curRow) +'"  placeholder = "undefined" style = "text-align:center"></input></td>');
+        col ++;
+        curRow ++;
+      }
+      else
+      {
+        $clone.find('td').eq(col).after('<td style = "text-align: center;"> <input type = "text" name = "'+ String(rows-1) +  String(curRow) +'"  placeholder = "undefined" style = "text-align:center"></input></td>');
+        col ++;
+        curRow++;
+      }
+  }
+  //adds the table row
+  $TABLE.find('table').append($clone);
+});
+</script>
+
+
+</body>
+
+</html>
