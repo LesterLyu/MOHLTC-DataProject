@@ -1,99 +1,100 @@
 <!doctype html>
 <html>
 <head>
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
-  <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
-  <link rel="stylesheet" href="/custom.css"> <!-- custom css -->
-<title>Signup</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <!-- load fontawesome -->
+    <link rel="stylesheet" href="/custom.css"> <!-- custom css -->
+    <title>Signup</title>
 
-<script>
-function saveForm()
-  {
+    <script>
+        function saveForm() {
 
-    if(typeof(Storage) !== "undefined")
-    {
-      sessionStorage.UserName = document.getElementById("userName").value;
-      sessionStorage.FirstNationName = document.getElementById('fnName').value;
-      sessionStorage.ChiefName = document.getElementById('chiefName').value;
-      sessionStorage.ContactName = document.getElementById('contactName').value;
-      sessionStorage.ContactPhone = document.getElementById('contactPhone').value;
-      sessionStorage.ContactEmail = document.getElementById('contactEmail').value;
-    }
+            if (typeof(Storage) !== "undefined") {
+                sessionStorage.UserName = document.getElementById("userName").value;
+                sessionStorage.FirstNationName = document.getElementById('fnName').value;
+                sessionStorage.ChiefName = document.getElementById('chiefName').value;
+                sessionStorage.ContactName = document.getElementById('contactName').value;
+                sessionStorage.ContactPhone = document.getElementById('contactPhone').value;
+                sessionStorage.ContactEmail = document.getElementById('contactEmail').value;
+            }
 
-  }
-</script>
+        }
+    </script>
 </head>
 <body class="signupbody">
-  <div class="container">
+<div class="container">
 
-    <div class = "col-sm-8 col-sm-offset-2 loginBox">
-      <h1><span class="fa fa-sign-in"></span> Sign Up </h1>
+    <div class="col-sm-8 col-sm-offset-2 loginBox">
+        <h1><span class="fa fa-sign-in"></span> Sign Up </h1>
     </div>
-  <div class="col-sm-8 col-sm-offset-2 box">
+    <div class="col-sm-8 col-sm-offset-2 box">
 
-    <% if (message.length > 0) { %>
-        <div class="alert alert-danger"><%= message %></div>
-    <% } %>
-    <% if (message1.length > 0) { %>
-        <div class="alert alert-danger"><%= message1 %></div>
-    <% } %>
-    <form action="/signup" method="post">
-      <div class="form-group">
-      <br/>
-    <label class="signuplabel" for "userName">
-      <b>Username:</b>
-    </label>
-          <input type = "text" class="form-control singupinput" id = "userName" name = "userName">
-      </div>
-      <div class="form-group">
-      <label class="signuplabel">Password:</label>
-          <input type="password" id = "password" class="form-control singupinput" name="password">
+        <% if (message.length > 0) { %>
+            <div class="alert alert-danger"><%= message %></div>
+        <% } %>
+        <% if (message1.length > 0) { %>
+            <div class="alert alert-danger"><%= message1 %></div>
+        <% } %>
+        <form action="/signup" method="post">
+            <div class="form-group">
+                <br/>
+                <label class="signuplabel" for "userName">
+                <b>Username:</b>
+                </label>
+                <input type="text" class="form-control singupinput" id="userName" name="userName">
+            </div>
+            <div class="form-group">
+                <label class="signuplabel">Password:</label>
+                <input type="password" id="password" class="form-control singupinput" name="password">
 
-      </div>
-      <div class="form-group">
-        <label class="signuplabel">Re-enter password:</label>
-          <input type="password" id ="confirm_password" class="form-control singupinput" name="confirm_password" required = "required" oninput = "check(this)">
-          <script language = 'javascript' type = 'text/javascript'>
-          function check(input)
-          {
-            console.log("saysomethingplease!");
-            if(input.value != document.getElementById('password').value)
-            {
-              input.setCustomValidity('Password Must Match');
-            }
-            else
-            {
-              input.setCustomValidity('');
-            }
-          }
-          </script>
-      </div>
-      <fieldset>
-          <label class="signuplabel" for "firstName">First Name: </label>
-        <input type = "text" id = "firstName" name = "firstName" placeholder = "John" class="form-control singupinput"/>
-        <br/>
-          <label class="signuplabel" for "lastName">Last Name: </label>
-        <input type = "text" id = "lastName" name = "lastName" placeholder = "Smith" class="form-control singupinput"/>
-        <br/>
-      </fieldset>
-      <div class="form-group">
-        <label class="signuplabel" for "contactEmail">Email: </label>
-        <input type = "email" id = "contactEmail" name = "contactEmail" placeholder = "contact@DanielZhao.com" class="form-control singupinput"/>
-          <br/>
-        <label class="signuplabel" for "contactPhone">Phone Number: </label>
-        <input type = "number" id = "contactPhone" name = "contactPhone" placeholder = "2269799881" class="form-control singupinput"/>
-      </div>
-      <div class="form-group">
-        <label class="signuplabel"  for "groupNumber">User Group Number: </label>
-        <input type = "number" id = "groupNumber" name = "groupNumber" placeholder = "1" class="form-control singupinput"/>
-      </div>
+            </div>
+            <div class="form-group">
+                <label class="signuplabel">Re-enter password:</label>
+                <input type="password" id="confirm_password" class="form-control singupinput" name="confirm_password"
+                       required="required" oninput="check(this)">
+                <script language='javascript' type='text/javascript'>
+                    function check(input) {
+                        console.log("saysomethingplease!");
+                        if (input.value != document.getElementById('password').value) {
+                            input.setCustomValidity('Password Must Match');
+                        }
+                        else {
+                            input.setCustomValidity('');
+                        }
+                    }
+                </script>
+            </div>
+            <fieldset>
+                <label class="signuplabel" for "firstName">First Name: </label>
+                <input type="text" id="firstName" name="firstName" placeholder="John" class="form-control singupinput"/>
+                <br/>
+                <label class="signuplabel" for "lastName">Last Name: </label>
+                <input type="text" id="lastName" name="lastName" placeholder="Smith" class="form-control singupinput"/>
+                <br/>
+            </fieldset>
+            <div class="form-group">
+                <label class="signuplabel" for "contactEmail">Email: </label>
+                <input type="email" id="contactEmail" name="contactEmail" placeholder="contact@DanielZhao.com"
+                       class="form-control singupinput"/>
+                <br/>
+                <label class="signuplabel" for "contactPhone">Phone Number: </label>
+                <input type="number" id="contactPhone" name="contactPhone" placeholder="2269799881"
+                       class="form-control singupinput"/>
+            </div>
+            <div class="form-group">
+                <label class="signuplabel" for "groupNumber">User Group Number: </label>
+                <input type="number" id="groupNumber" name="groupNumber" placeholder="1"
+                       class="form-control singupinput"/>
+            </div>
 
-      <button type="submit" onclick="saveForm()" class="btn">Next</button>
-      <br/>
-      <br/>
-      <p style = "margin-left: 2%;">Already have an account? <a href="/login">Login</a></p>
-      <p style = "margin-left: 2%;">Or go <a href="/">home</a>.</p>
+            <button type="submit" onclick="saveForm()" class="btn">Next</button>
+            <br/>
+            <br/>
+            <p style="margin-left: 2%;">Already have an account? <a href="/login">Login</a></p>
+            <p style="margin-left: 2%;">Or go <a href="/">home</a>.</p>
 
-  </form>
+        </form>
 </body>
 </html>

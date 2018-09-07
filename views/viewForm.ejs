@@ -2,219 +2,214 @@
 <html>
 <head>
     <title>Your Form</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css"> <!-- load bootstrap css -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css"> <!-- load fontawesome -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <!-- load fontawesome -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <link rel='stylesheet prefetch' href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
+    <link rel='stylesheet prefetch'
+          href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
     <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="/custom.css"> <!-- custom css -->
     <script>
-    function fnExcelReport()
-    {
-        var tab_text="<table border='2px'><tr bgcolor='#87AFC6'>";
-        var textRange; var j=0;
-        tab = document.getElementById('myTable'); // id of table
-        var ths = tab.rows[j].getElementsByTagName('td');
-        console.log(ths[0]);  ;
-        for(j = 0 ; j < tab.rows.length ; j++)
-        {
+        function fnExcelReport() {
+            var tab_text = "<table border='2px'><tr bgcolor='#87AFC6'>";
+            var textRange;
+            var j = 0;
+            tab = document.getElementById('myTable'); // id of table
+            var ths = tab.rows[j].getElementsByTagName('td');
+            console.log(ths[0]);
+            ;
+            for (j = 0; j < tab.rows.length; j++) {
 
 
-            var inputs = tab.rows[j].getElementsByTagName('input');
+                var inputs = tab.rows[j].getElementsByTagName('input');
 
-            for(var i = 0; i < inputs.length; i++)
-            {
-              //adding to the tab_text while inserting the <td> tags with the array of all the input tags
-              tab_text = tab_text + "<td class=\"tdtext\">" + inputs[i].value + "</td>" ;
+                for (var i = 0; i < inputs.length; i++) {
+                    //adding to the tab_text while inserting the <td> tags with the array of all the input tags
+                    tab_text = tab_text + "<td class=\"tdtext\">" + inputs[i].value + "</td>";
+                }
+                tab_text = tab_text + "</tr>";
+
+
             }
-            tab_text=tab_text+"</tr>";
+            //replacing the unwanted columns in the excel chart. kind of a hack where I just go into the tab_text string and remove the columns that contain the glyphicons so the excel sheet doesn't contain it
+            tab_text = tab_text.replace(/<td class="no-delete tdtext"><span class="table-remove glyphicon glyphicon-remove" style="margin-left: 5%;"><\/span><\/td>/g, '');
+            tab_text = tab_text.replace(/<td class="no-delete tdtext"><span class="table-up glyphicon glyphicon-arrow-up" style="margin-left: 5%;"><\/span><span class="table-down glyphicon glyphicon-arrow-down" style="margin-left: 5%;"><\/span><\/td>/g, '');
+            //tab_text=tab_text+"</tr>";
+            tab_text = tab_text + "</table>";
+            console.log(tab_text);
+            tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
+            tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // remove if u want images in your table
 
 
+            var ua = window.navigator.userAgent;
+            var msie = ua.indexOf("MSIE ");
+
+            if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
+            {
+                txtArea1.document.open("txt/html", "replace");
+                txtArea1.document.write(tab_text);
+                txtArea1.document.close();
+                txtArea1.focus();
+                sa = txtArea1.document.execCommand("SaveAs", true, "Say Thanks to Sumit.xls");
+            }
+            else                 //other browser not tested on IE 11
+                sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
+
+            return (sa);
         }
-        //replacing the unwanted columns in the excel chart. kind of a hack where I just go into the tab_text string and remove the columns that contain the glyphicons so the excel sheet doesn't contain it
-        tab_text = tab_text.replace(/<td class="no-delete tdtext"><span class="table-remove glyphicon glyphicon-remove" style="margin-left: 5%;"><\/span><\/td>/g,'');
-        tab_text = tab_text.replace(/<td class="no-delete tdtext"><span class="table-up glyphicon glyphicon-arrow-up" style="margin-left: 5%;"><\/span><span class="table-down glyphicon glyphicon-arrow-down" style="margin-left: 5%;"><\/span><\/td>/g, '');
-        //tab_text=tab_text+"</tr>";
-        tab_text=tab_text+"</table>";
-          console.log(tab_text);
-        tab_text= tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
-        tab_text= tab_text.replace(/<img[^>]*>/gi,""); // remove if u want images in your table
-
-
-        var ua = window.navigator.userAgent;
-        var msie = ua.indexOf("MSIE ");
-
-        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
-        {
-            txtArea1.document.open("txt/html","replace");
-            txtArea1.document.write(tab_text);
-            txtArea1.document.close();
-            txtArea1.focus();
-            sa=txtArea1.document.execCommand("SaveAs",true,"Say Thanks to Sumit.xls");
-        }
-        else                 //other browser not tested on IE 11
-            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
-
-        return (sa);
-    }
 
     </script>
 </head>
-<body style = " background-color: 	#DCDCDC">
-  <div class="container">
-    <a href="/profile" class="btn btn-default" style = " font-size: calc(9px + (16-9) * (100vw - 400px)/ (1600-450)); display: inline-block; margin-top: 2%; margin-bottom:1%;"><span class="fa fa-reply "></span> Back to Profile </a>
-    <div class= "top col-sm-12 well" style= "padding: 1.25% 0.15% 0.65% 1.2%; background-color:#FFFFF0; text-align:center; overflow-x: auto; " >
-      <header class = "header" style = "text-align:center; display: inline-block;"> Form Name: <%=title %></header>
-    <form method = "POST" style = "margin-left: auto; margin-right: auto;">
-      <table  class = "table" id = "myTable">
-        <tr>
+<body style=" background-color: 	#DCDCDC">
+<div class="container">
+    <a href="/profile" class="btn btn-default"
+       style=" font-size: calc(9px + (16-9) * (100vw - 400px)/ (1600-450)); display: inline-block; margin-top: 2%; margin-bottom:1%;"><span
+                class="fa fa-reply "></span> Back to Profile </a>
+    <div class="top col-sm-12 well"
+         style="padding: 1.25% 0.15% 0.65% 1.2%; background-color:#FFFFF0; text-align:center; overflow-x: auto; ">
+        <header class="header" style="text-align:center; display: inline-block;"> Form Name: <%= title %></header>
+        <form method="POST" style="margin-left: auto; margin-right: auto;">
+            <table class="table" id="myTable">
+                <tr>
 
-          <td class="tdtext"> 
-            <input style = "text-align: center; font-weight: bold;" value = "Attribute/Category" readonly >  
-          </td>
-          <td class="tdtext">
-            <input readonly style = "text-align: center; font-weight: bold;" value = "<%= data[0].categoryDesc%>" id= "C-0"> 
-          </td>
-          <% var aID = data[0].AttributeID; var catDescCounter = 1; var attriDescCounter = 1;  %>
-          <% for( var i = 1; i < data.length; i ++) { %>
-              <% if (data[i].AttributeID == aID && (data[i].CategoryID != data[i-1].CategoryID) ) { %>
-                <td class="tdtext">
-                  <input  readonly style = "text-align: center; font-weight: bold;" value = "<%= data[i].categoryDesc %>" id = "<%= "C-" + catDescCounter%>">  
-                </td>
-              <% catDescCounter = catDescCounter +1; } %>
-          <% } %>
-        </tr>
-        <tr>
-      <% for( var i = 0; i < data.length; i ++) { %>
-        <% if(i == 0) { %>
-          <td class="tdtext">
-            <input readonly style="text-align: center; font-weight: bold;" value="<%= data[i].attributeDesc %>" id="A-0">
-          </td>
-          <% } %>
-        <% if(i > 0) { %>
-          <% if (data[i].AttributeID != data[i-1].AttributeID) {  %>
-          </tr>
-          <tr>
-            <td class="tdtext">
-              <input readonly style="text-align: center; font-weight: bold;" value="<%= data[i].attributeDesc %>" id="<%=" A-
-                " + attriDescCounter%>">
-            </td>
-            <%  attriDescCounter = attriDescCounter +1;} %>
-        <%   } %>
-        <%  %>
-          <td class="tdtext">
-            <input style="text-align: center;" value="<%= data[i].Value %>" name="<%=i %>" id="<%=i %>"> 
-          </td>
-      <% } %>
-      <br>
-    </tr>
-  </table>
-  <input class="btn btn-warning" id = "submit" type = "submit" value = "Submit">
-      </form>
-      <button id="btnExport" onclick="fnExcelReport();" style = "margin-top: 2%; margin-bottom: 2%;"> EXPORT </button>
+                    <td class="tdtext">
+                        <input style="text-align: center; font-weight: bold;" value="Attribute/Category" readonly>
+                    </td>
+                    <td class="tdtext">
+                        <input readonly style="text-align: center; font-weight: bold;"
+                               value="<%= data[0].categoryDesc %>" id="C-0">
+                    </td>
+                    <% var aID = data[0].AttributeID; var catDescCounter = 1; var attriDescCounter = 1; %>
+                    <% for( var i = 1; i < data.length; i++) { %>
+                        <% if (data[i].AttributeID == aID && (data[i].CategoryID != data[i - 1].CategoryID) ) { %>
+                            <td class="tdtext">
+                                <input readonly style="text-align: center; font-weight: bold;"
+                                       value="<%= data[i].categoryDesc %>" id="<%= "C-" + catDescCounter %>">
+                            </td>
+                        <% catDescCounter = catDescCounter + 1; } %>
+                    <% } %>
+                </tr>
+                <tr>
+                    <% for( var i = 0; i < data.length; i++) { %>
+                        <% if(i == 0) { %>
+                            <td class="tdtext">
+                                <input readonly style="text-align: center; font-weight: bold;"
+                                       value="<%= data[i].attributeDesc %>" id="A-0">
+                            </td>
+                        <% } %>
+                        <% if(i > 0) { %>
+                            <% if (data[i].AttributeID != data[i - 1].AttributeID) { %>
+                </tr>
+                <tr>
+                    <td class="tdtext">
+                        <input readonly style="text-align: center; font-weight: bold;"
+                               value="<%= data[i].attributeDesc %>" id="<%= " A-
+                                " + attriDescCounter %>">
+                    </td>
+                    <%   attriDescCounter = attriDescCounter +1;}  %>
+                    <% } %>
+                    <%    %>
+                    <td class="tdtext">
+                        <input style="text-align: center;" value="<%= data[i].Value %>" name="<%= i %>" id="<%= i %>">
+                    </td>
+                    <% } %>
+                    <br>
+                </tr>
+            </table>
+            <input class="btn btn-warning" id="submit" type="submit" value="Submit">
+        </form>
+        <button id="btnExport" onclick="fnExcelReport();" style="margin-top: 2%; margin-bottom: 2%;"> EXPORT</button>
     </div>
-  </div>
-  <table id = "newTable" class="table" >
-  <tr class = "hide"></tr>
-  </div>
-    <div class= "container" style= "text-align:center;" >
-        <div class= "top col-sm-12 well" style= "background-color:#FFFFF0; text-align:center; " >
-  <div id = "wrapper">
-    Upload an excel file: <input type = "file" id = "input-excel"/>
-  </div>
-    <button id = "editTable" class = "hide" style = "margin-top: 3%">Click here to transfer the table into the form</button>
 </div>
-</div>
-  <script>
-  var $TABLE = $('#newTable');
-          $('#input-excel').change(function(e){
-                  var reader = new FileReader();
-                  reader.readAsArrayBuffer(e.target.files[0]);
-                  reader.onload = function(e) {
-                          var data = new Uint8Array(reader.result);
-                          var wb = XLSX.read(data,{type:'array'});
-                          var htmlstr = XLSX.write(wb,{sheet:"sheet1", type:'binary',bookType:'html'});
+<table id="newTable" class="table">
+    <tr class="hide"></tr>
+    </div>
+    <div class="container" style="text-align:center;">
+        <div class="top col-sm-12 well" style="background-color:#FFFFF0; text-align:center; ">
+            <div id="wrapper">
+                Upload an excel file: <input type="file" id="input-excel"/>
+            </div>
+            <button id="editTable" class="hide" style="margin-top: 3%">Click here to transfer the table into the form
+            </button>
+        </div>
+    </div>
+    <script>
+        var $TABLE = $('#newTable');
+        $('#input-excel').change(function (e) {
+            var reader = new FileReader();
+            reader.readAsArrayBuffer(e.target.files[0]);
+            reader.onload = function (e) {
+                var data = new Uint8Array(reader.result);
+                var wb = XLSX.read(data, {type: 'array'});
+                var htmlstr = XLSX.write(wb, {sheet: "sheet1", type: 'binary', bookType: 'html'});
 
-                        htmlstr =  htmlstr.replace(/<table>/, '<table id = "oldTable" class = "table"> ');
-                          console.log(htmlstr);
-                          $('#wrapper')[0].innerHTML += htmlstr;
-                          $('#editTable').removeClass('hide');
-                          var table = document.getElementById('oldTable');
-                          var td = table.getElementsByTagName('td');
-                          var maxWidth = 0;
-                          for(var i = 0; i < td.length; i++)
-                          {
-                              if(td[i].offsetWidth > maxWidth)
-                              {
-                                maxWidth = td[i].offsetWidth;
-                              }
-                          }
-                          for(var i = 0; i < td.length; i ++)
-                          {
-                            console.log(maxWidth);
-                            td[i].setAttribute('style', 'width:' + maxWidth + "px");
-                          }
-                  }
-          });
-          $('#editTable').click(function()
-          {
+                htmlstr = htmlstr.replace(/<table>/, '<table id = "oldTable" class = "table"> ');
+                console.log(htmlstr);
+                $('#wrapper')[0].innerHTML += htmlstr;
+                $('#editTable').removeClass('hide');
+                var table = document.getElementById('oldTable');
+                var td = table.getElementsByTagName('td');
+                var maxWidth = 0;
+                for (var i = 0; i < td.length; i++) {
+                    if (td[i].offsetWidth > maxWidth) {
+                        maxWidth = td[i].offsetWidth;
+                    }
+                }
+                for (var i = 0; i < td.length; i++) {
+                    console.log(maxWidth);
+                    td[i].setAttribute('style', 'width:' + maxWidth + "px");
+                }
+            }
+        });
+        $('#editTable').click(function () {
             var currentLetter = 'B';
             var currentNumber = 1;
             var formIndex = 0;
             //check to see if user submitted right-sized excel table/sheet
             var match = true;
-            if((document.getElementById('oldTable').rows[0].cells.length == document.getElementById('myTable').rows[0].cells.length) && (document.getElementById('oldTable').rows.length == document.getElementById('myTable').rows.length))
-            {
-              var totalElements = (document.getElementById('oldTable').rows[0].cells.length -1) * (document.getElementById('oldTable').rows.length -1)
-              // the size of the table matches, now we check the actual contents
-              // I named the input fields numbers that increment by 1 so I could user a for loop to compare its contents with the converted table
-              for(var i = 0; i < document.getElementById('oldTable').rows[0].cells.length-1; i ++ )
-              {
-                //check if categories match or not
-                if(document.getElementById("C-" + i).value == document.getElementById("sjs-" +currentLetter + String(1)).innerHTML)
-                {
-                  console.log("category matched!");
-                  currentLetter = String.fromCharCode(currentLetter.charCodeAt(0) + 1);
+            if ((document.getElementById('oldTable').rows[0].cells.length == document.getElementById('myTable').rows[0].cells.length) && (document.getElementById('oldTable').rows.length == document.getElementById('myTable').rows.length)) {
+                var totalElements = (document.getElementById('oldTable').rows[0].cells.length - 1) * (document.getElementById('oldTable').rows.length - 1)
+                // the size of the table matches, now we check the actual contents
+                // I named the input fields numbers that increment by 1 so I could user a for loop to compare its contents with the converted table
+                for (var i = 0; i < document.getElementById('oldTable').rows[0].cells.length - 1; i++) {
+                    //check if categories match or not
+                    if (document.getElementById("C-" + i).value == document.getElementById("sjs-" + currentLetter + String(1)).innerHTML) {
+                        console.log("category matched!");
+                        currentLetter = String.fromCharCode(currentLetter.charCodeAt(0) + 1);
+                    }
+                    else {
+                        console.log("categories not matched!")
+                        match = false;
+                    }
                 }
-                else
-                {
-                    console.log("categories not matched!")
-                    match = false;
+                //time to check if attributes are equal
+                for (var j = 0; j < document.getElementById('oldTable').rows.length - 1; j++) {
+                    currentLetter = "A";
+                    if (document.getElementById("A-" + j).value == document.getElementById("sjs-" + currentLetter + String(j + 2)).innerHTML) {
+                        console.log("attribute matched!")
+                    }
+                    else {
+                        console.log("attribute not matched!")
+                        match = false;
+                    }
                 }
-              }
-              //time to check if attributes are equal
-              for( var j = 0; j < document.getElementById('oldTable').rows.length-1; j++)
-              {
-                currentLetter = "A";
-                if(document.getElementById("A-" + j).value == document.getElementById("sjs-" + currentLetter + String(j+2)).innerHTML)
-                {
-                  console.log("attribute matched!")
-                }
-                else
-                {
-                  console.log("attribute not matched!")
-                  match = false;
-                }
-              }
             }
-            else
-            {
+            else {
 
             }
-            if(match == true)
-            {
-              for(var i = 1; i < document.getElementById('myTable').rows.length; i ++ )
-              {
-                currentLetter = "B";
-                for(var j = 1; j < document.getElementById('myTable').rows[0].cells.length; j++)
-                {
-                  document.getElementById(formIndex).value = document.getElementById("sjs-" + currentLetter + (i+1)).innerHTML;
-                  currentLetter = String.fromCharCode(currentLetter.charCodeAt(0) + 1);
-                  formIndex ++;
+            if (match == true) {
+                for (var i = 1; i < document.getElementById('myTable').rows.length; i++) {
+                    currentLetter = "B";
+                    for (var j = 1; j < document.getElementById('myTable').rows[0].cells.length; j++) {
+                        document.getElementById(formIndex).value = document.getElementById("sjs-" + currentLetter + (i + 1)).innerHTML;
+                        currentLetter = String.fromCharCode(currentLetter.charCodeAt(0) + 1);
+                        formIndex++;
+                    }
                 }
-              }
             }
-          });
-  </script>
+        });
+    </script>
 </body>
 </html>
