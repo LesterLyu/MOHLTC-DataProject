@@ -1,76 +1,141 @@
 <%- include('./common/header', {title: 'Fill Form'}); -%>
 
-<a href="/profile" class="btn btn-default"
-   style="font-size: calc(9px + (16 - 9) * (100vw - 400px)/ (1600 - 450)); margin-left:19.5%; margin-top: 2%; margin-bottom:1%;"><span
-            class="fa fa-reply "></span> &nbsp; Profile </a>
-<div style="background-color: #FFFFF0; text-align:center;" class="container" id="formDiv">
-    <header class="formheader"> <%= title[0].Title %> Form</header>
-    <br>
-    <br>
-</div>
-<br>
-<div class="container" style="background-color: #FFFFF0; overflow-x: auto; " id="formDiv">
+<div class="container col-sm-12 col-md-12 col-lg-11 col-xl-10 vertical-gap">
+    <a href="profile" class="btn btn-default"><h4><span class="fa fa-reply"></span> Profile</h4></a>
+    <h2 class="text-center"> <%= title[0].Title %> </h2>
+
+    <iframe id="txtArea1" style="display:none"></iframe>
 
     <form method="POST" id="form">
-        <table class="table" id="myTable" style="border: none;">
+        <table class="table table-bordered table-responsive col-md-10" id="table" style="border: none;">
             <tr>
-                <td type="text" style="text-align: center;" contenteditable="false"><b>Attribute/Category<b></td>
+                <th type="text" contenteditable="false">Attribute\Category</th>
                 <% for (var i = 0; i < category.length; i++) { %>
-                    <td style="text-align: center; font-weight: bold;"><b> <input id="<%= "0" + String(i + 1) %>"
-                                                                                  style="text-align:center; font-weight: bold;"
-                                                                                  value='<%= category[i][0].Description %>'
-                                                                                  readonly></b></td>
+                    <th><p id="<%= "0" + String(i + 1) %>"><%= category[i][0].Description %></p></th>
                 <% } %>
             </tr>
             <br>
             <% for (var i = 0; i < attribute.length; i++) { %>
-            <tr>
-                <td style="text-align: center;"><b> <input id="<%= String(i + 1)+ "0" %>"
-                                                           style="text-align:center; font-weight: bold;"
-                                                           value="<%= attribute[i][0].Description %>" readonly> </b>
-                </td>
-                <% for(var j = 0; j < category.length; j++ ) { %>
-                    <td style="text-align: center;"><input name="<%= String(i + 1) + String(j + 1) %>"
-                                                           id="<%= String(i + 1) + String(j + 1) %>" type="text"
-                                                           style="text-align:center;"></td>
-                <% } %>
-            </tr>
+                <tr>
+                    <th><p id="<%= String(i + 1) + "0" %>"> <%= attribute[i][0].Description %></p></th>
+                    <% for(var j = 0; j < category.length; j++ ) { %>
+                        <td contenteditable="true"><p name="<%= String(i + 1) + String(j + 1) %>"
+                                                      id="<%= String(i + 1) + String(j + 1) %>"></p></td>
+                    <% } %>
+                </tr>
             <% } %>
         </table>
-        <input class="btn btn-warning" id="submit" type="submit" value="Submit">
+        <input class="btn btn-outline-primary" id="submit" type="submit" value="Submit">
+        <button class="btn btn-outline-primary" type="button" id="export-btn"> Export</button>
     </form>
-    <button id="btnExport btnExportC" onclick="fnExcelReport();"> EXPORT</button>
-</div>
-<div class="container" style="background-color: #FFFFF0; text-align: center;" id="formDiv">
-    <div id="wrapper">
-        Upload an excel file: <input type="file" id="input-excel"/>
-        <br>
-        <p>Please make sure you select the right excel file and make sure you name your excel sheet "sheet1"</p>
-        <p> Also, please save your excel file as an 'xlsx' file (2007 version or newer)</p>
-    </div>
-    <table id="newTable" class="table">
+
+    <hr>
+
+    Upload an excel file: <input class="btn btn-outline-primary" type="file" id="input-excel"/>
+    <br>
+    <p>Please make sure you select the right excel file and make sure you name your excel sheet
+        "<%= title[0].Title %>"</p>
+    <table id="newTable" class="table table-bordered">
         <tr class="hide"></tr>
+    </table>
+    <p class="hide" id="message1" style="color: red"> Sorry, but the size of the excel file you uploaded does
+        not match the
+        size of the table above </p>
+    <button class="btn btn-outline-info hide" id="editTable" style="margin-top: 3%">Click here to transfer the
+        table into the form
+    </button>
+
 </div>
-<div class="alert hide" id="alert">
+
+<div class="modal fade" id="import-modal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importModalLabel">Import Table</h5>
+            </div>
+            <div class="scroll-x modal-body" id="import-body">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelSaveToForm" data-dismiss="modal">Close
+                </button>
+                <button type="button" class="btn btn-primary" id="saveToForm">Save changes to form</button>
+            </div>
+        </div>
+    </div>
 </div>
-<p class="hide" id="message1" style="color: red"> Sorry, but the size of the excel file you uploaded does not match the
-    size of the table above </p>
-<button id="editTable" class="hide" style="margin-top: 3%">Click here to transfer the table into the form</button>
 
 
-<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+<script src="https://unpkg.com/xlsx/dist/xlsx.core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/TableExport/5.0.2/js/tableexport.min.js"></script>
+
 
 <script>
-    var $TABLE = $('#newTable');
+    // author: Lester Lyu
+    // Table Export instance
+    var instance = $("#table").tableExport({
+        formats: ['xlsx'],
+        exportButtons: false,
+        filename: '<%= title[0].Title %>',
+    });
+    var exportData = instance.getExportData()['table']['xlsx'];
+
+    $('#export-btn').click(function () {
+        instance.export2file(exportData.data, exportData.mimeType, exportData.filename, exportData.fileExtension);
+    });
+
+    // initialize modal
+    $('#import-modal').modal({
+        keyboard: false,
+        show: false,
+        backdrop: 'static',
+    });
+
+    $('#cancelSaveToForm').click(function () {
+        $('#input-excel').val('');
+    });
+
     $('#input-excel').change(function (e) {
+        console.log('change');
         var reader = new FileReader();
         reader.readAsArrayBuffer(e.target.files[0]);
         reader.onload = function (e) {
             var data = new Uint8Array(reader.result);
             var wb = XLSX.read(data, {type: 'array'});
-            var htmlstr = XLSX.write(wb, {sheet: "sheet1", type: 'binary', bookType: 'html'});
+            var htmlstr = XLSX.write(wb, {sheet: "<%= title[0].Title %>", type: 'binary', bookType: 'html'});
+            console.log(htmlstr);
+            var readTable = $($(htmlstr)[2]);
+            readTable.addClass('table table-bordered');
+            console.log(readTable);
+            $('#import-body').html(readTable);
+            $('#import-modal').modal('show');
+        };
+    });
+
+
+
+</script>
+
+<script>
+    var $TABLE = $('#newTable');
+    $('#input-excel2').change(function (e) {
+        var reader = new FileReader();
+        reader.readAsArrayBuffer(e.target.files[0]);
+        reader.onload = function (e) {
+            var data = new Uint8Array(reader.result);
+            var wb = XLSX.read(data, {type: 'array'});
+            var htmlstr = XLSX.write(wb, {sheet: "<%= title[0].Title %>", type: 'binary', bookType: 'html'});
 
             htmlstr = htmlstr.replace(/<table>/, '<table id = "oldTableb" class = "table">');
             console.log(htmlstr);
@@ -143,51 +208,4 @@
         }
     });
 
-    function fnExcelReport() {
-        var tab_text = "<table border='2px'><tr bgcolor='#87AFC6'>";
-        var textRange;
-        var j = 0;
-        tab = document.getElementById('myTable'); // id of table
-        var ths = tab.rows[j].getElementsByTagName('td');
-        console.log(ths[0]);
-        tab_text = tab_text + "<td> <b> Attribute/category </b> </td>";
-        for (j = 0; j < tab.rows.length; j++) {
-
-
-            var inputs = tab.rows[j].getElementsByTagName('input');
-
-            for (var i = 0; i < inputs.length; i++) {
-                //adding to the tab_text while inserting the <td> tags with the array of all the input tags
-                tab_text = tab_text + "<td>" + inputs[i].value + "</td>";
-            }
-            tab_text = tab_text + "</tr>";
-
-
-        }
-        //replacing the unwanted columns in the excel chart. kind of a hack where I just go into the tab_text string and remove the columns that contain the glyphicons so the excel sheet doesn't contain it
-        tab_text = tab_text.replace(/<td class="no-delete"><span class="table-remove glyphicon glyphicon-remove" style="margin-left: 5%;"><\/span><\/td>/g, '');
-        tab_text = tab_text.replace(/<td class="no-delete"><span class="table-up glyphicon glyphicon-arrow-up" style="margin-left: 5%;"><\/span><span class="table-down glyphicon glyphicon-arrow-down" style="margin-left: 5%;"><\/span><\/td>/g, '');
-        //tab_text=tab_text+"</tr>";
-        tab_text = tab_text + "</table>";
-        console.log(tab_text);
-        tab_text = tab_text.replace(/<A[^>]*>|<\/A>/g, "");//remove if u want links in your table
-        tab_text = tab_text.replace(/<img[^>]*>/gi, ""); // remove if u want images in your table
-
-
-        var ua = window.navigator.userAgent;
-        var msie = ua.indexOf("MSIE ");
-
-        if (msie > 0 || !!navigator.userAgent.match(/Trident.*rv\:11\./))      // If Internet Explorer
-        {
-            txtArea1.document.open("txt/html", "replace");
-            txtArea1.document.write(tab_text);
-            txtArea1.document.close();
-            txtArea1.focus();
-            sa = txtArea1.document.execCommand("SaveAs", true, "Say Thanks to Sumit.xls");
-        }
-        else                 //other browser not tested on IE 11
-            sa = window.open('data:application/vnd.ms-excel,' + encodeURIComponent(tab_text));
-
-        return (sa);
-    }
 </script>

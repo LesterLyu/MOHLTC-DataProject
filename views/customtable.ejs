@@ -1,80 +1,81 @@
 <%- include('./common/header', {title: 'Creat Table'}); -%>
 
-<a href="/profile" class="btn btn-default"
-   style="font-size: calc(9px + (16 - 9) * (100vw - 400px)/ (1600 - 450)); margin-left:19.5%; margin-top: 2%; margin-bottom:1%;"><span
-            class="fa fa-reply "></span> &nbsp; Profile </a>
-<div class="container" style="text-align:center">
-    <h1 style="padding-top: 3%;"> Editable Table Form</h1>
+<div class="container col-sm-12 col-md-12 col-lg-12 col-xl-10 vertical-gap">
+    <a href="profile" class="btn btn-default"><h4><span class="fa fa-reply"></span> Profile</h4> </a>
+
+    <div class="container" style="text-align:center">
+        <h1 style="padding-top: 3%;"> Editable Table Form</h1>
+    </div>
+
+    <div id="table" class="table-editable container"
+         style="text-align:center; background-color:#FFFFF0; padding-top: 2%; overflow-x: auto;">
+        <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
+        <button class="table-add-row btn-success" onclick='updateRow(), updateAllRows()'> Add Row</button>
+        <button class="table-add-column btn-success"> Add Column</button>
+        <button class="table-delete-column btn-danger"> Delete Column</button> &nbsp;
+        <br>
+        <form action="/custom" method="POST">
+            <br>
+            <div>
+                <label for="groupNumber" style = "float: left; width: 350px;"> Group Number:</label>
+                <input type="number" name="groupNumber" placeholder="1" style="text-align:center; width: 144px; "
+                       required><br>
+                <label for="groupDescription" style ="float: left; width: 350px;"><b> Group Title</b>:</label>
+                <input type="text" name="groupTitle" placeholder="" style="text-align:center; width: 144px; " required>
+            </div>
+            <% if (messages != "undefined") { %>
+                <% var message = "Duplicate Title!" %>
+                <div class="alert alert-danger"><%= message %></div>
+            <% } %>
+            <br>
+            <br>
+            <br>
+            <table class="table" id="myTable">
+                <thead>
+                <tr class="first-TR" id="firstTableRow">
+                    <td type="text" style="text-align: center;" contenteditable="false"><b>DATATABLE ID:<b></td>
+                    <td style="text-align: center;" class="no-delete categoryChooser1 y">
+                        <select id="chooseCategory" name="category1">
+                            <option value="" selected disabled hidden>Choose Category</option>
+                            <% for( var i = 0; i < chooseCat.length; i++) { %>
+                                <option value="<%= chooseCat[i].Description %>"> <%= chooseCat[i].Description %> </option>
+                            <% } %>
+                        </select>
+                    </td>
+
+                </tr>
+                </thead>
+                <!-- This is our clonable table line -->
+                <tbody style='white-space: nowrap; '>
+                <tr class="hide">
+                    <td style="text-align: center;" class="no-delete attributeChooser1 x">
+                        <select id="chooseAttribute" name="attribute1">
+                            <option value="" selected disabled hidden>Choose Attribute</option>
+                            <% for( var i = 0; i < chooseAttri.length; i++) { %>
+                                <option value="<%= chooseAttri[i].Description %>"> <%= chooseAttri[i].Description %> </option>
+                            <% } %>
+                        </select>
+                    </td>
+                    <td style="text-align: center;" class="no-delete"><input type="text" name="category"
+                                                                             placeholder="undefined"
+                                                                             style="text-align:center"></input></td>
+                    <td class="no-delete" onclick="updateAllRows()"><span class="table-remove glyphicon glyphicon-remove"
+                                                                          style="margin-left: 5%;"></span></td>
+                    <td class="no-delete"><span class="table-up glyphicon glyphicon-arrow-up"
+                                                style="margin-left: 5%;"></span><span
+                                class="table-down glyphicon glyphicon-arrow-down" style="margin-left: 5%;"></span></td>
+
+                </tr>
+                </tbody>
+            </table>
+            <input class="btn btn-warning" id="submit" type="submit" value="Submit">
+            <br>
+            <br>
+        </form>
+
+    </div>
+
 </div>
-<br>
-<div id="table" class="table-editable container"
-     style="text-align:center; background-color:#FFFFF0; padding-top: 2%; overflow-x: auto;">
-    <button id="btnExport" onclick="fnExcelReport();"> EXPORT</button>
-    <button class="table-add-row btn-success" onclick='updateRow(), updateAllRows()'> Add Row</button>
-    <button class="table-add-column btn-success"> Add Column</button>
-    <button class="table-delete-column btn-danger"> Delete Column</button> &nbsp;
-    <br>
-    <form action="/custom" method="POST">
-        <br>
-        <div>
-            <label for="groupNumber" style = "float: left; width: 350px;"> Group Number:</label>
-            <input type="number" name="groupNumber" placeholder="1" style="text-align:center; width: 144px; "
-                   required><br>
-            <label for="groupDescription" style ="float: left; width: 350px;"><b> Group Title</b>:</label>
-            <input type="text" name="groupTitle" placeholder="" style="text-align:center; width: 144px; " required>
-        </div>
-        <% if (messages != "undefined") { %>
-            <% var message = "Duplicate Title!" %>
-            <div class="alert alert-danger"><%= message %></div>
-        <% } %>
-        <br>
-        <br>
-        <br>
-        <table class="table" id="myTable">
-            <thead>
-            <tr class="first-TR" id="firstTableRow">
-                <td type="text" style="text-align: center;" contenteditable="false"><b>DATATABLE ID:<b></td>
-                <td style="text-align: center;" class="no-delete categoryChooser1 y">
-                    <select id="chooseCategory" name="category1">
-                        <option value="" selected disabled hidden>Choose Category</option>
-                        <% for( var i = 0; i < chooseCat.length; i++) { %>
-                            <option value="<%= chooseCat[i].Description %>"> <%= chooseCat[i].Description %> </option>
-                        <% } %>
-                    </select>
-                </td>
-
-            </tr>
-            </thead>
-            <!-- This is our clonable table line -->
-            <tbody style='white-space: nowrap; '>
-            <tr class="hide">
-                <td style="text-align: center;" class="no-delete attributeChooser1 x">
-                    <select id="chooseAttribute" name="attribute1">
-                        <option value="" selected disabled hidden>Choose Attribute</option>
-                        <% for( var i = 0; i < chooseAttri.length; i++) { %>
-                            <option value="<%= chooseAttri[i].Description %>"> <%= chooseAttri[i].Description %> </option>
-                        <% } %>
-                    </select>
-                </td>
-                <td style="text-align: center;" class="no-delete"><input type="text" name="category"
-                                                                         placeholder="undefined"
-                                                                         style="text-align:center"></input></td>
-                <td class="no-delete" onclick="updateAllRows()"><span class="table-remove glyphicon glyphicon-remove"
-                                                                      style="margin-left: 5%;"></span></td>
-                <td class="no-delete"><span class="table-up glyphicon glyphicon-arrow-up"
-                                            style="margin-left: 5%;"></span><span
-                            class="table-down glyphicon glyphicon-arrow-down" style="margin-left: 5%;"></span></td>
-
-            </tr>
-            </tbody>
-        </table>
-        <input class="btn btn-warning" id="submit" type="submit" value="Submit">
-        <br>
-        <br>
-    </form>
-
-</div>
-<br>
 
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
