@@ -1,67 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
+<%- include('./common/header', {title: 'Creat Table'}); -%>
 
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <title>HTML5 Editable Table</title>
-    <link rel='stylesheet prefetch'
-          href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
-    <link rel='stylesheet prefetch' href='https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css'>
-
-    <link rel="stylesheet" href="stylesheets/dynamictablestyle.css">
-    <style>
-        .table {
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .table tbody {
-            overflow-x: auto;
-            white-space: nowrap;
-            vertical-align: top;
-        }
-
-        .table thead {
-            overflow-x: auto;
-            white-space: nowrap;
-            vertical-align: top;
-        }
-    </style>
-
-    <script>
-        function updateRow() {
-            var numberOfRows = document.getElementById('myTable').rows.length;
-
-            var k = document.getElementsByClassName('first-col')
-            for (var i = 0; i < k.length; i++)
-                if (k[i] != null) {
-                    k[i].querySelector("input").setAttribute("name", "Attribute" + String(i + 1));
-                }
-        }
-
-        function updateAllRows() {
-            var ths = document.getElementById('myTable');
-            var allRows = ths.getElementsByTagName('tr')
-            for (var i = 2; i < allRows.length; i++) {
-                var thb = allRows[i].getElementsByTagName('td');
-
-                var k = thb[0].querySelector("select");
-                console.log(k);
-                if (k != null) {
-                    k.setAttribute("name", "attribute" + String(i - 1));
-                }
-
-            }
-        }
-
-    </script>
-
-</head>
-
-<body style=" background-color: 	#DCDCDC">
 <a href="/profile" class="btn btn-default"
-   style="font-size: calc(9px + (16-9) * (100vw - 400px)/ (1600-450)); margin-left:19.5%; margin-top: 2%; margin-bottom:1%;"><span
+   style="font-size: calc(9px + (16 - 9) * (100vw - 400px)/ (1600 - 450)); margin-left:19.5%; margin-top: 2%; margin-bottom:1%;"><span
             class="fa fa-reply "></span> &nbsp; Profile </a>
 <div class="container" style="text-align:center">
     <h1 style="padding-top: 3%;"> Editable Table Form</h1>
@@ -77,10 +17,10 @@
     <form action="/custom" method="POST">
         <br>
         <div>
-            <label for "groupNumber" style = "float: left; width: 350px;"> Group Number:</label>
+            <label for="groupNumber" style = "float: left; width: 350px;"> Group Number:</label>
             <input type="number" name="groupNumber" placeholder="1" style="text-align:center; width: 144px; "
                    required><br>
-            <label for "groupDescription" style ="float: left; width: 350px;"><b> Group Title</b>:</label>
+            <label for="groupDescription" style ="float: left; width: 350px;"><b> Group Title</b>:</label>
             <input type="text" name="groupTitle" placeholder="" style="text-align:center; width: 144px; " required>
         </div>
         <% if (messages != "undefined") { %>
@@ -136,12 +76,11 @@
 </div>
 <br>
 
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 
-<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
-<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js'></script>
-<script src='https://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js'></script>
 <script src='https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore.js'></script>
-
 <script src="javascriptsheet/dynamictable.js"></script>
 <script>
     var categoryCounter = 2;
@@ -204,8 +143,29 @@
         $TABLE.find('table').append($clone);
     });
 </script>
+<script>
+    function updateRow() {
+        var numberOfRows = document.getElementById('myTable').rows.length;
 
+        var k = document.getElementsByClassName('first-col')
+        for (var i = 0; i < k.length; i++)
+            if (k[i] != null) {
+                k[i].querySelector("input").setAttribute("name", "Attribute" + String(i + 1));
+            }
+    }
 
-</body>
+    function updateAllRows() {
+        var ths = document.getElementById('myTable');
+        var allRows = ths.getElementsByTagName('tr')
+        for (var i = 2; i < allRows.length; i++) {
+            var thb = allRows[i].getElementsByTagName('td');
 
-</html>
+            var k = thb[0].querySelector("select");
+            console.log(k);
+            if (k != null) {
+                k.setAttribute("name", "attribute" + String(i - 1));
+            }
+        }
+    }
+
+</script>

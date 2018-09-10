@@ -1,22 +1,7 @@
-<!doctype html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-    <!-- load bootstrap css -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-    <!-- load fontawesome -->
-    <link rel="stylesheet" href="/formStyling.css">
-    <link rel="stylesheet" href="/custom.css"><!-- custom css -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
-    <link rel='stylesheet prefetch'
-          href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
-</head>
+<%- include('./common/header', {title: 'Fill Form'}); -%>
 
-<body class="formbody">
 <a href="/profile" class="btn btn-default"
-   style="font-size: calc(9px + (16-9) * (100vw - 400px)/ (1600-450)); margin-left:19.5%; margin-top: 2%; margin-bottom:1%;"><span
+   style="font-size: calc(9px + (16 - 9) * (100vw - 400px)/ (1600 - 450)); margin-left:19.5%; margin-top: 2%; margin-bottom:1%;"><span
             class="fa fa-reply "></span> &nbsp; Profile </a>
 <div style="background-color: #FFFFF0; text-align:center;" class="container" id="formDiv">
     <header class="formheader"> <%= title[0].Title %> Form</header>
@@ -72,7 +57,11 @@
     size of the table above </p>
 <button id="editTable" class="hide" style="margin-top: 3%">Click here to transfer the table into the form</button>
 
-</table>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
 <script>
     var $TABLE = $('#newTable');
     $('#input-excel').change(function (e) {
@@ -202,5 +191,3 @@
         return (sa);
     }
 </script>
-</body>
-</html>

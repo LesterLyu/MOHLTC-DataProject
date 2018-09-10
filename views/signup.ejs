@@ -1,35 +1,11 @@
-<!doctype html>
-<html>
-<head>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-    <!-- load bootstrap css -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-    <!-- load fontawesome -->
-    <link rel="stylesheet" href="/custom.css"> <!-- custom css -->
-    <title>Signup</title>
+<%- include('./common/header', {title: 'Sign Up'}); -%>
 
-    <script>
-        function saveForm() {
+<div class="container col-sm-8 col-md-6 col-lg-5 col-xl-4 vertical-gap">
 
-            if (typeof(Storage) !== "undefined") {
-                sessionStorage.UserName = document.getElementById("userName").value;
-                sessionStorage.FirstNationName = document.getElementById('fnName').value;
-                sessionStorage.ChiefName = document.getElementById('chiefName').value;
-                sessionStorage.ContactName = document.getElementById('contactName').value;
-                sessionStorage.ContactPhone = document.getElementById('contactPhone').value;
-                sessionStorage.ContactEmail = document.getElementById('contactEmail').value;
-            }
-
-        }
-    </script>
-</head>
-<body class="signupbody">
-<div class="container">
-
-    <div class="col-sm-8 col-sm-offset-2 loginBox">
-        <h1><span class="fa fa-sign-in"></span> Sign Up </h1>
+    <div class="loginBox">
+        <h1><span class="fa fa-sign-in"></span>Sign Up </h1>
     </div>
-    <div class="col-sm-8 col-sm-offset-2 box">
+    <div class="box">
 
         <% if (message.length > 0) { %>
             <div class="alert alert-danger"><%= message %></div>
@@ -40,7 +16,7 @@
         <form action="/signup" method="post">
             <div class="form-group">
                 <br/>
-                <label class="signuplabel" for "userName">
+                <label class="signuplabel" for="userName">
                 <b>Username:</b>
                 </label>
                 <input type="text" class="form-control singupinput" id="userName" name="userName">
@@ -67,34 +43,50 @@
                 </script>
             </div>
             <fieldset>
-                <label class="signuplabel" for "firstName">First Name: </label>
+                <label class="signuplabel" for="firstName">First Name: </label>
                 <input type="text" id="firstName" name="firstName" placeholder="John" class="form-control singupinput"/>
                 <br/>
-                <label class="signuplabel" for "lastName">Last Name: </label>
+                <label class="signuplabel" for="lastName">Last Name: </label>
                 <input type="text" id="lastName" name="lastName" placeholder="Smith" class="form-control singupinput"/>
                 <br/>
             </fieldset>
             <div class="form-group">
-                <label class="signuplabel" for "contactEmail">Email: </label>
+                <label class="signuplabel" for="contactEmail">Email: </label>
                 <input type="email" id="contactEmail" name="contactEmail" placeholder="contact@DanielZhao.com"
                        class="form-control singupinput"/>
                 <br/>
-                <label class="signuplabel" for "contactPhone">Phone Number: </label>
+                <label class="signuplabel" for="contactPhone">Phone Number: </label>
                 <input type="number" id="contactPhone" name="contactPhone" placeholder="2269799881"
                        class="form-control singupinput"/>
             </div>
             <div class="form-group">
-                <label class="signuplabel" for "groupNumber">User Group Number: </label>
+                <label class="signuplabel" for="groupNumber">User Group Number: </label>
                 <input type="number" id="groupNumber" name="groupNumber" placeholder="1"
                        class="form-control singupinput"/>
             </div>
 
-            <button type="submit" onclick="saveForm()" class="btn">Next</button>
+            <button type="submit" onclick="saveForm()" class="btn btn-primary">Next</button>
             <br/>
-            <br/>
+            <hr/>
             <p style="margin-left: 2%;">Already have an account? <a href="/login">Login</a></p>
             <p style="margin-left: 2%;">Or go <a href="/">home</a>.</p>
 
         </form>
-</body>
-</html>
+        <script>
+            function saveForm() {
+
+                if (typeof(Storage) !== "undefined") {
+                    sessionStorage.UserName = document.getElementById("userName").value;
+                    sessionStorage.FirstNationName = document.getElementById('fnName').value;
+                    sessionStorage.ChiefName = document.getElementById('chiefName').value;
+                    sessionStorage.ContactName = document.getElementById('contactName').value;
+                    sessionStorage.ContactPhone = document.getElementById('contactPhone').value;
+                    sessionStorage.ContactEmail = document.getElementById('contactEmail').value;
+                }
+
+            }
+        </script>
+    </div>
+</div>
+
+<%- include('./common/footer'); -%>

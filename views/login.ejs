@@ -1,21 +1,10 @@
-<!-- views/login.ejs -->
-<!doctype html>
-<html>
-<head>
-    <meta name="viewport" content="width=device-width, initial-scale=2.0">
-    <title>Login</title>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-    <!-- load bootstrap css -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-    <!-- load fontawesome -->
-    <link rel="stylesheet" href="/custom.css"><!-- custom css -->
-</head>
-<body class="loginbody">
-<div class="container">
-    <div class="col-sm-8 col-sm-offset-2 loginBox">
-        <h1 class="loginText"><span class="fa fa-sign-in"></span> Login</h1>
+<%- include('./common/header', {title: 'Log In'}); -%>
+
+<div class="container col-sm-8 col-md-6 col-lg-5 col-xl-4 vertical-gap">
+    <div class="loginBox">
+        <h1><span class="fa fa-sign-in"></span>Login</h1>
     </div>
-    <div class="col-sm-8 col-sm-offset-2 box">
+    <div class="box">
         <!-- show any messages that come back with authentication -->
         <% if (message.length > 0) { %>
             <div class="alert alert-danger"><%= message %></div>
@@ -33,7 +22,7 @@
                 <input type="password" class="form-control" name="password">
             </div>
 
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn btn-primary">Login</button>
         </form>
 
         <hr>
@@ -45,5 +34,4 @@
     </div>
 
 </div>
-</body>
-</html>
+<%- include('./common/footer'); -%>

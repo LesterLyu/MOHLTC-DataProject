@@ -59,7 +59,7 @@ module.exports = function (app, passport) {
     app.get('/signup', function (req, res) {
         //DEBUGGING
         console.log("app get /signup");
-        console.log(req.body);
+        //console.log(req.body);
         console.log("ABOVE IS APP.GET SIGNUP ^^^^^!!!");
         res.render('signup.ejs', {message: req.flash('signupMessage'), message1: req.flash('signupMessage1')});
     });
@@ -130,7 +130,7 @@ module.exports = function (app, passport) {
                 console.log(filledFormTitle);
                 console.log("hola");
                 console.log("filledFormTitle")
-                res.render('Profile.ejs',
+                res.render('profile.ejs',
                     {
                         user: req.user,
                         unfilledForms: formData,
