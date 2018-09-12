@@ -6,20 +6,13 @@
         <h1><span class="fa fa-sign-in"></span>Sign Up </h1>
     </div>
     <div class="box">
-
-        <% if (message.length > 0) { %>
-            <div class="alert alert-danger"><%= message %></div>
-        <% } %>
-        <% if (message1.length > 0) { %>
-            <div class="alert alert-danger"><%= message1 %></div>
-        <% } %>
-        <form action="/signup" method="post">
+        <form action="/api/signup" method="post">
             <div class="form-group">
                 <br/>
                 <label class="signuplabel" for="userName">
-                <b>Username:</b>
+                Username:
                 </label>
-                <input type="text" class="form-control singupinput" id="userName" name="userName">
+                <input type="text" class="form-control singupinput" id="username" name="username">
             </div>
             <div class="form-group">
                 <label class="signuplabel">Password:</label>
@@ -52,11 +45,11 @@
             </fieldset>
             <div class="form-group">
                 <label class="signuplabel" for="contactEmail">Email: </label>
-                <input type="email" id="contactEmail" name="contactEmail" placeholder="contact@DanielZhao.com"
+                <input type="email" id="email" name="email" placeholder="lester.lyu@ontario.com"
                        class="form-control singupinput"/>
                 <br/>
                 <label class="signuplabel" for="contactPhone">Phone Number: </label>
-                <input type="number" id="contactPhone" name="contactPhone" placeholder="2269799881"
+                <input type="number" id="phoneNumber" name="phoneNumber" placeholder="2269799881"
                        class="form-control singupinput"/>
             </div>
             <div class="form-group">
@@ -65,27 +58,14 @@
                        class="form-control singupinput"/>
             </div>
 
-            <button type="submit" onclick="saveForm()" class="btn btn-primary">Next</button>
+            <button type="submit" class="btn btn-primary">Next</button>
             <br/>
             <hr/>
             <p style="margin-left: 2%;">Already have an account? <a href="/login">Login</a></p>
             <p style="margin-left: 2%;">Or go <a href="/">home</a>.</p>
 
         </form>
-        <script>
-            function saveForm() {
 
-                if (typeof(Storage) !== "undefined") {
-                    sessionStorage.UserName = document.getElementById("userName").value;
-                    sessionStorage.FirstNationName = document.getElementById('fnName').value;
-                    sessionStorage.ChiefName = document.getElementById('chiefName').value;
-                    sessionStorage.ContactName = document.getElementById('contactName').value;
-                    sessionStorage.ContactPhone = document.getElementById('contactPhone').value;
-                    sessionStorage.ContactEmail = document.getElementById('contactEmail').value;
-                }
-
-            }
-        </script>
     </div>
 </div>
 

@@ -4,11 +4,14 @@ const passportLocalMongoose = require('passport-local-mongoose');
 let userSchema = new mongoose.Schema({
     username: {type: String, unique: true}, //key
     password: {type: String, required: true},
+    firstName: String,
+    lastName: String,
     createDate: {type: Date, default: Date.now },
     phoneNumber: String,
     validated: Boolean,
     type: {type: Number, required: true}, // system admin=0, form manager=1, user=2
     email: {type: String, unique: true},
+    groupNumber: Number,
     active: Boolean, // you can disable a user
 
 });

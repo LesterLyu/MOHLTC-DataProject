@@ -24,6 +24,9 @@ module.exports = {
                 // all good
                 let newUser = new User({
                     username: req.body.username,
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    groupNumber: req.body.groupNumber,
                     phoneNumber: req.body.phoneNumber,
                     validated: false,
                     type: 2, // system admin=0, form manager=1, user=2
@@ -33,6 +36,7 @@ module.exports = {
                     if (err) {
                         res.json({success: false, message: err});
                     }
+                    console.log('success sign up');
                     // authenticate the user right after registration
                     passport.authenticate('local')(req, res, function () {
                         res.json({success: true, redirect: '/profile'});
