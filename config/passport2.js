@@ -4,12 +4,19 @@
 var LocalStrategy = require('passport-local').Strategy;
 var query = require('../models/query');
 var loginquery = require('../models/loginquery');
+const User = require('../models/user'); // Mongoose model
+
 
 
 module.exports = function (passport) {
 // =========================================================================
 // passport session setup ==================================================
 // =========================================================================
+
+
+
+
+
 
 // REQUIRED for persistent login sessions
 
@@ -41,9 +48,16 @@ module.exports = function (passport) {
 // we are using named strategies since we have one for login and one for signup
 // by default, if there was no name, it would just be called 'local'
     passport.use('local-signup', new LocalStrategy(
-        function (userName, password, done) {
+        {
+            //by default, local strategy uses username and password, we will override with email
+            usernameField: 'userName',
+            passwordField: 'password',
+            passReqToCallback: true // allows us to pass back the entire request to the callback
+        },
+        function (req, userName, password, done) {
             console.log(" ---------------- PASSPORT REQUEST ---------------------");
-
+            //console.log(req);
+            console.log(" -------------------------------------------------------");
 
             //asynchronuous :P
             //User.findOne won't fire unless data is sent back

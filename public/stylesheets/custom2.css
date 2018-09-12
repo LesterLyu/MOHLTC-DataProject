@@ -19,9 +19,17 @@
     overflow-y: scroll;
 }
 
-.table {
-    border-radius: 5px;
-    width: 50%;
-    margin: 0px auto;
-    float: none;
+/*.table {*/
+/*border-radius: 5px;*/
+/*width: 50%;*/
+/*margin: 0px auto;*/
+/*float: none;*/
+/*}*/
+.fill-table {
+    display: inline-block;
+    border: none;
+}
+
+.table-container {
+    text-align:center;
 }

@@ -13,11 +13,14 @@
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "formidable": "^1.2.1",
+    "mongodb": "^3.1.4",
+    "mongoose": "^5.2.14",
     "morgan": "^1.9.0",
     "mysql": "^2.16.0",
     "nodemailer": "^4.6.8",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^5.0.1",
     "path": "^0.12.7",
     "xlsx": "^0.12.13"
   },
@@ -27,17 +30,18 @@
   },
   "devDependencies": {},
   "scripts": {
+    "run": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mzhao123/DataProject.git"
+    "url": "git+https://github.com/LesterLyu/MOHLTC-DataProject.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mzhao123/DataProject/issues"
+    "url": "https://github.com/LesterLyu/MOHLTC-DataProject/issues"
   },
-  "homepage": "https://github.com/mzhao123/DataProject#readme"
+  "homepage": "https://github.com/LesterLyu/MOHLTC-DataProject#readme"
 }
