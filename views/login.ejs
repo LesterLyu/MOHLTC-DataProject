@@ -5,14 +5,10 @@
         <h1><span class="fa fa-sign-in"></span>Login</h1>
     </div>
     <div class="box">
-        <!-- show any messages that come back with authentication -->
-        <% if (message.length > 0) { %>
-            <div class="alert alert-danger"><%= message %></div>
-        <% } %>
 
         <br/>
         <!-- LOGIN FORM -->
-        <form action="/login" method="post">
+        <form action="/api/login" method="post">
             <div class="form-group">
                 <label class="loginlabel">Username:</label>
                 <input type="text" class="form-control" name="userName">

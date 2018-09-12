@@ -4,30 +4,59 @@ const user_controller = require('../controller/user');
 let router = express.Router();
 
 
-router.get("/login", function (req, res) {
-    console.log("app get '/login'");
-    res.render('login.ejs', {message: req.flash('loginMessage')});
+// =====================================
+// LOGIN =============================
+// =====================================
+router.get('/login', function (req, res) {
+    res.render('login.ejs');
 });
 
-router.post("/login", passport.authenticate('local-login',
-    {
-        successRedirect: '/profile',
-        failureRedirect: '/login',
-        failureFlash: true //flash messages are allowed
-    }));
-// =====================================
-// SIGNUP ==============================
-// =====================================
 router.get('/signup', function (req, res) {
-    //DEBUGGING
-    console.log("app get /signup");
-    //console.log(req.body);
-    console.log("ABOVE IS APP.GET SIGNUP ^^^^^!!!");
-    res.render('signup.ejs', {message: req.flash('signupMessage'), message1: req.flash('signupMessage1')});
+    res.render('signup.ejs');
 });
 
 
-router.get('/validate', isLoggedIn, function (req, res) {
+// New code by Lester
+// POST request for user sign up
+router.post('api/signup', user_controller.user_sign_up);
+
+router.post('api/signin', user_controller.user_sign_in);
+
+// check authentication middleware
+router.use((req, res, next) => {
+    if (!req.isAuthenticated()) {
+        res.status(401).json({
+            success: false,
+            message: 'You need to be authenticated to access this page!'
+        })
+    }
+});
+
+// =====================================
+// PROFILE =============================
+// =====================================
+router.get('/profile', function (req, res) {
+    console.log("/GET PROFILE");
+    //Check user
+    console.log(req.user);
+    var query = require('../models/query.js');
+    var displayTables = require('../models/formRetriever.js');
+    displayTables.getFormIndex(req.user, function (formData) {
+        displayTables.getFilledForms(req.user, function (filledFormTitle) {
+            console.log(filledFormTitle);
+            console.log("hola");
+            console.log("filledFormTitle");
+            res.render('profile.ejs',
+                {
+                    user: req.user,
+                    unfilledForms: formData,
+                    filledForms: filledFormTitle
+                });
+        });
+    });
+});
+
+router.get('/validate', function (req, res) {
     console.log("app get /validation-required");
     var query = require('../models/query');
     var loginquery = require('../models/loginquery.js');
@@ -57,47 +86,6 @@ router.get('/validate-now', function (req, res) {
     var tokenAuthen = require('../models/tokenauth');
     tokenAuthen.checkToken(res, req);
 });
-// =====================================
-// LOGIN =============================
-// =====================================
-router.get('/login', function (req, res) {
-    console.log("app get '/login'");
-    res.render('login.ejs', {message: req.flash('loginMessage')});
-});
-
-router.post('/login', passport.authenticate('local-login',
-    {
-        successRedirect: '/profile',
-        failureRedirect: '/login',
-        failureFlash: true //allow flash messages
-    }));
-
-// =====================================
-// PROFILE =============================
-// =====================================
-app.get('/profile', isLoggedIn, function (req, res) {
-    console.log("/GET PROFILE");
-    //Check user
-    console.log(req.user);
-    var query = require('../models/query.js');
-    var displayTables = require('../models/formRetriever.js');
-    displayTables.getFormIndex(req.user, function (formData) {
-        displayTables.getFilledForms(req.user, function (filledFormTitle) {
-            console.log(filledFormTitle);
-            console.log("hola");
-            console.log("filledFormTitle");
-            res.render('profile.ejs',
-                {
-                    user: req.user,
-                    unfilledForms: formData,
-                    filledForms: filledFormTitle
-                });
-        });
-    });
-});
-
-// New code by Lester
-// POST request for user sign up
-router.post('/signup', user_controller.user_sign_up);
 
 
+module.exports = router;

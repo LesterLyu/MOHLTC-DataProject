@@ -30,6 +30,8 @@ const config = require('./config/config');
 
 const usersRouter = require('./routes/users');
 
+const User = require('./models/user');
+
 require('./config/passport')(passport); // pass passport for configuration
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -86,9 +88,11 @@ pool.getConnection(function (err, connection) {
 http.createServer(app).listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
 });
-index(app, passport);
 
 app.use('/users', usersRouter);
+
+
+index(app, passport);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
