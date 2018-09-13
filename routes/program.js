@@ -108,7 +108,7 @@ module.exports = function (app, passport) {
         //declare all the requires
         var query = require('../models/query');
         var loginquery = require('../models/loginquery.js');
-        var mail = require('../models/sendMail.js');
+        var mail = require('../controller/sendmail.js');
         var userEmail = req.body.userEmail;
         query.newQuery("SELECT * FROM user WHERE user.email = '" + userEmail + "'  ;", function (err, emailLength) {
             if (emailLength.length < 1) {

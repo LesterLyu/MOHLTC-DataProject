@@ -28,6 +28,8 @@ const flash = require('connect-flash');
 
 const config = require('./config/config');
 
+const indexRouter = require('./routes/index');
+
 const usersRouter = require('./routes/users');
 
 const User = require('./models/user');
@@ -89,12 +91,9 @@ http.createServer(app).listen(app.get('port'), function () {
 });
 
 // home page
-app.get("/", function (req, res) {
-    res.render('index.ejs');
-});
-
-
-app.use('/', usersRouter);
+app.use('/', indexRouter);
+// user authentication related
+app.use('/', usersRouter); // API or pages below this requires authentication
 // api endpoints that need authentication
 
 

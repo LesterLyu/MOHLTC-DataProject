@@ -1,6 +1,7 @@
 const express = require('express');
 const passport = require('passport');
 const user_controller = require('../controller/user');
+const jwt = require("jsonwebtoken");
 let router = express.Router();
 
 
@@ -16,11 +17,13 @@ router.get('/signup', function (req, res) {
 });
 
 
-// New code by Lester
 // POST request for user sign up
 router.post('/api/signup', user_controller.user_sign_up);
 
 router.post('/api/login', user_controller.user_log_in);
+
+// validate account
+router.get('/validate/:token', user_controller.user_validate);
 
 // check authentication middleware
 router.use((req, res, next) => {
@@ -37,7 +40,21 @@ router.use((req, res, next) => {
     }
 });
 
+router.get('/validate-now', function (req, res) {
+    res.render('tobevalidated.ejs');
+});
+
+// // check account validation middleware
+router.use((req, res, next) => {
+
+    if (!req.session.user.validated) {
+        return res.redirect('/validate-now');
+    }
+    next();
+});
+
 router.post('/api/logout', user_controller.user_log_out);
+
 
 // =====================================
 // PROFILE =============================
@@ -61,37 +78,6 @@ router.get('/profile', function (req, res) {
                 });
         });
     });
-});
-
-router.get('/validate', function (req, res) {
-    console.log("app get /validation-required");
-    var query = require('../models/query');
-    var loginquery = require('../models/loginquery.js');
-    var mail = require('../models/sendMail.js');
-
-    //Now, let's generate a token
-    loginquery.generateTokenObject(req.user.ID, 10, function (tokenObject) {
-        console.log(tokenObject);
-        query.newQuery("INSERT INTO token (UserId, TokenContent, Expiry) VALUES (" + tokenObject.ID + ", '" + tokenObject.token + "', '" + tokenObject.expiry + "');", function (err, data) {
-            console.log("SUCCESS!");
-            console.log(data);
-        });
-        console.log("Let's asynchronously also send the email");
-        console.log(req.user.email);
-        mail.sendFromHaodasMail(req.user.email, "First Nations Online Income Reports: User Validation Required!",
-            "Please click on the following link: \n https://genericdataappexp.azurewebsites.net/validate-now?tok=" + tokenObject.token + " to validate yourself: "
-        );
-    });
-    res.render('tobevalidated.ejs');
-});
-// =====================================
-// Validation ==========================
-// =====================================
-router.get('/validate-now', function (req, res) {
-    console.log(req.query.tok);
-    var query = require('../models/query');
-    var tokenAuthen = require('../models/tokenauth');
-    tokenAuthen.checkToken(res, req);
 });
 
 
