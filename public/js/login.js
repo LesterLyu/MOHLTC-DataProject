@@ -1,27 +1,20 @@
-/*  ======== User login =================  */
-function login(){
-
-    const data = {
-        "username": $("#username").val(),
-        "password": $("#password").val()
-    };
-
+$("#loginForm").submit(function(e) {
+    e.preventDefault();
     $.ajax({
         url: '/api/login',
-        method: "POST",
-        contentType:"application/json; charset=utf-8",
-        data: JSON.stringify(data),
+        type: 'POST',
+        data: $('#loginForm').serialize(),
     }).done(function (response) {
         if(response.success) {
             console.log(response);
             window.location.href = response.redirect;
         }
     }).fail(function(xhr, status, error) {
+        console.log('fail');
         showModalAlert('Login Error', xhr.responseJSON.message.message);
     });
-}
+});
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
-
 }
