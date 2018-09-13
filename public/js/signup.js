@@ -1,9 +1,9 @@
-$("#loginForm").submit(function(e) {
+$("#signupForm").submit(function(e) {
     e.preventDefault();
     $.ajax({
-        url: '/api/login',
+        url: '/api/signup',
         type: 'POST',
-        data: $('#loginForm').serialize(),
+        data: $('#signupForm').serialize(),
     }).done(function (response) {
         if(response.success) {
             console.log(response);

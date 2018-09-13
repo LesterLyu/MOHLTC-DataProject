@@ -1,7 +1,5 @@
 var nodeMailer = require('nodemailer');
 
-var express = require('express'); //idk how useful this is. DELETE if unnecessary
-
 var smtpTransport = nodeMailer.createTransport({
     service: "gmail", //hostname
     host: "smtp.gmail.com",
@@ -38,4 +36,4 @@ module.exports = {
             callback();
         });
     }
-}
+};

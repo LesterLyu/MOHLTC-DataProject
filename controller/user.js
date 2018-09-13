@@ -15,7 +15,7 @@ module.exports = {
                 return res.json({success: false, message: err});
             }
             if (user) {
-                return res.status(401).json({success: false, message: 'Username taken.'});
+                return res.status(400).json({success: false, message: 'Username taken.'});
             }
             User.findOne({email: req.body.email}, (err, user) => {
                 if (err) {
@@ -23,10 +23,10 @@ module.exports = {
                     return res.json({success: false, message: err});
                 }
                 if (user) {
-                    return res.status(401).json({success: false, message: 'Email taken.'});
+                    return res.status(400).json({success: false, message: 'Email taken.'});
                 }
                 if (!is_email(req.body.email)) {
-                    return res.status(401).json({success: false, message: 'Email format error.'});
+                    return res.status(400).json({success: false, message: 'Email format error.'});
                 }
                 // all good
                 let newUser = new User({
@@ -67,7 +67,7 @@ module.exports = {
                     return next(err);
                 }
                 if (!user) {
-                    return res.status(401).json({success: false, message: info})
+                    return res.status(401).json({success: false, message: info.message})
                 }
                 req.logIn(user, function (err) {
                     if (err) {
