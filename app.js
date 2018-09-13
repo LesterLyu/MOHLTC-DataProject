@@ -6,8 +6,6 @@ const app = express();
 
 const path = require('path');
 
-const index = require('./Routes/program.js');
-
 const mysql = require('mysql');
 
 const mongoose = require('mongoose');

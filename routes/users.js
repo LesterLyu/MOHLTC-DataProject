@@ -29,10 +29,7 @@ router.get('/validate/:token', user_controller.user_validate);
 router.use((req, res, next) => {
 
     if (!req.isAuthenticated()) {
-        return res.status(401).json({
-            success: false,
-            message: 'You need to be authenticated to access this page!'
-        })
+        return res.redirect('/login');
     }
     else {
         console.log('Authenticated');
@@ -40,9 +37,11 @@ router.use((req, res, next) => {
     }
 });
 
+router.get('/send-validation-email', user_controller.user_send_validation_email);
+
 router.get('/validate-now', function (req, res) {
     if (req.session.user.validated) {
-        return res.redirect('/profile');
+        return res.redirect('/login');
     }
     res.render('tobevalidated.ejs');
 });
@@ -58,11 +57,13 @@ router.use((req, res, next) => {
 
 router.post('/api/logout', user_controller.user_log_out);
 
-
+router.get('/profile', function (req, res) {
+    res.json(req.session.user);
+});
 // =====================================
 // PROFILE =============================
 // =====================================
-router.get('/profile', function (req, res) {
+router.get('/profile2', function (req, res) {
     console.log("/GET PROFILE");
     //Check user
     console.log(req.user);

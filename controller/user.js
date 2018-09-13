@@ -116,9 +116,9 @@ module.exports = {
 
     user_send_validation_email: (req, res, next) => {
         // create token and sent by email
-        const token = generateToken(req.body.username, 60);
-        sendMail.sendValidationEmail(req.body.email, token, (info) => {
-            return res.redirect('/');
+        const token = generateToken(req.session.user.username, 60);
+        sendMail.sendValidationEmail(req.session.user.email, token, (info) => {
+            return res.redirect('/validate-now');
         });
     },
 
@@ -141,7 +141,7 @@ module.exports = {
                                     return next(err);
                                 }
                                 // good
-                                return res.redirect('/profile');
+                                return res.redirect('/login');
                             });
 
                         }
