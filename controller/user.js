@@ -9,17 +9,24 @@ function is_email(email) {
 module.exports = {
     user_sign_up: (req, res, next) => {
         // check if email is taken (passport will check other errors, i.e. username taken)
-        User.findOne({email: req.body.email}, (err, email) => {
+        User.findOne({username: req.body.username}, (err, user) => {
             if (err) {
                 console.log(err);
-                res.json({success: false, message: err});
+                return res.json({success: false, message: err});
             }
-            if (email) {
-                res.json({success: false, message: 'Email taken.'});
+            if (user) {
+                return res.json({success: false, message: 'Username taken.'});
             }
-            else {
-                if (is_email(req.body.email)) {
-                    res.json({success: false, message: 'Email format error.'});
+            User.findOne({email: req.body.email}, (err, user) => {
+                if (err) {
+                    console.log(err);
+                    return res.json({success: false, message: err});
+                }
+                if (user) {
+                    return res.json({success: false, message: 'Email taken.'});
+                }
+                if (!is_email(req.body.email)) {
+                    return res.json({success: false, message: 'Email format error.'});
                 }
                 // all good
                 let newUser = new User({
@@ -34,41 +41,51 @@ module.exports = {
                 });
                 User.register(newUser, req.body.password, (err, user) => {
                     if (err) {
-                        res.json({success: false, message: err});
+                        return res.json({success: false, message: err});
                     }
                     console.log('success sign up');
-                    // authenticate the user right after registration
-                    passport.authenticate('local')(req, res, function () {
-                        res.json({success: true, redirect: '/profile'});
-                    });
-                })
-            }
-        })
+                    return res.json({success: true, redirect: '/'});
+
+                });
+            });
+
+        });
 
     },
 
     user_log_out: (req, res) => {
+        console.log('logout');
         req.logout();
-        req.json({success: true, redirect: '/'})
+        return res.json({success: true, redirect: '/'})
     },
 
-    user_sign_in: (req, res, next) => {
-        passport.authenticate('local', (err, user, info) => {
-            if (err) {
-                res.json({success: false, message: err + info});
-            }
+    user_log_in:
+        (req, res, next) => {
+            console.log('sign in');
+            passport.authenticate('local', function (err, user, info) {
+                if (err) {
+                    return next(err);
+                }
+                if (!user) {
+                    return res.json({success: false, message: info})
+                }
+                req.logIn(user, function (err) {
+                    if (err) {
+                        return next(err);
+                    }
 
-        });
-        req.session.save((err) => {
-            if (err) {
-                res.json({success: false, message: err});
-            }
-            res.json({success: true, redirect: '/profile'});
-        })
-    },
+                    return res.json({success: true, username: user.username})
+                });
+            })(req, res, next);
 
-    user_validate: (req, res, next) => {
+            //res.json({success: true, username: req.username})
 
-    },
+        },
 
-};
+    user_validate:
+        (req, res, next) => {
+
+        },
+
+}
+;

@@ -18,19 +18,26 @@ router.get('/signup', function (req, res) {
 
 // New code by Lester
 // POST request for user sign up
-router.post('api/signup', user_controller.user_sign_up);
+router.post('/api/signup', user_controller.user_sign_up);
 
-router.post('api/signin', user_controller.user_sign_in);
+router.post('/api/login', user_controller.user_log_in);
 
 // check authentication middleware
 router.use((req, res, next) => {
+
     if (!req.isAuthenticated()) {
-        res.status(401).json({
+        return res.status(401).json({
             success: false,
             message: 'You need to be authenticated to access this page!'
         })
     }
+    else {
+        console.log('Authenticated');
+        next();
+    }
 });
+
+router.post('/api/logout', user_controller.user_log_out);
 
 // =====================================
 // PROFILE =============================
