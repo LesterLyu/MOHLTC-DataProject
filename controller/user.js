@@ -118,7 +118,7 @@ module.exports = {
         // create token and sent by email
         const token = generateToken(req.body.username, 60);
         sendMail.sendValidationEmail(req.body.email, token, (info) => {
-            return res.json({success: true, redirect: '/validate-now'});
+            return res.redirect('/');
         });
     },
 

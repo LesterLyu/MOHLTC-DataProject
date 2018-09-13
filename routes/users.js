@@ -41,6 +41,9 @@ router.use((req, res, next) => {
 });
 
 router.get('/validate-now', function (req, res) {
+    if (req.session.user.validated) {
+        return res.redirect('/profile');
+    }
     res.render('tobevalidated.ejs');
 });
 
