@@ -14,4 +14,10 @@ router.post('/filled-workbook', workbookController.create_workbook);
 // DELETE Delete filled workbook
 router.delete('/filled-workbook', workbookController.create_workbook);
 
+// GET Find all workbooks in current group
+router.get('/workbooks', workbookController.get_workbooks);
+
+// GET Find all filled workbooks in current group for a user
+router.get('/filled-workbooks', workbookController.get_filled_workbooks);
+
 module.exports = router;

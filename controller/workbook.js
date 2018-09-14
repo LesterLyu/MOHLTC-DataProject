@@ -91,6 +91,29 @@ module.exports = {
         })
     },
 
+    get_workbooks: (req, res, next) => {
+        const groupNumber = req.session.user.groupNumber;
+        Workbook.find({groupNumber: groupNumber}, 'name', (err, workbooks) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            return res.json({success: true, workbooks: workbooks});
+        })
+    },
+
+    get_filled_workbooks: (req, res, next) => {
+        const username = req.session.user.username;
+        const groupNumber = req.session.user.groupNumber;
+        FilledWorkbook.find({username: username, groupNumber: groupNumber}, 'name', (err, filledWorkbooks) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            return res.json({success: true, filledWorkbooks: filledWorkbooks});
+        })
+    }
+
 
 }
 ;
