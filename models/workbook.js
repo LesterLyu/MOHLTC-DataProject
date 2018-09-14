@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
 let workbookSchema = new mongoose.Schema({
-    title: {type: String, unique: true},
+    name: {type: String},
     // category: [String],
     // attribute: [String],
+    groupNumber: {type: Number, required: true},
     data: {}, // reserved for table with populated data
 });
 module.exports = mongoose.model('Attribute', workbookSchema);

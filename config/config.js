@@ -10,6 +10,6 @@ module.exports = {
             pass: "password"
         }
     },
-    serverHostname: "http://localhost:3000", //used for receive validation link
+    serverHostname: "http://142.107.248.32:3000", //used for receive validation link
 
 };

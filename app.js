@@ -30,6 +30,8 @@ const indexRouter = require('./routes/index');
 
 const usersRouter = require('./routes/users');
 
+const workbookRouter = require('./routes/workbook');
+
 const User = require('./models/user');
 
 app.set('port', process.env.PORT || 3000);
@@ -93,7 +95,7 @@ app.use('/', indexRouter);
 // user authentication related
 app.use('/', usersRouter); // API or pages below this requires authentication
 // api endpoints that need authentication
-
+app.use('/', workbookRouter);
 
 
 

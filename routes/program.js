@@ -214,7 +214,7 @@ module.exports = function (app, passport) {
 
     });
     app.get('/createNew', isLoggedIn, isAdmin, function (req, res) {
-        res.render('createRows.ejs',
+        res.render('addAttCat.ejs',
             {
                 attriMessage: "",
                 catMessage: "",

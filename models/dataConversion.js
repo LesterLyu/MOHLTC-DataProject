@@ -12,7 +12,7 @@ module.exports =
             query.newQuery("SELECT * FROM categories WHERE Description = '" + reqBody.newCategory + "'", function (err, data) {
                 if (data.length > 0) {
                     req.flash('duplicate category', 'duplicate category!');
-                    res.render("createRows.ejs",
+                    res.render("addAttCat.ejs",
                         {
                             attriMessage: "",
                             catMessage: req.flash('duplicate category'),
@@ -21,7 +21,7 @@ module.exports =
                 }
                 else {
                     query.newQuery("INSERT INTO categories (Description) VALUES ('" + reqBody.newCategory + "')", function (err, data) {
-                        res.render("createRows.ejs",
+                        res.render("addAttCat.ejs",
                             {
                                 attriMessage: "",
                                 catMessage: "",
@@ -35,7 +35,7 @@ module.exports =
             query.newQuery("SELECT * FROM attributes WHERE Description = '" + reqBody.newAttribute + "'", function (err, data) {
                 if (data.length > 0) {
                     req.flash('duplicate attribute', 'duplicate attribute!');
-                    res.render("createRows.ejs",
+                    res.render("addAttCat.ejs",
                         {
                             attriMessage: req.flash('duplicate attribute'),
                             catMessage: "",
@@ -44,7 +44,7 @@ module.exports =
                 }
                 else {
                     query.newQuery("INSERT INTO attributes (Description) VALUES ('" + reqBody.newAttribute + "')", function (err, data) {
-                        res.render("createRows.ejs",
+                        res.render("addAttCat.ejs",
                             {
                                 attriMessage: "",
                                 catMessage: "",
