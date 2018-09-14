@@ -9,10 +9,16 @@ let router = express.Router();
 // LOGIN =============================
 // =====================================
 router.get('/login', function (req, res) {
+    if (req.isAuthenticated()) {
+        return res.redirect('/profile');
+    }
     res.render('login.ejs');
 });
 
 router.get('/signup', function (req, res) {
+    if (req.isAuthenticated()) {
+        return res.redirect('/profile');
+    }
     res.render('signup.ejs');
 });
 
@@ -37,12 +43,6 @@ router.use((req, res, next) => {
     }
 });
 
-// add attribute ang cat
-router.post('api/add-att', user_controller.user_add_att);
-router.post('api/add-cat', user_controller.user_add_cat);
-
-
-//
 
 router.get('/send-validation-email', user_controller.user_send_validation_email);
 
@@ -50,10 +50,10 @@ router.get('/validate-now', function (req, res) {
     if (req.session.user.validated) {
         return res.redirect('/login');
     }
-    res.render('tobevalidated.ejs');
+    res.render('tobevalidated.ejs', {user: req.session.user});
 });
 
-// // check account validation middleware
+// check account validation middleware
 router.use((req, res, next) => {
 
     if (!req.session.user.validated) {
@@ -62,39 +62,21 @@ router.use((req, res, next) => {
     next();
 });
 
-router.post('/api/logout', user_controller.user_log_out);
+router.get('/api/logout', user_controller.user_log_out);
+
+router.get('/add-att-cat', (req, res, next) => {
+    res.render('addAttCat.ejs', {user: req.session.user});
+});
+
+// add attribute ang cat
+router.post('/api/add-att', user_controller.user_add_att);
+
+router.post('/api/add-cat', user_controller.user_add_cat);
+
 
 router.get('/profile', function (req, res) {
-    res.render('profile.ejs',
-        {
-            user: req.session.user,
-        });
+    res.render('profile.ejs', {user: req.session.user});
 });
-// =====================================
-// PROFILE =============================
-// =====================================
-router.get('/profile2', function (req, res) {
-    console.log("/GET PROFILE");
-    //Check user
-    console.log(req.user);
-    var query = require('../models/query.js');
-    var displayTables = require('../models/formRetriever.js');
-    displayTables.getFormIndex(req.user, function (formData) {
-        displayTables.getFilledForms(req.user, function (filledFormTitle) {
-            console.log(filledFormTitle);
-            console.log("hola");
-            console.log("filledFormTitle");
-            res.render('profile.ejs',
-                {
-                    user: req.user,
-                    unfilledForms: formData,
-                    filledForms: filledFormTitle
-                });
-        });
-    });
-});
-
-
 
 
 module.exports = router;

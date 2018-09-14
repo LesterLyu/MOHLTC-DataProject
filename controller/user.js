@@ -4,7 +4,7 @@ const config = require('../config/config'); // get our config file
 const sendMail = require('./sendmail');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 const Attribute = require('../models/attribute');
-const category = require('../models/category');
+const Category = require('../models/category');
 
 // helper functions
 function isEmail(email) {
@@ -113,7 +113,7 @@ module.exports = {
         req.logout();
         // clear user info in the session
         req.session.user = {};
-        return res.json({success: true, redirect: '/'})
+        return res.redirect('/')
     },
 
     user_send_validation_email: (req, res, next) => {
@@ -154,48 +154,60 @@ module.exports = {
 
 
     user_add_att: (req, res, next) => {
-        Attribute.findOne({attribute: req.body.attribute}, (err, attribute) => {
+        const attribute = req.body.attribute;
+        const groupNumber = req.session.user.groupNumber;
+        if (attribute === '') {
+            return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
+        }
+        Attribute.findOne({attribute: attribute, groupNumber: groupNumber}, (err, attribute) => {
             if (err) {
-                return res.json({success: false, message: err});
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
             }
 
             if (attribute) {
-                return res.json({success: false, message: 'Attribute exists'});
+                return res.status(400).json({success: false, message: 'Attribute ' + attribute.attribute + ' exists.'});
             } else {
                 let newAttribute = new Attribute({
                     attribute: req.body.attribute,
-                    groupNumber: req.body.groupNumber,
+                    groupNumber: groupNumber,
                 });
                 newAttribute.save((err, updatedAttribute) => {
                     if (err) {
                         console.log(err);
                         return next(err);
                     }
+                    return res.json({success: true, message: 'Attribute ' + updatedAttribute.attribute + ' added.'})
                 });
-
             }
         });
-
     },
 
     user_add_cat: (req, res, next) => {
-        Category.findOne({category: req.body.category}, (err, category) => {
+        const category = req.body.category;
+        const groupNumber = req.session.user.groupNumber;
+        if (category === '') {
+            return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
+        }
+        Category.findOne({category: category, groupNumber: groupNumber}, (err, category) => {
             if (err) {
-                return res.json({success: false, message: err});
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
             }
 
             if (category) {
-                return res.json({success: false, message: 'Category exists'});
+                return res.status(400).json({success: false, message: 'Category ' + category.category +' exists.'});
             } else {
                 let newCategory = new Category({
                     category: req.body.category,
-                    groupNumber: req.body.groupNumber,
+                    groupNumber: groupNumber,
                 });
                 newCategory.save((err, updatedCategory) => {
                     if (err) {
                         console.log(err);
                         return next(err);
                     }
+                    return res.json({success: true, message: 'Category ' + updatedCategory.category + ' added.'})
                 });
 
             }
