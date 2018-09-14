@@ -4,4 +4,4 @@ let categorySchema = new mongoose.Schema({
     category: {type: String},
     groupNumber: {type: Number, required: true}
 });
-module.exports = mongoose.model('Attribute', categorySchema);
+module.exports = mongoose.model('Category', categorySchema);

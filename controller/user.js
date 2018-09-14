@@ -3,6 +3,8 @@ const passport = require('passport');
 const config = require('../config/config'); // get our config file
 const sendMail = require('./sendmail');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
+const Attribute = require('../models/attribute');
+const category = require('../models/category');
 
 // helper functions
 function isEmail(email) {
@@ -150,5 +152,55 @@ module.exports = {
             });
         },
 
-}
-;
+
+    user_add_att: (req, res, next) => {
+        Attribute.findOne({attribute: req.body.attribute}, (err, attribute) => {
+            if (err) {
+                return res.json({success: false, message: err});
+            }
+
+            if (attribute) {
+                return res.json({success: false, message: 'Attribute exists'});
+            } else {
+                let newAttribute = new Attribute({
+                    attribute: req.body.attribute,
+                    groupNumber: req.body.groupNumber,
+                });
+                newAttribute.save((err, updatedAttribute) => {
+                    if (err) {
+                        console.log(err);
+                        return next(err);
+                    }
+                });
+
+            }
+        });
+
+    },
+
+    user_add_cat: (req, res, next) => {
+        Category.findOne({category: req.body.category}, (err, category) => {
+            if (err) {
+                return res.json({success: false, message: err});
+            }
+
+            if (category) {
+                return res.json({success: false, message: 'Category exists'});
+            } else {
+                let newCategory = new Category({
+                    category: req.body.category,
+                    groupNumber: req.body.groupNumber,
+                });
+                newCategory.save((err, updatedCategory) => {
+                    if (err) {
+                        console.log(err);
+                        return next(err);
+                    }
+                });
+
+            }
+        });
+
+    },
+
+};

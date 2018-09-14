@@ -37,6 +37,13 @@ router.use((req, res, next) => {
     }
 });
 
+// add attribute ang cat
+router.post('api/add-att', user_controller.user_add_att);
+router.post('api/add-cat', user_controller.user_add_cat);
+
+
+//
+
 router.get('/send-validation-email', user_controller.user_send_validation_email);
 
 router.get('/validate-now', function (req, res) {
@@ -86,6 +93,8 @@ router.get('/profile2', function (req, res) {
         });
     });
 });
+
+
 
 
 module.exports = router;
