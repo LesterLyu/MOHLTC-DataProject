@@ -6,13 +6,13 @@ let router = express.Router();
 router.post('/workbook', workbookController.create_workbook);
 
 // DELETE Delete workbook
-router.delete('/workbook', workbookController.create_workbook);
+router.delete('/workbook', workbookController.delete_workbook());
 
 // POST Create or Update filled workbook
-router.post('/filled-workbook', workbookController.create_workbook);
+router.post('/filled-workbook', workbookController.update_filled_workbook());
 
 // DELETE Delete filled workbook
-router.delete('/filled-workbook', workbookController.create_workbook);
+router.delete('/filled-workbook', workbookController.delete_filled_workbook());
 
 // GET Find all workbooks in current group
 router.get('/workbooks', workbookController.get_workbooks);
