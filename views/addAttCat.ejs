@@ -6,15 +6,7 @@
     <div class="container" style="margin-top: 0.25%;">
         <h1> Create new Categories/Attributes </h1>
         <br>
-        <% if (attriMessage != "") { %>
-            <div class="alert alert-danger"><%= attriMessage %></div>
-        <% } %>
-        <% if (catMessage != "") { %>
-            <div class="alert alert-danger"><%= catMessage %></div>
-        <% } %>
-        <% if (successMessage != "") { %>
-            <div class="alert alert-danger"><%= successMessage %></div>
-        <% } %>
+
         <form method="post" action="/submitCategory">
             <label for="newCategory"> New category name: </label>
             <input name="newCategory" type="text">
