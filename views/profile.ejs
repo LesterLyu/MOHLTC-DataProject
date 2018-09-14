@@ -5,38 +5,41 @@
     <div class="card">
         <div class="card-body">
             <h4 class="card-title"><span class="fa fa-user"></span> User Information</h4>
-            ID: <%= user.ID %> <br> Username: <%= user.userName %> <br> Email: <%= user.email %>
+            Group: <%= user.groupNumber %> <br> Username: <%= user.username %> <br> Email: <%= user.email %>
 
             <hr>
 
-            <h4 class="card-title"><span class="far fa-edit"></span> Empty forms you can fill out</h4>
-            <div >
-                <% for (var i = 0; i < unfilledForms.length; i++) { %>
-                    <a href="fillForm?formId=<%= unfilledForms[i].Id %>&formGroupNumber=<%= unfilledForms[i].GroupNumber %>"
-                       class="btn btn-outline-secondary form-name-box"><span  class="fas fa-table"></span> <%= unfilledForms[i].Title %> </a>
-                <% } %>
+            <h4 class="card-title"><span class="far fa-edit"></span> Empty workbook you can fill out</h4>
+            <div id="workbooks">
+
             </div>
 
             <hr>
 
             <h4><span class="fas fa-edit"></span> View/Edit Filled Forms</h4>
-            <% for (var i = 0; i < filledForms.length; i++) {    //console.log(filledForms); %>
-            <a href="viewForm?Title=<%= filledForms[i].Title %>&formID=<%= filledForms[i].Id %>"
-               class="btn btn-outline-secondary form-name-box"><span class="fas fa-table"></span> <%= filledForms[i].Title %> </a>
-            <% } %>
+            <div id="filled-workbooks">
 
+            </div>
             <hr>
 
-            <h4><span class="fas fa-user-edit"></span> Admin Privilege</h4>
+            <h4><span class="fas fa-user-edit"></span>Workbook Admin</h4>
 
-                <a class="btn btn-outline-success admin-btn" href="/custom">Create Table</a>
-                <a class="btn btn-outline-success admin-btn" href="/createNew">Create Attributes/Categories</a>
+            <a class="btn btn-outline-success admin-btn" href="/custom">Create Table</a>
+
+            <h4><span class="fas fa-user-edit"></span>System Admin</h4>
+
+            <a class="btn btn-outline-success admin-btn" href="/createNew">Create Attributes/Categories</a>
 
 
         </div>
     </div>
-
+    <%- include('./common/messageModal'); -%>
 
 </div>
+<script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="/js/profile.js"></script>
 
 <%- include('./common/footer'); -%>

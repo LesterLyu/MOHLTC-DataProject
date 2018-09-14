@@ -11,7 +11,7 @@ $("#signupForm").submit(function(e) {
         }
     }).fail(function(xhr, status, error) {
         console.log('fail');
-        showModalAlert('Login Error', xhr.responseJSON.message);
+        showModalAlert('Sign up Error', xhr.responseJSON.message);
     });
 });
 

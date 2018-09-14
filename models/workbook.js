@@ -7,4 +7,4 @@ let workbookSchema = new mongoose.Schema({
     groupNumber: {type: Number, required: true},
     data: {}, // reserved for table with populated data
 });
-module.exports = mongoose.model('Attribute', workbookSchema);
+module.exports = mongoose.model('Workbook', workbookSchema);

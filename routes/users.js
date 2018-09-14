@@ -58,7 +58,10 @@ router.use((req, res, next) => {
 router.post('/api/logout', user_controller.user_log_out);
 
 router.get('/profile', function (req, res) {
-    res.json(req.session.user);
+    res.render('profile.ejs',
+        {
+            user: req.session.user,
+        });
 });
 // =====================================
 // PROFILE =============================
