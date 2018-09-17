@@ -215,4 +215,26 @@ module.exports = {
 
     },
 
+    get_attributes: (req, res, next) => {
+        const groupNumber = req.session.user.groupNumber;
+        Attribute.find({groupNumber: groupNumber}, 'name', (err, attributes) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            return res.json({success: true, attributes: attributes});
+        })
+    },
+
+    get_categories: (req, res, next) => {
+        const groupNumber = req.session.user.groupNumber;
+        Category.find({groupNumber: groupNumber}, 'name', (err, categories) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            return res.json({success: true, attributes: categories});
+        })
+    }
+
 };

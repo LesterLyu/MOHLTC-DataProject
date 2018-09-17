@@ -20,4 +20,9 @@ router.get('/api/workbooks', workbookController.get_workbooks);
 // GET Find all filled workbooks in current group for a user
 router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 
+// web pages
+router.get('/create-table', (req, res, next) => {
+    res.render('createTable.ejs', req.session.user);
+});
+
 module.exports = router;
