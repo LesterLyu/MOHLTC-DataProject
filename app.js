@@ -6,8 +6,6 @@ const app = express();
 
 const path = require('path');
 
-const mysql = require('mysql');
-
 const mongoose = require('mongoose');
 
 const passport = require('passport'); //Passport for authentication
@@ -71,21 +69,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 
-var pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'password',
-    database: 'dataproject'
-});
-
-pool.getConnection(function (err, connection) {
-    if (err) {
-        console.log("connection error.");
-        throw err;
-
-    }
-    //Nothing goes here yet
-});
 http.createServer(app).listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
 });
