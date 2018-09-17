@@ -22,7 +22,7 @@ router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 
 // web pages
 router.get('/create-table', (req, res, next) => {
-    res.render('createTable.ejs', req.session.user);
+    res.render('createTable.ejs', {user: req.session.user});
 });
 
 module.exports = router;
