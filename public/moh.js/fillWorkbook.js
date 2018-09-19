@@ -53,10 +53,18 @@ function addTab(sheetName) {
 
 $(document).ready(function () {
     var workbookName = $('#filled-workbook').val();
+    var mode = $('#mode').val();
+    // default url is for fill the workbook first time
+    var url = '/api/workbook/' + workbookName;
+    // if this page is loaded for edit filled workbook
+    if (mode === 'edit') {
+        url = '/api/filled-workbook/' + workbookName
+    }
     $.ajax({
-        url: '/api/workbook/' + workbookName,
+        url: url,
         type: 'GET',
     }).done(function (response) {
+        console.log(response);
         if (response.success) {
             var workBook = response.workbook.data;
             console.log(workBook);
@@ -68,7 +76,6 @@ $(document).ready(function () {
                     // generate table
                     var container = document.getElementById(gridId);
                     var addedTable = newTable(container, $(window).height() - 500, true);
-                    sheets.push(addedTable);
                     addedTable.loadData(data);
                     // lock cells
                     addedTable.updateSettings({
@@ -82,6 +89,7 @@ $(document).ready(function () {
                     });
                 }
             }
+            console.log(sheets);
             $('#nav-tab a:first-child').tab('show');
         }
     }).fail(function (xhr, status, error) {
@@ -108,6 +116,7 @@ $('#save-workbook-btn').on('click', function () {
         data: JSON.stringify({data: workbook, name: $('#filled-workbook').val()}),
     }).done(function (response) {
         if (response.success) {
+            console.log(response);
             statusText.html('<i class="fas fa-check"></i> Saved');
             btn.prop('disabled', false);
         }

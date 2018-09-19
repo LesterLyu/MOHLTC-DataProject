@@ -59,7 +59,7 @@ module.exports = {
                 console.log(err);
                 return res.status(500).json({success: false, message: err})
             }
-            return res.json({success: true, message: 'Deleted workbook '  + name})
+            return res.json({success: true, message: 'Deleted workbook ' + name})
         })
     },
 
@@ -75,7 +75,7 @@ module.exports = {
             if (!workbook) {
                 return res.status(400).json({success: false, message: 'filled Workbook does not exist.'});
             }
-            return res.json({success: true, filledWorkbook: workbook});
+            return res.json({success: true, workbook: workbook});
         })
     },
 
@@ -95,22 +95,30 @@ module.exports = {
                 // update it
                 filledWorkbook.date = date;
                 filledWorkbook.data = data;
-                return res.json({success: true, message: 'Successfully updated filled workbook ' + name + '.'})
+                filledWorkbook.save((err, updated) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    return res.json({success: true, message: 'Successfully updated filled workbook ' + name + '.'})
+                });
             }
-            // create a filled workbook
-            let newFilledWorkbook = new FilledWorkbook({
-                name: name,
-                username: username,
-                groupNumber: groupNumber,
-                data: data
-            });
-            newFilledWorkbook.save((err, updatedFilledWorkbook) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json({success: false, message: err});
-                }
-                return res.json({success: true, message: 'Successfully added filled workbook ' + name + '.'});
-            })
+            else {
+                // create a filled workbook
+                let newFilledWorkbook = new FilledWorkbook({
+                    name: name,
+                    username: username,
+                    groupNumber: groupNumber,
+                    data: data
+                });
+                newFilledWorkbook.save((err, updatedFilledWorkbook) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    return res.json({success: true, message: 'Successfully added filled workbook ' + name + '.'});
+                })
+            }
         });
     },
 
@@ -123,7 +131,7 @@ module.exports = {
                 console.log(err);
                 return res.status(500).json({success: false, message: err})
             }
-            return res.json({success: true, message: 'Deleted filled workbook '  + name})
+            return res.json({success: true, message: 'Deleted filled workbook ' + name})
         })
     },
 
