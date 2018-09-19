@@ -1,32 +1,45 @@
-$.ajax({
-    url: '/api/workbooks',
-    type: 'GET',
-}).done(function (response) {
-    if(response.success) {
-        console.log(response);
-        let html = ' <a href="fillForm" class="btn btn-outline-secondary form-name-box">\n' +
-            '                        <span class="fas fa-table"></span> Title</a>';
-        $('#workbooks').html();
-    }
-}).fail(function(xhr, status, error) {
-    console.log('fail');
-    showModalAlert('Error', xhr.responseJSON.message);
+
+$(document).ready(function () {
+    $.ajax({
+        url: '/api/workbooks',
+        type: 'GET',
+    }).done(function (response) {
+        if(response.success) {
+            console.log(response);
+            var workbooks = response.workbooks;
+            var container = $('#workbooks');
+            for (var i = 0; i < workbooks.length; i++) {
+                console.log('add');
+                container.append('<a href="fillForm" class="btn btn-outline-secondary form-name-box mr-2">\n' +
+                    '<span class="fas fa-table"></span> ' + workbooks[i].name + '</a>');
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        console.log('fail');
+        showModalAlert('Error', xhr.responseJSON.message);
+    });
+
+    $.ajax({
+        url: '/api/filled-workbooks',
+        type: 'GET',
+    }).done(function (response) {
+        if(response.success) {
+            console.log(response);
+            var filledWorkbooks = response.filledWorkbooks;
+            var container = $('#filled-workbooks');
+            for (var i = 0; i < filledWorkbooks.length; i++) {
+                console.log('add');
+                container.append('<a href="fillForm" class="btn btn-outline-secondary form-name-box mr-2">\n' +
+                    '<span class="fas fa-table"></span> ' + filledWorkbooks[i].name + '</a>');
+            }
+        }
+    }).fail(function(xhr, status, error) {
+        console.log('fail');
+        showModalAlert('Error', xhr.responseJSON.message);
+    });
+
 });
 
-$.ajax({
-    url: '/api/filled-workbooks',
-    type: 'GET',
-}).done(function (response) {
-    if(response.success) {
-        console.log(response);
-        let html = ' <a href="fillForm" class="btn btn-outline-secondary form-name-box">\n' +
-            '                        <span class="fas fa-table"></span> Title</a>';
-        $('#filled-workbooks').html();
-    }
-}).fail(function(xhr, status, error) {
-    console.log('fail');
-    showModalAlert('Error', xhr.responseJSON.message);
-});
 
 
 function showModalAlert(title, msg) {
