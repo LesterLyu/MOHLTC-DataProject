@@ -55,10 +55,10 @@ $(document).ready(function () {
     var workbookName = $('#filled-workbook').val();
     var mode = $('#mode').val();
     // default url is for fill the workbook first time
-    var url = '/api/workbook/' + workbookName;
+    var url = '/api/workbook/' + encodeURIComponent(workbookName);
     // if this page is loaded for edit filled workbook
     if (mode === 'edit') {
-        url = '/api/filled-workbook/' + workbookName
+        url = '/api/filled-workbook/' + encodeURIComponent(workbookName)
     }
     $.ajax({
         url: url,

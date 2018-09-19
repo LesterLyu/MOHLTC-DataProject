@@ -136,13 +136,24 @@ module.exports = {
     },
 
     get_workbooks: (req, res, next) => {
+        const username = req.session.user.username;
         const groupNumber = req.session.user.groupNumber;
         Workbook.find({groupNumber: groupNumber}, 'name', (err, workbooks) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
-            return res.json({success: true, workbooks: workbooks});
+            // remove filled workbooks
+            FilledWorkbook.find({username: username, groupNumber: groupNumber}, 'name', (err, filledWorkbooks) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                const namesToRemove = new Set(filledWorkbooks.map(x => x.name));
+                workbooks = workbooks.filter(workbook => !namesToRemove.has(workbook.name));
+
+                return res.json({success: true, workbooks: workbooks});
+            });
         })
     },
 
