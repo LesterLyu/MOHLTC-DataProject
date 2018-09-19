@@ -3,39 +3,83 @@
 <div class="container col-sm-10 col-md-10 col-lg-10 col-xl-10 vertical-gap">
     <a href="/profile"><h4><span class="fa fa-reply"></span> Profile</h4></a>
 
-    <form id="createTableForm">
-        <div class="form-group">
+    <form id="create-workbook-form">
+        <div class="form-group col-sm-10 col-md-6 col-lg-4 px-0">
             <label for="workbookNameInput">Workbook Name:</label>
             <input type="text" class="form-control" id="workbookNameInput" name="workbookName" placeholder="">
             <small class="form-text text-muted">A workbook may contain multiple sheets.</small>
         </div>
-        <div class="form-group">
-            <label for="select-categories">Categories:</label>
-            <select class="selectpicker mr-3" multiple data-live-search="true" data-style="btn-outline-primary"
-                    data-header="Select categories" id="select-categories">
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="select-categories">Attributes:</label>
-            <select class="selectpicker mr-3" multiple data-live-search="true" data-style="btn-outline-primary"
-                    data-header="Select attributes" id="select-attributes">
-            </select>
-        </div>
-        <button type="button" id="create-btn" class="btn-save btn btn-primary">Preview Sheet</button>
-        <button type="submit" id="create-btn" class="btn-save btn btn-primary">Add Sheet</button>
-    </form>
 
+    </form>
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab">
+
+            <a id="show-modal-btn" class="nav-link nav-item" href="#"><i class="fas fa-plus"></i> Add Sheet</a>
+
+
+        </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+
+    </div>
     <br>
-    <div id="grid"></div>
+    <div class="container row" id="save-row">
+        <button type="button" id="save-workbook-btn" class="btn-save btn btn-primary">Save Workbook</button>
+
+    </div>
 
     <hr>
-    <div class="container">
+    <div class="container d-none d-md-block">
         <h5>Instruction: </h5>
         <p> Right click to view the menu. Select row/column and drag to move row/column.</p>
     </div>
-
-
 </div>
+
+<div id="add-modal" tabindex="-1" class="modal fade" role="dialog" aria-labelledby="msg-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Sheet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-form-label col-sm-3" for="sheetNameInput">Sheet Name:</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="sheetNameInput" name="sheetName"
+                               placeholder="">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3" for="select-categories">Categories:</label>
+                    <select class="selectpicker col-sm-9" multiple data-live-search="true"
+                            data-style="btn-outline-primary"
+                            data-header="Select categories" id="select-categories">
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3" for="select-categories">Attributes:</label>
+                    <select class="selectpicker col-sm-9" multiple data-live-search="true"
+                            data-style="btn-outline-primary"
+                            data-header="Select attributes" id="select-attributes">
+                    </select>
+                </div>
+                <button type="button" id="preview-btn" class="btn-save btn btn-primary">Preview Sheet</button>
+                <hr>
+                <div id="preview-grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+                <button type="button" id="add-confirm-btn" class="btn-save btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Message Modal-->
+<%- include('./common/messageModal'); -%>
 
 <script
         src="https://code.jquery.com/jquery-3.3.1.min.js"

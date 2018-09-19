@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 let workbookSchema = new mongoose.Schema({
-    name: {type: String},
+    name: {type: String, required: true},
     // category: [String],
     // attribute: [String],
     groupNumber: {type: Number, required: true},

@@ -7,6 +7,10 @@ module.exports = {
         const name = req.body.name;
         const groupNumber = req.session.user.groupNumber;
         let data = req.body.data;
+        if (name === '') {
+            return res.status(500).json({success: false, message: 'Name cannot be empty.'});
+        }
+
         Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
             if (err) {
                 console.log(err);
