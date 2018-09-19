@@ -2,11 +2,17 @@ const express = require('express');
 const workbookController = require('../controller/workbook');
 let router = express.Router();
 
+// GET Find a workbook in current group
+router.get('/api/workbook/:name', workbookController.get_workbook);
+
 // POST Create workbook
 router.post('/api/workbook', workbookController.create_workbook);
 
 // DELETE Delete workbook
 router.delete('/api/workbook', workbookController.delete_workbook);
+
+// GET Find a workbook in current group
+router.get('/api/filled-workbook/:name', workbookController.get_filled_workbook);
 
 // POST Create or Update filled workbook
 router.post('/api/filled-workbook', workbookController.update_filled_workbook);
@@ -21,8 +27,17 @@ router.get('/api/workbooks', workbookController.get_workbooks);
 router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 
 // web pages
-router.get('/create-table', (req, res, next) => {
-    res.render('createTable.ejs', {user: req.session.user});
+router.get('/create-workbook', (req, res, next) => {
+    res.render('createWorkbook.ejs', {user: req.session.user});
 });
+
+router.get('/fill-workbook/:name', (req, res, next) => {
+    res.render('fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'fill'});
+});
+
+router.get('/edit-workbook/:name', (req, res, next) => {
+    res.render('fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'edit'});
+});
+
 
 module.exports = router;

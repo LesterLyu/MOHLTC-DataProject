@@ -1,4 +1,4 @@
-<%- include('./common/header', {title: 'Create Table'}); -%>
+<%- include('./common/header', {title: 'Create Workbook'}); -%>
 
 <div class="container col-sm-10 col-md-10 col-lg-10 col-xl-10 vertical-gap">
     <a href="/profile"><h4><span class="fa fa-reply"></span> Profile</h4></a>
@@ -23,9 +23,13 @@
 
     </div>
     <br>
-    <div class="container row" id="save-row">
-        <button type="button" id="save-workbook-btn" class="btn-save btn btn-primary">Save Workbook</button>
-
+    <div class="container row align-items-center" id="save-row">
+        <div class="col-auto">
+            <button type="button" id="save-workbook-btn" class="btn-save btn btn-primary">Save Workbook</button>
+        </div>
+        <div class="col-auto">
+            <div id="status"> </div>
+        </div>
     </div>
 
     <hr>
@@ -102,4 +106,4 @@
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
 
-<script src="/moh.js/createTable.js"></script>
+<script src="/moh.js/createWorkbook.js"></script>

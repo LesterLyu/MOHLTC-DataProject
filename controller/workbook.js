@@ -3,6 +3,22 @@ const FilledWorkbook = require('../models/filledWorkbook');
 
 module.exports = {
 
+    // get an empty workbook templet
+    get_workbook: (req, res, next) => {
+        const name = req.params.name;
+        const groupNumber = req.session.user.groupNumber;
+        Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            if (!workbook) {
+                return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+            }
+            return res.json({success: true, workbook: workbook});
+        })
+    },
+
     create_workbook: (req, res, next) => {
         const name = req.body.name;
         const groupNumber = req.session.user.groupNumber;
@@ -44,6 +60,22 @@ module.exports = {
                 return res.status(500).json({success: false, message: err})
             }
             return res.json({success: true, message: 'Deleted workbook '  + name})
+        })
+    },
+
+    // get a filled workbook
+    get_filled_workbook: (req, res, next) => {
+        const name = req.params.name;
+        const groupNumber = req.session.user.groupNumber;
+        FilledWorkbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            if (!workbook) {
+                return res.status(400).json({success: false, message: 'filled Workbook does not exist.'});
+            }
+            return res.json({success: true, filledWorkbook: workbook});
         })
     },
 

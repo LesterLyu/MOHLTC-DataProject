@@ -9,8 +9,8 @@ $(document).ready(function () {
             var workbooks = response.workbooks;
             var container = $('#workbooks');
             for (var i = 0; i < workbooks.length; i++) {
-                console.log('add');
-                container.append('<a href="fillForm" class="btn btn-outline-secondary form-name-box mr-2">\n' +
+                var name = encodeURIComponent(workbooks[i].name);
+                container.append('<a href="fill-workbook/' + name + '" class="btn btn-outline-secondary form-name-box mr-2">\n' +
                     '<span class="fas fa-table"></span> ' + workbooks[i].name + '</a>');
             }
         }
@@ -28,8 +28,8 @@ $(document).ready(function () {
             var filledWorkbooks = response.filledWorkbooks;
             var container = $('#filled-workbooks');
             for (var i = 0; i < filledWorkbooks.length; i++) {
-                console.log('add');
-                container.append('<a href="fillForm" class="btn btn-outline-secondary form-name-box mr-2">\n' +
+                var name = encodeURIComponent(filledWorkbooks[i].name);
+                container.append('<a href="edit-workbook/' + name + '" class="btn btn-outline-secondary form-name-box mr-2">\n' +
                     '<span class="fas fa-table"></span> ' + filledWorkbooks[i].name + '</a>');
             }
         }

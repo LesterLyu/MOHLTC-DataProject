@@ -25,7 +25,7 @@ function newTable(container, height, preview) {
         manualRowMove: true,
         rowHeaders: true,
         colHeaders: true,
-        contextMenu: true,
+        contextMenu: ['remove_row', 'remove_col', '---------', 'copy'],
     };
     if (preview) {
         spec.manualColumnMove = false;
@@ -142,7 +142,7 @@ $("#add-confirm-btn").click(function () {
 
     // generate table
     var container = document.getElementById(gridId);
-    var addedTable = newTable(container, $(window).height() - 500, true);
+    var addedTable = newTable(container, $(window).height() - 500, false);
     addedTable.loadData(getSelected());
     // lock cells
     addedTable.updateSettings({
@@ -161,7 +161,9 @@ $("#add-confirm-btn").click(function () {
 
 $('#save-workbook-btn').on('click', function () {
     var btn = $(this);
-    btn.html('<i class="fas fa-spinner fa-spin"></i> Saving').prop('disabled', true);
+    var statusText = $('#status');
+    statusText.html('<i class="fas fa-spinner fa-spin"></i> Saving');
+    btn.prop('disabled', true);
     var workbook = {};
     for (var i = 0; i < sheets.length; i++) {
         workbook[sheetNames[i]] = sheets[i].getData();
@@ -174,12 +176,13 @@ $('#save-workbook-btn').on('click', function () {
         data: JSON.stringify({data: workbook, name: $('#workbookNameInput').val()}),
     }).done(function (response) {
         if (response.success) {
-            btn.html('Saved');
+            statusText.html('<i class="fas fa-check"></i> Saved');
+            btn.prop('disabled', false);
         }
     }).fail(function (xhr, status, error) {
         console.log('fail ' + xhr.responseJSON.message);
-        btn.removeClass('disabled').html('Save Workbook').prop('disabled', false);;
-        showModalAlert('Failed to save workbook', xhr.responseJSON.message);
+        statusText.html('<i class="fas fa-times"></i> Failed to create workbook: ' + xhr.responseJSON.message);
+        btn.prop('disabled', false);
     });
 });
 
