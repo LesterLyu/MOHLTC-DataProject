@@ -78,9 +78,10 @@ function exportToExcel(workbook, name) {
 function workbookToJson(workbook) {
     var result = {};
     workbook.SheetNames.forEach(function (sheetName) {
-        var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1});
+        var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1, defval: ''});
         if (roa.length) result[sheetName] = roa;
     });
+    console.log(result);
     return result;
 }
 
@@ -192,6 +193,7 @@ $('#file-import').change(function (e) {
         var workbook = XLSX.read(data, {type: rABS ? 'binary' : 'array'});
 
         /* DO SOMETHING WITH workbook HERE */
+        // To-DO validate the import
         applyJson(workbookToJson(workbook))
     };
     if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
