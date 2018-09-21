@@ -118,10 +118,11 @@ module.exports = {
     },
 
     user_send_validation_email: (req, res, next) => {
+        console.log('here');
         // create token and sent by email
         const token = generateToken(req.session.user.username, 60);
         sendMail.sendValidationEmail(req.session.user.email, token, (info) => {
-            return res.redirect('/validate-now');
+            return res.json({success: true, message: info});
         });
     },
 

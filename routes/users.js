@@ -49,8 +49,9 @@ router.use((req, res, next) => {
     }
 });
 
+router.get('/api/logout', user_controller.user_log_out);
 
-router.get('/send-validation-email', user_controller.user_send_validation_email);
+router.get('/api/send-validation-email', user_controller.user_send_validation_email);
 
 router.get('/validate-now', function (req, res) {
     if (req.session.user.validated) {
@@ -67,8 +68,6 @@ router.use((req, res, next) => {
     }
     next();
 });
-
-router.get('/api/logout', user_controller.user_log_out);
 
 router.get('/add-att-cat', (req, res, next) => {
     res.render('addAttCat.ejs', {user: req.session.user});

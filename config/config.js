@@ -8,7 +8,8 @@ module.exports = {
         auth: {
             user: "lyulester@gmail.com",
             pass: "password"
-        }
+        },
+        sender: '"Lester Lyu" <lyulester@gmail.com>'
     },
     serverHostname: "http://142.107.248.32:3000", //used for receive validation link
     userTypes: { // not yet used
