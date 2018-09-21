@@ -36,3 +36,7 @@ a.nav-item.active.show {
     background-color: #6c757d;
     border-color: #6c757d;
 }
+
+#wrapper #content-wrapper {
+    padding-bottom: 0;
+}

@@ -28,7 +28,7 @@ router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 
 // web pages
 router.get('/create-workbook', (req, res, next) => {
-    res.render('createWorkbook.ejs', {user: req.session.user});
+    res.render('createWorkbookTemplate.ejs', {user: req.session.user});
 });
 
 router.get('/fill-workbook/:name', (req, res, next) => {
@@ -40,8 +40,12 @@ router.get('/edit-workbook/:name', (req, res, next) => {
 });
 
 // new
-router.get('/new/create-workbook', (req, res, next) => {
-    res.render('new/createWorkbook.ejs', {user: req.session.user});
+router.get('/new/create-workbook-template', (req, res, next) => {
+    res.render('new/createWorkbookTemplate.ejs', {user: req.session.user});
+});
+
+router.get('/new/manage-workbook-templates', (req, res, next) => {
+    res.render('new/manageWorkbookTemplate.ejs', {user: req.session.user});
 });
 
 router.get('/new/fill-workbook/:name', (req, res, next) => {

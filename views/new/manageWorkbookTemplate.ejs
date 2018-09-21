@@ -1,0 +1,29 @@
+<%- include('../common/dashboardHeader', {title: 'Manage Workbook template'}); -%>
+
+<div class="container-fluid">
+
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">Workbook Templates</a>
+        </li>
+        <li class="breadcrumb-item active">Manage Template</li>
+    </ol>
+
+</div>
+
+
+<!--Message Modal-->
+<%- include('../common/messageModal'); -%>
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+<%- include('../common/dashboardFooter', {js: [
+'/moh.js/profile.js',
+'https://cdn.jsdelivr.net/npm/handsontable@5.0.2/dist/handsontable.full.min.js',
+'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
+'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.0/xlsx.full.min.js',
+'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js'
+
+]}); -%>

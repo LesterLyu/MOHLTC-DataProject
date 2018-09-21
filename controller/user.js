@@ -99,7 +99,8 @@ module.exports = {
                     }
                     // set user info in the session
                     req.session.user = user;
-
+                    if (config.enableNewInterface)
+                        return res.json({success: true, username: user.username, redirect: '/new/profile'});
                     return res.json({success: true, username: user.username, redirect: '/profile'})
                 });
             })(req, res, next);

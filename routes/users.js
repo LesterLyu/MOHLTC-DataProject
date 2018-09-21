@@ -4,12 +4,16 @@ const user_controller = require('../controller/user');
 const jwt = require("jsonwebtoken");
 let router = express.Router();
 
+const config = require('../config/config');
+
 
 // =====================================
 // LOGIN =============================
 // =====================================
 router.get('/login', function (req, res) {
     if (req.isAuthenticated()) {
+        if (config.enableNewInterface)
+            return res.redirect('/new/profile');
         return res.redirect('/profile');
     }
     res.render('login.ejs');
@@ -17,6 +21,8 @@ router.get('/login', function (req, res) {
 
 router.get('/signup', function (req, res) {
     if (req.isAuthenticated()) {
+        if (config.enableNewInterface)
+            return res.redirect('/new/profile');
         return res.redirect('/profile');
     }
     res.render('signup.ejs');
