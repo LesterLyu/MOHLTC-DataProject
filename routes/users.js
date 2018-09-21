@@ -108,5 +108,9 @@ router.get('/new/workbooks', function (req, res) {
     res.render('new/workbooks.ejs', {user: req.session.user});
 });
 
+router.get('/new/add-att-cat', (req, res, next) => {
+    res.render('new/addAttCat.ejs', {user: req.session.user});
+});
+
 
 module.exports = router;
