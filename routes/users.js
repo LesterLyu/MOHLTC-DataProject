@@ -11,7 +11,7 @@ const config = require('../config/config');
 // LOGIN =============================
 // =====================================
 router.get('/login', function (req, res) {
-    if (req.isAuthenticated()) {
+    if (req.isAuthenticated() && req.session.user.validated) { // preserve sign in after validation
         if (config.enableNewInterface)
             return res.redirect('/new/profile');
         return res.redirect('/profile');
@@ -53,11 +53,19 @@ router.get('/api/logout', user_controller.user_log_out);
 
 router.get('/api/send-validation-email', user_controller.user_send_validation_email);
 
-router.get('/validate-now', function (req, res) {
-    if (req.session.user.validated) {
-        return res.redirect('/login');
-    }
-    res.render('tobevalidated.ejs', {user: req.session.user});
+router.get('/validate-now', function (req, res, next) {
+    // check if the user is validated
+    user_controller.get_user(req.session.user.username, (err, user) => {
+        if (err) {
+            return next(err);
+        }
+        if (user.validated) {
+            return res.redirect('/login');
+        }
+        res.render('tobevalidated.ejs', {user: req.session.user});
+    })
+
+
 });
 
 // check account validation middleware
@@ -99,8 +107,6 @@ router.get('/new/profile', function (req, res) {
 router.get('/new/workbooks', function (req, res) {
     res.render('new/workbooks.ejs', {user: req.session.user});
 });
-
-
 
 
 module.exports = router;

@@ -27,6 +27,14 @@ function generateToken(username, expireTime) {
 }
 
 module.exports = {
+    get_user: (username, cb) => {
+        User.findOne({username: username}, (err, user) => {
+            if (err) {
+                return cb(err);
+            }
+            return cb(err, user);
+        });
+    },
     user_sign_up: (req, res, next) => {
         // check if email is taken (passport will check other errors, i.e. username taken)
         User.findOne({username: req.body.username}, (err, user) => {
@@ -118,7 +126,6 @@ module.exports = {
     },
 
     user_send_validation_email: (req, res, next) => {
-        console.log('here');
         // create token and sent by email
         const token = generateToken(req.session.user.username, 60);
         sendMail.sendValidationEmail(req.session.user.email, token, (info) => {
@@ -145,6 +152,7 @@ module.exports = {
                                     return next(err);
                                 }
                                 // good
+
                                 return res.redirect('/login');
                             });
 
