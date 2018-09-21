@@ -197,7 +197,7 @@ module.exports = {
         const category = req.body.category;
         const groupNumber = req.session.user.groupNumber;
         if (category === '') {
-            return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
+            return res.status(400).json({success: false, message: 'Category cannot be empty.'});
         }
         Category.findOne({category: category, groupNumber: groupNumber}, (err, category) => {
             if (err) {
