@@ -82,5 +82,20 @@ router.get('/profile', function (req, res) {
     res.render('profile.ejs', {user: req.session.user});
 });
 
+router.get('/dashboard', function (req, res) {
+    res.render('new/dashboard.ejs', {user: req.session.user});
+});
+
+// new pages
+router.get('/new/profile', function (req, res) {
+    res.render('new/profile.ejs', {user: req.session.user});
+});
+
+router.get('/new/workbooks', function (req, res) {
+    res.render('new/workbooks.ejs', {user: req.session.user});
+});
+
+
+
 
 module.exports = router;

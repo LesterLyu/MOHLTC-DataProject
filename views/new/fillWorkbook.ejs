@@ -1,0 +1,61 @@
+<%- include('../common/dashboardHeader', {title: 'Fill Workbook'}); -%>
+<div class="container-fluid">
+
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/new/workbooks">Workbooks</a>
+        </li>
+        <li class="breadcrumb-item active">Fill Workbook</li>
+    </ol>
+
+    <!--Transfer data from EJS to front-end-->
+    <input class="hide" id="filled-workbook" value="<%= workbook %>">
+    <input class="hide" id="mode" value="<%= mode %>">
+
+    <h2>
+        <%= workbook %>
+    </h2>
+    <div class="container row align-items-center" id="save-row">
+        <div class="col-auto p-1">
+            <div class="input-group">
+                <button id="import-workbook-btn" class="btn btn-primary">Import</button>
+                <input id="file-import" type="file" class="hide">
+            </div>
+        </div>
+        <div class="col-auto p-1">
+            <button type="button" id="export-workbook-btn" class="btn-save btn btn-primary">Export</button>
+        </div>
+        <div class="col-auto p-1">
+            <button type="button" id="save-workbook-btn" class="btn-save btn btn-primary">Save Workbook</button>
+        </div>
+        <div class="col-auto">
+            <div id="status"></div>
+        </div>
+    </div>
+    <br>
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab">
+        </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+
+    </div>
+    <br>
+</div>
+
+<!--Message Modal-->
+<%- include('../common/messageModal'); -%>
+
+<link href="https://cdn.jsdelivr.net/npm/handsontable@5.0.2/dist/handsontable.full.min.css" rel="stylesheet"
+      media="screen">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+
+<%- include('../common/dashboardFooter', {js: [
+    '/moh.js/profile.js',
+    'https://cdn.jsdelivr.net/npm/handsontable@5.0.2/dist/handsontable.full.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.0/xlsx.full.min.js',
+    '/moh.js/fillWorkbook.js',
+]}); -%>

@@ -39,5 +39,19 @@ router.get('/edit-workbook/:name', (req, res, next) => {
     res.render('fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'edit'});
 });
 
+// new
+router.get('/new/create-workbook', (req, res, next) => {
+    res.render('new/createWorkbook.ejs', {user: req.session.user});
+});
+
+router.get('/new/fill-workbook/:name', (req, res, next) => {
+    res.render('new/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'fill'});
+});
+
+router.get('/new/edit-workbook/:name', (req, res, next) => {
+    res.render('new/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'edit'});
+});
+
+
 
 module.exports = router;

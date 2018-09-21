@@ -42,14 +42,14 @@ function addTab(sheetName) {
 
     // deactivate previous tab and content
     $('div.active.show').removeClass('active show');
-    $('a.active').removeClass('active');
+    $('a.active').removeClass('active show');
 
     // add content
     var tabContent = $('<div id="' + tabContentId + '" class="tab-pane fade active show"> <div id="' + gridId + '"></div></div>');
     $('#nav-tabContent').append(tabContent);
 
     // add tab
-    var newTab = $('<a class="nav-item nav-link active" data-toggle="tab" href="#' + tabContentId + '">' + sheetName + '</a>');
+    var newTab = $('<a class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '">' + sheetName + '</a>');
     newTab.insertBefore('#nav-tab a:nth-last-child(1)');
 
     tabCounter++;

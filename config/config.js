@@ -7,9 +7,13 @@ module.exports = {
         secure: true,
         auth: {
             user: "lyulester@gmail.com",
-            pass: "lvds1995."
+            pass: "password"
         }
     },
     serverHostname: "http://142.107.248.32:3000", //used for receive validation link
-
+    userTypes: { // not yet used
+        0: 'User',
+        1: 'Superuser',
+        2: 'Admin'
+    }
 };
