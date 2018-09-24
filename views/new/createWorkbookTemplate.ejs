@@ -51,11 +51,12 @@
     </div>
 </div>
 
+<!--For add/edit sheet-->
 <div id="add-modal" tabindex="-1" class="modal fade" role="dialog" aria-labelledby="msg-modal" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Sheet</h5>
+                <h5 id="add-modal-title" class="modal-title">Add Sheet</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -71,14 +72,14 @@
                 <div class="form-group row">
                     <label class="col-sm-3" for="select-categories">Categories:</label>
                     <select class="selectpicker col-sm-9" multiple data-live-search="true"
-                            data-style="btn-outline-primary"
+                            data-style="btn-outline-primary" data-actions-box="true"
                             data-header="Select categories" id="select-categories">
                     </select>
                 </div>
                 <div class="form-group row">
                     <label class="col-sm-3" for="select-categories">Attributes:</label>
                     <select class="selectpicker col-sm-9" multiple data-live-search="true"
-                            data-style="btn-outline-primary"
+                            data-style="btn-outline-primary" data-actions-box="true"
                             data-header="Select attributes" id="select-attributes">
                     </select>
                 </div>

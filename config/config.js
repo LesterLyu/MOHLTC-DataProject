@@ -17,5 +17,5 @@ module.exports = {
         1: 'Superuser',
         2: 'Admin'
     },
-    enableNewInterface: false, // use sidebar
+    enableNewInterface: true, // use sidebar
 };

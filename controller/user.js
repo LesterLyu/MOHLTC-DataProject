@@ -166,7 +166,6 @@ module.exports = {
     user_add_att: (req, res, next) => {
         const attribute = req.body.attribute;
         const groupNumber = req.session.user.groupNumber;
-        console.log(groupNumber);
         if (attribute === '') {
             return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
         }
@@ -186,8 +185,6 @@ module.exports = {
                     attribute: req.body.attribute,
                     groupNumber: groupNumber,
                 });
-                console.log(req.body.attribute);
-                console.log(groupNumber);
                 newAttribute.save((err, updatedAttribute) => {
                     if (err) {
                         console.log(err);

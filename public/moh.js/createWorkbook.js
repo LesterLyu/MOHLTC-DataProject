@@ -1,6 +1,9 @@
 var tabCounter = 0;
 var sheets = [], sheetNames = [];
 var mode;
+var state = {
+    modalMode: 'none' // none, add, edit
+}; // store state
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
@@ -40,6 +43,7 @@ function newTable(container, height, preview) {
 function addTab(sheetName) {
     var gridId = 'grid-' + tabCounter;
     var tabContentId = 'tab-content-' + tabCounter;
+    var tabId = 'tab-' + tabCounter;
 
     // deactivate previous tab and content
     $('div.active.show').removeClass('active show');
@@ -50,8 +54,8 @@ function addTab(sheetName) {
     $('#nav-tabContent').append(tabContent);
 
     // add tab
-    var newTab = $('<a class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '"> ' + sheetName
-        + '<i class="fas fa-pen ml-2"></i></a>');
+    var newTab = $('<a id="' + tabId + '" class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '"> ' + sheetName
+        + '<i onclick="editSheet(' + tabCounter + ')" class="fas fa-pen ml-2"></i></a>');
     newTab.insertBefore('#nav-tab a:nth-last-child(1)');
 
     tabCounter++;
@@ -128,6 +132,30 @@ $(document).ready(function () {
 
 });
 
+function editSheet(index) {
+    state.modalMode = 'edit';
+    state.modelDisplayIndex = index;
+    var selecte_categories = $('#select-categories');
+    var selecte_attributes = $('#select-attributes');
+    selecte_categories.selectpicker('deselectAll');
+    selecte_attributes.selectpicker('deselectAll');
+    $('#sheetNameInput').val(sheetNames[index]);
+
+    var data = sheets[index].getData().slice();
+    console.log(data);
+    data[0].splice(data[0].indexOf(''), 1)
+    var cates = data[0];
+    var attrs = [];
+    for (var i = 1; i < data.length; i++) {
+        if (data[i][0] !== '') attrs.push(data[i][0])
+    }
+    console.log(attrs);
+    selecte_categories.selectpicker('val', cates);
+    selecte_attributes.selectpicker('val', attrs);
+    $('#add-confirm-btn').html('Modify');
+    $('#add-modal').modal({backdrop: 'static'});
+}
+
 
 // apply json to GUI tables
 function applyJson(workBookJson) {
@@ -172,6 +200,10 @@ function getSelected() {
 
 // add sheet modal
 $('#show-modal-btn').click(function () {
+    state.modalMode = 'add';
+    $('#select-categories').selectpicker('deselectAll');
+    $('#select-attributes').selectpicker('deselectAll');
+    $('#add-confirm-btn').html('Add');
     $('#add-modal').modal({backdrop: 'static'});
 });
 
@@ -191,27 +223,35 @@ $('#preview-btn').click(function () {
 });
 
 // confirm to add sheet to the workbook
-// TO-DO check inputs, i.e. duplicates...
+// TO-DO check inputs, i.e. duplicates, empty name/row/column...
 $("#add-confirm-btn").click(function () {
     var sheetName = $('#sheetNameInput').val();
-    sheetNames.push(sheetName);
-    var gridId = addTab(sheetName);
+    if (state.modalMode === 'add') {
+        sheetNames.push(sheetName);
+        var gridId = addTab(sheetName);
 
-    // generate table
-    var container = document.getElementById(gridId);
-    var addedTable = newTable(container, $(window).height() - 500, false);
-    addedTable.loadData(getSelected());
-    // lock cells
-    addedTable.updateSettings({
-        cells: function (row, col) {
-            var cellProperties = {};
-            if (row === 0 || col === 0) {
-                cellProperties.readOnly = true;
+        // generate table
+        var container = document.getElementById(gridId);
+        var addedTable = newTable(container, $(window).height() - 500, false);
+        addedTable.loadData(getSelected());
+        // lock cells
+        addedTable.updateSettings({
+            cells: function (row, col) {
+                var cellProperties = {};
+                if (row === 0 || col === 0) {
+                    cellProperties.readOnly = true;
+                }
+                return cellProperties;
             }
-            return cellProperties;
-        }
-    });
-    $('#' + sheetName + '-tab').tab('show');
+        });
+    }
+    else if (state.modalMode === 'edit') {
+        sheetNames[state.modelDisplayIndex] = sheetName;
+        $('#tab-' + state.modelDisplayIndex).html(sheetName
+            + '<i onclick="editSheet(' + state.modelDisplayIndex + ')" class="fas fa-pen ml-2"></i>');
+        sheets[state.modelDisplayIndex].loadData(getSelected());
+    }
+
 
     $('#add-modal').modal('hide');
 });
@@ -242,4 +282,6 @@ $('#save-workbook-btn').on('click', function () {
         btn.prop('disabled', false);
     });
 });
+
+// edit
 
