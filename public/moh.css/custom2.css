@@ -40,3 +40,10 @@ a.nav-item.active.show {
 #wrapper #content-wrapper {
     padding-bottom: 0;
 }
+
+.btn-outline-secondary-no-hover {
+    color: #6c757d;
+    background-color: #fff;
+    border-color: #6c757d;
+    cursor: default !important;
+}

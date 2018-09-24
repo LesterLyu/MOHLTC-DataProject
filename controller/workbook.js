@@ -19,7 +19,7 @@ module.exports = {
         })
     },
 
-    create_workbook: (req, res, next) => {
+    admin_create_workbook: (req, res, next) => {
         const name = req.body.name;
         const groupNumber = req.session.user.groupNumber;
         let data = req.body.data;
@@ -51,7 +51,7 @@ module.exports = {
         });
     },
 
-    delete_workbook: (req, res, next) => {
+    admin_delete_workbook: (req, res, next) => {
         const name = req.body.name;
         const groupNumber = req.session.user.groupNumber;
         Workbook.deleteOne({name: name, groupNumber: groupNumber}, (err) => {
@@ -59,7 +59,7 @@ module.exports = {
                 console.log(err);
                 return res.status(500).json({success: false, message: err})
             }
-            return res.json({success: true, message: 'Deleted workbook ' + name})
+            return res.json({success: true, message: 'Deleted workbook ' + name + '.'})
         })
     },
 
@@ -135,7 +135,7 @@ module.exports = {
         })
     },
 
-    get_workbooks: (req, res, next) => {
+    get_unfilled_workbooks: (req, res, next) => {
         const username = req.session.user.username;
         const groupNumber = req.session.user.groupNumber;
         Workbook.find({groupNumber: groupNumber}, 'name', (err, workbooks) => {
@@ -167,6 +167,45 @@ module.exports = {
             }
             return res.json({success: true, filledWorkbooks: filledWorkbooks});
         })
+    },
+
+    // admin
+    admin_get_workbooks: (req, res, next) => {
+        const groupNumber = req.session.user.groupNumber;
+        Workbook.find({groupNumber: groupNumber}, 'name', (err, workbooks) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            return res.json({success: true, workbooks: workbooks});
+        })
+    },
+
+    admin_edit_workbooks: (req, res, next) => {
+        const name = req.body.name;
+        const date = Date.now();
+        const groupNumber = req.session.user.groupNumber;
+        let data = req.body.data;
+        Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            if (!workbook) {
+                return res.status(500).json({success: false, message: 'Workbook not found.'});
+            }
+            else {
+                // update it
+                workbook.data = data;
+                workbook.save((err, updated) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    return res.json({success: true, message: 'Successfully updated workbook ' + name + '.'})
+                });
+            }
+        });
     }
 
 

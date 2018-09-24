@@ -6,12 +6,9 @@ let router = express.Router();
 router.get('/api/workbook/:name', workbookController.get_workbook);
 
 // POST Create workbook
-router.post('/api/workbook', workbookController.create_workbook);
+router.post('/api/workbook', workbookController.admin_create_workbook);
 
-// DELETE Delete workbook
-router.delete('/api/workbook', workbookController.delete_workbook);
-
-// GET Find a workbook in current group
+// GET Find a filled workbook in current group
 router.get('/api/filled-workbook/:name', workbookController.get_filled_workbook);
 
 // POST Create or Update filled workbook
@@ -20,11 +17,20 @@ router.post('/api/filled-workbook', workbookController.update_filled_workbook);
 // DELETE Delete filled workbook
 router.delete('/api/filled-workbook', workbookController.delete_filled_workbook);
 
-// GET Find all workbooks in current group
-router.get('/api/workbooks', workbookController.get_workbooks);
+// GET Find all unfilled workbooks in current group
+router.get('/api/workbooks', workbookController.get_unfilled_workbooks);
 
 // GET Find all filled workbooks in current group for a user
 router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
+
+// GET Find all filled workbooks in current group for a user
+router.get('/api/admin/workbooks', workbookController.admin_get_workbooks);
+
+// PUT Edit a workbook
+router.put('/api/admin/workbooks', workbookController.admin_edit_workbooks);
+
+// DELETE Delete workbook
+router.delete('/api/admin/workbook', workbookController.admin_delete_workbook);
 
 // web pages
 router.get('/create-workbook', (req, res, next) => {
