@@ -23,3 +23,27 @@
     display: inline-block;
     border: none;
 }
+
+a.nav-item {
+    color: #495057;
+    background-color: #f3f3f3;
+    box-shadow: 0 0 2px 0 black;
+    margin: 1px;
+}
+
+a.nav-item.active.show {
+    color: #fff;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+#wrapper #content-wrapper {
+    padding-bottom: 0;
+}
+
+.btn-outline-secondary-no-hover {
+    color: #6c757d;
+    background-color: #fff;
+    border-color: #6c757d;
+    cursor: default !important;
+}

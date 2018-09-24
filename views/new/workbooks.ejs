@@ -1,0 +1,34 @@
+<%- include('../common/dashboardHeader', {title: 'Workbooks'}); -%>
+<div class="container-fluid">
+
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">Workbooks</a>
+        </li>
+        <li class="breadcrumb-item active">Overview</li>
+    </ol>
+
+    <div class="card">
+        <div class="card-body">
+
+            <h4 class="card-title"><span class="far fa-edit"></span> Empty workbooks you can fill out</h4>
+
+            <div id="workbooks">
+
+            </div>
+
+            <hr>
+
+            <h4 class="card-title"><span class="fas fa-edit"></span> View/Edit Filled Workbooks</h4>
+
+            <div id="filled-workbooks">
+
+            </div>
+
+        </div>
+    </div>
+    <%- include('../common/messageModal'); -%>
+</div>
+
+<%- include('../common/dashboardFooter', {js: ['/moh.js/profile.new.js']}); -%>

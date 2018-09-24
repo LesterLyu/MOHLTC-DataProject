@@ -1,5 +1,6 @@
 var tabCounter = 0;
 var sheets = [], sheetNames = [];
+var mode;
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
@@ -42,14 +43,15 @@ function addTab(sheetName) {
 
     // deactivate previous tab and content
     $('div.active.show').removeClass('active show');
-    $('a.active').removeClass('active');
+    $('a.active').removeClass('active show');
 
     // add content
     var tabContent = $('<div id="' + tabContentId + '" class="tab-pane fade active show"> <div id="' + gridId + '"></div></div>');
     $('#nav-tabContent').append(tabContent);
 
     // add tab
-    var newTab = $('<a class="nav-item nav-link active" data-toggle="tab" href="#' + tabContentId + '">' + sheetName + '</a>');
+    var newTab = $('<a class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '"> ' + sheetName
+        + '<i class="fas fa-pen ml-2"></i></a>');
     newTab.insertBefore('#nav-tab a:nth-last-child(1)');
 
     tabCounter++;
@@ -98,7 +100,62 @@ $(document).ready(function () {
         //showErrorAlert(xhr.responseJSON.message);
     });
 
+    // if this page is loaded for edit workbook
+    workbookName = $('#workbookNameInput').val();
+    mode = $('#mode').val();
+    if (mode === 'edit') {
+
+        // default url is for fill the workbook first time
+        var url = '/api/workbook/' + encodeURIComponent(workbookName);
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function (response) {
+            console.log(response);
+            if (response.success) {
+                var workBook = response.workbook.data;
+                console.log(workBook);
+                applyJson(workBook);
+                $('#loading').hide();
+            }
+        }).fail(function (xhr, status, error) {
+            console.log('fail ' + xhr.responseJSON.message);
+            //showErrorAlert(xhr.responseJSON.message);
+            $('#loading').hide();
+        });
+    }
+
 });
+
+
+// apply json to GUI tables
+function applyJson(workBookJson) {
+    // load to front-end
+    for (var sheetName in workBookJson) {
+        if (workBookJson.hasOwnProperty(sheetName)) {
+            sheetNames.push(sheetName);
+            var data = workBookJson[sheetName];
+            var gridId = addTab(sheetName);
+            // generate table
+            var container = document.getElementById(gridId);
+            var addedTable = newTable(container, $(window).height() - 500, false);
+            addedTable.loadData(data);
+            // lock cells
+            addedTable.updateSettings({
+                cells: function (row, col) {
+                    var cellProperties = {};
+                    if (row === 0 || col === 0) {
+                        cellProperties.readOnly = true;
+                    }
+                    return cellProperties;
+                }
+            });
+        }
+    }
+    console.log(sheets);
+    $('#nav-tab a:first-child').tab('show');
+}
 
 // get the selected att and cat
 function getSelected() {
@@ -170,10 +227,10 @@ $('#save-workbook-btn').on('click', function () {
     }
 
     $.ajax({
-        url: '/api/workbook',
-        type: 'POST',
+        url: '/api/admin/workbook',
+        type: (mode === 'edit' ? 'PUT' : 'POST'),
         contentType: 'application/json',
-        data: JSON.stringify({data: workbook, name: $('#workbookNameInput').val()}),
+        data: JSON.stringify({data: workbook, oldName: $('#workbookOldName').val(),name: $('#workbookNameInput').val()}),
     }).done(function (response) {
         if (response.success) {
             statusText.html('<i class="fas fa-check"></i> Saved');

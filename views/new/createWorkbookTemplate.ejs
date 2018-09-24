@@ -1,0 +1,110 @@
+<%- include('../common/dashboardHeader'); -%>
+
+<div class="container-fluid">
+
+    <input class="hide" id="mode" value="<%=mode%>">
+    <input class="hide" id="workbookOldName" value="<%=workbook%>">
+
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/new/manage-workbook-templates">Workbook Templates</a>
+        </li>
+        <li id="currentPageName" class="breadcrumb-item active"><%=title%></li>
+    </ol>
+
+    <form id="create-workbook-form">
+        <div class="form-group col-sm-10 col-md-6 col-lg-4 px-0">
+            <label for="workbookNameInput">Workbook Name:</label>
+            <input type="text" class="form-control" id="workbookNameInput" name="workbookName" placeholder="" value="<%=workbook%>">
+            <small class="form-text text-muted">A workbook may contain multiple sheets.</small>
+        </div>
+
+    </form>
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab">
+
+            <a id="show-modal-btn" class="nav-link nav-item" href="#"><i class="fas fa-plus"></i> Add Sheet</a>
+
+        </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+        <div id="loading" class="<%=(mode === 'edit' ? '' : 'hide')%>">
+            <br>
+            <h4><i class="fas fa-spinner fa-spin"></i> Loading... </h4>
+        </div>
+    </div>
+    <br>
+    <div class="container row align-items-center" id="save-row">
+        <div class="col-auto">
+            <button type="button" id="save-workbook-btn" class="btn-save btn btn-primary">Save Workbook</button>
+        </div>
+        <div class="col-auto">
+            <div id="status"> </div>
+        </div>
+    </div>
+
+    <hr>
+    <div class="container-fluid d-none d-md-block">
+        <h5>Instruction: </h5>
+        <p> Right click to view the menu. Select row/column and drag to move row/column.</p>
+    </div>
+</div>
+
+<div id="add-modal" tabindex="-1" class="modal fade" role="dialog" aria-labelledby="msg-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Sheet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-form-label col-sm-3" for="sheetNameInput">Sheet Name:</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="sheetNameInput" name="sheetName"
+                               placeholder="">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3" for="select-categories">Categories:</label>
+                    <select class="selectpicker col-sm-9" multiple data-live-search="true"
+                            data-style="btn-outline-primary"
+                            data-header="Select categories" id="select-categories">
+                    </select>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-3" for="select-categories">Attributes:</label>
+                    <select class="selectpicker col-sm-9" multiple data-live-search="true"
+                            data-style="btn-outline-primary"
+                            data-header="Select attributes" id="select-attributes">
+                    </select>
+                </div>
+                <button type="button" id="preview-btn" class="btn-save btn btn-primary">Preview Sheet</button>
+                <hr>
+                <div id="preview-grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+                <button type="button" id="add-confirm-btn" class="btn-save btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Message Modal-->
+<%- include('../common/messageModal'); -%>
+
+<link href="https://cdn.jsdelivr.net/npm/handsontable@5.0.2/dist/handsontable.full.min.css" rel="stylesheet"
+      media="screen">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+
+<%- include('../common/dashboardFooter', {js: [
+'https://cdn.jsdelivr.net/npm/handsontable@5.0.2/dist/handsontable.full.min.js',
+'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
+'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.0/xlsx.full.min.js',
+'/moh.js/createWorkbook.js',
+]}); -%>

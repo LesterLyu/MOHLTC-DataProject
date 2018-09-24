@@ -27,6 +27,14 @@ function generateToken(username, expireTime) {
 }
 
 module.exports = {
+    get_user: (username, cb) => {
+        User.findOne({username: username}, (err, user) => {
+            if (err) {
+                return cb(err);
+            }
+            return cb(err, user);
+        });
+    },
     user_sign_up: (req, res, next) => {
         // check if email is taken (passport will check other errors, i.e. username taken)
         User.findOne({username: req.body.username}, (err, user) => {
@@ -99,7 +107,8 @@ module.exports = {
                     }
                     // set user info in the session
                     req.session.user = user;
-
+                    if (config.enableNewInterface)
+                        return res.json({success: true, username: user.username, redirect: '/new/profile'});
                     return res.json({success: true, username: user.username, redirect: '/profile'})
                 });
             })(req, res, next);
@@ -120,7 +129,7 @@ module.exports = {
         // create token and sent by email
         const token = generateToken(req.session.user.username, 60);
         sendMail.sendValidationEmail(req.session.user.email, token, (info) => {
-            return res.redirect('/validate-now');
+            return res.json({success: true, message: info});
         });
     },
 
@@ -143,6 +152,7 @@ module.exports = {
                                     return next(err);
                                 }
                                 // good
+
                                 return res.redirect('/login');
                             });
 
@@ -220,7 +230,7 @@ module.exports = {
         const category = req.body.category;
         const groupNumber = req.session.user.groupNumber;
         if (category === '') {
-            return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
+            return res.status(400).json({success: false, message: 'Category cannot be empty.'});
         }
         Category.findOne({category: category, groupNumber: groupNumber}, (err, category) => {
             if (err) {

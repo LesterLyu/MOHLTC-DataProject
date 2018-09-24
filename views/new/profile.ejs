@@ -1,0 +1,29 @@
+<%- include('../common/dashboardHeader', {title: 'Profile'}); -%>
+<div class="container-fluid">
+
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">Profile</a>
+        </li>
+        <li class="breadcrumb-item active">Overview</li>
+    </ol>
+
+    <div class="card">
+        <div class="card-body">
+            <h4 class="card-title"><span class="fa fa-user"></span> User Information</h4>
+            First name: <%= user.firstName %> <br>
+            Last name: <%= user.lastName %> <br>
+            Group: <%= user.groupNumber %> <br>
+            Username: <%= user.username %> <br>
+            User type: <%= user.type %> <br>
+            Email: <%= user.email %> <br>
+            Registration Date: <%= user.createDate %> <br>
+            <hr>
+            <a class="btn btn-outline-success" href="/404">Update Profile</a>
+            <a class="btn btn-outline-success" href="/404">Change Password</a>
+        </div>
+    </div>
+</div>
+
+<%- include('../common/dashboardFooter'); -%>
