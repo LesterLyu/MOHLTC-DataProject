@@ -6,7 +6,7 @@ let router = express.Router();
 router.get('/api/workbook/:name', workbookController.get_workbook);
 
 // POST Create workbook
-router.post('/api/workbook', workbookController.admin_create_workbook);
+router.post('/api/admin/workbook', workbookController.admin_create_workbook);
 
 // GET Find a filled workbook in current group
 router.get('/api/filled-workbook/:name', workbookController.get_filled_workbook);
@@ -27,7 +27,7 @@ router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 router.get('/api/admin/workbooks', workbookController.admin_get_workbooks);
 
 // PUT Edit a workbook
-router.put('/api/admin/workbooks', workbookController.admin_edit_workbooks);
+router.put('/api/admin/workbook', workbookController.admin_edit_workbooks);
 
 // DELETE Delete workbook
 router.delete('/api/admin/workbook', workbookController.admin_delete_workbook);
@@ -47,7 +47,15 @@ router.get('/edit-workbook/:name', (req, res, next) => {
 
 // new
 router.get('/new/create-workbook-template', (req, res, next) => {
-    res.render('new/createWorkbookTemplate.ejs', {user: req.session.user});
+    res.render('new/createWorkbookTemplate.ejs', {
+        user: req.session.user, workbook: null, mode: 'create', title: 'Create Workbook Template'
+    });
+});
+
+router.get('/new/edit-workbook-template/:name', (req, res, next) => {
+    res.render('new/createWorkbookTemplate.ejs', {
+        user: req.session.user, workbook: req.params.name, mode: 'edit',  title: 'Edit Workbook Template'
+    });
 });
 
 router.get('/new/manage-workbook-templates', (req, res, next) => {

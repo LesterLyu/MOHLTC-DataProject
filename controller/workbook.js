@@ -59,7 +59,13 @@ module.exports = {
                 console.log(err);
                 return res.status(500).json({success: false, message: err})
             }
-            return res.json({success: true, message: 'Deleted workbook ' + name + '.'})
+            FilledWorkbook.deleteMany({name: name, groupNumber: groupNumber}, (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err})
+                }
+                return res.json({success: true, message: 'Deleted workbook ' + name + '.'})
+            });
         })
     },
 
@@ -183,10 +189,10 @@ module.exports = {
 
     admin_edit_workbooks: (req, res, next) => {
         const name = req.body.name;
-        const date = Date.now();
+        const oldName = req.body.oldName;
         const groupNumber = req.session.user.groupNumber;
         let data = req.body.data;
-        Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+        Workbook.findOne({name: oldName, groupNumber: groupNumber}, (err, workbook) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
@@ -196,6 +202,7 @@ module.exports = {
             }
             else {
                 // update it
+                workbook.name = name;
                 workbook.data = data;
                 workbook.save((err, updated) => {
                     if (err) {

@@ -16,7 +16,7 @@ function loadWorkbooks() {
                 var name = encodeURIComponent(workbooks[i].name);
                 container.append('<span class="btn btn-outline-secondary-no-hover form-name-box mr-2">\n' +
                     '<span class="fas fa-table"></span> ' + workbooks[i].name +
-                    '<a class="btn btn-outline-success ml-3" href="/new/admin/edit-workbook/' + name +'">' +
+                    '<a class="btn btn-outline-success ml-3" href="/new/edit-workbook-template/' + name +'">' +
                     'Edit</a> <a class="btn btn-outline-danger" href="#" onclick="deleteWorkbook(\''+ workbooks[i].name +'\')"> Delete</a> </span>');
             }
         }
@@ -27,6 +27,7 @@ function loadWorkbooks() {
 }
 
 // To-DO add confirmation dialog
+// All filled workbooks will also be deleted.
 function deleteWorkbook(name) {
     $.ajax({
         url: '/api/admin/workbook/',
