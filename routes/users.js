@@ -68,10 +68,19 @@ router.get('/add-att-cat', (req, res, next) => {
     res.render('addAttCat.ejs', {user: req.session.user});
 });
 
+router.get('/delete-att-cat', (req, res, next) => {
+    res.render('deleteAttCat.ejs', {user: req.session.user});
+});
+
+
 // add attribute ang category
 router.post('/api/add-att', user_controller.user_add_att);
 
 router.post('/api/add-cat', user_controller.user_add_cat);
+
+router.delete('/api/delete-cat', user_controller.user_delete_cat);
+
+router.delete('/api/delete-att', user_controller.user_delete_att);
 
 router.get('/api/attributes', user_controller.get_attributes);
 

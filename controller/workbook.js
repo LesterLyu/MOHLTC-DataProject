@@ -126,7 +126,7 @@ module.exports = {
         const name = req.body.name;
         const username = req.session.user.username;
         const groupNumber = req.session.user.groupNumber;
-        FilledWorkbook.deleteOne({name: name, username: username, groupNumber: groupNumber}, (err) => {
+        Attribute.deleteOne({name: name, username: username, groupNumber: groupNumber}, (err) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err})

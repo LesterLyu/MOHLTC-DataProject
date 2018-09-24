@@ -1,0 +1,64 @@
+<%- include('./common/header', {title: 'Create Attribute/Catrgories'}); -%>
+
+<div class="container col-sm-10 col-md-9 col-lg-8 col-xl-6 vertical-gap">
+    <a href="/profile"><h4><span class="fa fa-reply"></span> Profile</h4> </a>
+
+    <div class="container" style="margin-top: 0.25%;">
+
+        <div id="alert-error" class="alert alert-danger alert-dismissible hide" role="alert">
+            <h5 id="alert-error-text"></h5>
+            <button type="button" class="close" aria-label="Close" onclick="hideErrorAlert()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div id="alert" class="alert alert-success alert-dismissible hide" role="alert">
+            <h5 id="alert-text"></h5>
+            <button type="button" class="close" aria-label="Close" onclick="hideAlert()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <h1> Delete Category/Attribute </h1>
+        <br>
+
+        <form id="categoryForm" method="delete">
+            <label for="category"> Category name: </label>
+            <Select id="CatDropDown">
+
+            </Select>
+            <Button type="delete" class="btn btn-outline-primary"> Delete </Button>
+
+        </form>
+
+        <br>
+
+        <form id="attributeForm" method="delete">
+            <label for="attribute"> Attribute name: </label>
+            <Select id="AttDropDown">
+
+            </Select>
+            <Button type="delete" class="btn btn-outline-primary"> Delete </Button>
+
+        </form>
+    </div>
+
+</div>
+
+<script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
+
+<script src="/moh.js/deleteAttCat.js"></script>
+
+
+<%- include('./common/footer'); -%>
+

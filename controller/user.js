@@ -156,10 +156,12 @@ module.exports = {
     user_add_att: (req, res, next) => {
         const attribute = req.body.attribute;
         const groupNumber = req.session.user.groupNumber;
+        console.log(groupNumber);
         if (attribute === '') {
             return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
         }
         Attribute.findOne({attribute: attribute, groupNumber: groupNumber}, (err, attribute) => {
+
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
@@ -168,20 +170,51 @@ module.exports = {
             if (attribute) {
                 return res.status(400).json({success: false, message: 'Attribute ' + attribute.attribute + ' exists.'});
             } else {
+
                 let newAttribute = new Attribute({
+
                     attribute: req.body.attribute,
                     groupNumber: groupNumber,
                 });
+                console.log(req.body.attribute);
+                console.log(groupNumber);
                 newAttribute.save((err, updatedAttribute) => {
                     if (err) {
                         console.log(err);
                         return next(err);
                     }
+
                     return res.json({success: true, message: 'Attribute ' + updatedAttribute.attribute + ' added.'})
                 });
             }
         });
     },
+
+    user_delete_att: (req, res, next) => {
+        const attribute = req.body.data;
+        const groupNumber = req.session.user.groupNumber;
+        Attribute.deleteOne({attribute: attribute, groupNumber: groupNumber}, (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err})
+            }
+            return res.json({success: true, message: 'Deleted attribute ' + attribute})
+        });
+    },
+
+    user_delete_cat: (req, res, next) => {
+        const category = req.body.data;
+        const groupNumber = req.session.user.groupNumber;
+
+        Category.deleteOne({category: category, groupNumber: groupNumber}, (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err})
+            }
+            return res.json({success: true, message: 'Deleted category ' + category})
+        });
+    },
+
 
     user_add_cat: (req, res, next) => {
         const category = req.body.category;
@@ -214,6 +247,9 @@ module.exports = {
         });
 
     },
+
+
+
 
     get_attributes: (req, res, next) => {
         const groupNumber = req.session.user.groupNumber;
