@@ -142,14 +142,15 @@ function editSheet(index) {
     $('#sheetNameInput').val(sheetNames[index]);
 
     var data = sheets[index].getData().slice();
-    console.log(data);
-    data[0].splice(data[0].indexOf(''), 1)
-    var cates = data[0];
-    var attrs = [];
+    // console.log(data);
+    data[0].splice(data[0].indexOf(''), 1);
+    var attrs = data[0];
+    var cates = [];
     for (var i = 1; i < data.length; i++) {
-        if (data[i][0] !== '') attrs.push(data[i][0])
+        if (data[i][0] !== '') cates.push(data[i][0])
     }
-    console.log(attrs);
+
+    console.log(attrs, cates);
     selecte_categories.selectpicker('val', cates);
     selecte_attributes.selectpicker('val', attrs);
     $('#add-confirm-btn').html('Modify');
@@ -190,10 +191,10 @@ function getSelected() {
     var selected_categories = $('#select-categories').val();
     var selected_attributes = $('#select-attributes').val();
     var data = [];
-    data.push([''].concat(selected_categories));
-    for (var i = 0; i < selected_attributes.length; i++) {
-        data.push([selected_attributes[i]].concat(
-            Array(selected_categories.length).join('.').split('.')));
+    data.push([''].concat(selected_attributes));
+    for (var i = 0; i < selected_categories.length; i++) {
+        data.push([selected_categories[i]].concat(
+            Array(selected_attributes.length).join('.').split('.')));
     }
     return data;
 }
@@ -201,6 +202,7 @@ function getSelected() {
 // add sheet modal
 $('#show-modal-btn').click(function () {
     state.modalMode = 'add';
+    $('#sheetNameInput').val('');
     $('#select-categories').selectpicker('deselectAll');
     $('#select-attributes').selectpicker('deselectAll');
     $('#add-confirm-btn').html('Add');
