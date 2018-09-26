@@ -31,12 +31,16 @@ function newTable(container, height, preview) {
         colHeaders: true,
         contextMenu: ['remove_row', 'remove_col', '---------', 'copy'],
     };
+
+    var createdTable = new Handsontable(container, spec);
+
     if (preview) {
         spec.manualColumnMove = false;
         spec.manualRowMove = false;
     }
-    var createdTable = new Handsontable(container, spec);
-    sheets.push(createdTable);
+    else {
+        sheets.push(createdTable);
+    }
     return createdTable;
 }
 
