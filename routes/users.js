@@ -1,29 +1,17 @@
 const express = require('express');
-const passport = require('passport');
 const user_controller = require('../controller/user');
-const jwt = require("jsonwebtoken");
 let router = express.Router();
 
-const config = require('../config/config');
-
-
-// =====================================
-// LOGIN =============================
-// =====================================
 router.get('/login', function (req, res) {
-    if (req.isAuthenticated() && req.session.user.validated) { // preserve sign in after validation
-        if (config.enableNewInterface)
-            return res.redirect('/new/profile');
-        return res.redirect('/profile');
+    if (req.isAuthenticated()) {
+        return res.redirect('/sidebar/profile');
     }
     res.render('login.ejs');
 });
 
 router.get('/signup', function (req, res) {
     if (req.isAuthenticated()) {
-        if (config.enableNewInterface)
-            return res.redirect('/new/profile');
-        return res.redirect('/profile');
+        return res.redirect('/sidebar/profile');
     }
     res.render('signup.ejs');
 });
@@ -32,9 +20,10 @@ router.get('/signup', function (req, res) {
 // POST request for user sign up
 router.post('/api/signup', user_controller.user_sign_up);
 
+// POST request for user sign in
 router.post('/api/login', user_controller.user_log_in);
 
-// validate account
+// validate account from email link
 router.get('/validate/:token', user_controller.user_validate);
 
 // check authentication middleware
@@ -44,15 +33,17 @@ router.use((req, res, next) => {
         return res.redirect('/login');
     }
     else {
-        console.log('Authenticated');
         next();
     }
 });
 
+// GET log out current account
 router.get('/api/logout', user_controller.user_log_out);
 
+// GET send account verification email
 router.get('/api/send-validation-email', user_controller.user_send_validation_email);
 
+// validate page (ask you to check your email)
 router.get('/validate-now', function (req, res, next) {
     // check if the user is validated
     user_controller.get_user(req.session.user.username, (err, user) => {
@@ -60,68 +51,26 @@ router.get('/validate-now', function (req, res, next) {
             return next(err);
         }
         if (user.validated) {
+            user_controller.logout(req);
             return res.redirect('/login');
         }
         res.render('tobevalidated.ejs', {user: req.session.user});
     })
-
-
 });
 
 // check account validation middleware
 router.use((req, res, next) => {
-
     if (!req.session.user.validated) {
         return res.redirect('/validate-now');
     }
     next();
 });
 
-router.get('/add-att-cat', (req, res, next) => {
-    res.render('addAttCat.ejs', {user: req.session.user});
-});
-
-router.get('/delete-att-cat', (req, res, next) => {
-    res.render('deleteAttCat.ejs', {user: req.session.user});
-});
-
-
-// add attribute ang category
-router.post('/api/add-att', user_controller.user_add_att);
-
-router.post('/api/add-cat', user_controller.user_add_cat);
-
-router.delete('/api/delete-cat', user_controller.user_delete_cat);
-
-router.delete('/api/delete-att', user_controller.user_delete_att);
-
-router.get('/api/attributes', user_controller.get_attributes);
-
-router.get('/api/categories', user_controller.get_categories);
-
-
-router.get('/profile', function (req, res) {
-    res.render('profile.ejs', {user: req.session.user});
-});
 
 // new pages
-router.get('/new/profile', function (req, res) {
-    res.render('new/profile.ejs', {user: req.session.user});
+router.get('/profile', function (req, res) {
+    res.render('sidebar/profile.ejs', {user: req.session.user});
 });
-
-router.get('/new/workbooks', function (req, res) {
-    res.render('new/workbooks.ejs', {user: req.session.user});
-});
-
-router.get('/new/add-att-cat', (req, res, next) => {
-    res.render('new/addAttCat.ejs', {user: req.session.user});
-});
-
-router.get('/new/delete-att-cat', (req, res, next) => {
-    res.render('new/deleteAttCat.ejs', {user: req.session.user});
-});
-
-
 
 
 module.exports = router;

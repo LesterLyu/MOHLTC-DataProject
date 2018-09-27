@@ -20,7 +20,7 @@ function loadWorkbooks() {
                 var name = encodeURIComponent(workbooks[i].name);
                 container.append('<span class="btn btn-outline-secondary-no-hover form-name-box mr-2">\n' +
                     '<span class="fas fa-table"></span> ' + workbooks[i].name +
-                    '<a class="btn btn-outline-success ml-3" href="/new/edit-workbook-template/' + name +'">' +
+                    '<a class="btn btn-outline-success ml-3" href="/edit-workbook-template/' + name +'">' +
                     'Edit</a> <a class="btn btn-outline-danger" href="#" onclick="deleteWorkbook(\'' + addslashes(name) +'\')"> Delete</a> </span>');
             }
         }

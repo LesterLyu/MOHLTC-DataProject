@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const passportLocalMongoose = require('passport-local-mongoose');
+const config = require('../config/config')
 
 let userSchema = new mongoose.Schema({
     username: {type: String, unique: true}, //key
@@ -12,7 +13,7 @@ let userSchema = new mongoose.Schema({
     email: {type: String, unique: true},
     groupNumber: Number,
     active: {type: Boolean, default: true}, // you can disable a user
-    permissions: [] // 'admin-add-workbook', 'admin-add-attribute', ...
+    permissions: {type: Array, default: [config.permissions.FILL_WORKBOOK]} // 'admin-add-workbook', 'admin-add-attribute', ...
 
 });
 // embed passport functions

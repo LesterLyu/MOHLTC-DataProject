@@ -12,10 +12,10 @@ module.exports = {
         sender: '"Lester Lyu" <lyulester@gmail.com>'
     },
     serverHostname: "http://142.107.248.32:3000", //used for receive validation link
-    userTypes: { // not yet used
-        0: 'User',
-        1: 'Superuser',
-        2: 'Admin'
+    permissions: { // Constants, not yet used
+        FILL_WORKBOOK: 'fill-workbook',
+        WORKBOOK_TEMPLATE_MANAGEMENT: 'CRUD-workbook-template',
+        ATTRIBUTE_CATEGORY_MANAGEMENT: 'create-delete-attribute-category',
+        USER_MANAGEMENT: 'user-management'
     },
-    enableNewInterface: true, // use sidebar
 };

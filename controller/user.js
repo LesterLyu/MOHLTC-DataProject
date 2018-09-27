@@ -35,6 +35,13 @@ module.exports = {
             return cb(err, user);
         });
     },
+
+    logout: (req) => {
+        req.logout();
+        // clear user info in the session
+        req.session.user = {};
+    },
+
     user_sign_up: (req, res, next) => {
         // check if email is taken (passport will check other errors, i.e. username taken)
         User.findOne({username: req.body.username}, (err, user) => {
@@ -107,9 +114,7 @@ module.exports = {
                     }
                     // set user info in the session
                     req.session.user = user;
-                    if (config.enableNewInterface)
-                        return res.json({success: true, username: user.username, redirect: '/new/profile'});
-                    return res.json({success: true, username: user.username, redirect: '/profile'})
+                    return res.json({success: true, username: user.username, redirect: '/profile'});
                 });
             })(req, res, next);
 
@@ -163,121 +168,6 @@ module.exports = {
         },
 
 
-    user_add_att: (req, res, next) => {
-        const attribute = req.body.attribute;
-        const groupNumber = req.session.user.groupNumber;
-        if (attribute === '') {
-            return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
-        }
-        Attribute.findOne({attribute: attribute, groupNumber: groupNumber}, (err, attribute) => {
 
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-
-            if (attribute) {
-                return res.status(400).json({success: false, message: 'Attribute ' + attribute.attribute + ' exists.'});
-            } else {
-
-                let newAttribute = new Attribute({
-
-                    attribute: req.body.attribute,
-                    groupNumber: groupNumber,
-                });
-                newAttribute.save((err, updatedAttribute) => {
-                    if (err) {
-                        console.log(err);
-                        return next(err);
-                    }
-
-                    return res.json({success: true, message: 'Attribute ' + updatedAttribute.attribute + ' added.'})
-                });
-            }
-        });
-    },
-
-    user_delete_att: (req, res, next) => {
-        const attribute = req.body.data;
-        const groupNumber = req.session.user.groupNumber;
-        Attribute.deleteOne({attribute: attribute, groupNumber: groupNumber}, (err) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err})
-            }
-            return res.json({success: true, message: 'Deleted attribute ' + attribute})
-        });
-    },
-
-    user_delete_cat: (req, res, next) => {
-        const category = req.body.data;
-        const groupNumber = req.session.user.groupNumber;
-
-        Category.deleteOne({category: category, groupNumber: groupNumber}, (err) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err})
-            }
-            return res.json({success: true, message: 'Deleted category ' + category})
-        });
-    },
-
-
-    user_add_cat: (req, res, next) => {
-        const category = req.body.category;
-        const groupNumber = req.session.user.groupNumber;
-        if (category === '') {
-            return res.status(400).json({success: false, message: 'Category cannot be empty.'});
-        }
-        Category.findOne({category: category, groupNumber: groupNumber}, (err, category) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-
-            if (category) {
-                return res.status(400).json({success: false, message: 'Category ' + category.category +' exists.'});
-            } else {
-                let newCategory = new Category({
-                    category: req.body.category,
-                    groupNumber: groupNumber,
-                });
-                newCategory.save((err, updatedCategory) => {
-                    if (err) {
-                        console.log(err);
-                        return next(err);
-                    }
-                    return res.json({success: true, message: 'Category ' + updatedCategory.category + ' added.'})
-                });
-
-            }
-        });
-
-    },
-
-
-
-
-    get_attributes: (req, res, next) => {
-        const groupNumber = req.session.user.groupNumber;
-        Attribute.find({groupNumber: groupNumber}, 'attribute', (err, attributes) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            return res.json({success: true, attributes: attributes});
-        })
-    },
-
-    get_categories: (req, res, next) => {
-        const groupNumber = req.session.user.groupNumber;
-        Category.find({groupNumber: groupNumber}, 'category', (err, categories) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            return res.json({success: true, categories: categories});
-        })
-    }
 
 };

@@ -1,7 +1,15 @@
 const Workbook = require('../models/workbook');
 const FilledWorkbook = require('../models/filledWorkbook');
+const error = require('../config/error');
+const config = require('../config/config');
+
+function checkPermission(req) {
+    return req.session.user.permissions.includes(config.permissions.WORKBOOK_TEMPLATE_MANAGEMENT);
+}
+
 
 module.exports = {
+    checkPermission: checkPermission,
 
     // get an empty workbook templet
     get_workbook: (req, res, next) => {
@@ -16,56 +24,6 @@ module.exports = {
                 return res.status(400).json({success: false, message: 'Workbook does not exist.'});
             }
             return res.json({success: true, workbook: workbook});
-        })
-    },
-
-    admin_create_workbook: (req, res, next) => {
-        const name = req.body.name;
-        const groupNumber = req.session.user.groupNumber;
-        let data = req.body.data;
-        if (name === '') {
-            return res.status(500).json({success: false, message: 'Name cannot be empty.'});
-        }
-
-        Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            if (workbook) {
-                return res.status(400).json({success: false, message: 'Workbook exists.'})
-            }
-            let newWorkbook = new Workbook({
-                name: name,
-                groupNumber: groupNumber,
-                data: data
-            });
-            newWorkbook.save((err, updatedWorkbook) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json({success: false, message: err});
-                }
-                return res.json({success: true, message: 'Successfully added workbook ' + name + '.'});
-            })
-
-        });
-    },
-
-    admin_delete_workbook: (req, res, next) => {
-        const name = req.body.name;
-        const groupNumber = req.session.user.groupNumber;
-        Workbook.deleteOne({name: name, groupNumber: groupNumber}, (err) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err})
-            }
-            FilledWorkbook.deleteMany({name: name, groupNumber: groupNumber}, (err) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json({success: false, message: err})
-                }
-                return res.json({success: true, message: 'Deleted workbook ' + name + '.'})
-            });
         })
     },
 
@@ -176,7 +134,66 @@ module.exports = {
     },
 
     // admin
+    admin_create_workbook: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        const name = req.body.name;
+        const groupNumber = req.session.user.groupNumber;
+        let data = req.body.data;
+        if (name === '') {
+            return res.status(500).json({success: false, message: 'Name cannot be empty.'});
+        }
+
+        Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            if (workbook) {
+                return res.status(400).json({success: false, message: 'Workbook exists.'})
+            }
+            let newWorkbook = new Workbook({
+                name: name,
+                groupNumber: groupNumber,
+                data: data
+            });
+            newWorkbook.save((err, updatedWorkbook) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                return res.json({success: true, message: 'Successfully added workbook ' + name + '.'});
+            })
+
+        });
+    },
+
+    admin_delete_workbook: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        const name = req.body.name;
+        const groupNumber = req.session.user.groupNumber;
+        Workbook.deleteOne({name: name, groupNumber: groupNumber}, (err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err})
+            }
+            FilledWorkbook.deleteMany({name: name, groupNumber: groupNumber}, (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err})
+                }
+                return res.json({success: true, message: 'Deleted workbook ' + name + '.'})
+            });
+        })
+    },
+
     admin_get_workbooks: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
         const groupNumber = req.session.user.groupNumber;
         Workbook.find({groupNumber: groupNumber}, 'name', (err, workbooks) => {
             if (err) {
@@ -188,6 +205,9 @@ module.exports = {
     },
 
     admin_edit_workbooks: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
         const name = req.body.name;
         const oldName = req.body.oldName;
         const groupNumber = req.session.user.groupNumber;

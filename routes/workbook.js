@@ -2,6 +2,8 @@ const express = require('express');
 const workbookController = require('../controller/workbook');
 let router = express.Router();
 
+const error = require('../config/error');
+
 // GET Find a workbook in current group
 router.get('/api/workbook/:name', workbookController.get_workbook);
 
@@ -33,43 +35,51 @@ router.put('/api/admin/workbook', workbookController.admin_edit_workbooks);
 router.delete('/api/admin/workbook', workbookController.admin_delete_workbook);
 
 // web pages
-router.get('/create-workbook', (req, res, next) => {
-    res.render('createWorkbookTemplate.ejs', {user: req.session.user});
+
+router.get('/create-workbook-template', (req, res, next) => {
+    if(workbookController.checkPermission(req)) {
+        res.render('sidebar/createWorkbookTemplate.ejs', {
+            user: req.session.user, workbook: null, mode: 'create', title: 'Create Workbook Template'
+        });
+    }
+    else{
+        res.status(403).render('error.ejs', error.NO_PERMISSION)
+    }
+
+});
+
+router.get('/edit-workbook-template/:name', (req, res, next) => {
+    if(workbookController.checkPermission(req)) {
+        res.render('sidebar/createWorkbookTemplate.ejs', {
+            user: req.session.user, workbook: req.params.name, mode: 'edit',  title: 'Edit Workbook Template'
+        });
+    }
+    else{
+        res.status(403).render('error.ejs', error.NO_PERMISSION)
+    }
+
+});
+
+router.get('/manage-workbook-templates', (req, res, next) => {
+    if(workbookController.checkPermission(req)) {
+        res.render('sidebar/manageWorkbookTemplate.ejs', {user: req.session.user});
+    }
+    else{
+        res.status(403).render('error.ejs', error.NO_PERMISSION)
+    }
 });
 
 router.get('/fill-workbook/:name', (req, res, next) => {
-    res.render('fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'fill'});
+    res.render('sidebar/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'fill'});
 });
 
 router.get('/edit-workbook/:name', (req, res, next) => {
-    res.render('fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'edit'});
+    res.render('sidebar/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'edit'});
 });
 
-// new
-router.get('/new/create-workbook-template', (req, res, next) => {
-    res.render('new/createWorkbookTemplate.ejs', {
-        user: req.session.user, workbook: null, mode: 'create', title: 'Create Workbook Template'
-    });
+router.get('/workbooks', function (req, res) {
+    res.render('sidebar/workbooks.ejs', {user: req.session.user});
 });
-
-router.get('/new/edit-workbook-template/:name', (req, res, next) => {
-    res.render('new/createWorkbookTemplate.ejs', {
-        user: req.session.user, workbook: req.params.name, mode: 'edit',  title: 'Edit Workbook Template'
-    });
-});
-
-router.get('/new/manage-workbook-templates', (req, res, next) => {
-    res.render('new/manageWorkbookTemplate.ejs', {user: req.session.user});
-});
-
-router.get('/new/fill-workbook/:name', (req, res, next) => {
-    res.render('new/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'fill'});
-});
-
-router.get('/new/edit-workbook/:name', (req, res, next) => {
-    res.render('new/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'edit'});
-});
-
 
 
 module.exports = router;
