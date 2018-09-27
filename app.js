@@ -32,6 +32,8 @@ const workbookRouter = require('./routes/workbook');
 
 const attCatRouter = require('./routes/attCat');
 
+const userManagementRouter = require('./routes/userManagement');
+
 const User = require('./models/user');
 
 app.set('port', process.env.PORT || 3000);
@@ -83,6 +85,7 @@ app.use('/', usersRouter); // API or pages below this requires authentication
 
 app.use('/', attCatRouter);
 app.use('/', workbookRouter);
+app.use('/', userManagementRouter);
 
 
 

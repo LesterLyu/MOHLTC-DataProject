@@ -67,10 +67,11 @@ router.use((req, res, next) => {
 });
 
 
-// new pages
+// profile page
 router.get('/profile', function (req, res) {
     res.render('sidebar/profile.ejs', {user: req.session.user});
 });
+
 
 
 module.exports = router;
