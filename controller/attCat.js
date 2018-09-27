@@ -122,7 +122,7 @@ module.exports = {
 
     get_attributes: (req, res, next) => {
         const groupNumber = req.session.user.groupNumber;
-        Attribute.find({groupNumber: groupNumber}, 'attribute', (err, attributes) => {
+        Attribute.find({groupNumber: groupNumber}, 'attribute id', (err, attributes) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
@@ -133,7 +133,7 @@ module.exports = {
 
     get_categories: (req, res, next) => {
         const groupNumber = req.session.user.groupNumber;
-        Category.find({groupNumber: groupNumber}, 'category', (err, categories) => {
+        Category.find({groupNumber: groupNumber}, 'category id', (err, categories) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});

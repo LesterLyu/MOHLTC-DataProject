@@ -37,44 +37,41 @@ router.delete('/api/admin/workbook', workbookController.admin_delete_workbook);
 // web pages
 
 router.get('/create-workbook-template', (req, res, next) => {
-    if(workbookController.checkPermission(req)) {
+    if (workbookController.checkPermission(req)) {
         res.render('sidebar/createWorkbookTemplate.ejs', {
             user: req.session.user, workbook: null, mode: 'create', title: 'Create Workbook Template'
         });
     }
-    else{
+    else {
         res.status(403).render('error.ejs', error.NO_PERMISSION)
     }
 
 });
 
 router.get('/edit-workbook-template/:name', (req, res, next) => {
-    if(workbookController.checkPermission(req)) {
+    if (workbookController.checkPermission(req)) {
         res.render('sidebar/createWorkbookTemplate.ejs', {
-            user: req.session.user, workbook: req.params.name, mode: 'edit',  title: 'Edit Workbook Template'
+            user: req.session.user, workbook: req.params.name, mode: 'edit', title: 'Edit Workbook Template'
         });
     }
-    else{
+    else {
         res.status(403).render('error.ejs', error.NO_PERMISSION)
     }
 
 });
 
 router.get('/manage-workbook-templates', (req, res, next) => {
-    if(workbookController.checkPermission(req)) {
+    if (workbookController.checkPermission(req)) {
         res.render('sidebar/manageWorkbookTemplate.ejs', {user: req.session.user});
     }
-    else{
+    else {
         res.status(403).render('error.ejs', error.NO_PERMISSION)
     }
 });
-
+// fill an empty workbook
 router.get('/fill-workbook/:name', (req, res, next) => {
-    res.render('sidebar/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'fill'});
-});
+    return res.render('sidebar/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name});
 
-router.get('/edit-workbook/:name', (req, res, next) => {
-    res.render('sidebar/fillWorkbook.ejs', {user: req.session.user, workbook: req.params.name, mode: 'edit'});
 });
 
 router.get('/workbooks', function (req, res) {

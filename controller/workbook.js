@@ -27,19 +27,31 @@ module.exports = {
         })
     },
 
-    // get a filled workbook
+    // get a filled workbook, if not exists, send an empty workbook
     get_filled_workbook: (req, res, next) => {
         const name = req.params.name;
+        const username = req.session.user.username;
         const groupNumber = req.session.user.groupNumber;
-        FilledWorkbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+        FilledWorkbook.findOne({name: name, username: username, groupNumber: groupNumber}, (err, filledWorkbook) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
-            if (!workbook) {
-                return res.status(400).json({success: false, message: 'filled Workbook does not exist.'});
+            if (!filledWorkbook) {
+                Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    if (!workbook) {
+                        return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                    }
+                    return res.json({success: true, workbook: workbook});
+                })
             }
-            return res.json({success: true, workbook: workbook});
+            else {
+                return res.json({success: true, workbook: filledWorkbook});
+            }
         })
     },
 

@@ -11,7 +11,6 @@
 
     <!--Transfer data from EJS to front-end-->
     <input class="hide" id="filled-workbook" value="<%= workbook %>">
-    <input class="hide" id="mode" value="<%= mode %>">
 
     <h2>
         <%= workbook %>
@@ -39,7 +38,10 @@
         </div>
     </nav>
     <div class="tab-content" id="nav-tabContent">
-
+        <div id="loading">
+            <br>
+            <h4><i class="fas fa-spinner fa-spin"></i> Loading... </h4>
+        </div>
     </div>
     <br>
 </div>

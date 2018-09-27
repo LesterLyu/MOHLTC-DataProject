@@ -21,7 +21,7 @@ function newTable(container, height, preview) {
         data: [],
         width: container.offsetWidth,
         height: height,
-        colWidths: 100,
+        colWidths: 80,
         rowHeights: 23,
         manualColumnResize: true,
         manualRowResize: true,
@@ -78,8 +78,8 @@ $(document).ready(function () {
         if (response.success) {
             $.each(response.attributes, function (i, item) {
                 selectAttributes.append($('<option>', {
-                    value: item.attribute,
-                    text: item.attribute
+                    value: item.id + ',' + item.attribute,
+                    text: '#' + item.id + '  ' + item.attribute,
                 }));
             });
 
@@ -96,8 +96,8 @@ $(document).ready(function () {
         if (response.success) {
             $.each(response.categories, function (i, item) {
                 selectCategories.append($('<option>', {
-                    value: item.category,
-                    text: item.category
+                    value: item.id + ',' + item.category,
+                    text: '#' + item.id + '  ' + item.category,
                 }));
             });
 
@@ -195,9 +195,20 @@ function getSelected() {
     var selected_categories = $('#select-categories').val();
     var selected_attributes = $('#select-attributes').val();
     var data = [];
-    data.push([''].concat(selected_attributes));
-    for (var i = 0; i < selected_categories.length; i++) {
-        data.push([selected_categories[i]].concat(
+    var att_id = [], att = [], i;
+    // add first two rows
+    for (i = 0; i < selected_attributes.length; i++) {
+        att_id.push(selected_attributes[i].substring(0, selected_attributes[i].indexOf(',')))
+        att.push(selected_attributes[i].substring(1 + selected_attributes[i].indexOf(',')))
+    }
+    data.push(['', ''].concat(att_id));
+    data.push(['', ''].concat(att));
+
+    // add columns
+    for (i = 0; i < selected_categories.length; i++) {
+        var cat_id = selected_categories[i].substring(0, selected_categories[i].indexOf(','));
+        var cat = selected_categories[i].substring(1 + selected_categories[i].indexOf(','))
+        data.push([cat_id, cat].concat(
             Array(selected_attributes.length).join('.').split('.')));
     }
     return data;
@@ -215,6 +226,7 @@ $('#show-modal-btn').click(function () {
 
 // preview the sheet in the modal
 $('#preview-btn').click(function () {
+    $('#preview-grid').html('');
     var container = document.getElementById('preview-grid');
     var previewTable = newTable(container, 300, true);
     previewTable.loadData(getSelected());
