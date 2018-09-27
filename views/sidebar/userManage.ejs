@@ -1,0 +1,12 @@
+<%- include('../common/dashboardHeader', {title: 'User Management'}); -%>
+
+<table id="users" class="display" width="100%"></table>
+
+
+<link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+
+
+<%- include('../common/dashboardFooter', {js: [
+    'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js',
+    '/moh.js/userManage.js'
+]}); -%>
