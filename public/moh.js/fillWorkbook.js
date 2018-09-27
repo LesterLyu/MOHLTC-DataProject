@@ -1,6 +1,6 @@
 var tabCounter = 0;
 var sheets = [], sheetNames = [];
-var workbookName, mode;
+var workbookName;
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
@@ -17,7 +17,7 @@ function newTable(container, height) {
         data: [],
         width: container.offsetWidth,
         height: height,
-        colWidths: 100,
+        colWidths: 80,
         rowHeights: 23,
         manualColumnResize: true,
         manualRowResize: true,
@@ -123,13 +123,8 @@ function applyJson(workBookJson) {
 
 $(document).ready(function () {
     workbookName = $('#filled-workbook').val();
-    mode = $('#mode').val();
     // default url is for fill the workbook first time
-    var url = '/api/workbook/' + encodeURIComponent(workbookName);
-    // if this page is loaded for edit filled workbook
-    if (mode === 'edit') {
-        url = '/api/filled-workbook/' + encodeURIComponent(workbookName)
-    }
+    var url = '/api/filled-workbook/' + encodeURIComponent(workbookName);
     $.ajax({
         url: url,
         type: 'GET',
@@ -138,10 +133,12 @@ $(document).ready(function () {
         if (response.success) {
             var workBook = response.workbook.data;
             console.log(workBook);
-            applyJson(workBook)
+            applyJson(workBook);
+            $('#loading').hide();
         }
     }).fail(function (xhr, status, error) {
         console.log('fail ' + xhr.responseJSON.message);
+        $('#loading').hide();
         //showErrorAlert(xhr.responseJSON.message);
     });
 
