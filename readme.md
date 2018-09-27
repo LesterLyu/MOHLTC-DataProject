@@ -1,5 +1,5 @@
 # DataProject
-## Live on http://104.211.9.242:3000
+## Live on http://dataproject-env.u2t3prjsea.us-east-2.elasticbeanstalk.com
 ## Documents
 - [User Types](document/user-types.md)
 
