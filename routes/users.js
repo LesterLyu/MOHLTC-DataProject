@@ -4,14 +4,14 @@ let router = express.Router();
 
 router.get('/login', function (req, res) {
     if (req.isAuthenticated()) {
-        return res.redirect('/sidebar/profile');
+        return res.redirect('/profile');
     }
     res.render('login.ejs');
 });
 
 router.get('/signup', function (req, res) {
     if (req.isAuthenticated()) {
-        return res.redirect('/sidebar/profile');
+        return res.redirect('/profile');
     }
     res.render('signup.ejs');
 });
