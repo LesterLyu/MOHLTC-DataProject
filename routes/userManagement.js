@@ -46,14 +46,15 @@ router.post('/api/user/permission', user_management_controller.admin_update_user
  */
 router.get('/api/user/details', user_management_controller.admin_get_all_users_with_details);
 
-router.get('/user-management', (req, res, next) => {
+router.get('/user/management', (req, res, next) => {
     if (user_management_controller.checkPermission(req)) {
-        res.render('sidebar/userManage.ejs', {user: req.session.user});
+        res.render('sidebar/userManagement.ejs', {user: req.session.user});
     }
     else {
         res.status(403).render('error.ejs', error.NO_PERMISSION)
     }
 });
+
 
 
 module.exports = router;

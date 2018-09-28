@@ -1,0 +1,38 @@
+<%- include('../common/dashboardHeader', {title: 'User management'}); -%>
+
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/css/bootstrap-select.min.css">
+
+<div class="container-fluid">
+
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">Users</a>
+        </li>
+        <li class="breadcrumb-item active">Overview</li>
+    </ol>
+
+    <div class="card">
+        <div class="card-body">
+            <table id="user-table" class="display">
+                <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Group Number</th>
+                    <th>validated</th>
+                    <th>Email</th>
+                    <th>Permissions</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<%- include('../common/dashboardFooter', {js: [
+    'https://cdn.datatables.net/1.10.19/js/jquery.dataTables.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.2/js/bootstrap-select.min.js',
+    '/moh.js/userManagement.js',
+
+]}); -%>
