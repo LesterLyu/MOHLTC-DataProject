@@ -13,7 +13,7 @@ module.exports = {
     },
     serverHostname: "http://142.107.248.32:3000", //used for receive validation link
     permissions: { // Constants, not yet used
-        FILL_WORKBOOK: 'fill-workbook', // not implemented, fow now, everyone can fill workbooks
+        //FILL_WORKBOOK: 'fill-workbook', // not implemented, fow now, everyone can fill workbooks
         WORKBOOK_TEMPLATE_MANAGEMENT: 'CRUD-workbook-template',
         ATTRIBUTE_CATEGORY_MANAGEMENT: 'create-delete-attribute-category',
         USER_MANAGEMENT: 'user-management'

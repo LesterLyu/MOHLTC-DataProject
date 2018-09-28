@@ -13,7 +13,7 @@ let userSchema = new mongoose.Schema({
     email: {type: String, unique: true},
     groupNumber: Number,
     active: {type: Boolean, default: true}, // you can disable a user
-    permissions: {type: Array, default: [config.permissions.FILL_WORKBOOK]} // 'admin-add-workbook', 'admin-add-attribute', ...
+    permissions: {type: Array} // 'admin-add-workbook', 'admin-add-attribute', ...
 
 });
 // embed passport functions

@@ -1,6 +1,33 @@
+var userData = [];
+
+//helpers
+// runs into O(nLogn)
+function compare(array1, array2) {
+    array1.sort();
+    array2.sort();
+    for (var i = 0; i < array1.length; i++) {
+        if (array1[i] !== array2[i]) return false;
+    }
+    return true;
+}
+
 $(document).ready(function () {
 
+    $.ajax({
+        url: '/api/permissions',
+        type: 'GET',
+    }).done(function (response) {
+        if (response.success) {
+            // init datatable
+            initDatatable(response.permissions);
 
+        }
+    }).fail(function (xhr, status, error) {
+        console.log(xhr.responseJSON.message);
+    });
+});
+
+function initDatatable(permissions) {
     $('#user-table').DataTable({
         ajax: {
             url: '/api/user/details',
@@ -13,7 +40,67 @@ $(document).ready(function () {
             {'data': 'email'},
             {'data': 'permissions'},
         ],
-    });
+        columnDefs: [{
+            render: function (data, type, row) {
+                var newPer = $('<select></select>').addClass('selectpicker')
+                    .attr('multiple', 'multiple').attr('id', 'select-' + row.username)
+                    .attr('data-style', 'btn-outline-primary')
+                    .attr('data-live-search', 'true');
+                for (var i = 0; i < permissions.length; i++) {
+                    var option = $('<option>', {
+                        value: permissions[i],
+                        text: permissions[i],
+                    });
+                    if (data.includes(permissions[i])) {
+                        option.attr('selected', 'selected')
+                    }
+                    newPer.append(option);
+                }
 
+                return newPer.prop('outerHTML');
+            },
+            targets: 4
+        }],
+        initComplete: function (settings, json) {
+            // store locally
+            userData = json.users;
+
+        }
+    }).on('draw', function () {
+        // reload selectpicker
+        $('select').selectpicker();
+    });
+}
+
+$('#save-btn').click(function () {
+    var btn = $(this);
+    var statusText = $('#status');
+    statusText.html('<i class="fas fa-spinner fa-spin"></i> Saving');
+    btn.prop('disabled', true);
+
+    var data = [];
+    for (var i = 0; i < userData.length; i++) {
+        var selected = $('#select-' + userData[i].username).val();
+        if (selected !== undefined && !compare(selected, userData[i].permissions))
+            data.push({permissions: selected, username: userData[i].username})
+    }
+    console.log(data);
+
+    // send to server
+    $.ajax({
+        url: '/api/user/permission',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({data: data}),
+    }).done(function (response) {
+        if (response.success) {
+            statusText.html('<i class="fas fa-check"></i> Saved');
+            btn.prop('disabled', false);
+        }
+    }).fail(function (xhr, status, error) {
+        console.log(xhr.responseJSON.message);
+        statusText.html('<i class="fas fa-check"></i> ' + xhr.responseJSON.message);
+        btn.prop('disabled', false);
+    });
 
 });

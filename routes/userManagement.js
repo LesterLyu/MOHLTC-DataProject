@@ -7,16 +7,15 @@ const error = require('../config/error');
 // Add permission
 /**
  * Request:
- * {
+ * {data: [{
  *      username: <String>,
- *      groupNumber: <Integer>,
  *      permissions: [
  *          'CRUD-workbook-template',
  *          'create-delete-attribute-category',
  *          'user-management',
  *          ...
  *      ]
- * }
+ * }]}
  */
 router.post('/api/user/permission', user_management_controller.admin_update_user_permission);
 
@@ -45,6 +44,8 @@ router.post('/api/user/permission', user_management_controller.admin_update_user
     ]}
  */
 router.get('/api/user/details', user_management_controller.admin_get_all_users_with_details);
+
+router.get('/api/permissions', user_management_controller.admin_get_all_permissions);
 
 router.get('/user/management', (req, res, next) => {
     if (user_management_controller.checkPermission(req)) {
