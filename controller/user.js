@@ -74,6 +74,9 @@ module.exports = {
                     type: 2, // system admin=0, form manager=1, user=2
                     email: req.body.email,
                 });
+                if (config.disableEmailValidation) {
+                    newUser.validated = true;
+                }
                 User.register(newUser, req.body.password, (err, user) => {
                     if (err) {
                         console.log(err);
@@ -84,6 +87,9 @@ module.exports = {
                     passport.authenticate('local')(req, res, () => {
                         // set user info in the session
                         req.session.user = user;
+                        if (config.disableEmailValidation) {
+                            return res.json({success: true, redirect: '/profile'});
+                        }
                         // create token and sent by email
                         const token = generateToken(req.body.username, 60);
                         sendMail.sendValidationEmail(req.body.email, token, (info) => {

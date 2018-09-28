@@ -18,4 +18,5 @@ module.exports = {
         ATTRIBUTE_CATEGORY_MANAGEMENT: 'create-delete-attribute-category',
         USER_MANAGEMENT: 'user-management'
     },
+    disableEmailValidation: true,
 };
