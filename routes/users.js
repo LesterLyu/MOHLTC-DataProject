@@ -17,6 +17,7 @@ router.get('/signup', function (req, res) {
 });
 
 
+
 // POST request for user sign up
 router.post('/api/signup', user_controller.user_sign_up);
 
@@ -72,6 +73,14 @@ router.get('/profile', function (req, res) {
     res.render('sidebar/profile.ejs', {user: req.session.user});
 });
 
+// update profile
+
+router.post('/api/update-profile',user_controller.update_user_info);
+
+
+router.get('/update-profile', function (req, res) {
+    res.render('sidebar/updateProfile.ejs', {user: req.session.user});
+});
 
 
 module.exports = router;

@@ -36,11 +36,73 @@ module.exports = {
         });
     },
 
-    logout: (req) => {
-        req.logout();
-        // clear user info in the session
-        req.session.user = {};
+    update_user_info: (req, res, next) => {
+        User.findOne({username:  req.body.username}, (err, user) => {
+            if (err) {
+                console.log(err);
+                return res.json({success: false, message: err});
+            }
+            if (user) {
+                if (user._id == req.session.user._id) {
+                    user.username=req.body.username;
+                    user.firstName=req.body.firstName;
+                    user.lastName=req.body.lastName;
+                    user.email=req.body.email;
+                    user.phoneNumber=req.body.phoneNumber;
+                    user.save((err,user2)=> {
+                        if (err) {
+                            console.log(err);
+                            return res.status(400).json({success: false, message: err});
+                        }
+                        req.login(user2, function(err) {
+                            if (err) {
+                                console.log(err);
+                                return res.json({success: false, message: err});
+                            }
+                        });
+                        return res.json({success: true, message: "Profile is updated!"});
+                    });
+                } else {
+                    return res.json({success: false, message: "Username has existed!"});
+                }
+            } else {
+                User.findOne({_id:req.session.user._id}, (err, user) => {
+                    if (err) {
+                        console.log(err);
+                        return res.json({success: false, message: err});
+                    }
+                    user.username=req.body.username;
+                    user.firstName=req.body.firstName;
+                    user.lastName=req.body.lastName;
+                    user.email=req.body.email;
+                    user.phoneNumber=req.body.phoneNumber;
+                    user.save((err,user2)=> {
+                        if (err) {
+                            console.log(err);
+                            return res.status(400).json({success: false, message: err});
+                        }
+                        req.login(user2, function(err) {
+                            if (err) {
+                                console.log(err);
+                                return res.json({success: false, message: err});
+                            }
+                        });
+                        console.log("d");
+                        return res.json({success: true, message: "Profile is updated!"});
+                    });
+                });
+            }
+        });
     },
+
+
+    logout: (req) => {
+            req.logout();
+            // clear user info in the session
+            req.session.user = {};
+        },
+
+
 
     user_sign_up: (req, res, next) => {
         // check if email is taken (passport will check other errors, i.e. username taken)
