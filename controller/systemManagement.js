@@ -1,7 +1,10 @@
 const si = require('systeminformation');
 const config = require('../config/config'); // get our config file
 const error = require('../config/error');
-const os = require('os');
+const express = require('express');
+const reload = require('reload');
+let app = express();
+
 
 
 function checkPermission(req) {
@@ -67,6 +70,30 @@ module.exports = {
             .catch( err => {
                 res.json({success: false, message: err})
             })
-    }
+    },
+    get_config: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        res.json({
+            success: true,
+            config: {
+                database: config.database,
+                mailServer: config.mailServer, //smtp
+                serverHostname: config.serverHostname,
+                disableEmailValidation: config.disableEmailValidation
+            }
+        })
+
+    },
+     update_config: (req, res, next) => {
+         if (!checkPermission(req)) {
+             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+         }
+
+         // reload app
+
+
+     }
 
 };

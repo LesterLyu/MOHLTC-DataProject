@@ -99,13 +99,17 @@
             </a>
         </li>
 
-        <li class="nav-item">
-            <a class="nav-link" href="/system/info">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="pagesDropdown" role="button" data-toggle="dropdown"
+               aria-haspopup="true" aria-expanded="false">
                 <i class="fas fa-info-circle"></i>
-                <span>System Info</span>
+                <span>System</span>
             </a>
+            <div class="dropdown-menu" aria-labelledby="pagesDropdown">
+                <a class="dropdown-item" href="/system/info">System Info</a>
+                <a class="dropdown-item" href="/system/config">System Configuration</a>
+            </div>
         </li>
-
 
     </ul>
 

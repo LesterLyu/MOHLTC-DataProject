@@ -31,6 +31,10 @@ module.exports = {
                 if (allPermissions.includes(permissions[i]))
                     filteredPermissions.push(permissions[i])
             }
+            if (req.session.user.username === username) {
+                req.session.user.permissions = filteredPermissions;
+            }
+
             // add to promise chain
             promiseArr.push(new Promise((resolve, reject) => {
                 User.findOneAndUpdate({username: username}, {permissions: filteredPermissions})
