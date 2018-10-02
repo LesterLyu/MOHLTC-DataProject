@@ -82,5 +82,11 @@ router.get('/update-profile', function (req, res) {
     res.render('sidebar/updateProfile.ejs', {user: req.session.user});
 });
 
+// change password
+router.post('/api/change-password', user_controller.change_password);
+
+router.get('/change-password', function (req, res) {
+    res.render('sidebar/changePassword.ejs');
+});
 
 module.exports = router;
