@@ -36,6 +36,36 @@ module.exports = {
         });
     },
 
+    change_password: (req, res, next) => {
+        var oldPassword = req.body.oldPassword;
+        var newPassword = req.body.newPassword;
+        var confirmPassword = req.body.confirmPassword;
+        var username = req.session.user.username;
+        if (confirmPassword !== newPassword) {
+            return res.status(400).json({success: false, message: "New Password does not match!"});
+        }
+        User.findOne({username: username}, (err, user) => {
+            if (err) {
+                return res.status(400).json({success: false, message: err});
+            }
+            user.changePassword(oldPassword, newPassword, (err) => {
+                if (err) {
+                    return res.status(400).json({success: false, message: "Wrong Old Password!"});
+                }
+                req.logIn(user, function (err) {
+                    if (err) {
+                        return next(err);
+                    }
+                    // set user info in the session
+                    req.session.user = user;
+                });
+                return res.json({success: true, message: "The password has been changed"});
+            });
+        });
+    },
+
+
+
     update_user_info: (req, res, next) => {
         User.findOne({username:  req.body.username}, (err, user) => {
             if (err) {
@@ -59,6 +89,7 @@ module.exports = {
                                 console.log(err);
                                 return res.json({success: false, message: err});
                             }
+                            req.session.user = user2;
                         });
                         return res.json({success: true, message: "Profile is updated!"});
                     });
@@ -86,8 +117,8 @@ module.exports = {
                                 console.log(err);
                                 return res.json({success: false, message: err});
                             }
+                            req.session.user = user2;
                         });
-                        console.log("d");
                         return res.json({success: true, message: "Profile is updated!"});
                     });
                 });
