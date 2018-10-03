@@ -74,6 +74,10 @@ $("#categoryForm").submit(function(e) {
             reloadCate();
 
         }
+        if (!response.success) {
+            console.log(response);
+            showErrorAlert(response.message);
+        }
     }).fail(function(xhr, status, error) {
         console.log('fail');
         showErrorAlert(xhr.responseJSON.message);
@@ -97,6 +101,10 @@ $("#attributeForm").submit(function(e) {
             $('#AttDropDown').html('');
             reloadAttr();
 
+        }
+        if (!response.success) {
+            console.log(response);
+            showErrorAlert(response.message);
         }
     }).fail(function(xhr, status, error) {
         console.log('fail');
