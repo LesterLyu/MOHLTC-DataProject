@@ -5,6 +5,7 @@
   - [ ] API for upload excel and apply style to workbook
   - [ ] Show workbooks with excel styles
   - [ ] Warning when delete workbook that is filled by user
+  - [ ] Setup page (First time run)
 ## Finished
  - [X] "Change Password" in Profile page
  - [X] "Change Profile" in Profile page
