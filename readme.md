@@ -1,5 +1,15 @@
 # DataProject
 ## Live on http://dataproject-env.u2t3prjsea.us-east-2.elasticbeanstalk.com
+## TO-DO
+  - [ ] Read excel styles in back-end
+  - [ ] API for upload excel and apply style to workbook
+  - [ ] Show workbooks with excel styles
+  - [ ] Warning when delete workbook that is filled by user
+## Finished
+ - [X] "Change Password" in Profile page
+ - [X] "Change Profile" in Profile page
+ - [X] Warning when delete attribute/category that is used in the system
+ 
 ## Documents
 - [User Types](document/user-types.md)
 
