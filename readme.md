@@ -1,7 +1,19 @@
 # DataProject
 ## Live on http://dataproject-env.u2t3prjsea.us-east-2.elasticbeanstalk.com
+## TO-DO
+  - [ ] Read excel styles in back-end
+  - [ ] API for upload excel and apply style to workbook
+  - [ ] Show workbooks with excel styles
+  - [ ] Warning when delete workbook that is filled by user
+  - [ ] Setup page (First time run)
+## Finished
+ - [X] "Change Password" in Profile page
+ - [X] "Change Profile" in Profile page
+ - [X] Warning when delete attribute/category that is used in the system
+ 
 ## Documents
 - [User Types](document/user-types.md)
+- [Excel Indexed Colors](https://github.com/ClosedXML/ClosedXML/wiki/Excel-Indexed-Colors)
 
 # Purpose
 The purpose of this project/application is to create an easier way for users to submit forms to the government. When entering in a form, the user has two choices: the first choice is to fill in the form on the browser and the second choice is to convert the table into an excel sheet and fill it in later. Both the table in the browser and the excel sheet can be read and have their information sent to a database.

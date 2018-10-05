@@ -1,5 +1,6 @@
 const Attribute = require('../models/attribute');
 const Category = require('../models/category');
+const Workbook = require('../models/workbook');
 const error = require('../config/error');
 const config = require('../config/config');
 
@@ -53,15 +54,56 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-
         const attribute = req.body.data;
         const groupNumber = req.session.user.groupNumber;
-        Attribute.deleteOne({attribute: attribute, groupNumber: groupNumber}, (err) => {
+        const existAttribute = [];
+        var existAttribute_othergroup = false;
+        Workbook.find({}, (err, workbooks) => {
             if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err})
+                return res.status(400).json({success: false, message: err});
             }
-            return res.json({success: true, message: 'Deleted attribute ' + attribute})
+            for (var i = 0; i < workbooks.length; i++) {
+                console.log(workbooks.length);
+                var workbookData =  workbooks[i].data;
+                console.log(workbookData.length);
+                for (var workbookSheetName in workbookData) {
+                    var workbookSheet = workbookData[workbookSheetName];
+                    var workbookAttributes = workbookSheet[0];
+                    console.log(workbookAttributes.length);
+                    for (var h = 0; h < workbookAttributes.length; h++) {
+                        console.log(workbookAttributes[h]);
+                        if (attribute == workbookAttributes[h]) {
+                            if (workbooks[i].groupNumber === groupNumber) {
+                                existAttribute.push(workbooks[i].name + "/" + workbookSheetName);
+                            } else {
+                                existAttribute_othergroup = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (existAttribute.length === 0 && !existAttribute_othergroup) {
+                Attribute.deleteOne({attribute: attribute, groupNumber: groupNumber}, (err) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err})
+                    }
+                    return res.json({success: true, message: 'Deleted attribute ' + attribute})
+                });
+            } else {
+                if (existAttribute.length !== 0) {
+                    var message = "The attribute " + '"' + attribute + '"' + " has been used in ";
+                    for (var i = 0; i < existAttribute.length - 1; i++) {
+                        message = message + existAttribute[i] + ", ";
+                    }
+                    message = message + existAttribute[existAttribute.length - 1] + ". ";
+                }
+                if (existAttribute_othergroup) {
+                    message = message + "This attribute has been used in other groups!";
+                }
+                console.log(message);
+                return res.json({success: false, message: message});
+            }
         });
     },
 
@@ -69,17 +111,71 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-
         const category = req.body.data;
         const groupNumber = req.session.user.groupNumber;
-
-        Category.deleteOne({category: category, groupNumber: groupNumber}, (err) => {
+        const existCategory = [];
+        var existCategory_othergroup = false;
+        Workbook.find({}, (err, workbooks) => {
             if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err})
+                return res.status(400).json({success: false, message: err});
             }
-            return res.json({success: true, message: 'Deleted category ' + category})
+            for (var i = 0; i < workbooks.length; i++) {
+                console.log(workbooks.length);
+                var workbookData =  workbooks[i].data;
+                console.log(workbookData.length);
+                for (var workbookSheetName in workbookData) {
+                    var workbookSheet = workbookData[workbookSheetName];
+                    for (var j = 0; j < workbookSheet.length; j++) {
+                        if (category == workbookSheet[j][0]) {
+                            if (workbooks[i].groupNumber === groupNumber) {
+                                existCategory.push(workbooks[i].name + "/" + workbookSheetName);
+                            } else {
+                                existCategory_othergroup = true;
+                            }
+                        }
+                    }
+                }
+            }
+            if (existCategory.length === 0 && !existCategory_othergroup) {
+                Category.deleteOne({category: category, groupNumber: groupNumber}, (err) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err})
+                    }
+                    return res.json({success: true, message: 'Deleted category ' + category})
+                });
+            } else {
+                if (existCategory.length !== 0) {
+                    var message = "The category " + '"' + category + '"' + " has been used in ";
+                    for (var i = 0; i < existCategory.length - 1; i++) {
+                        message = message + existCategory[i] + ", ";
+                    }
+                    message = message + existCategory[existCategory.length - 1] + ". ";
+                }
+                if (existCategory_othergroup) {
+                    message = message + "This category has been used in other groups!";
+                }
+                console.log(message);
+                return res.json({success: false, message: message});
+            }
         });
+
+
+
+      //  if (!checkPermission(req)) {
+        //    return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        //}
+
+        //const category = req.body.data;
+        //const groupNumber = req.session.user.groupNumber;
+
+        //Category.deleteOne({category: category, groupNumber: groupNumber}, (err) => {
+          //  if (err) {
+            //    console.log(err);
+              //  return res.status(500).json({success: false, message: err})
+            //}
+            //return res.json({success: true, message: 'Deleted category ' + category})
+        //});
     },
 
 
