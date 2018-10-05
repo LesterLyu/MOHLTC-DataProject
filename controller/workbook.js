@@ -2,6 +2,7 @@ const Workbook = require('../models/workbook');
 const FilledWorkbook = require('../models/filledWorkbook');
 const error = require('../config/error');
 const config = require('../config/config');
+const excel = require('./excel/xlsx');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(config.permissions.WORKBOOK_TEMPLATE_MANAGEMENT);
@@ -244,6 +245,26 @@ module.exports = {
                     return res.json({success: true, message: 'Successfully updated workbook ' + name + '.'})
                 });
             }
+        });
+    },
+
+    upload_file: (req, res, next) => {
+        if (!req.files)
+            return res.status(400).json({success: false, message: 'No files were uploaded.'});
+
+        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+        let excelFile = req.files.excel;
+
+        // Use the mv() method to place the file somewhere on your server
+        excelFile.mv('./uploads/' + req.params.name, function (err) {
+            if (err)
+                return res.status(500).json({success: false, message: err});
+
+            excel.processFile(req.params.name)
+                .then(data => {
+                    res.json({success: true, message: 'File uploaded!', data: data});
+                });
+
         });
     }
 

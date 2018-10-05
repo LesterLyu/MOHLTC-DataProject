@@ -22,6 +22,8 @@ const session = require('express-session');
 
 const flash = require('connect-flash');
 
+const fileUpload = require('express-fileupload');
+
 const config = require('./config/config');
 
 const indexRouter = require('./routes/index');
@@ -74,6 +76,10 @@ passport.deserializeUser(User.deserializeUser());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
+
+app.use(fileUpload({
+    limits: { fileSize: 50 * 1024 * 1024 },
+}));
 
 
 
