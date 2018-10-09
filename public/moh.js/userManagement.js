@@ -43,55 +43,48 @@ function initDatatable(permissions) {
         ],
         columnDefs: [
             {
-            render: function (data, type, row) {
-                var newPer = $('<select></select>').addClass('selectpicker')
-                    .attr('multiple', 'multiple').attr('id', 'select-' + row.username)
-                    .attr('data-style', 'btn-outline-primary')
-                    .attr('data-live-search', 'true');
-                for (var i = 0; i < permissions.length; i++) {
-                    var option = $('<option>', {
-                        value: permissions[i],
-                        text: permissions[i],
-                    });
-                    if (data.includes(permissions[i])) {
-                        option.attr('selected', 'selected')
+                render: function (data, type, row) {
+                    var newPer = $('<select></select>').addClass('selectpicker')
+                        .attr('multiple', 'multiple').attr('id', 'select-' + row.username)
+                        .attr('data-style', 'btn-outline-primary')
+                        .attr('data-live-search', 'true');
+                    for (var i = 0; i < permissions.length; i++) {
+                        var option = $('<option>', {
+                            value: permissions[i],
+                            text: permissions[i],
+                        });
+                        if (data.includes(permissions[i])) {
+                            option.attr('selected', 'selected')
+                        }
+                        newPer.append(option);
                     }
-                    newPer.append(option);
-                }
 
-                return newPer.prop('outerHTML');
-            },
-            targets: 4
+                    return newPer.prop('outerHTML');
+                },
+                targets: 4
             },
             {
-                targets: 5,
                 render: function (data, type, row) {
+                    var div = $('<div></div>').addClass('btn-group btn-group-toggle').attr('data-toggle', 'buttons')
+                        .attr('id', 'radios-' + row.username);
+                    var label1 = $('<label></label>').addClass('btn btn-secondary');
+                    var label2 = label1.clone();
+                    var opt1 = $('<input>').attr('type', 'radio').val('true').attr('autocomplete', 'off');
+                    var opt2 = opt1.clone().val('false');
                     if (data) {
-                        console.log(data);
-                        var button = '<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
-                         //   '<label class="btn btn-secondary active">' +
-                            '<input type="radio" name="options" id="option1" value="' + row.username + '" autocomplete="off" checked> Active' +
-                         //   '</label>' +
-                          //  '<label class="btn btn-secondary">' +
-                            '<input type="radio" name="options" id="option2" value="' + row.username + '" autocomplete="off"> Radio' +
-                         //   '</label>' +
-                            '</div>';
-                        return button;
+                        label1.addClass('active');
+                        opt1.attr('checked', true);
                     }
-                    if (!data) {
-                        console.log("ss");
-                        var button ='<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
-                        //    '<label class="btn btn-secondary">' +
-                            '<input type="radio" name="options" id="option1" value="' + row.username + '" autocomplete="off"> Active' +
-                         //   '</label>' +
-                          //  '<label class="btn btn-secondary active">' +
-                            '<input  type="radio" name="options" id="option2" value="' + row.username + '" autocomplete="off" checked> Radio' +
-                        //    '</label>' +
-                            '</div>';
-                        return button;
+                    else {
+                        label2.addClass('active');
+                        opt2.attr('checked', true);
                     }
+                    div.append(label1.append(opt1).append('on')).append(label2.append(opt2).append('off'));
 
-                }
+                    return div.prop('outerHTML');
+                },
+
+                targets: 5,
             }
 
         ],
@@ -106,12 +99,6 @@ function initDatatable(permissions) {
     });
 }
 
-$("#user-table").on("click","#option1,#option2",function(){
-    alert('You clicked radio!');
-    console.log($(this).attr("value"));
-});
-
-
 
 $('#save-btn').click(function () {
     var btn = $(this);
@@ -119,13 +106,20 @@ $('#save-btn').click(function () {
     statusText.html('<i class="fas fa-spinner fa-spin"></i> Saving');
     btn.prop('disabled', true);
 
-    var data = [];
+    // get modified permissions and permissions
+    var data = [], actives = [];
     for (var i = 0; i < userData.length; i++) {
         var selected = $('#select-' + userData[i].username).val();
         if (selected !== undefined && !compare(selected, userData[i].permissions))
-            data.push({permissions: selected, username: userData[i].username})
+            data.push({permissions: selected, username: userData[i].username});
+
+        var active = $('input' ,$('label.active', '#radios-' + userData[i].username)).val();
+        if (active !== undefined && active !== userData[i].active + '')
+            actives.push({active: active, username: userData[i].username});
     }
-    console.log(data);
+
+    console.log(actives);
+
 
     // send to server
     $.ajax({

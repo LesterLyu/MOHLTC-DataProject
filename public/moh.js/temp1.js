@@ -2,7 +2,7 @@ var tabCounter = 0;
 var sheets = [], sheetNames = [];
 var workbookName;
 var workbookData = {};
-var scale = 7;
+var scale = 8;
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
@@ -21,7 +21,7 @@ function newTable(container, height, data, rowHeights, colWidths, merges) {
         width: container.offsetWidth,
         height: height,
         colWidths: colWidths.map(function(x) { return x * scale; }),
-        rowHeights: rowHeights.map(function(x) { return x * scale / 5; }),
+        rowHeights: rowHeights.map(function(x) { return x * scale / 5.5385; }),
         mergeCells: merges,
         manualColumnResize: true,
         manualRowResize: true,
@@ -91,24 +91,27 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
 
     // alignment
     var cellMeta = instance.getCellMeta(row, col);
+    var previousClass = cellMeta.className ? (cellMeta.className !== undefined && cellMeta.className) : '';
+
     if (style && style.hasOwnProperty('alignment')) {
         if (style.alignment.hasOwnProperty('horizontal')) {
             td.style.textAlign = style.alignment.horizontal;
         }
         if (style.alignment.hasOwnProperty('vertical')) {
+
             switch (style.alignment.vertical) {
                 case 'top':
-                    instance.setCellMeta(row, col, 'className', cellMeta.className + ' htTop');
+                    instance.setCellMeta(row, col, 'className', previousClass + ' htTop');
                     break;
                 case 'middle':
-                    instance.setCellMeta(row, col, 'className', cellMeta.className + ' htMiddle');
+                    instance.setCellMeta(row, col, 'className', previousClass + ' htMiddle');
                     break;
             }
         }
     }
     else {
         // default bottom
-        instance.setCellMeta(row, col, 'className', cellMeta.className + ' htBottom');
+        instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
     }
 
     // font
@@ -123,12 +126,16 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             td.style.fontStyle = 'italic';
         }
     }
+
     // background
     if (style && style.hasOwnProperty('fill')) {
         if (style.fill.hasOwnProperty('fgColor') && style.fill.fgColor.hasOwnProperty('argb')) {
             td.style.background = '#' + argbToRgb(style.fill.fgColor.argb);
         }
     }
+
+    // borders
+
 
 
     //
@@ -158,13 +165,15 @@ function applyJson(workBookJson) {
             // transform mergeCells
             var merges = [];
             for (var position in ws.merges) {
-                var model = ws.merges[position].model;
-                merges.push({
-                    row: model.top - 1,
-                    col: model.left - 1,
-                    rowspan: model.top - model.bottom + 1,
-                    colspan: model.right - model.left + 1
-                })
+                if (ws.merges.hasOwnProperty(position)) {
+                    var model = ws.merges[position].model;
+                    merges.push({
+                        row: model.top - 1,
+                        col: model.left - 1,
+                        rowspan: model.top - model.bottom + 1,
+                        colspan: model.right - model.left + 1
+                    })
+                }
             }
 
             // generate table
