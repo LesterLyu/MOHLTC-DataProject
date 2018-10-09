@@ -159,23 +159,6 @@ module.exports = {
                 return res.json({success: false, message: message});
             }
         });
-
-
-
-      //  if (!checkPermission(req)) {
-        //    return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        //}
-
-        //const category = req.body.data;
-        //const groupNumber = req.session.user.groupNumber;
-
-        //Category.deleteOne({category: category, groupNumber: groupNumber}, (err) => {
-          //  if (err) {
-            //    console.log(err);
-              //  return res.status(500).json({success: false, message: err})
-            //}
-            //return res.json({success: true, message: 'Deleted category ' + category})
-        //});
     },
 
 

@@ -39,8 +39,10 @@ function initDatatable(permissions) {
             {'data': 'validated'},
             {'data': 'email'},
             {'data': 'permissions'},
+            {'data': 'active'},
         ],
-        columnDefs: [{
+        columnDefs: [
+            {
             render: function (data, type, row) {
                 var newPer = $('<select></select>').addClass('selectpicker')
                     .attr('multiple', 'multiple').attr('id', 'select-' + row.username)
@@ -60,7 +62,39 @@ function initDatatable(permissions) {
                 return newPer.prop('outerHTML');
             },
             targets: 4
-        }],
+            },
+            {
+                targets: 5,
+                render: function (data, type, row) {
+                    if (data) {
+                        console.log(data);
+                        var button = '<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
+                         //   '<label class="btn btn-secondary active">' +
+                            '<input type="radio" name="options" id="option1" value="' + row.username + '" autocomplete="off" checked> Active' +
+                         //   '</label>' +
+                          //  '<label class="btn btn-secondary">' +
+                            '<input type="radio" name="options" id="option2" value="' + row.username + '" autocomplete="off"> Radio' +
+                         //   '</label>' +
+                            '</div>';
+                        return button;
+                    }
+                    if (!data) {
+                        console.log("ss");
+                        var button ='<div class="btn-group btn-group-toggle" data-toggle="buttons">' +
+                        //    '<label class="btn btn-secondary">' +
+                            '<input type="radio" name="options" id="option1" value="' + row.username + '" autocomplete="off"> Active' +
+                         //   '</label>' +
+                          //  '<label class="btn btn-secondary active">' +
+                            '<input  type="radio" name="options" id="option2" value="' + row.username + '" autocomplete="off" checked> Radio' +
+                        //    '</label>' +
+                            '</div>';
+                        return button;
+                    }
+
+                }
+            }
+
+        ],
         initComplete: function (settings, json) {
             // store locally
             userData = json.users;
@@ -71,6 +105,13 @@ function initDatatable(permissions) {
         $('select').selectpicker();
     });
 }
+
+$("#user-table").on("click","#option1,#option2",function(){
+    alert('You clicked radio!');
+    console.log($(this).attr("value"));
+});
+
+
 
 $('#save-btn').click(function () {
     var btn = $(this);

@@ -72,7 +72,7 @@ module.exports = {
                 return res.status(500).json({success: false, message: err});
             }
             return res.json({success: true, users: users});
-        })
+        });
     },
 
     admin_get_all_permissions: (req, res, next) => {
@@ -80,7 +80,18 @@ module.exports = {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
         return res.json({success: true, permissions: allPermissions});
-    }
+    },
 
+    delete_user: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        User.deleteOne({username:req.body.username}, (err) => {
+            if (err) {
+                return res.status(500).json({success: false, message: err});
+            }
+            return res.json({success: true, message: "The user " + req.body.username + " has been deleted!"});
+        });
+},
 
 };
