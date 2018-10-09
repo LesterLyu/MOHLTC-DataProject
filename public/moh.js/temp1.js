@@ -135,13 +135,17 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     }
 
     // borders
-
-
-
-    //
-    //td.style.fontWeight = 'bold';
-    //td.style.color = 'green';
-    // td.style.background = '#CEC';
+    if (style && style.hasOwnProperty('border')) {
+        for (var key in style.border) {
+            if (style.border.hasOwnProperty(key)) {
+                var upper = key.charAt(0).toUpperCase() + key.slice(1);
+                var border = style.border[key];
+                if (border.hasOwnProperty('color') && border.color.hasOwnProperty('argb')) {
+                    td.style['border' + upper] = '1px solid #' + argbToRgb(border.color.argb);
+                }
+            }
+        }
+    }
 }
 
 // apply json to GUI tables
@@ -176,13 +180,12 @@ function applyJson(workBookJson) {
                 }
             }
 
+
             // generate table
             var container = document.getElementById(gridId);
             var table = newTable(container, $(window).height() - 350, data, ws.row.height, ws.col.width, merges);
             table.sheetNo = sheetNo;
 
-
-            // lock cells
             table.updateSettings({
                 cells: function (row, col) {
                     var ws = workbookData[this.instance.sheetNo];
