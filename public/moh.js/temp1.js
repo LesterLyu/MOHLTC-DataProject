@@ -1,6 +1,8 @@
 var tabCounter = 0;
 var sheets = [], sheetNames = [];
 var workbookName;
+var workbookData = {};
+var scale = 7;
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
@@ -10,21 +12,25 @@ function showModalAlert(title, msg) {
  * create a new Handsontable
  * @param container
  * @param height int
- * @return a Handsontable
+ * @return Handsontable
  */
-function newTable(container, height) {
+function newTable(container, height, data, rowHeights, colWidths, merges) {
+
     var spec = {
-        data: [],
+        data: data,
         width: container.offsetWidth,
         height: height,
-        colWidths: 80,
-        rowHeights: 23,
+        colWidths: colWidths.map(function(x) { return x * scale; }),
+        rowHeights: rowHeights.map(function(x) { return x * scale / 5; }),
+        mergeCells: merges,
         manualColumnResize: true,
         manualRowResize: true,
         manualColumnMove: false,
         manualRowMove: false,
         rowHeaders: true,
         colHeaders: true,
+        autoWrapCol: false,
+        autoWrapRow: false,
         contextMenu: ['copy'],
     };
     var createdTable = new Handsontable(container, spec);
@@ -75,14 +81,60 @@ function exportToExcel(workbook, name) {
     }
 }
 
-function workbookToJson(workbook) {
-    var result = {};
-    workbook.SheetNames.forEach(function (sheetName) {
-        var roa = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header: 1, defval: ''});
-        if (roa.length) result[sheetName] = roa;
-    });
-    console.log(result);
-    return result;
+function argbToRgb(argb) {
+    return argb.substring(2);
+}
+
+function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    var style = cellProperties.style;
+
+    // alignment
+    var cellMeta = instance.getCellMeta(row, col);
+    if (style && style.hasOwnProperty('alignment')) {
+        if (style.alignment.hasOwnProperty('horizontal')) {
+            td.style.textAlign = style.alignment.horizontal;
+        }
+        if (style.alignment.hasOwnProperty('vertical')) {
+            switch (style.alignment.vertical) {
+                case 'top':
+                    instance.setCellMeta(row, col, 'className', cellMeta.className + ' htTop');
+                    break;
+                case 'middle':
+                    instance.setCellMeta(row, col, 'className', cellMeta.className + ' htMiddle');
+                    break;
+            }
+        }
+    }
+    else {
+        // default bottom
+        instance.setCellMeta(row, col, 'className', cellMeta.className + ' htBottom');
+    }
+
+    // font
+    if (style && style.hasOwnProperty('font')) {
+        if (style.font.hasOwnProperty('color') && style.font.color.hasOwnProperty('argb')) {
+            td.style.color = '#' + argbToRgb(style.font.color.argb);
+        }
+        if (style.font.hasOwnProperty('bold') && style.font.bold) {
+            td.style.fontWeight = 'bold';
+        }
+        if (style.font.hasOwnProperty('italic') && style.font.italic) {
+            td.style.fontStyle = 'italic';
+        }
+    }
+    // background
+    if (style && style.hasOwnProperty('fill')) {
+        if (style.fill.hasOwnProperty('fgColor') && style.fill.fgColor.hasOwnProperty('argb')) {
+            td.style.background = '#' + argbToRgb(style.fill.fgColor.argb);
+        }
+    }
+
+
+    //
+    //td.style.fontWeight = 'bold';
+    //td.style.color = 'green';
+    // td.style.background = '#CEC';
 }
 
 // apply json to GUI tables
@@ -96,22 +148,42 @@ function applyJson(workBookJson) {
     sheetNames = [];
 
     // load to front-end
-    for (var sheetName in workBookJson) {
-        if (workBookJson.hasOwnProperty(sheetName)) {
-            sheetNames.push(sheetName);
-            var data = workBookJson[sheetName];
-            var gridId = addTab(sheetName);
+    for (var sheetNo in workBookJson) {
+        if (workBookJson.hasOwnProperty(sheetNo)) {
+            var ws = workBookJson[sheetNo];
+            sheetNames.push(ws.name);
+            var data = ws.data;
+            var gridId = addTab(ws.name);
+
+            // transform mergeCells
+            var merges = [];
+            for (var position in ws.merges) {
+                var model = ws.merges[position].model;
+                merges.push({
+                    row: model.top - 1,
+                    col: model.left - 1,
+                    rowspan: model.top - model.bottom + 1,
+                    colspan: model.right - model.left + 1
+                })
+            }
+
             // generate table
             var container = document.getElementById(gridId);
-            var addedTable = newTable(container, $(window).height() - 350, true);
-            addedTable.loadData(data);
+            var table = newTable(container, $(window).height() - 350, data, ws.row.height, ws.col.width, merges);
+            table.sheetNo = sheetNo;
+
+
             // lock cells
-            addedTable.updateSettings({
+            table.updateSettings({
                 cells: function (row, col) {
+                    var ws = workbookData[this.instance.sheetNo];
+
                     var cellProperties = {};
-                    if (row === 0 || col === 0) {
-                        cellProperties.readOnly = true;
+                    cellProperties.style = null;
+                    if (ws.style[row].length > col && Object.keys(ws.style[row][col]).length !== 0) {
+                        cellProperties.style = ws.style[row][col];
                     }
+                    cellProperties.renderer = cellRenderer;
                     return cellProperties;
                 }
             });
@@ -133,7 +205,7 @@ $(document).ready(function () {
         if (response.success) {
             var workBook = response.workbook.data;
             console.log(workBook);
-            applyJson(workBook);
+            //applyJson(workBook);
             $('#loading').hide();
         }
     }).fail(function (xhr, status, error) {
@@ -181,24 +253,32 @@ $('#import-workbook-btn').on('click', function () {
 });
 
 $('#file-import').change(function (e) {
-    var rABS = true; // true: readAsBinaryString ; false: readAsArrayBuffer
-    var files = e.target.files, f = files[0];
-    var reader = new FileReader();
-    reader.onload = function (e) {
-        var data = e.target.result;
-        if (!rABS) data = new Uint8Array(data);
-        var workbook = XLSX.read(data, {type: rABS ? 'binary' : 'array', cellStyles: true, cellNF: true});
 
-        /* DO SOMETHING WITH workbook HERE */
-        // To-DO validate the import
-        console.log(workbook);
-        test(workbook);
-        applyJson(workbookToJson(workbook))
-    };
-    if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+    var files = e.target.files, f = files[0];
+    var formData = new FormData();
+    formData.append('excel', f);
+
+    $.ajax({
+        url: '/api/upload/' + encodeURIComponent($('#filled-workbook').val() + '.xlsx'),
+        type: 'POST',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false
+    }).done(function (response) {
+        if (response.success) {
+            console.log(response);
+            workbookData = response.data;
+            applyJson(response.data);
+        }
+    }).fail(function (xhr, status, error) {
+        console.log('fail ' + xhr.responseJSON.message);
+
+    });
+
 });
 
-function test (workbook){
+function test(workbook) {
     workbook.SheetNames.forEach(function (sheetName) {
 
 
