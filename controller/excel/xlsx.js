@@ -72,8 +72,18 @@ function processFile(name) {
                     wsData.style.push([]);
 
                     row.eachCell({includeEmpty: true}, function (cell, colNumber) {
-                        wsData.data[rowNumber - 1].push(cell.value);
-                        wsData.style[rowNumber - 1].push(translateIndexedColor(cell.style))
+                        wsData.style[rowNumber - 1].push(translateIndexedColor(cell.style));
+
+                        // transfer sharedFormula to formula
+                        if (cell.formulaType === Excel.FormulaType.Shared) {
+                            wsData.data[rowNumber - 1].push({
+                                formula: cell.formula,
+                                result: cell.value.result
+                            });
+                        }
+                        else {
+                            wsData.data[rowNumber - 1].push(cell.value);
+                        }
                     });
 
                     // empty row
@@ -85,6 +95,9 @@ function processFile(name) {
                     else if (row.cellCount < worksheet.columnCount) {
                         wsData.data[rowNumber - 1] = wsData.data[rowNumber - 1].concat(Array(worksheet.columnCount - row.cellCount).fill(null))
                     }
+
+
+
 
                 });
 
