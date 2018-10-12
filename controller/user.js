@@ -256,7 +256,6 @@ module.exports = {
                                     return next(err);
                                 }
                                 // good
-
                                 return res.redirect('/login');
                             });
 

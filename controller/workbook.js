@@ -266,6 +266,50 @@ module.exports = {
                 });
 
         });
+    },
+
+    upload_style: (req, res, next) => {
+        if (!req.files)
+            return res.status(400).json({success: false, message: 'No files were uploaded.'});
+
+        const groupNumber = req.session.user.groupNumber;
+
+        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+        let excelFile = req.files.excel;
+
+        // Use the mv() method to place the file somewhere on your server
+        excelFile.mv('./uploads/' + req.params.name + '.xlsx', function (err) {
+            if (err)
+                return res.status(500).json({success: false, message: err});
+
+            excel.processFile(req.params.name + '.xlsx')
+                .then(data => {
+                    Workbook.findOne({name: req.params.name, groupNumber: groupNumber}, (err, workbook) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).json({success: false, message: err});
+                        }
+                        if (!workbook) {
+                            return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                        }
+                        // TO-DO check integrity
+                        workbook.data = JSON.parse(JSON.stringify(data));
+                        workbook.save((err, updated) => {
+                            if (err) {
+                                console.log(err);
+                                return res.status(500).json({success: false, message: err});
+                            }
+                            return res.json({
+                                success: true,
+                                message: 'Successfully updated workbook style' + req.params.name + '.',
+                                data: data,
+                            })
+                        });
+
+                    });
+                });
+
+        });
     }
 
 

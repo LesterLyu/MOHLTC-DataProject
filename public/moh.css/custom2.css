@@ -28,7 +28,7 @@ a.nav-item {
     color: #495057;
     background-color: #f3f3f3;
     box-shadow: 0 0 2px 0 black;
-    margin: 1px;
+    margin: 1px 2px 1px 1px;
 }
 
 a.nav-item.active.show {
@@ -48,7 +48,9 @@ a.nav-item.active.show {
     cursor: default !important;
 }
 
-/*.scrolledTable {*/
-    /*overflow-y: auto;*/
-    /*clear: both;*/
-/*}*/
+#nav-tab {
+    overflow-x: auto;
+    overflow-y:hidden;
+    flex-wrap: nowrap;
+    white-space: pre;
+}

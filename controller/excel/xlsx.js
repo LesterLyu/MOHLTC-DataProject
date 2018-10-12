@@ -43,9 +43,18 @@ function processFile(name) {
     return wb.xlsx.readFile('./uploads/' + name)
         .then(() => {
             wb.eachSheet(function (worksheet, sheetId) {
+                // tab color
+                let tabColor = undefined;
+                if (worksheet.properties.tabColor && 'indexed' in worksheet.properties.tabColor) {
+                    tabColor = {argb: color[worksheet.properties.tabColor.indexed]}
+                }
+                else if (worksheet.properties.tabColor) {
+                    tabColor = worksheet.properties.tabColor;
+                }
+
                 let wsData = wbData[worksheet.orderNo] = {
                     name: worksheet.name,
-                    tabColor: worksheet.properties.tabColor,
+                    tabColor: tabColor,
                     state: worksheet.state,
                     data: [], // cell data
                     style: [], //cell style

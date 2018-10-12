@@ -85,5 +85,7 @@ router.get('/temp1', function (req, res) {
 router.post('/api/upload/:name', workbookController.upload_file);
 
 
+router.post('/api/upload/style/:name', workbookController.upload_style);
+
 
 module.exports = router;

@@ -1,70 +1,13 @@
-var tabCounter = 0;
-var sheets = [], sheetNames = [];
 var mode;
 var state = {
     modalMode: 'none' // none, add, edit
 }; // store state
+var workbookData;
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
 }
 
-/**
- * create a new Handsontable
- * @param container
- * @param height int
- * @param preview boolean
- * @return a Handsontable
- */
-function newTable(container, height, preview) {
-    var spec = {
-        data: [],
-        width: container.offsetWidth,
-        height: height,
-        colWidths: 80,
-        rowHeights: 23,
-        manualColumnResize: true,
-        manualRowResize: true,
-        manualColumnMove: true,
-        manualRowMove: true,
-        rowHeaders: true,
-        colHeaders: true,
-        contextMenu: ['remove_row', 'remove_col', '---------', 'copy'],
-    };
-
-    var createdTable = new Handsontable(container, spec);
-
-    if (preview) {
-        spec.manualColumnMove = false;
-        spec.manualRowMove = false;
-    }
-    else {
-        sheets.push(createdTable);
-    }
-    return createdTable;
-}
-
-function addTab(sheetName) {
-    var gridId = 'grid-' + tabCounter;
-    var tabContentId = 'tab-content-' + tabCounter;
-    var tabId = 'tab-' + tabCounter;
-
-    // deactivate previous tab and content
-    $('div.active.show').removeClass('active show');
-    $('a.active').removeClass('active show');
-
-    // add content
-    var tabContent = $('<div id="' + tabContentId + '" class="tab-pane fade active show"> <div id="' + gridId + '"></div></div>');
-    $('#nav-tabContent').append(tabContent);
-
-    // add tab
-    var newTab = $('<a id="' + tabId + '" class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '"> ' + sheetName
-        + '<i onclick="editSheet(' + tabCounter + ')" class="fas fa-pen ml-2"></i></a>');
-    newTab.insertBefore('#nav-tab a:nth-last-child(1)');
-
-    tabCounter++;
-    return gridId;
-}
 
 $(document).ready(function () {
 
@@ -78,8 +21,8 @@ $(document).ready(function () {
         if (response.success) {
             $.each(response.attributes, function (i, item) {
                 selectAttributes.append($('<option>', {
-                    value: item.id + ',' + item.attribute,
                     text: '#' + item.id + '  ' + item.attribute,
+                    value: item.id + ',' + item.attribute,
                 }));
             });
 
@@ -96,8 +39,8 @@ $(document).ready(function () {
         if (response.success) {
             $.each(response.categories, function (i, item) {
                 selectCategories.append($('<option>', {
-                    value: item.id + ',' + item.category,
                     text: '#' + item.id + '  ' + item.category,
+                    value: item.id + ',' + item.category,
                 }));
             });
 
@@ -122,9 +65,15 @@ $(document).ready(function () {
         }).done(function (response) {
             console.log(response);
             if (response.success) {
-                var workBook = response.workbook.data;
-                console.log(workBook);
-                applyJson(workBook);
+                workbookData = response.workbook.data;
+                console.log(workbookData);
+                // check if it has style
+                if (workbookData[0] && workbookData[0].hasOwnProperty('style')) {
+                    applyJsonWithStyle(workbookData, 'edit');
+                }
+                else {
+                    applyJsonWithoutStyle(workbookData, 'edit');
+                }
                 $('#loading').hide();
             }
         }).fail(function (xhr, status, error) {
@@ -145,6 +94,7 @@ function editSheet(index) {
     selecte_attributes.selectpicker('deselectAll');
     $('#sheetNameInput').val(sheetNames[index]);
 
+
     var data = sheets[index].getData().slice();
     // console.log(data);
     data[0].splice(data[0].indexOf(''), 1);
@@ -162,33 +112,6 @@ function editSheet(index) {
 }
 
 
-// apply json to GUI tables
-function applyJson(workBookJson) {
-    // load to front-end
-    for (var sheetName in workBookJson) {
-        if (workBookJson.hasOwnProperty(sheetName)) {
-            sheetNames.push(sheetName);
-            var data = workBookJson[sheetName];
-            var gridId = addTab(sheetName);
-            // generate table
-            var container = document.getElementById(gridId);
-            var addedTable = newTable(container, $(window).height() - 500, false);
-            addedTable.loadData(data);
-            // lock cells
-            addedTable.updateSettings({
-                cells: function (row, col) {
-                    var cellProperties = {};
-                    if (row === 0 || col === 0) {
-                        cellProperties.readOnly = true;
-                    }
-                    return cellProperties;
-                }
-            });
-        }
-    }
-    console.log(sheets);
-    $('#nav-tab a:first-child').tab('show');
-}
 
 // get the selected att and cat
 function getSelected() {
@@ -214,6 +137,43 @@ function getSelected() {
     return data;
 }
 
+$('#import-workbook-btn').on('click', function () {
+    $('#file-import').click();
+});
+
+$('#file-import').change(function (e) {
+
+    var files = e.target.files, f = files[0];
+    var formData = new FormData();
+    formData.append('excel', f);
+
+    $.ajax({
+        url: '/api/upload/style/' + encodeURIComponent($('#workbookNameInput').val()),
+        type: 'POST',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false
+    }).done(function (response) {
+        if (response.success) {
+            console.log(response);
+            workbookData = response.data;
+            applyJsonWithStyle(response.data, 'edit');
+        }
+    }).fail(function (xhr, status, error) {
+        console.log('fail ' + xhr.responseJSON.message);
+
+    });
+
+});
+
+$('#export-workbook-btn').on('click', function () {
+    workbookName = $('#workbookNameInput').val();
+    if (!workbookName)
+        workbookName = 'workbook1';
+    exportToExcel();
+});
+
 // add sheet modal
 $('#show-modal-btn').click(function () {
     state.modalMode = 'add';
@@ -228,7 +188,7 @@ $('#show-modal-btn').click(function () {
 $('#preview-btn').click(function () {
     $('#preview-grid').html('');
     var container = document.getElementById('preview-grid');
-    var previewTable = newTable(container, 300, true);
+    var previewTable = newSimpleTable(container, 300, true);
     previewTable.loadData(getSelected());
     // lock all cells
     previewTable.updateSettings({
@@ -246,11 +206,11 @@ $("#add-confirm-btn").click(function () {
     var sheetName = $('#sheetNameInput').val();
     if (state.modalMode === 'add') {
         sheetNames.push(sheetName);
-        var gridId = addTab(sheetName);
+        var gridId = addTab(sheetName, 'edit');
 
         // generate table
         var container = document.getElementById(gridId);
-        var addedTable = newTable(container, $(window).height() - 500, false);
+        var addedTable = newSimpleTable(container, $(window).height() - 500, false);
         addedTable.loadData(getSelected());
         // lock cells
         addedTable.updateSettings({
@@ -281,7 +241,10 @@ $('#save-workbook-btn').on('click', function () {
     btn.prop('disabled', true);
     var workbook = {};
     for (var i = 0; i < sheets.length; i++) {
-        workbook[sheetNames[i]] = sheets[i].getData();
+        workbook[i] = {
+            name: sheetNames[i],
+            data: sheets[i].getData()
+        };
     }
 
     $.ajax({
