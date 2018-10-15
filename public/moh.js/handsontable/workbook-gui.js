@@ -188,7 +188,8 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
                 if (border.hasOwnProperty('color') && border.color.hasOwnProperty('argb')) {
                     td.style['border' + upper] = '1px solid #' + argbToRgb(border.color.argb);
                 }
-                else if (border.hasOwnProperty('color')){
+                else {
+                    // black color
                     td.style['border' + upper] = '1px solid #000';
                 }
             }
