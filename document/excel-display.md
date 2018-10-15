@@ -59,5 +59,5 @@ A buggy library.
   - [ ] re-evaluate upon other value changes
   
 ## Richtext
-####Not yet Supported.
+#### Not yet Supported.
 
