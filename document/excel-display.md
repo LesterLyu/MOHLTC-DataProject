@@ -21,6 +21,8 @@ Colors in font, border, tabs, etc...
  - [X] *Italic* 
  - [X] Font color
  - [X] Background color
+ - [X] Alignments
+    - top, middle, bottom, left, center, right
  
 #### Not supported
  - [ ] Fonts
@@ -61,3 +63,9 @@ A buggy library.
 ## Richtext
 #### Not yet Supported.
 
+## Data validation
+#### Not yet Supported.
+
+
+## Data types
+#### Not yet Supported.
