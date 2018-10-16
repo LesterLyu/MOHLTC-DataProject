@@ -286,7 +286,7 @@ function applyJsonWithStyle(workBookJson, mode) {
                     var ws = workbookData[this.instance.sheetNo];
                     var cellProperties = {};
                     cellProperties.style = null;
-                    if (ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
+                    if (ws.style.length > 0 && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
                         cellProperties.style = ws.style[row][col];
                     }
                     cellProperties.renderer = cellRenderer;

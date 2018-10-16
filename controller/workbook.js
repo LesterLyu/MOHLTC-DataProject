@@ -263,6 +263,14 @@ module.exports = {
             excel.processFile(req.params.name)
                 .then(data => {
                     res.json({success: true, message: 'File uploaded!', data: data});
+                    var fs = require('fs');
+                    fs.writeFile("tmp/" + req.params.name + '.json', JSON.stringify(data), function(err) {
+                        if(err) {
+                            return console.log(err);
+                        }
+
+                        console.log("The file was saved!");
+                    });
                 });
 
         });
@@ -293,6 +301,7 @@ module.exports = {
                             return res.status(400).json({success: false, message: 'Workbook does not exist.'});
                         }
                         // TO-DO check integrity
+
                         workbook.data = JSON.parse(JSON.stringify(data));
                         workbook.save((err, updated) => {
                             if (err) {

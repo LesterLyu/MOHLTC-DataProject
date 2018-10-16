@@ -75,8 +75,10 @@ function processFile(name) {
                     wsData.data.push([]);
                     wsData.row.height.push(row.height);
                     wsData.row.style.push(translateIndexedColor(row.style));
+                    if (row.hidden) {
+                        wsData.row.hidden.push(rowNumber - 1);
+                    }
 
-                    wsData.row.hidden.push(row.hidden);
                     // Iterate over all cells in a row (including empty cells)
                     wsData.style.push([]);
 
@@ -95,18 +97,11 @@ function processFile(name) {
                         }
                     });
 
-                    // empty row
-                    if (row.cellCount === 0) {
+                    // we want to store all columns in first row
+                    if (row.cellCount === 0 && rowNumber === 1) {
                         wsData.data[rowNumber - 1] = (Array(worksheet.columnCount).fill(null))
 
                     }
-                    // we want the row have all columns
-                    else if (row.cellCount < worksheet.columnCount) {
-                        wsData.data[rowNumber - 1] = wsData.data[rowNumber - 1].concat(Array(worksheet.columnCount - row.cellCount).fill(null))
-                    }
-
-
-
 
                 });
 
@@ -115,7 +110,9 @@ function processFile(name) {
                     const col = worksheet.getColumn(i);
                     wsData.col.width.push(col.width);
                     wsData.col.style.push(translateIndexedColor(col.style));
-                    wsData.col.hidden.push(col.hidden);
+                    if (col.hidden) {
+                        wsData.col.hidden.push(i - 1);
+                    }
                 }
 
             });
