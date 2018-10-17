@@ -3,6 +3,11 @@ function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
 }
 
+function updateLoadingStatus(text) {
+    console.log('Loading... (' + text + ')');
+    $('#loadingText').html('Loading... (' + text + ')');
+}
+
 function workbookToJson(workbook) {
     var result = {};
     workbook.SheetNames.forEach(function (sheetName) {

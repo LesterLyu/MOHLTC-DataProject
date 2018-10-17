@@ -3,6 +3,7 @@ const FilledWorkbook = require('../models/filledWorkbook');
 const error = require('../config/error');
 const config = require('../config/config');
 const excel = require('./excel/xlsx');
+const {gzip, ungzip} = require('node-gzip');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(config.permissions.WORKBOOK_TEMPLATE_MANAGEMENT);
@@ -24,7 +25,12 @@ module.exports = {
             if (!workbook) {
                 return res.status(400).json({success: false, message: 'Workbook does not exist.'});
             }
-            return res.json({success: true, workbook: workbook});
+            // decompress workbook style data
+            ungzip(workbook.data.buffer)
+                .then(decompressed => {
+                    workbook.data = JSON.parse(decompressed.toString());
+                    return res.json({success: true, workbook: workbook});
+                });
         })
     },
 
@@ -47,7 +53,12 @@ module.exports = {
                     if (!workbook) {
                         return res.status(400).json({success: false, message: 'Workbook does not exist.'});
                     }
-                    return res.json({success: true, workbook: workbook});
+                    // decompress workbook style data
+                    ungzip(workbook.data.buffer)
+                        .then(decompressed => {
+                            workbook.data = JSON.parse(decompressed.toString());
+                            return res.json({success: true, workbook: workbook});
+                        });
                 })
             }
             else {
@@ -301,20 +312,26 @@ module.exports = {
                             return res.status(400).json({success: false, message: 'Workbook does not exist.'});
                         }
                         // TO-DO check integrity
-
-                        workbook.data = JSON.parse(JSON.stringify(data));
-                        workbook.save((err, updated) => {
-                            if (err) {
-                                console.log(err);
-                                return res.status(500).json({success: false, message: err});
-                            }
-                            return res.json({
-                                success: true,
-                                message: 'Successfully updated workbook style' + req.params.name + '.',
-                                data: data,
-                            })
-                        });
-
+                        // compress the string
+                        const dataString = JSON.stringify(data);
+                        gzip(dataString)
+                            .then(compressedData => {
+                                // calculate compression rate
+                                const buf = Buffer.from(dataString);
+                                console.info('gzip compression saved ' + (1 - (compressedData.length / buf.length)) + '% spaces!');
+                                workbook.data = compressedData;
+                                workbook.save((err, updated) => {
+                                    if (err) {
+                                        console.log(err);
+                                        return res.status(500).json({success: false, message: err});
+                                    }
+                                    return res.json({
+                                        success: true,
+                                        message: 'Successfully updated workbook style' + req.params.name + '.',
+                                        data: data,
+                                    })
+                                });
+                            });
                     });
                 });
 

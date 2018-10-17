@@ -1,5 +1,7 @@
 const express = require('express');
 
+const compression = require('compression')
+
 const http = require('http');
 
 const app = express();
@@ -69,6 +71,8 @@ app.use(session({
     saveUninitialized: true,
     cookie: {maxAge: 3600 * 1000} //1 hour
 }));
+
+app.use(compression());
 
 // passport authentication setup
 passport.use(new LocalStrategy(User.authenticate()));

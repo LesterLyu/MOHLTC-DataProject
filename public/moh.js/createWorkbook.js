@@ -8,6 +8,10 @@ function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
 }
 
+function updateLoadingStatus(text) {
+    console.log('Loading... (' + text + ')');
+    $('#loadingText').html('Loading... (' + text + ')')
+}
 
 $(document).ready(function () {
 

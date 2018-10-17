@@ -7,6 +7,13 @@ var workbookData;
 var SCALE = 8;  // scale up the column width and row height
 
 var currSheet;
+var state = {
+    tabs: {
+        mode: 'edit', // edit or view
+        tabsToAdd: [], // array of jquery element, stack
+        tabContentsToAdd: [] //...
+    }
+};
 
 /**
  * Initialize a simple table that has no styles
@@ -73,11 +80,23 @@ function newStyledTable(container, height, data, rowHeights, colWidths, merges) 
         colHeaders: true,
         autoWrapCol: false,
         autoWrapRow: false,
+        autoRowSize: false,
+        autoColumnSize: false,
         contextMenu: ['copy'],
     };
     var createdTable = new Handsontable(container, spec);
     sheets.push(createdTable);
     return createdTable;
+}
+
+function applyTabs(){
+    // deactivate previous tab and content
+    $('div.active.show').removeClass('active show');
+    $('a.active').removeClass('active show');
+    var i;
+    for (i = 0; i < state.tabContentsToAdd.length; i++) {
+        $('#nav-tabContent').append(state.tabContentsToAdd[i]);
+    }
 }
 
 /**
@@ -245,6 +264,7 @@ function applyJsonWithoutStyle(workBookJson, mode) {
 
 // apply json to GUI tables
 function applyJsonWithStyle(workBookJson, mode) {
+    var timerStart = Date.now();
     // clear tables and tabs
     if (mode !== 'edit')
         $('#nav-tab').html('');
@@ -253,11 +273,13 @@ function applyJsonWithStyle(workBookJson, mode) {
     // clear global variables
     sheets = [];
     sheetNames = [];
+    var cnt = 0;
 
     // load to front-end
     for (var sheetNo in workBookJson) {
         if (workBookJson.hasOwnProperty(sheetNo)) {
             var ws = workBookJson[sheetNo];
+            updateLoadingStatus(ws.name + ' ' + Math.round(cnt / Object.keys(workBookJson).length * 100) + '%');
             sheetNames.push(ws.name);
             var data = ws.data;
             var gridId = addTab(ws.name, mode, ws.tabColor);
@@ -297,6 +319,7 @@ function applyJsonWithStyle(workBookJson, mode) {
                 }
             });
         }
+        cnt++;
     }
     console.log(sheets);
     $('#nav-tab a:first-child').tab('show');
@@ -305,6 +328,7 @@ function applyJsonWithStyle(workBookJson, mode) {
     $('.nav-tabs a').on('show.bs.tab', function(event){
         currSheet = $(event.target).text();         // active tab
     });
+    console.log("Time consumed: ", Date.now()-timerStart + 'ms');
 }
 
 
