@@ -1,5 +1,7 @@
 module.exports = function (grunt) {
     require("load-grunt-tasks")(grunt); // npm install --save-dev load-grunt-tasks
+    grunt.loadNpmTasks('grunt-contrib-watch');
+
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         babel: {
@@ -17,7 +19,17 @@ module.exports = function (grunt) {
                     }
                 ]
             }
-        }
+        },
+        watch: {
+            scripts: {
+                files: ['public/moh.js/**/*.js'],
+                tasks: ['babel'],
+                options: {
+                    spawn: false,
+                    interrupt: true,
+                },
+            },
+        },
     });
 
     grunt.registerTask("default", ["babel"]);
