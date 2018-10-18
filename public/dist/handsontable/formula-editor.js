@@ -19,7 +19,7 @@ var FormulaEditor = TextEditor.prototype.extend();
 FormulaEditor.prototype.prepare = function (row, col, prop, td, originalValue, cellProperties) {
   this.rawValue = {}; // set editor type
 
-  if (originalValue !== null && originalValue.hasOwnProperty('formula')) {
+  if (originalValue !== null && originalValue !== undefined && originalValue.hasOwnProperty('formula')) {
     this.type = 'formula';
     TextEditor.prototype.prepare.apply(this, [row, col, prop, td, originalValue.formula, cellProperties]);
   } else if (originalValue !== null && typeof originalValue === 'string') {
@@ -52,7 +52,8 @@ FormulaEditor.prototype.saveValue = function (value, ctrlDown) {
   }
 
   if (this.type === 'text') {
-    return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
+    console.log(value);
+    return this.instance.setDataAtCell(this.row, this.col, value); //return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
   } else if (this.type === 'formula') {
     this.rawValue.formula = value[0][0].slice(1); // re-evaluate the result
 

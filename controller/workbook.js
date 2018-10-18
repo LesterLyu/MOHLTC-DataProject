@@ -4,11 +4,11 @@ const error = require('../config/error');
 const config = require('../config/config');
 const excel = require('./excel/xlsx');
 const {gzip, ungzip} = require('node-gzip');
+const pako = require('pako');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(config.permissions.WORKBOOK_TEMPLATE_MANAGEMENT);
 }
-
 
 module.exports = {
     checkPermission: checkPermission,
@@ -25,12 +25,7 @@ module.exports = {
             if (!workbook) {
                 return res.status(400).json({success: false, message: 'Workbook does not exist.'});
             }
-            // decompress workbook style data
-            ungzip(workbook.data.buffer)
-                .then(decompressed => {
-                    workbook.data = JSON.parse(decompressed.toString());
-                    return res.json({success: true, workbook: workbook});
-                });
+            return res.json({success: true, workbook: workbook});
         })
     },
 
@@ -53,12 +48,7 @@ module.exports = {
                     if (!workbook) {
                         return res.status(400).json({success: false, message: 'Workbook does not exist.'});
                     }
-                    // decompress workbook style data
-                    ungzip(workbook.data.buffer)
-                        .then(decompressed => {
-                            workbook.data = JSON.parse(decompressed.toString());
-                            return res.json({success: true, workbook: workbook});
-                        });
+                    return res.json({success: true, workbook: workbook});
                 })
             }
             else {
@@ -259,35 +249,76 @@ module.exports = {
         });
     },
 
-    upload_file: (req, res, next) => {
+    user_import_workbook: (req, res, next) => {
         if (!req.files)
             return res.status(400).json({success: false, message: 'No files were uploaded.'});
+
+        const name = req.params.name;
+        const username = req.session.user.username;
+        const groupNumber = req.session.user.groupNumber;
 
         // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
         let excelFile = req.files.excel;
 
         // Use the mv() method to place the file somewhere on your server
-        excelFile.mv('./uploads/' + req.params.name, function (err) {
+        excelFile.mv('./uploads/temp.xlsx', function (err) {
             if (err)
                 return res.status(500).json({success: false, message: err});
 
-            excel.processFile(req.params.name)
+            excel.processFile('temp.xlsx')
                 .then(data => {
-                    res.json({success: true, message: 'File uploaded!', data: data});
-                    var fs = require('fs');
-                    fs.writeFile("tmp/" + req.params.name + '.json', JSON.stringify(data), function(err) {
-                        if(err) {
-                            return console.log(err);
+                    FilledWorkbook.findOne({name: req.params.name, groupNumber: groupNumber}, (err, workbook) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).json({success: false, message: err});
                         }
+                        // compress the string
+                        const dataString = JSON.stringify(data);
+                        const compressedData = pako.deflate(dataString, {to: 'string'});
 
-                        console.log("The file was saved!");
+                        if (!workbook) {
+                            let newFilledWorkbook = new FilledWorkbook({
+                                name: name,
+                                username: username,
+                                groupNumber: groupNumber,
+                                data: compressedData
+                            });
+                            newFilledWorkbook.save((err, updated) => {
+                                if (err) {
+                                    console.log(err);
+                                    return res.status(500).json({success: false, message: err});
+                                }
+                                return res.json({success: true, workbook: updated, message: 'Successfully added filled workbook ' + name + '.'});
+                            })
+                        }
+                        else {
+                            // TO-DO check integrity
+                            workbook.data = compressedData;
+                            workbook.save((err, updated) => {
+                                if (err) {
+                                    console.log(err);
+                                    return res.status(500).json({success: false, message: err});
+                                }
+                                return res.json({
+                                    success: true,
+                                    workbook: updated,
+                                    message: 'Successfully updated workbook style' + req.params.name + '.',
+                                })
+                            });
+                        }
                     });
                 });
 
         });
     },
 
-    upload_style: (req, res, next) => {
+    // import workbook
+    // TO-DO validate col/rows
+    admin_upload_style: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        let start = new Date();
         if (!req.files)
             return res.status(400).json({success: false, message: 'No files were uploaded.'});
 
@@ -300,9 +331,13 @@ module.exports = {
         excelFile.mv('./uploads/' + req.params.name + '.xlsx', function (err) {
             if (err)
                 return res.status(500).json({success: false, message: err});
+            console.log('upload takes: ' + (new Date() - start) + 'ms');
+            start = new Date();
 
             excel.processFile(req.params.name + '.xlsx')
                 .then(data => {
+                    console.log('processFile takes: ' + (new Date() - start) + 'ms');
+                    start = new Date();
                     Workbook.findOne({name: req.params.name, groupNumber: groupNumber}, (err, workbook) => {
                         if (err) {
                             console.log(err);
@@ -314,28 +349,36 @@ module.exports = {
                         // TO-DO check integrity
                         // compress the string
                         const dataString = JSON.stringify(data);
-                        gzip(dataString)
-                            .then(compressedData => {
-                                // calculate compression rate
-                                const buf = Buffer.from(dataString);
-                                console.info('gzip compression saved ' + (1 - (compressedData.length / buf.length)) + '% spaces!');
-                                workbook.data = compressedData;
-                                workbook.save((err, updated) => {
-                                    if (err) {
-                                        console.log(err);
-                                        return res.status(500).json({success: false, message: err});
-                                    }
-                                    return res.json({
-                                        success: true,
-                                        message: 'Successfully updated workbook style' + req.params.name + '.',
-                                        data: data,
-                                    })
-                                });
-                            });
+                        console.log('stringify takes: ' + (new Date() - start) + 'ms');
+                        start = new Date();
+                        const compressedData = pako.deflate(dataString, {to: 'string'});
+                        console.log('gzip takes: ' + (new Date() - start) + 'ms');
+                        start = new Date();
+                        // calculate compression rate
+                        const buf = Buffer.from(dataString);
+                        console.info('gzip compression saved ' + (1 - (compressedData.length / buf.length)) * 100 + '% spaces!');
+                        workbook.data = compressedData;
+                        workbook.save((err, updated) => {
+                            if (err) {
+                                console.log(err);
+                                return res.status(500).json({success: false, message: err});
+                            }
+                            console.log('workbook.save takes: ' + (new Date() - start) + 'ms');
+
+                            return res.json({
+                                success: true,
+                                workbook: updated,
+                                message: 'Successfully updated workbook style' + req.params.name + '.',
+                            })
+                        });
                     });
                 });
 
         });
+    },
+
+    workbook_export: (req, res, next) => {
+        const groupNumber = req.session.user.groupNumber;
     }
 
 

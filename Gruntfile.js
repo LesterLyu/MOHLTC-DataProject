@@ -1,6 +1,7 @@
 module.exports = function (grunt) {
     require("load-grunt-tasks")(grunt); // npm install --save-dev load-grunt-tasks
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-browserify');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -20,6 +21,7 @@ module.exports = function (grunt) {
                 ]
             }
         },
+
         watch: {
             scripts: {
                 files: ['public/moh.js/**/*.js'],
@@ -30,6 +32,7 @@ module.exports = function (grunt) {
                 },
             },
         },
+
     });
 
     grunt.registerTask("default", ["babel"]);
