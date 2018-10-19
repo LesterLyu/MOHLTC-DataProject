@@ -10,19 +10,38 @@ router.get('/login', function (req, res) {
 });
 
 router.get('/signup', function (req, res) {
-    if (req.isAuthenticated()) {
-        return res.redirect('/profile');
-    }
     res.render('signup.ejs');
 });
 
-
+router.get('/api/organization_details', user_controller.getOrganizationDetails);
 
 // POST request for user sign up
 router.post('/api/signup', user_controller.user_sign_up);
 
+router.get('/register-success-submit', function (req, res) {
+    res.render('registerSuccessSubmit.ejs');
+});
+
 // POST request for user sign in
 router.post('/api/login', user_controller.user_log_in);
+
+
+// reset password by email
+router.get('/enter-your-email', function (req, res) {
+    res.render('ForgetPasswordReset.ejs');
+});
+
+router.post('/api/reset-password', user_controller.user_reset_password);
+
+router.post('/api/send-reset-email', user_controller.user_send_reset_email);
+
+router.get('/reset/:token', user_controller.password_reset_validate);
+
+router.post('/api/reset-password-link', user_controller.reset_password_link);
+
+router.get('/reset-password-link', function (req, res) {
+    res.render('ForgetPasswordLink.ejs', {username: req.session.user.username});
+});
 
 // validate account from email link
 router.get('/validate/:token', user_controller.user_validate);

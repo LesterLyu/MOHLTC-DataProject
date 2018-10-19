@@ -6,18 +6,18 @@ module.exports = {
         port: 465,
         secure: true,
         auth: {
-            user: "lyulester@gmail.com",
-            pass: "password"
+            user: "w767089351@gmail.com",
+            pass: "wkw1234567"
         },
-        sender: '"Lester Lyu" <lyulester@gmail.com>'
-    },
-    serverHostname: "http://142.107.248.32:3000", //used for receive validation link
+sender: '"Will Wang" <w767089351@gmail.com>'
+},
+serverHostname: "localhost:3000", //used for receive validation link
     permissions: {
-        //FILL_WORKBOOK: 'fill-workbook', // not implemented, fow now, everyone can fill workbooks
-        WORKBOOK_TEMPLATE_MANAGEMENT: 'CRUD-workbook-template',
+    //FILL_WORKBOOK: 'fill-workbook', // not implemented, fow now, everyone can fill workbooks
+    WORKBOOK_TEMPLATE_MANAGEMENT: 'CRUD-workbook-template',
         ATTRIBUTE_CATEGORY_MANAGEMENT: 'create-delete-attribute-category',
         USER_MANAGEMENT: 'user-management',
         SYSTEM_MANAGEMENT: 'system-management'
-    },
-    disableEmailValidation: true,
+},
+disableEmailValidation: true,
 };

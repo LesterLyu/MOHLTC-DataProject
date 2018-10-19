@@ -43,7 +43,10 @@ router.post('/api/user/permission', user_management_controller.admin_update_user
         },...
     ]}
  */
+
 router.get('/api/user/details', user_management_controller.admin_get_all_users_with_details);
+
+router.get('/api/user/registerInfo', user_management_controller.user_register_details);
 
 router.get('/api/permissions', user_management_controller.admin_get_all_permissions);
 
@@ -57,5 +60,16 @@ router.get('/user/management', (req, res, next) => {
 });
 
 
+router.post('/api/user/register_management', user_management_controller.register_management);
+
+router.get('/user/register_management', (req, res, next) => {
+    if (user_management_controller.checkPermission(req)) {
+        res.render('sidebar/registerManagement.ejs', {user: req.session.user});
+    }
+    else {
+        res.status(403).render('error.ejs', error.NO_PERMISSION)
+    }
+});
 
 module.exports = router;
+

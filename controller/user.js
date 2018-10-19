@@ -1,4 +1,6 @@
 const User = require('../models/user');
+const Organization = require('../models/organization');
+const RegisterRequest = require('../models/registerRequest');
 const passport = require('passport');
 const config = require('../config/config'); // get our config file
 const sendMail = require('./sendmail');
@@ -133,6 +135,15 @@ module.exports = {
             req.session.user = {};
         },
 
+    getOrganizationDetails: (req, res, next) => {
+        Organization.find({}, (err, organizations) => {
+            if (err) {
+                console.log(err);
+                return res.json({success: false, message: err});
+            }
+            return res.json({success: true, organizations: organizations});
+        });
+    },
 
 
     user_sign_up: (req, res, next) => {
@@ -156,40 +167,27 @@ module.exports = {
                 if (!isEmail(req.body.email)) {
                     return res.status(400).json({success: false, message: 'Email format error.'});
                 }
-                // all good
-                let newUser = new User({
+
+                let newRequest = new RegisterRequest({
                     username: req.body.username,
                     firstName: req.body.firstName,
                     lastName: req.body.lastName,
                     groupNumber: req.body.groupNumber,
                     phoneNumber: req.body.phoneNumber,
-                    validated: false,
-                    type: 2, // system admin=0, form manager=1, user=2
+                    organization: req.body.organization,
                     email: req.body.email,
+                    role: req.body.role
                 });
-                if (config.disableEmailValidation) {
-                    newUser.validated = true;
-                }
-                User.register(newUser, req.body.password, (err, user) => {
+
+                newRequest.save((err, user) => {
                     if (err) {
                         console.log(err);
                         return res.json({success: false, message: err});
                     }
-                    console.log('success sign up');
-                    // sign in right after
-                    passport.authenticate('local')(req, res, () => {
-                        // set user info in the session
-                        req.session.user = user;
-                        if (config.disableEmailValidation) {
-                            return res.json({success: true, redirect: '/profile'});
-                        }
-                        // create token and sent by email
-                        const token = generateToken(req.body.username, 60);
-                        sendMail.sendValidationEmail(req.body.email, token, (info) => {
-                            return res.json({success: true, redirect: '/validate-now'});
-                        });
+                    console.log('success submit request');
+                    sendMail.sendRegisterSubmitEmail(req.body.email, req.body.username, (info) => {
+                        return res.json({success: true, redirect: '/register-success-submit'});
                     });
-
                 });
             });
 
@@ -229,6 +227,33 @@ module.exports = {
         return res.redirect('/')
     },
 
+    user_reset_password: (req, res, next) => {
+        var username = req.body.username;
+        var email = req.body.email;
+      User.findOne({username: username}, (err, user) => {
+          if (err) {
+              return res.status(400).json({success: false, message: err});
+          }else if (user) {
+              if (user.email == email) {
+                  return res.json({success: true, message: "An email has been sent to your email, please reset your password in email!"});
+              } else {
+                  return res.json({success: false, message: "Email address does not match!"});
+              }
+          } else {
+              return res.json({success: false, message: "Username does not exist!"});
+          }
+      });
+    },
+
+    user_send_reset_email: (req, res, next) => {
+        console.log(req.body);
+        const token = generateToken(req.body.username, 60);
+        sendMail.sendResetEmail(req.body.email, token, (info) => {
+            return res.json({success: true, message: info});
+        });
+    },
+
+
     user_send_validation_email: (req, res, next) => {
         // create token and sent by email
         const token = generateToken(req.session.user.username, 60);
@@ -236,6 +261,57 @@ module.exports = {
             return res.json({success: true, message: info});
         });
     },
+
+    reset_password_link: (req, res, next) => {
+        var newPassword = req.body.newPassword;
+        var confirmPassword = req.body.confirmPassword;
+        var username = req.session.user.username;
+        if (confirmPassword !== newPassword) {
+            return res.status(400).json({success: false, message: "New Password does not match!"});
+        }
+        User.findOne({username: username}, (err, user) => {
+            if (err) {
+                return res.status(400).json({success: false, message: err});
+            }
+            user.setPassword(newPassword, (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(400).json({success: false, message: err});
+                }
+                user.save(function(err){
+                        if (err) {
+                            return res.status(400).json({success: false, message: err});
+                        }
+                        req.session.user = user;
+                })
+
+                console.log(req.session);
+                return res.json({success: true, message: "The password has been changed"});
+            });
+        });
+    },
+
+
+    password_reset_validate:
+        (req, res, next) => {
+            jwt.verify(req.params.token, config.superSecret, function (err, decoded) {
+                if (err) {
+                    return res.json({success: false, message: 'Failed to authenticate token.'});
+                } else {
+                    User.findOne({username: decoded.username}, (err, user) => {
+                        console.log(user);
+                        if (err) {
+                            console.log(err);
+                            return next(err);
+                        }
+                        else {
+                            req.session.user = user;
+                            return res.redirect('/reset-password-link');
+                        }
+                    })
+                }
+            });
+        },
 
     user_validate:
         (req, res, next) => {

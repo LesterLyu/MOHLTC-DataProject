@@ -8,6 +8,7 @@ let userSchema = new mongoose.Schema({
     lastName: String,
     createDate: {type: Date, default: Date.now},
     phoneNumber: String,
+    organization: String,
     validated: Boolean,
     type: {type: Number, required: true}, // system admin=0, form manager=1, user=2
     email: {type: String, unique: true},

@@ -107,20 +107,20 @@ $('#save-btn').click(function () {
     btn.prop('disabled', true);
 
     // get modified permissions and permissions
-    var data = [], actives = [];
+    var permission = [], actives = [];
     for (var i = 0; i < userData.length; i++) {
         var selected = $('#select-' + userData[i].username).val();
         if (selected !== undefined && !compare(selected, userData[i].permissions))
-            data.push({permissions: selected, username: userData[i].username});
+            permission.push({permissions: selected, username: userData[i].username});
 
-        var active = $('input' ,$('label.active', '#radios-' + userData[i].username)).val();
+        var active = $('input' ,$('.active', '#radios-' + userData[i].username)).val();
         if (active !== undefined && active !== userData[i].active + '')
             actives.push({active: active, username: userData[i].username});
     }
 
     console.log(actives);
 
-
+    var data = {permission, actives};
     // send to server
     $.ajax({
         url: '/api/user/permission',
@@ -129,8 +129,10 @@ $('#save-btn').click(function () {
         data: JSON.stringify({data: data}),
     }).done(function (response) {
         if (response.success) {
+            location.reload();
             statusText.html('<i class="fas fa-check"></i> Saved');
             btn.prop('disabled', false);
+
         }
     }).fail(function (xhr, status, error) {
         console.log(xhr.responseJSON.message);
