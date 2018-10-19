@@ -10,30 +10,9 @@
             <div class="form-group">
                 <br/>
                 <label class="signuplabel" for="userName">
-                Username:
+                    Username:
                 </label>
                 <input type="text" class="form-control singupinput" id="username" name="username">
-            </div>
-            <div class="form-group">
-                <label class="signuplabel">Password:</label>
-                <input type="password" id="password" class="form-control singupinput" name="password">
-
-            </div>
-            <div class="form-group">
-                <label class="signuplabel">Re-enter password:</label>
-                <input type="password" id="confirm_password" class="form-control singupinput" name="confirm_password"
-                       required="required" oninput="check(this)">
-                <script language='javascript' type='text/javascript'>
-                    function check(input) {
-                        console.log("saysomethingplease!");
-                        if (input.value !== document.getElementById('password').value) {
-                            input.setCustomValidity('Password Must Match');
-                        }
-                        else {
-                            input.setCustomValidity('');
-                        }
-                    }
-                </script>
             </div>
             <fieldset>
                 <label class="signuplabel" for="firstName">First Name: </label>
@@ -43,6 +22,26 @@
                 <input type="text" id="lastName" name="lastName" placeholder="Smith" class="form-control singupinput"/>
                 <br/>
             </fieldset>
+            <div class="form-group row">
+                <label class="col-sm-11" for="organization"> Choose your Organization: </label>
+
+                <Select class="selectpicker col-sm-12" data-live-search="true" data-style="btn-outline-primary" data-actions-box="true"
+                        data-header="Select organization" id="OrganizationDropDown" name="organization">
+                </Select>
+
+            </div>
+            <div class="form-group row">
+                <label class="col-sm-11" for="role"> Choose your role: </label>
+
+                <Select class="selectpicker col-sm-12" data-live-search="true" data-style="btn-outline-primary" data-actions-box="true"
+                        data-header="Select role" id="RoleDropDown" name="role">
+                    <option value="user">User (have access to fill workbook)</option>
+                    <option value="workbookAdmin">Administrator (have access to manage workbook templates)</option>
+                    <option value="manager">Manager (have access to user management)</option>
+                </Select>
+
+            </div>
+
             <div class="form-group">
                 <label class="signuplabel" for="contactEmail">Email: </label>
                 <input type="email" id="email" name="email" placeholder="lester.lyu@ontario.com"
@@ -70,10 +69,17 @@
     <!--Message Modal-->
     <%- include('./common/messageModal'); -%>
 </div>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+
+
 <script
         src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
         crossorigin="anonymous"></script>
-<script src="/dist/signup.js"></script>
 
-<%- include('./common/footer'); -%>
+<%- include('./common/dashboardFooter', {js: [
+'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
+'/moh.js/signup.js',
+]}); -%>
