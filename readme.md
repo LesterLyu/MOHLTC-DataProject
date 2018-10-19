@@ -12,9 +12,9 @@
  - [X] Warning when delete attribute/category that is used in the system
  
 ## Documents
-- [User Types](document/user-types.md)
+- [User Types](documents/user-types.md)
 - [Excel Indexed Colors](https://github.com/ClosedXML/ClosedXML/wiki/Excel-Indexed-Colors)
-- [Excel Display](document/excel-display.md)
+- [Excel Display](documents/excel-display.md)
 
 
 # Purpose

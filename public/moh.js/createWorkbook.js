@@ -3,11 +3,25 @@ var state = {
     modalMode: 'none' // none, add, edit
 }; // store state
 var workbookData;
+let gui;
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
 }
 
+function unzip(binary) {
+    return JSON.parse(pako.inflate(binary, {to: 'string'}));
+}
+
+function zip(string) {
+    return pako.deflate(string, {to: 'string'});
+}
+
+// does not work when loading tables...
+function updateLoadingStatus(text) {
+    console.log('Loading... (' + text + ')');
+    $('#loadingText').html('Loading... (' + text + ')')
+}
 
 $(document).ready(function () {
 
@@ -52,7 +66,7 @@ $(document).ready(function () {
     });
 
     // if this page is loaded for edit workbook
-    workbookName = $('#workbookNameInput').val();
+    const workbookName = $('#workbookNameInput').val();
     mode = $('#mode').val();
     if (mode === 'edit') {
 
@@ -65,15 +79,12 @@ $(document).ready(function () {
         }).done(function (response) {
             console.log(response);
             if (response.success) {
-                workbookData = response.workbook.data;
-                console.log(workbookData);
-                // check if it has style
-                if (workbookData[0] && workbookData[0].hasOwnProperty('style')) {
-                    applyJsonWithStyle(workbookData, 'edit');
-                }
-                else {
-                    applyJsonWithoutStyle(workbookData, 'edit');
-                }
+                const data = unzip(response.workbook.data);
+                console.log(data);
+                gui = new WorkbookGUI('edit', workbookName, data, $(window).height() - 390);
+                gui.setAddSheetCallback(addSheet);
+                gui.load();
+
                 $('#loading').hide();
             }
         }).fail(function (xhr, status, error) {
@@ -81,6 +92,14 @@ $(document).ready(function () {
             //showErrorAlert(xhr.responseJSON.message);
             $('#loading').hide();
         });
+    }
+    // add mode
+    else {
+        console.log('add mode');
+        $('#import-workbook-btn').prop('disabled', true);
+        gui = new WorkbookGUI('edit', workbookName, {}, $(window).height() - 390);
+        gui.setAddSheetCallback(addSheet);
+
     }
 
 });
@@ -92,10 +111,11 @@ function editSheet(index) {
     var selecte_attributes = $('#select-attributes');
     selecte_categories.selectpicker('deselectAll');
     selecte_attributes.selectpicker('deselectAll');
-    $('#sheetNameInput').val(sheetNames[index]);
+    $('#sheetNameInput').val(gui.sheetNames[index]);
 
 
-    var data = sheets[index].getData().slice();
+    // get categories and attributes
+    var data = gui.tables[index].getData().slice();
     // console.log(data);
     data[0].splice(data[0].indexOf(''), 1);
     var attrs = data[0];
@@ -156,9 +176,10 @@ $('#file-import').change(function (e) {
         processData: false
     }).done(function (response) {
         if (response.success) {
-            console.log(response);
-            workbookData = response.data;
-            applyJsonWithStyle(response.data, 'edit');
+            const data = unzip(response.workbook.data);
+            console.log(data);
+            gui.updateJson(data);
+            gui.load();
         }
     }).fail(function (xhr, status, error) {
         console.log('fail ' + xhr.responseJSON.message);
@@ -168,24 +189,25 @@ $('#file-import').change(function (e) {
 });
 
 $('#export-workbook-btn').on('click', function () {
-    workbookName = $('#workbookNameInput').val();
-    if (!workbookName)
-        workbookName = 'workbook1';
+    if (!gui.workbookName)
+        gui.workbookName = 'workbook1';
     exportToExcel();
 });
 
 // add sheet modal
-$('#show-modal-btn').click(function () {
+function addSheet() {
     state.modalMode = 'add';
     $('#sheetNameInput').val('');
     $('#select-categories').selectpicker('deselectAll');
     $('#select-attributes').selectpicker('deselectAll');
     $('#add-confirm-btn').html('Add');
     $('#add-modal').modal({backdrop: 'static'});
-});
+}
 
 // preview the sheet in the modal
 $('#preview-btn').click(function () {
+    showModalAlert('Error', 'Not yet implemented');
+    return;
     $('#preview-grid').html('');
     var container = document.getElementById('preview-grid');
     var previewTable = newSimpleTable(container, 300, true);
@@ -205,47 +227,28 @@ $('#preview-btn').click(function () {
 $("#add-confirm-btn").click(function () {
     var sheetName = $('#sheetNameInput').val();
     if (state.modalMode === 'add') {
-        sheetNames.push(sheetName);
-        var gridId = addTab(sheetName, 'edit');
-
-        // generate table
-        var container = document.getElementById(gridId);
-        var addedTable = newSimpleTable(container, $(window).height() - 500, false);
-        addedTable.loadData(getSelected());
-        // lock cells
-        addedTable.updateSettings({
-            cells: function (row, col) {
-                var cellProperties = {};
-                if (row === 0 || col === 0) {
-                    cellProperties.readOnly = true;
-                }
-                return cellProperties;
-            }
-        });
+        gui.addSheet(sheetName, getSelected());
+        console.log(getSelected())
     }
     else if (state.modalMode === 'edit') {
-        sheetNames[state.modelDisplayIndex] = sheetName;
+        $('#add-modal').modal('hide');
+        showModalAlert('Error', 'Not yet implemented');
+        return;
+        gui.sheetNames[state.modelDisplayIndex] = sheetName;
         $('#tab-' + state.modelDisplayIndex).html(sheetName
             + '<i onclick="editSheet(' + state.modelDisplayIndex + ')" class="fas fa-pen ml-2"></i>');
-        sheets[state.modelDisplayIndex].loadData(getSelected());
+        gui.tables[state.modelDisplayIndex].loadData(getSelected());
     }
-
-
     $('#add-modal').modal('hide');
 });
 
 $('#save-workbook-btn').on('click', function () {
+
     var btn = $(this);
     var statusText = $('#status');
     statusText.html('<i class="fas fa-spinner fa-spin"></i> Saving');
     btn.prop('disabled', true);
-    var workbook = {};
-    for (var i = 0; i < sheets.length; i++) {
-        workbook[i] = {
-            name: sheetNames[i],
-            data: sheets[i].getData()
-        };
-    }
+    const workbook = zip(JSON.stringify(gui.getData()));
 
     $.ajax({
         url: '/api/admin/workbook',
@@ -254,6 +257,10 @@ $('#save-workbook-btn').on('click', function () {
         data: JSON.stringify({data: workbook, oldName: $('#workbookOldName').val(),name: $('#workbookNameInput').val()}),
     }).done(function (response) {
         if (response.success) {
+            // enable import style button once saved
+            if (mode !== 'edit') {
+                $('#import-workbook-btn').prop('disabled', false);
+            }
             statusText.html('<i class="fas fa-check"></i> Saved');
             btn.prop('disabled', false);
         }

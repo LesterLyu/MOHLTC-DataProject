@@ -19,7 +19,9 @@
         <div class="col-auto p-1">
             <div class="input-group">
                 <button id="import-workbook-btn" class="btn btn-primary">Import</button>
-                <input id="file-import" type="file" class="hide">
+                <form id="upload-form" enctype="multipart/form-data">
+                    <input name="excel" id="file-import" type="file" class="hide">
+                </form>
             </div>
         </div>
         <div class="col-auto p-1">
@@ -38,12 +40,12 @@
         </div>
     </nav>
     <div class="tab-content" id="nav-tabContent">
-        <div id="loading">
-            <br>
-            <h4><i class="fas fa-spinner fa-spin"></i> Loading... </h4>
-        </div>
+
     </div>
-    <div id="test"></div>
+    <div id="loading">
+        <br>
+        <h4><i class="fas fa-spinner fa-spin"></i> <i id="loadingText"> Loading...</i></h4>
+    </div>
 </div>
 
 <!--Message Modal-->
@@ -63,8 +65,9 @@
     'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.0/xlsx.full.min.js',
 
     '/js/formula-parser.js',
-    '/moh.js/handsontable/formula-parser.js',
-    '/moh.js/handsontable/formula-editor.js',
-    '/moh.js/handsontable/workbook-gui.js',
-    '/moh.js/fillWorkbook.js',
+    '/dist/handsontable/formula-parser.js',
+    '/dist/handsontable/formula-editor.js',
+    '/dist/handsontable/workbook-gui.js',
+    '/node_modules/pako/dist/pako.min.js',
+    '/dist/fillWorkbook.js',
 ]}); -%>

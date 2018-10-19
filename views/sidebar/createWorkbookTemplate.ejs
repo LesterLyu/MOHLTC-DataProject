@@ -23,15 +23,12 @@
     </form>
     <nav>
         <div class="nav nav-tabs" id="nav-tab">
-
-            <a id="show-modal-btn" class="nav-link nav-item" href="#"><i class="fas fa-plus"></i> Add Sheet</a>
-
         </div>
     </nav>
     <div class="tab-content" id="nav-tabContent">
         <div id="loading" class="<%=(mode === 'edit' ? '' : 'hide')%>">
             <br>
-            <h4><i class="fas fa-spinner fa-spin"></i> Loading... </h4>
+            <h4><i class="fas fa-spinner fa-spin"></i> <i id="loadingText"> Loading...</i></h4>
         </div>
     </div>
     <br>
@@ -57,11 +54,11 @@
         </div>
     </div>
 
-    <hr>
-    <div class="container-fluid d-none d-md-block">
-        <h5>Instruction: </h5>
-        <p> Right click to view the menu. Select row/column and drag to move row/column.</p>
-    </div>
+    <!--<hr>-->
+    <!--<div class="container-fluid d-none d-md-block">-->
+        <!--<h5>Instruction: </h5>-->
+        <!--<p> Right click to view the menu. Select row/column and drag to move row/column.</p>-->
+    <!--</div>-->
 </div>
 
 <!--For add/edit sheet-->
@@ -125,8 +122,9 @@
 'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.0/xlsx.full.min.js',
 '/js/formula-parser.js',
-'/moh.js/handsontable/formula-parser.js',
-'/moh.js/handsontable/formula-editor.js',
-'/moh.js/handsontable/workbook-gui.js',
-'/moh.js/createWorkbook.js',
+'/dist/handsontable/formula-parser.js',
+'/dist/handsontable/formula-editor.js',
+'/dist/handsontable/workbook-gui.js',
+'/node_modules/pako/dist/pako.min.js',
+'/dist/createWorkbook.js',
 ]}); -%>

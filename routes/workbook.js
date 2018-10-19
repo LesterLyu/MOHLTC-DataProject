@@ -82,10 +82,11 @@ router.get('/temp1', function (req, res) {
     res.render('sidebar/temp1.ejs', {user: req.session.user});
 });
 
-router.post('/api/upload/:name', workbookController.upload_file);
+// for user
+router.post('/api/upload/workbook/:name', workbookController.user_import_workbook);
 
-
-router.post('/api/upload/style/:name', workbookController.upload_style);
+// for admin
+router.post('/api/upload/style/:name', workbookController.admin_upload_style);
 
 
 module.exports = router;

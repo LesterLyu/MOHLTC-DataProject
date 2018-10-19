@@ -11,13 +11,13 @@ var parser = new formulaParser.Parser();
 parser.on('callCellValue', function (cellCoord, done) {
     //console.log('get ' + cellCoord.label);
     if (cellCoord.hasOwnProperty('sheet')) {
-        if (!sheetNames.includes(cellCoord.sheet)) {
+        if (!gui.sheetNames.includes(cellCoord.sheet)) {
             console.error('Sheet name does not exist: ' + cellCoord.sheet);
         }
-        var sheet = sheets[sheetNames.indexOf(cellCoord.sheet)];
+        var sheet = gui.tables[gui.sheetNames.indexOf(cellCoord.sheet)];
     }
     else {
-        sheet = sheets[sheetNames.indexOf(currSheet)];
+        sheet = gui.tables[gui.sheetNames.indexOf(gui.currSheet)];
     }
     var data = sheet.getDataAtCell(cellCoord.row.index, cellCoord.column.index);
     if (data === null) {
@@ -38,13 +38,13 @@ parser.on('callRangeValue', function (startCellCoord, endCellCoord, done) {
 
     // find sheet
     if (startCellCoord.hasOwnProperty('sheet')) {
-        if (!sheetNames.includes(startCellCoord.sheet)) {
+        if (!gui.sheetNames.includes(startCellCoord.sheet)) {
             console.error('Sheet name does not exist: ' + startCellCoord.sheet);
         }
-        var sheet = sheets[sheetNames.indexOf(startCellCoord.sheet)];
+        var sheet = gui.tables[gui.sheetNames.indexOf(startCellCoord.sheet)];
     }
     else {
-        sheet = sheets[sheetNames.indexOf(currSheet)];
+        sheet = gui.tables[gui.sheetNames.indexOf(gui.currSheet)];
     }
 
     // find data

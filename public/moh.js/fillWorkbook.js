@@ -1,6 +1,20 @@
+let gui;
 
 function showModalAlert(title, msg) {
     $('#msg-modal').find('h5').html(title).end().find('p').html(msg).end().modal('show');
+}
+
+function unzip(binary) {
+    return JSON.parse(pako.inflate(binary, {to: 'string'}));
+}
+
+function zip(string) {
+    return pako.deflate(string, {to: 'string'});
+}
+
+function updateLoadingStatus(text) {
+    console.log('Loading... (' + text + ')');
+    $('#loadingText').html('Loading... (' + text + ')');
 }
 
 function workbookToJson(workbook) {
@@ -14,9 +28,8 @@ function workbookToJson(workbook) {
 }
 
 
-
 $(document).ready(function () {
-    workbookName = $('#filled-workbook').val();
+    const workbookName = $('#filled-workbook').val();
     // default url is for fill the workbook first time
     var url = '/api/filled-workbook/' + encodeURIComponent(workbookName);
     $.ajax({
@@ -25,14 +38,12 @@ $(document).ready(function () {
     }).done(function (response) {
         console.log(response);
         if (response.success) {
-            workbookData =response.workbook.data;
-            // check if it has style
-            if (workbookData[0] && workbookData[0].hasOwnProperty('style')) {
-                applyJsonWithStyle(workbookData, 'view');
-            }
-            else {
-                applyJsonWithoutStyle(workbookData, 'view');
-            }
+            let start = new Date();
+            const data = unzip(response.workbook.data);
+            console.log('parse data takes: ' + (new Date() - start) + 'ms');
+            console.log(data);
+            gui = new WorkbookGUI('view', workbookName, data);
+            gui.load();
             $('#loading').hide();
         }
     }).fail(function (xhr, status, error) {
@@ -48,10 +59,7 @@ $('#save-workbook-btn').on('click', function () {
     var statusText = $('#status');
     statusText.html('<i class="fas fa-spinner fa-spin"></i> Saving');
     btn.prop('disabled', true);
-    var workbook = {};
-    for (var i = 0; i < sheets.length; i++) {
-        workbook[sheetNames[i]] = sheets[i].getData();
-    }
+    const workbook = zip(JSON.stringify(gui.getData()));
 
     $.ajax({
         url: '/api/filled-workbook',
@@ -80,18 +88,26 @@ $('#import-workbook-btn').on('click', function () {
 });
 
 $('#file-import').change(function (e) {
-    var rABS = true; // true: readAsBinaryString ; false: readAsArrayBuffer
     var files = e.target.files, f = files[0];
-    var reader = new FileReader();
-    reader.onload = function (e) {
-        var data = e.target.result;
-        if (!rABS) data = new Uint8Array(data);
-        var workbook = XLSX.read(data, {type: rABS ? 'binary' : 'array', cellStyles: true, cellNF: true});
+    var formData = new FormData();
+    formData.append('excel', f);
 
-        // To-DO validate the import
-        console.log(workbook);
-        //workbookData
-        applyJson(workbookToJson(workbook))
-    };
-    if (rABS) reader.readAsBinaryString(f); else reader.readAsArrayBuffer(f);
+    $.ajax({
+        url: '/api/upload/workbook/' + encodeURIComponent($('#filled-workbook').val()),
+        type: 'POST',
+        data: formData,
+        cache: false,
+        contentType: false,
+        processData: false
+    }).done(function (response) {
+        if (response.success) {
+            const data = unzip(response.workbook.data);
+            console.log(data);
+            gui.updateJson(data);
+            gui.load();
+        }
+    }).fail(function (xhr, status, error) {
+        console.log('fail ' + xhr.responseJSON.message);
+
+    });
 });

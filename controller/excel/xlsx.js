@@ -98,9 +98,8 @@ function processFile(name) {
                     });
 
                     // we want to store all columns in first row
-                    if (row.cellCount === 0 && rowNumber === 1) {
+                    if (row.cellCount !== worksheet.columnCount && rowNumber === 1) {
                         wsData.data[rowNumber - 1] = (Array(worksheet.columnCount).fill(null))
-
                     }
 
                 });

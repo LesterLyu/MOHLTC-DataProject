@@ -1,5 +1,7 @@
 const express = require('express');
 
+const compression = require('compression')
+
 const http = require('http');
 
 const app = express();
@@ -57,8 +59,8 @@ db.once('open', function() {
 });
 
 app.use(logger('dev')); //log every request to the CONSOLE.
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json({limit: '50mb'}));
+app.use(bodyParser.urlencoded({extended: false, limit: '50mb'}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
@@ -69,6 +71,8 @@ app.use(session({
     saveUninitialized: true,
     cookie: {maxAge: 3600 * 1000} //1 hour
 }));
+
+app.use(compression());
 
 // passport authentication setup
 passport.use(new LocalStrategy(User.authenticate()));

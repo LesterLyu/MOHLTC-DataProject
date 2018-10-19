@@ -1,130 +1,267 @@
 // Workbook GUI functions...
 
-var tabCounter = 0;
-var sheets = [], sheetNames = [];
-var workbookName;
-var workbookData;
-var SCALE = 8;  // scale up the column width and row height
+const SCALE = 8; // scale up the column width and row height
+let global = {workbookData: {}};
 
-var currSheet;
-
-/**
- * Initialize a simple table that has no styles
- * @param container
- * @param height
- * @param preview
- */
-function newSimpleTable(container, height, preview) {
-    var spec = {
-        data: [],
-        width: container.offsetWidth,
-        height: height,
-        colWidths: 80,
-        rowHeights: 23,
-        manualColumnResize: true,
-        manualRowResize: true,
-        manualColumnMove: true,
-        manualRowMove: true,
-        rowHeaders: true,
-        colHeaders: true,
-        contextMenu: ['remove_row', 'remove_col', '---------', 'copy'],
-    };
-
-    var createdTable = new Handsontable(container, spec);
-
-    if (preview) {
-        spec.manualColumnMove = false;
-        spec.manualRowMove = false;
+class WorkbookGUI {
+    constructor(mode, workbookName, workbookData, height = $(window).height() - 360) {
+        this.height = height;
+        this.mode = mode; // can be 'view' or 'edit'
+        this.addSheetTab = $('<a id="add-sheet-btn" class="nav-link nav-item" href="#"><i class="fas fa-plus"></i> Add Sheet</a>');
+        this.workbookName = workbookName;
+        global.workbookData = workbookData;
+        this.currSheet = '';
+        this.sheetNames = [];
+        this.tables = [];
+        this.tabContents = [];
+        this.tabs = [];
+        this.tabCounter = 0;
+        this.gridIds = [];
+        this._appendAddSheetTab();
     }
-    else {
-        sheets.push(createdTable);
+
+    /**
+     * Initialize a styled table
+     * @param container
+     * @param height
+     * @param data
+     * @param rowHeights
+     * @param colWidths
+     * @param merges
+     */
+    addTable(container, width, height, data, rowHeights, colWidths, merges, sheetNo, cells) {
+        let prop = {};
+        if (typeof rowHeights === 'number') {
+            prop.rowHeights = rowHeights;
+            prop.colWidths = colWidths;
+        }
+        else {
+            prop.rowHeights = rowHeights.map(function (x) {
+                return Math.round(x * SCALE / 5.5385);
+            })
+            prop.colWidths = colWidths.map(function (x) {
+                return Math.round(x * SCALE);
+            })
+        }
+        var spec = {
+            data: data,
+            width: width,
+            height: height,
+            colWidths: prop.colWidths,
+            rowHeights: prop.rowHeights,
+            mergeCells: merges,
+            manualColumnResize: true,
+            manualRowResize: true,
+            manualColumnMove: false,
+            manualRowMove: false,
+            rowHeaders: true,
+            colHeaders: true,
+            autoWrapCol: false,
+            autoWrapRow: false,
+            autoRowSize: false,
+            autoColumnSize: false,
+            contextMenu: ['copy'],
+            renderAllRows: false,
+            cells: cells,
+        };
+
+        var createdTable = new Handsontable(container, spec);
+        this.tables.push(createdTable);
+        return createdTable;
     }
-    return createdTable;
+
+    /**
+     * Edit mode for create/edit workbook, View mode for user view the workbook
+     *
+     * @param sheetName
+     * @param mode can be either 'edit' or 'view'
+     * @param tabColor can be null
+     * @return string
+     */
+    addTab(sheetName, tabColor) {
+        var gridId = 'grid-' + this.tabCounter;
+        this.gridIds.push(gridId);
+        var tabContentId = 'tab-content-' + this.tabCounter;
+        var tabId = 'tab-' + this.tabCounter;
+
+        // add content
+        var tabContent = $('<div id="' + tabContentId + '" class="tab-pane active show"> <div id="' + gridId + '"></div></div>');
+        this.tabContents.push(tabContent);
+
+        // add tab
+        var newTab;
+        // edit mode have edit button in tabs
+        if (this.mode === 'edit') {
+            newTab = $('<a id="' + tabId + '" class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '"> ' + sheetName
+                + '<i onclick="editSheet(' + this.tabCounter + ')" class="fas fa-pen ml-2"></i></a>');
+        }
+        else {
+            newTab = $('<a class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '">' + sheetName + '</a>');
+        }
+        if (tabColor && tabColor.argb) {
+            newTab.css('border-bottom', '3px solid #' + argbToRgb(tabColor.argb));
+        }
+        this.tabs.push(newTab);
+
+        this.tabCounter++;
+        return gridId;
+    }
+
+    applyTabs() {
+        // deactivate previous tab and content
+        $('div.active.show').removeClass('active show');
+        $('a.active').removeClass('active show');
+        let i;
+        for (i = 0; i < this.tabContents.length; i++) {
+            $('#nav-tabContent').append(this.tabContents[i]);
+
+            if (this.mode === 'edit') {
+                this.tabs[i].insertBefore('#nav-tab a:nth-last-child(1)');
+            }
+            else {
+                $('#nav-tab').append(this.tabs[i]);
+            }
+        }
+        this.tabs = [];
+        this.tabContents = [];
+    }
+
+    _appendAddSheetTab() {
+        $('#nav-tab').append(this.addSheetTab);
+    }
+
+    setAddSheetCallback(cb) {
+        $('#add-sheet-btn').on('click', cb);
+    }
+
+    updateJson(workbookData) {
+        global.workbookData = workbookData;
+    }
+
+    load() {
+        this.tabCounter = 0;
+        // clear tables and tabs
+        $('#nav-tab').html('');
+        $('#nav-tabContent').html('');
+
+        if (this.mode === 'edit')
+            this._appendAddSheetTab();
+
+        this.applyJsonWithStyle();
+    }
+
+    // apply json to GUI tables
+    applyJsonWithStyle() {
+        var timerStart = Date.now();
+        // clear global variables
+        this.sheets = [];
+        this.sheetNames = [];
+
+        // load tabs
+        for (var sheetNo in global.workbookData) {
+            if (global.workbookData.hasOwnProperty(sheetNo)) {
+                var ws = global.workbookData[sheetNo];
+                this.sheetNames.push(ws.name);
+                const gridId = this.addTab(ws.name, ws.tabColor);
+                this.applyTabs();
+                let container = $('#' + gridId)[0];
+                let data = ws.data;
+
+                // transform mergeCells
+                var merges = [];
+                for (var position in ws.merges) {
+                    if (ws.merges.hasOwnProperty(position)) {
+                        var model = ws.merges[position].model;
+                        merges.push({
+                            row: model.top - 1,
+                            col: model.left - 1,
+                            rowspan: model.bottom - model.top + 1,
+                            colspan: model.right - model.left + 1
+                        })
+                    }
+                }
+                // generate table
+                // worksheet has no style
+                let table;
+                if (!ws.row) {
+                    table = this.addTable(container, $('#nav-tab').width(), this.height, data,
+                        23, 80, true, sheetNo, function (row, col) {
+                            let cellProperties = {};
+                            cellProperties.editor = FormulaEditor;
+                            cellProperties.renderer = cellRenderer;
+                            return cellProperties;
+                        });
+                }
+                else {
+                    table = this.addTable(container, $('#nav-tab').width(), this.height, data,
+                        ws.row.height, ws.col.width, merges, sheetNo, function (row, col) {
+                            if (!('sheetNo' in this.instance)) {
+                                this.instance.sheetNo = sheetNo;
+                                console.log('loading ' + sheetNo)
+                            }
+                            var ws = global.workbookData[this.instance.sheetNo];
+                            var cellProperties = {};
+                            cellProperties.style = null;
+                            if (ws.style.length > 0 && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
+                                cellProperties.style = ws.style[row][col];
+                            }
+                            cellProperties.renderer = cellRenderer;
+                            cellProperties.editor = FormulaEditor;
+
+                            return cellProperties;
+                        });
+                }
+
+                table.sheetNo = sheetNo;
+            }
+        }
+
+        $('#nav-tab a:first-child').tab('show');
+        this.currSheet = this.sheetNames[0];
+        // add listener to tabs
+        $('.nav-tabs a').on('show.bs.tab', function (event) {
+            this.currSheet = $(event.target).text();         // active tab
+        });
+        console.log("Time consumed: ", Date.now() - timerStart + 'ms');
+    }
+
+    getData() {
+        let cnt = 0;
+        for (let sheetNo in global.workbookData) {
+            if (global.workbookData.hasOwnProperty(sheetNo)) {
+                let ws = global.workbookData[sheetNo];
+                ws.name = this.sheetNames[cnt];
+                ws.data = this.tables[cnt].getData();
+            }
+            cnt++;
+        }
+        return global.workbookData;
+    }
+
+    addSheet(sheetName, data) {
+        const sheetNo = this.sheetNames.length;
+        global.workbookData[sheetNo] = {name: sheetName, data: data};
+        this.sheetNames.push(sheetName);
+        const gridId = this.addTab(sheetName);
+        this.applyTabs();
+        let container = $('#' + gridId)[0];
+        let table = this.addTable(container, $('#nav-tab').width(), this.height, data,
+            23, 80, true, sheetNo, function (row, col) {
+                let cellProperties = {};
+                cellProperties.editor = FormulaEditor;
+                cellProperties.renderer = cellRenderer;
+                return cellProperties;
+            });
+        this.tables.push(table);
+
+        $('#nav-tab a:first-child').tab('show');
+        this.currSheet = this.sheetNames[0];
+        // add listener to tabs
+        $('.nav-tabs a').on('show.bs.tab', function (event) {
+            this.currSheet = $(event.target).text();         // active tab
+        });
+    }
 }
-
-
-/**
- * Initialize a styled table
- * @param container
- * @param height
- * @param data
- * @param rowHeights
- * @param colWidths
- * @param merges
- */
-function newStyledTable(container, height, data, rowHeights, colWidths, merges) {
-
-    var spec = {
-        data: data,
-        width: container.offsetWidth,
-        height: height,
-        colWidths: colWidths.map(function (x) {
-            return Math.round(x * SCALE);
-        }),
-        rowHeights: rowHeights.map(function (x) {
-            return Math.round(x * SCALE / 5.5385);
-        }),
-        mergeCells: merges,
-        manualColumnResize: true,
-        manualRowResize: true,
-        manualColumnMove: false,
-        manualRowMove: false,
-        rowHeaders: true,
-        colHeaders: true,
-        autoWrapCol: false,
-        autoWrapRow: false,
-        contextMenu: ['copy'],
-    };
-    var createdTable = new Handsontable(container, spec);
-    sheets.push(createdTable);
-    return createdTable;
-}
-
-/**
- * Edit mode for create/edit workbook, View mode for user view the workbook
- *
- * @param sheetName
- * @param mode can be either 'edit' or 'view'
- * @param tabColor can be null
- * @return {string}
- */
-function addTab(sheetName, mode, tabColor) {
-    var gridId = 'grid-' + tabCounter;
-    var tabContentId = 'tab-content-' + tabCounter;
-    var tabId = 'tab-' + tabCounter;
-
-    // deactivate previous tab and content
-    $('div.active.show').removeClass('active show');
-    $('a.active').removeClass('active show');
-
-    // add content
-    var tabContent = $('<div id="' + tabContentId + '" class="tab-pane fade active show"> <div id="' + gridId + '"></div></div>');
-    $('#nav-tabContent').append(tabContent);
-
-    // add tab
-    var newTab;
-    // edit mode have edit button in tabs
-    if (mode === 'edit') {
-        newTab = $('<a id="' + tabId + '" class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '"> ' + sheetName
-            + '<i onclick="editSheet(' + tabCounter + ')" class="fas fa-pen ml-2"></i></a>');
-    }
-    else {
-        newTab = $('<a class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '">' + sheetName + '</a>');
-    }
-    if (tabColor && tabColor.argb) {
-        newTab.css('border-bottom', '3px solid #' + argbToRgb(tabColor.argb));
-    }
-    if (mode === 'edit') {
-        newTab.insertBefore('#nav-tab a:nth-last-child(1)');
-    }
-    else {
-        $('#nav-tab').append(newTab);
-    }
-
-    tabCounter++;
-    return gridId;
-}
-
 
 function argbToRgb(argb) {
     return argb.substring(2);
@@ -132,70 +269,70 @@ function argbToRgb(argb) {
 
 function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
-    var style = cellProperties.style;
+    if (('style' in cellProperties) && cellProperties.style) {
+        var style = cellProperties.style;
+        // alignment
+        var cellMeta = instance.getCellMeta(row, col);
+        var previousClass = (cellMeta.className !== undefined) ? cellMeta.className : '';
 
-    // alignment
-    var cellMeta = instance.getCellMeta(row, col);
-    var previousClass = (cellMeta.className !== undefined) ? cellMeta.className : '';
-
-    if (style && style.hasOwnProperty('alignment')) {
-        if (style.alignment.hasOwnProperty('horizontal')) {
-            td.style.textAlign = style.alignment.horizontal;
-        }
-        if (style.alignment.hasOwnProperty('vertical')) {
-
-            switch (style.alignment.vertical) {
-                case 'top':
-                    instance.setCellMeta(row, col, 'className', previousClass + ' htTop');
-                    break;
-                case 'middle':
-                    instance.setCellMeta(row, col, 'className', previousClass + ' htMiddle');
-                    break;
+        if (style.hasOwnProperty('alignment')) {
+            if (style.alignment.hasOwnProperty('horizontal')) {
+                td.style.textAlign = style.alignment.horizontal;
             }
-        }
-    }
-    else {
-        // default bottom
-        instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
-    }
+            if (style.alignment.hasOwnProperty('vertical')) {
 
-    // font
-    if (style && style.hasOwnProperty('font')) {
-        if (style.font.hasOwnProperty('color') && style.font.color.hasOwnProperty('argb')) {
-            td.style.color = '#' + argbToRgb(style.font.color.argb);
-        }
-        if (style.font.hasOwnProperty('bold') && style.font.bold) {
-            td.style.fontWeight = 'bold';
-        }
-        if (style.font.hasOwnProperty('italic') && style.font.italic) {
-            td.style.fontStyle = 'italic';
-        }
-    }
-
-    // background
-    if (style && style.hasOwnProperty('fill')) {
-        if (style.fill.hasOwnProperty('fgColor') && style.fill.fgColor.hasOwnProperty('argb')) {
-            td.style.background = '#' + argbToRgb(style.fill.fgColor.argb);
-        }
-    }
-
-    // borders
-    if (style && style.hasOwnProperty('border')) {
-        for (var key in style.border) {
-            if (style.border.hasOwnProperty(key)) {
-                var upper = key.charAt(0).toUpperCase() + key.slice(1);
-                var border = style.border[key];
-                if (border.hasOwnProperty('color') && border.color.hasOwnProperty('argb')) {
-                    td.style['border' + upper] = '1px solid #' + argbToRgb(border.color.argb);
-                }
-                else {
-                    // black color
-                    td.style['border' + upper] = '1px solid #000';
+                switch (style.alignment.vertical) {
+                    case 'top':
+                        instance.setCellMeta(row, col, 'className', previousClass + ' htTop');
+                        break;
+                    case 'middle':
+                        instance.setCellMeta(row, col, 'className', previousClass + ' htMiddle');
+                        break;
                 }
             }
         }
-    }
+        else {
+            // default bottom
+            instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
+        }
 
+        // font
+        if (style.hasOwnProperty('font')) {
+            if (style.font.hasOwnProperty('color') && style.font.color.hasOwnProperty('argb')) {
+                td.style.color = '#' + argbToRgb(style.font.color.argb);
+            }
+            if (style.font.hasOwnProperty('bold') && style.font.bold) {
+                td.style.fontWeight = 'bold';
+            }
+            if (style.font.hasOwnProperty('italic') && style.font.italic) {
+                td.style.fontStyle = 'italic';
+            }
+        }
+
+        // background
+        if (style.hasOwnProperty('fill')) {
+            if (style.fill.hasOwnProperty('fgColor') && style.fill.fgColor.hasOwnProperty('argb')) {
+                td.style.background = '#' + argbToRgb(style.fill.fgColor.argb);
+            }
+        }
+
+        // borders
+        if (style.hasOwnProperty('border')) {
+            for (var key in style.border) {
+                if (style.border.hasOwnProperty(key)) {
+                    var upper = key.charAt(0).toUpperCase() + key.slice(1);
+                    var border = style.border[key];
+                    if (border.hasOwnProperty('color') && border.color.hasOwnProperty('argb')) {
+                        td.style['border' + upper] = '1px solid #' + argbToRgb(border.color.argb);
+                    }
+                    else {
+                        // black color
+                        td.style['border' + upper] = '1px solid #000';
+                    }
+                }
+            }
+        }
+    }
     // render formula
     if (value && typeof value === 'object' && value.hasOwnProperty('formula')) {
         if (value.result && value.result.error) {
@@ -204,7 +341,6 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         else {
             td.innerHTML = value.result !== undefined ? value.result : null;
         }
-
     }
     // render dropdown
 }
@@ -243,70 +379,6 @@ function applyJsonWithoutStyle(workBookJson, mode) {
     $('#nav-tab a:first-child').tab('show');
 }
 
-// apply json to GUI tables
-function applyJsonWithStyle(workBookJson, mode) {
-    // clear tables and tabs
-    if (mode !== 'edit')
-        $('#nav-tab').html('');
-    $('#nav-tabContent').html('');
-
-    // clear global variables
-    sheets = [];
-    sheetNames = [];
-
-    // load to front-end
-    for (var sheetNo in workBookJson) {
-        if (workBookJson.hasOwnProperty(sheetNo)) {
-            var ws = workBookJson[sheetNo];
-            sheetNames.push(ws.name);
-            var data = ws.data;
-            var gridId = addTab(ws.name, mode, ws.tabColor);
-
-            // transform mergeCells
-            var merges = [];
-            for (var position in ws.merges) {
-                if (ws.merges.hasOwnProperty(position)) {
-                    var model = ws.merges[position].model;
-                    merges.push({
-                        row: model.top - 1,
-                        col: model.left - 1,
-                        rowspan: model.bottom - model.top + 1,
-                        colspan: model.right - model.left + 1
-                    })
-                }
-            }
-
-            // generate table
-            var container = document.getElementById(gridId);
-            var table = newStyledTable(container, $(window).height() - 360, data, ws.row.height, ws.col.width, merges);
-            table.sheetNo = sheetNo;
-
-            table.updateSettings({
-                cells: function (row, col) {
-                    var ws = workbookData[this.instance.sheetNo];
-                    var cellProperties = {};
-                    cellProperties.style = null;
-                    if (ws.style.length > 0 && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
-                        cellProperties.style = ws.style[row][col];
-                    }
-                    cellProperties.renderer = cellRenderer;
-                    cellProperties.editor = FormulaEditor;
-
-
-                    return cellProperties;
-                }
-            });
-        }
-    }
-    console.log(sheets);
-    $('#nav-tab a:first-child').tab('show');
-    currSheet = sheetNames[0];
-    // add listener to tabs
-    $('.nav-tabs a').on('show.bs.tab', function(event){
-        currSheet = $(event.target).text();         // active tab
-    });
-}
-
 
 function getWorkbook(sheets, sheetNames) {
     // create a workbook
@@ -324,7 +396,7 @@ function exportToExcel(workbook, name) {
     var fileExtension = '.xlsx';
     // empty params
     if (typeof workbook === 'undefined') {
-        return XLSX.writeFile(getWorkbook(sheets, sheetNames), workbookName + fileExtension);
+        return XLSX.writeFile(getWorkbook(gui.tables, gui.sheetNames), gui.workbookName + fileExtension);
     }
     else {
         XLSX.writeFile(workbook, name + fileExtension);
