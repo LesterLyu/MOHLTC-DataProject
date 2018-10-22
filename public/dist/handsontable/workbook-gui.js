@@ -36,7 +36,6 @@ function () {
     this.tabs = [];
     this.tabCounter = 0;
     this.gridIds = [];
-    this.rendered = {}; // {sheet1: false, sheet2: false,...}
 
     this._appendAddSheetTab();
   }
@@ -168,6 +167,12 @@ function () {
     key: "updateJson",
     value: function updateJson(workbookData) {
       global.workbookData = workbookData;
+      this.sheetNames = [];
+      this.tables = [];
+      this.tabContents = [];
+      this.tabs = [];
+      this.tabCounter = 0;
+      this.gridIds = [];
     }
   }, {
     key: "load",
@@ -185,14 +190,13 @@ function () {
     value: function applyJsonWithStyle() {
       var timerStart = Date.now(); // clear global variables
 
-      this.sheets = [];
+      this.tables = [];
       this.sheetNames = []; // load tabs
 
       for (var sheetNo in global.workbookData) {
         if (global.workbookData.hasOwnProperty(sheetNo)) {
           var ws = global.workbookData[sheetNo];
           this.sheetNames.push(ws.name);
-          this.rendered[ws.name] = false;
           var gridId = this.addTab(ws.name, ws.tabColor);
           this.applyTabs();
           var container = $('#' + gridId)[0];

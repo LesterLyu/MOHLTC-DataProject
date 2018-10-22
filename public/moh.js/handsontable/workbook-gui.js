@@ -17,7 +17,6 @@ class WorkbookGUI {
         this.tabs = [];
         this.tabCounter = 0;
         this.gridIds = [];
-        this.rendered = {}; // {sheet1: false, sheet2: false,...}
         this._appendAddSheetTab();
     }
 
@@ -140,6 +139,12 @@ class WorkbookGUI {
 
     updateJson(workbookData) {
         global.workbookData = workbookData;
+        this.sheetNames = [];
+        this.tables = [];
+        this.tabContents = [];
+        this.tabs = [];
+        this.tabCounter = 0;
+        this.gridIds = [];
     }
 
     load() {
@@ -158,7 +163,7 @@ class WorkbookGUI {
     applyJsonWithStyle() {
         var timerStart = Date.now();
         // clear global variables
-        this.sheets = [];
+        this.tables = [];
         this.sheetNames = [];
 
         // load tabs
@@ -167,7 +172,6 @@ class WorkbookGUI {
 
                 var ws = global.workbookData[sheetNo];
                 this.sheetNames.push(ws.name);
-                this.rendered[ws.name] = false;
                 const gridId = this.addTab(ws.name, ws.tabColor);
                 this.applyTabs();
                 let container = $('#' + gridId)[0];
