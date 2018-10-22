@@ -36,17 +36,21 @@ function () {
     this.tabs = [];
     this.tabCounter = 0;
     this.gridIds = [];
+    this.rendered = {}; // {sheet1: false, sheet2: false,...}
 
     this._appendAddSheetTab();
   }
   /**
    * Initialize a styled table
    * @param container
+   * @param width
    * @param height
    * @param data
    * @param rowHeights
    * @param colWidths
    * @param merges
+   * @param sheetNo
+   * @param cells
    */
 
 
@@ -88,9 +92,10 @@ function () {
         renderAllRows: false,
         cells: cells
       };
+      var that = this;
       var createdTable = new Handsontable(container, spec);
-      this.tables.push(createdTable);
-      return createdTable;
+      createdTable.sheetNo = sheetNo;
+      that.tables.push(createdTable);
     }
     /**
      * Edit mode for create/edit workbook, View mode for user view the workbook
@@ -187,6 +192,7 @@ function () {
         if (global.workbookData.hasOwnProperty(sheetNo)) {
           var ws = global.workbookData[sheetNo];
           this.sheetNames.push(ws.name);
+          this.rendered[ws.name] = false;
           var gridId = this.addTab(ws.name, ws.tabColor);
           this.applyTabs();
           var container = $('#' + gridId)[0];
@@ -208,27 +214,26 @@ function () {
           // worksheet has no style
 
 
-          var table = void 0;
-
           if (!ws.row) {
-            table = this.addTable(container, $('#nav-tab').width(), this.height, data, 23, 80, true, sheetNo, function (row, col) {
+            this.addTable(container, $('#nav-tab').width(), this.height, data, 23, 80, true, sheetNo, function (row, col) {
               var cellProperties = {};
               cellProperties.editor = FormulaEditor;
               cellProperties.renderer = cellRenderer;
               return cellProperties;
             });
           } else {
-            table = this.addTable(container, $('#nav-tab').width(), this.height, data, ws.row.height, ws.col.width, merges, sheetNo, function (row, col) {
+            this.addTable(container, $('#nav-tab').width(), this.height, data, ws.row.height, ws.col.width, merges, sheetNo, function (row, col) {
+              var cellProperties = {};
+
               if (!('sheetNo' in this.instance)) {
                 this.instance.sheetNo = sheetNo;
-                console.log('loading ' + sheetNo);
+                console.log(sheetNo);
               }
 
               var ws = global.workbookData[this.instance.sheetNo];
-              var cellProperties = {};
               cellProperties.style = null;
 
-              if (ws.style.length > 0 && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
+              if (ws.style.length > 0 && ws.style[row] && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
                 cellProperties.style = ws.style[row][col];
               }
 
@@ -237,16 +242,29 @@ function () {
               return cellProperties;
             });
           }
-
-          table.sheetNo = sheetNo;
         }
       }
 
       $('#nav-tab a:first-child').tab('show');
-      this.currSheet = this.sheetNames[0]; // add listener to tabs
+      this.currSheet = this.sheetNames[0];
+      hideLoadingStatus();
+      var that = this; // setTimeout(function () {
+      //     that.tables[0].render();
+      //     hideLoadingStatus();
+      // }, 0);
+      // add listener to tabs
 
       $('.nav-tabs a').on('show.bs.tab', function (event) {
-        this.currSheet = $(event.target).text(); // active tab
+        that.currSheet = $(event.target).text(); // active tab
+        // if (!that.rendered[that.currSheet]) {
+        //     updateStatus('Rendering...');
+        //     setTimeout(function () {
+        //         const table = that.tables[that.sheetNames.indexOf(that.currSheet)];
+        //         table.render();
+        //         clearStatus();
+        //     }, 10);
+        //     that.rendered[that.currSheet] = true;
+        // }
       });
       console.log("Time consumed: ", Date.now() - timerStart + 'ms');
     }
@@ -381,40 +399,6 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     }
   } // render dropdown
 
-} // apply json to GUI tables
-
-
-function applyJsonWithoutStyle(workBookJson, mode) {
-  if (mode !== 'edit') $('#nav-tab').html('');
-  $('#nav-tabContent').html(''); // load to front-end
-
-  for (var sheetNo in workBookJson) {
-    if (workBookJson.hasOwnProperty(sheetNo)) {
-      var ws = workBookJson[sheetNo];
-      sheetNames.push(ws.name);
-      var data = ws.data;
-      var gridId = addTab(ws.name, 'edit'); // generate table
-
-      var container = document.getElementById(gridId);
-      var addedTable = newSimpleTable(container, $(window).height() - 500, false);
-      addedTable.loadData(data); // lock cells
-
-      addedTable.updateSettings({
-        cells: function cells(row, col) {
-          var cellProperties = {};
-
-          if (row === 0 || col === 0) {
-            cellProperties.readOnly = true;
-          }
-
-          return cellProperties;
-        }
-      });
-    }
-  }
-
-  console.log(sheets);
-  $('#nav-tab a:first-child').tab('show');
 }
 
 function getWorkbook(sheets, sheetNames) {

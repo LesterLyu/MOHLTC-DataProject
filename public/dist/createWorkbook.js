@@ -31,6 +31,10 @@ function updateLoadingStatus(text) {
   $('#loadingText').html('Loading... (' + text + ')');
 }
 
+function hideLoadingStatus() {
+  $('#loading').hide();
+}
+
 $(document).ready(function () {
   // get attributes and categories.
   var selectAttributes = $('#select-attributes');
@@ -81,7 +85,9 @@ $(document).ready(function () {
       console.log(response);
 
       if (response.success) {
+        var start = new Date();
         var data = unzip(response.workbook.data);
+        console.log('unzipping takes: ' + (new Date() - start) + 'ms');
         console.log(data);
         gui = new WorkbookGUI('edit', workbookName, data, $(window).height() - 390);
         gui.setAddSheetCallback(addSheet);

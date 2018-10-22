@@ -23,6 +23,10 @@ function updateLoadingStatus(text) {
     $('#loadingText').html('Loading... (' + text + ')')
 }
 
+function hideLoadingStatus() {
+    $('#loading').hide();
+}
+
 $(document).ready(function () {
 
     // get attributes and categories.
@@ -79,7 +83,9 @@ $(document).ready(function () {
         }).done(function (response) {
             console.log(response);
             if (response.success) {
+                let start = new Date();
                 const data = unzip(response.workbook.data);
+                console.log('unzipping takes: ' + (new Date() - start) + 'ms');
                 console.log(data);
                 gui = new WorkbookGUI('edit', workbookName, data, $(window).height() - 390);
                 gui.setAddSheetCallback(addSheet);

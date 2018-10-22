@@ -1,5 +1,5 @@
 # DataProject
-## Live on http://ec2-18-218-171-151.us-east-2.compute.amazonaws.com/
+## Live on http://dataproject-env.u2t3prjsea.us-east-2.elasticbeanstalk.com
 ## TO-DO
   - [ ] Read excel styles in back-end
   - [ ] API for upload excel and apply style to workbook
