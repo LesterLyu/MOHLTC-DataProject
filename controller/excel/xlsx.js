@@ -81,10 +81,10 @@ function processFile(name) {
                         hidden: [],
                         width: [],
                         style: [],
-                    }
+                    },
+                    // store data validation
+                    dataValidation: worksheet.dataValidations.model
                 };
-
-                console.log(worksheet.getCell('E3').dataValidation);
 
                 worksheet.eachRow({includeEmpty: true}, function (row, rowNumber) {
                     wsData.data.push([]);

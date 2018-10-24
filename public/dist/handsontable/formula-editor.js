@@ -22,7 +22,7 @@ FormulaEditor.prototype.prepare = function (row, col, prop, td, originalValue, c
   if (originalValue !== null && originalValue !== undefined && originalValue.hasOwnProperty('formula')) {
     this.type = 'formula';
     TextEditor.prototype.prepare.apply(this, [row, col, prop, td, originalValue.formula, cellProperties]);
-  } else if (originalValue !== null && typeof originalValue === 'string') {
+  } else if (originalValue !== null && (typeof originalValue === 'string' || typeof originalValue === 'number')) {
     this.type = 'text';
     TextEditor.prototype.prepare.apply(this, [row, col, prop, td, originalValue, cellProperties]);
   } else {

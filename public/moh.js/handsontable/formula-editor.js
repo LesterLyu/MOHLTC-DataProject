@@ -25,7 +25,7 @@ FormulaEditor.prototype.prepare = function (row, col, prop, td, originalValue, c
         this.type = 'formula';
         TextEditor.prototype.prepare.apply(this, [row, col, prop, td, originalValue.formula, cellProperties]);
     }
-    else if (originalValue !== null && typeof originalValue === 'string') {
+    else if (originalValue !== null && (typeof originalValue === 'string' || typeof originalValue === 'number')) {
         this.type = 'text';
         TextEditor.prototype.prepare.apply(this, [row, col, prop, td, originalValue, cellProperties]);
     }
