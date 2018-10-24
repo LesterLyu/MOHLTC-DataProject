@@ -1,7 +1,7 @@
 // Workbook GUI functions...
 
 const SCALE = 8; // scale up the column width and row height
-let global = {workbookData: {}};
+let global = {workbookData: {}, dataValidation: {}};
 
 class WorkbookGUI {
     constructor(mode, workbookName, workbookData, height = $(window).height() - 360) {
@@ -17,6 +17,8 @@ class WorkbookGUI {
         this.tabs = [];
         this.tabCounter = 0;
         this.gridIds = [];
+        this.definedNames = {};
+
         this._appendAddSheetTab();
     }
 
@@ -71,6 +73,7 @@ class WorkbookGUI {
         let createdTable = new Handsontable(container, spec);
         createdTable.sheetNo = sheetNo;
         that.tables.push(createdTable);
+        return createdTable;
     }
 
     /**
@@ -166,13 +169,16 @@ class WorkbookGUI {
         this.tables = [];
         this.sheetNames = [];
 
+
         // load tabs
         const sheets = global.workbookData.sheets;
+        // push sheet names first, since we need it now to call getSheet()
+        for (var sheetNo in sheets) {
+            this.sheetNames.push(sheets[sheetNo].name);
+        }
         for (var sheetNo in sheets) {
             if (sheets.hasOwnProperty(sheetNo)) {
-
                 var ws = sheets[sheetNo];
-                this.sheetNames.push(ws.name);
                 const gridId = this.addTab(ws.name, ws.tabColor);
                 this.applyTabs();
                 let container = $('#' + gridId)[0];
@@ -191,6 +197,52 @@ class WorkbookGUI {
                         })
                     }
                 }
+
+                // process data validation
+                global.dataValidation[sheetNo] = {
+                    dropDownAddresses: [],
+                    dropDownData: {}
+                };
+                for (let key in ws.dataValidations) {
+                    if (ws.dataValidations.hasOwnProperty(key)) {
+                        const dataValidation = ws.dataValidations[key];
+                        if (dataValidation.type !== 'list') {
+                            console.error('Unsupported data validation type: ' + dataValidation.type);
+                            continue;
+                        }
+                        const addresses = key.split(' ');
+                        for (let i = 0; i < addresses.length; i++) {
+                            // e.g. {address: "A1", col: 1, row: 1, $col$row: "$A$1"}
+                            const address = colCache.decode(addresses[i]);
+                            global.dataValidation[sheetNo].dropDownAddresses.push(addresses[i]);
+
+                            // get data
+                            // situation 1: e.g. formulae: [""1,2,3,4""]
+                            const formulae = dataValidation.formulae[0];
+                            if (formulae.indexOf(',') > 0) {
+                                global.dataValidation[sheetNo].dropDownData[addresses[i]] = formulae.slice(1, formulae.length - 1).split(',');
+                            }
+                            // situation 2: e.g. formulae: ["$B$5:$K$5"]
+                            else if (formulae.indexOf(':') > 0) {
+                                const parsed = parser.parse(formulae);
+                                // concat 2d array to 1d array
+                                let newArr = [];
+                                for (let i = 0; i < parsed.length; i++) {
+                                    newArr = newArr.concat(parsed[i]);
+                                }
+                                global.dataValidation[sheetNo].dropDownData[addresses[i]] = newArr;
+                            }
+                            // situation 3: e.g. formulae: ["definedName"]
+                            else if (formulae in global.workbookData.definedNames) {
+                                global.dataValidation[sheetNo].dropDownData[addresses[i]] = this.getDefinedName(formulae);
+                            }
+                            else {
+                                console.error('Unknown dataValidation formulae situation: ' + formulae);
+                            }
+                        }
+                    }
+                }
+
                 // generate table
                 // worksheet has no style
                 if (!ws.row) {
@@ -203,24 +255,40 @@ class WorkbookGUI {
                         });
                 }
                 else {
-                    this.addTable(container, $('#nav-tab').width(), this.height, data,
+                    const table = this.addTable(container, $('#nav-tab').width(), this.height, data,
                         ws.row.height, ws.col.width, merges, sheetNo, function (row, col) {
                             let cellProperties = {};
                             if (!('sheetNo' in this.instance)) {
                                 this.instance.sheetNo = sheetNo;
                                 console.log(sheetNo)
                             }
+
+                            // dropdown
+                            // TO-DO move data validation to ws.style, this should improve the efficient
+                            const address = colCache.encode(row + 1, col + 1);
+                            const dataValidation = global.dataValidation[this.instance.sheetNo];
+                            if (dataValidation.dropDownAddresses.includes(address)) {
+                                cellProperties.selectOptions = dataValidation.dropDownData[address];
+                                cellProperties.renderer = Handsontable.renderers.DropdownRenderer;
+                                cellProperties.editor =  Handsontable.editors.DropdownEditor;
+                                console.log('set DropdownEditor: ' + address);
+                                return cellProperties;
+                            }
+
+                            // text or formula
                             var ws = global.workbookData.sheets[this.instance.sheetNo];
 
                             cellProperties.style = null;
                             if (ws.style.length > 0 && ws.style[row] && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
                                 cellProperties.style = ws.style[row][col];
                             }
+                            if (address === 'E3')
+                                console.log('????')
                             cellProperties.renderer = cellRenderer;
                             cellProperties.editor = FormulaEditor;
-
                             return cellProperties;
-                        })
+                        });
+
                 }
 
             }
@@ -287,6 +355,37 @@ class WorkbookGUI {
             this.currSheet = $(event.target).text();         // active tab
         });
     }
+
+    getSheet(name) {
+        return global.workbookData.sheets[this.sheetNames.indexOf(name)];
+    }
+
+    getTable(name) {
+        return this.tables[this.sheetNames.indexOf(name)];
+    }
+
+    getDefinedName(definedName) {
+        const definedNames = global.workbookData.definedNames;
+        if (!(definedName in definedNames)) {
+            console.error('Cannot find defined name: ' + definedName);
+            return;
+        }
+        const currName = global.workbookData.definedNames[definedName];
+        let result = [];
+        for (let i = 0; i < currName.length; i++) {
+            const cell = this.getSheet(currName[i].sheetName).data[currName[i].row - 1][currName[i].col - 1];
+            if (cell === null) {
+            }
+            else if (typeof cell === 'object' && 'result' in cell) {
+                result.push(cell.result);
+            }
+            else {
+                result.push(cell);
+            }
+        }
+        return result;
+    }
+
 }
 
 function argbToRgb(argb) {

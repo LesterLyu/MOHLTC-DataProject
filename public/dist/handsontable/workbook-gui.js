@@ -12,7 +12,8 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 var SCALE = 8; // scale up the column width and row height
 
 var global = {
-  workbookData: {}
+  workbookData: {},
+  dataValidation: {}
 };
 
 var WorkbookGUI =
@@ -36,6 +37,7 @@ function () {
     this.tabs = [];
     this.tabCounter = 0;
     this.gridIds = [];
+    this.definedNames = {};
 
     this._appendAddSheetTab();
   }
@@ -95,6 +97,7 @@ function () {
       var createdTable = new Handsontable(container, spec);
       createdTable.sheetNo = sheetNo;
       that.tables.push(createdTable);
+      return createdTable;
     }
     /**
      * Edit mode for create/edit workbook, View mode for user view the workbook
@@ -193,12 +196,15 @@ function () {
       this.tables = [];
       this.sheetNames = []; // load tabs
 
-      var sheets = global.workbookData.sheets;
+      var sheets = global.workbookData.sheets; // push sheet names first, since we need it now to call getSheet()
+
+      for (var sheetNo in sheets) {
+        this.sheetNames.push(sheets[sheetNo].name);
+      }
 
       for (var sheetNo in sheets) {
         if (sheets.hasOwnProperty(sheetNo)) {
           var ws = sheets[sheetNo];
-          this.sheetNames.push(ws.name);
           var gridId = this.addTab(ws.name, ws.tabColor);
           this.applyTabs();
           var container = $('#' + gridId)[0];
@@ -216,6 +222,54 @@ function () {
                 colspan: model.right - model.left + 1
               });
             }
+          } // process data validation
+
+
+          global.dataValidation[sheetNo] = {
+            dropDownAddresses: [],
+            dropDownData: {}
+          };
+
+          for (var key in ws.dataValidations) {
+            if (ws.dataValidations.hasOwnProperty(key)) {
+              var dataValidation = ws.dataValidations[key];
+
+              if (dataValidation.type !== 'list') {
+                console.error('Unsupported data validation type: ' + dataValidation.type);
+                continue;
+              }
+
+              var addresses = key.split(' ');
+
+              for (var i = 0; i < addresses.length; i++) {
+                // e.g. {address: "A1", col: 1, row: 1, $col$row: "$A$1"}
+                var address = colCache.decode(addresses[i]);
+                global.dataValidation[sheetNo].dropDownAddresses.push(addresses[i]); // get data
+                // situation 1: e.g. formulae: [""1,2,3,4""]
+
+                var formulae = dataValidation.formulae[0];
+
+                if (formulae.indexOf(',') > 0) {
+                  global.dataValidation[sheetNo].dropDownData[addresses[i]] = formulae.slice(1, formulae.length - 1).split(',');
+                } // situation 2: e.g. formulae: ["$B$5:$K$5"]
+                else if (formulae.indexOf(':') > 0) {
+                    var parsed = parser.parse(formulae); // concat 2d array to 1d array
+
+                    var newArr = [];
+
+                    for (var _i = 0; _i < parsed.length; _i++) {
+                      newArr = newArr.concat(parsed[_i]);
+                    }
+
+                    global.dataValidation[sheetNo].dropDownData[addresses[i]] = newArr;
+                  } // situation 3: e.g. formulae: ["definedName"]
+                  else if (formulae in global.workbookData.definedNames) {
+                      global.dataValidation[sheetNo].dropDownData[addresses[i]] = this.getDefinedName(formulae);
+                    } else {
+                      console.error('Unknown dataValidation formulae situation: ' + formulae);
+                    }
+              }
+            }
           } // generate table
           // worksheet has no style
 
@@ -228,13 +282,27 @@ function () {
               return cellProperties;
             });
           } else {
-            this.addTable(container, $('#nav-tab').width(), this.height, data, ws.row.height, ws.col.width, merges, sheetNo, function (row, col) {
+            var table = this.addTable(container, $('#nav-tab').width(), this.height, data, ws.row.height, ws.col.width, merges, sheetNo, function (row, col) {
               var cellProperties = {};
 
               if (!('sheetNo' in this.instance)) {
                 this.instance.sheetNo = sheetNo;
                 console.log(sheetNo);
-              }
+              } // dropdown
+              // TO-DO move data validation to ws.style, this should improve the efficient
+
+
+              var address = colCache.encode(row + 1, col + 1);
+              var dataValidation = global.dataValidation[this.instance.sheetNo];
+
+              if (dataValidation.dropDownAddresses.includes(address)) {
+                cellProperties.selectOptions = dataValidation.dropDownData[address];
+                cellProperties.renderer = Handsontable.renderers.DropdownRenderer;
+                cellProperties.editor = Handsontable.editors.DropdownEditor;
+                console.log('set DropdownEditor: ' + address);
+                return cellProperties;
+              } // text or formula
+
 
               var ws = global.workbookData.sheets[this.instance.sheetNo];
               cellProperties.style = null;
@@ -243,6 +311,7 @@ function () {
                 cellProperties.style = ws.style[row][col];
               }
 
+              if (address === 'E3') console.log('????');
               cellProperties.renderer = cellRenderer;
               cellProperties.editor = FormulaEditor;
               return cellProperties;
@@ -316,6 +385,41 @@ function () {
       $('.nav-tabs a').on('show.bs.tab', function (event) {
         this.currSheet = $(event.target).text(); // active tab
       });
+    }
+  }, {
+    key: "getSheet",
+    value: function getSheet(name) {
+      return global.workbookData.sheets[this.sheetNames.indexOf(name)];
+    }
+  }, {
+    key: "getTable",
+    value: function getTable(name) {
+      return this.tables[this.sheetNames.indexOf(name)];
+    }
+  }, {
+    key: "getDefinedName",
+    value: function getDefinedName(definedName) {
+      var definedNames = global.workbookData.definedNames;
+
+      if (!(definedName in definedNames)) {
+        console.error('Cannot find defined name: ' + definedName);
+        return;
+      }
+
+      var currName = global.workbookData.definedNames[definedName];
+      var result = [];
+
+      for (var i = 0; i < currName.length; i++) {
+        var cell = this.getSheet(currName[i].sheetName).data[currName[i].row - 1][currName[i].col - 1];
+
+        if (cell === null) {} else if (_typeof(cell) === 'object' && 'result' in cell) {
+          result.push(cell.result);
+        } else {
+          result.push(cell);
+        }
+      }
+
+      return result;
     }
   }]);
 

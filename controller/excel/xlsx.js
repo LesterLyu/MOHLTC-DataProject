@@ -117,7 +117,6 @@ function processFile(name) {
                         wsData.data[rowNumber - 1] =
                             wsData.data[rowNumber - 1].concat(Array(worksheet.columnCount - row.cellCount).fill(null));
                     }
-
                 });
 
                 // add column info
