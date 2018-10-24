@@ -1,5 +1,6 @@
-const Excel = require('exceljs');
+const Excel = require('../../node_modules/exceljs/dist/es5/index');
 const color = require('./color');
+const XLSX = require('xlsx');
 
 
 // have to hard code
@@ -37,11 +38,23 @@ function translateThemeColor(style) {
 }
 
 function processFile(name) {
+    processFileWithSheetJs(name);
 // read from a file
     let wb = new Excel.Workbook();
-    let wbData = {};
+    let wbData = {sheets: {}};
     return wb.xlsx.readFile('./uploads/' + name)
         .then(() => {
+
+            // store defined names
+            wbData.definedNames = {};
+            wb.definedNames.forEach((name) => {
+                const currName = wb.definedNames.getMatrix(name);
+                wbData.definedNames[name] = [];
+                currName.forEach((cell) => {
+                    wbData.definedNames[name].push(cell);
+                });
+            });
+
             wb.eachSheet(function (worksheet, sheetId) {
                 // tab color
                 let tabColor = undefined;
@@ -52,7 +65,7 @@ function processFile(name) {
                     tabColor = worksheet.properties.tabColor;
                 }
 
-                let wsData = wbData[worksheet.orderNo] = {
+                let wsData = wbData.sheets[worksheet.orderNo] = {
                     name: worksheet.name,
                     tabColor: tabColor,
                     state: worksheet.state,
@@ -70,6 +83,8 @@ function processFile(name) {
                         style: [],
                     }
                 };
+
+                console.log(worksheet.getCell('E3').dataValidation);
 
                 worksheet.eachRow({includeEmpty: true}, function (row, rowNumber) {
                     wsData.data.push([]);
@@ -119,6 +134,11 @@ function processFile(name) {
             return wbData;
         });
 
+}
+
+function processFileWithSheetJs(name) {
+    let workbook = XLSX.readFile('./uploads/' + name);
+    workbook.SheetNames[0];
 }
 
 //processFile('wb2.xlsx');

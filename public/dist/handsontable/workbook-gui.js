@@ -193,9 +193,11 @@ function () {
       this.tables = [];
       this.sheetNames = []; // load tabs
 
-      for (var sheetNo in global.workbookData) {
-        if (global.workbookData.hasOwnProperty(sheetNo)) {
-          var ws = global.workbookData[sheetNo];
+      var sheets = global.workbookData.sheets;
+
+      for (var sheetNo in sheets) {
+        if (sheets.hasOwnProperty(sheetNo)) {
+          var ws = sheets[sheetNo];
           this.sheetNames.push(ws.name);
           var gridId = this.addTab(ws.name, ws.tabColor);
           this.applyTabs();
@@ -234,7 +236,7 @@ function () {
                 console.log(sheetNo);
               }
 
-              var ws = global.workbookData[this.instance.sheetNo];
+              var ws = global.workbookData.sheets[this.instance.sheetNo];
               cellProperties.style = null;
 
               if (ws.style.length > 0 && ws.style[row] && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
@@ -277,9 +279,9 @@ function () {
     value: function getData() {
       var cnt = 0;
 
-      for (var sheetNo in global.workbookData) {
-        if (global.workbookData.hasOwnProperty(sheetNo)) {
-          var ws = global.workbookData[sheetNo];
+      for (var sheetNo in global.workbookData.sheets) {
+        if (global.workbookData.sheets.hasOwnProperty(sheetNo)) {
+          var ws = global.workbookData.sheets[sheetNo];
           ws.name = this.sheetNames[cnt];
           ws.data = this.tables[cnt].getData();
         }
@@ -293,7 +295,7 @@ function () {
     key: "addSheet",
     value: function addSheet(sheetName, data) {
       var sheetNo = this.sheetNames.length;
-      global.workbookData[sheetNo] = {
+      global.workbookData.sheets[sheetNo] = {
         name: sheetName,
         data: data
       };

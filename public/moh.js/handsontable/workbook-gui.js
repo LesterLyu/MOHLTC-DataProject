@@ -167,10 +167,11 @@ class WorkbookGUI {
         this.sheetNames = [];
 
         // load tabs
-        for (var sheetNo in global.workbookData) {
-            if (global.workbookData.hasOwnProperty(sheetNo)) {
+        const sheets = global.workbookData.sheets;
+        for (var sheetNo in sheets) {
+            if (sheets.hasOwnProperty(sheetNo)) {
 
-                var ws = global.workbookData[sheetNo];
+                var ws = sheets[sheetNo];
                 this.sheetNames.push(ws.name);
                 const gridId = this.addTab(ws.name, ws.tabColor);
                 this.applyTabs();
@@ -209,7 +210,7 @@ class WorkbookGUI {
                                 this.instance.sheetNo = sheetNo;
                                 console.log(sheetNo)
                             }
-                            var ws = global.workbookData[this.instance.sheetNo];
+                            var ws = global.workbookData.sheets[this.instance.sheetNo];
 
                             cellProperties.style = null;
                             if (ws.style.length > 0 && ws.style[row] && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
@@ -251,9 +252,10 @@ class WorkbookGUI {
 
     getData() {
         let cnt = 0;
-        for (let sheetNo in global.workbookData) {
-            if (global.workbookData.hasOwnProperty(sheetNo)) {
-                let ws = global.workbookData[sheetNo];
+
+        for (let sheetNo in global.workbookData.sheets) {
+            if (global.workbookData.sheets.hasOwnProperty(sheetNo)) {
+                let ws = global.workbookData.sheets[sheetNo];
                 ws.name = this.sheetNames[cnt];
                 ws.data = this.tables[cnt].getData();
             }
@@ -264,7 +266,7 @@ class WorkbookGUI {
 
     addSheet(sheetName, data) {
         const sheetNo = this.sheetNames.length;
-        global.workbookData[sheetNo] = {name: sheetName, data: data};
+        global.workbookData.sheets[sheetNo] = {name: sheetName, data: data};
         this.sheetNames.push(sheetName);
         const gridId = this.addTab(sheetName);
         this.applyTabs();
