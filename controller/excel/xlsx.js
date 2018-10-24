@@ -83,7 +83,7 @@ function processFile(name) {
                         style: [],
                     },
                     // store data validation
-                    dataValidation: worksheet.dataValidations.model
+                    dataValidations: worksheet.dataValidations.model
                 };
 
                 worksheet.eachRow({includeEmpty: true}, function (row, rowNumber) {
@@ -114,7 +114,8 @@ function processFile(name) {
 
                     // we want to store all columns in first row
                     if (row.cellCount !== worksheet.columnCount && rowNumber === 1) {
-                        wsData.data[rowNumber - 1] = (Array(worksheet.columnCount).fill(null))
+                        wsData.data[rowNumber - 1] =
+                            wsData.data[rowNumber - 1].concat(Array(worksheet.columnCount - row.cellCount).fill(null));
                     }
 
                 });
