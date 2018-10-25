@@ -202,6 +202,8 @@ function () {
         this.sheetNames.push(sheets[sheetNo].name);
       }
 
+      this.currSheet = this.sheetNames[0];
+
       for (var sheetNo in sheets) {
         if (sheets.hasOwnProperty(sheetNo)) {
           var ws = sheets[sheetNo];
@@ -253,7 +255,7 @@ function () {
                   global.dataValidation[sheetNo].dropDownData[addresses[i]] = formulae.slice(1, formulae.length - 1).split(',');
                 } // situation 2: e.g. formulae: ["$B$5:$K$5"]
                 else if (formulae.indexOf(':') > 0) {
-                    var parsed = parser.parse(formulae); // concat 2d array to 1d array
+                    var parsed = parser.parse(formulae).result; // concat 2d array to 1d array
 
                     var newArr = [];
 
@@ -296,10 +298,11 @@ function () {
               var dataValidation = global.dataValidation[this.instance.sheetNo];
 
               if (dataValidation.dropDownAddresses.includes(address)) {
-                cellProperties.selectOptions = dataValidation.dropDownData[address];
-                cellProperties.renderer = Handsontable.renderers.DropdownRenderer;
+                cellProperties.source = dataValidation.dropDownData[address];
+                cellProperties.renderer = Handsontable.renderers.AutocompleteRenderer;
                 cellProperties.editor = Handsontable.editors.DropdownEditor;
-                console.log('set DropdownEditor: ' + address);
+                cellProperties.validator = Handsontable.validators.AutocompleteValidator;
+                cellProperties.allowInvalid = false;
                 return cellProperties;
               } // text or formula
 
@@ -321,7 +324,6 @@ function () {
       }
 
       $('#nav-tab a:first-child').tab('show');
-      this.currSheet = this.sheetNames[0];
       hideLoadingStatus();
       var that = this; // setTimeout(function () {
       //     that.tables[0].render();
@@ -390,6 +392,11 @@ function () {
     key: "getSheet",
     value: function getSheet(name) {
       return global.workbookData.sheets[this.sheetNames.indexOf(name)];
+    }
+  }, {
+    key: "getDataAtSheetAndCell",
+    value: function getDataAtSheetAndCell(sheet, row, col) {
+      return global.workbookData.sheets[this.sheetNames.indexOf(sheet)].data[row][col];
     }
   }, {
     key: "getTable",

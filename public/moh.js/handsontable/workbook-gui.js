@@ -169,13 +169,14 @@ class WorkbookGUI {
         this.tables = [];
         this.sheetNames = [];
 
-
         // load tabs
         const sheets = global.workbookData.sheets;
         // push sheet names first, since we need it now to call getSheet()
         for (var sheetNo in sheets) {
             this.sheetNames.push(sheets[sheetNo].name);
         }
+        this.currSheet = this.sheetNames[0];
+
         for (var sheetNo in sheets) {
             if (sheets.hasOwnProperty(sheetNo)) {
                 var ws = sheets[sheetNo];
@@ -224,7 +225,7 @@ class WorkbookGUI {
                             }
                             // situation 2: e.g. formulae: ["$B$5:$K$5"]
                             else if (formulae.indexOf(':') > 0) {
-                                const parsed = parser.parse(formulae);
+                                const parsed = parser.parse(formulae).result;
                                 // concat 2d array to 1d array
                                 let newArr = [];
                                 for (let i = 0; i < parsed.length; i++) {
@@ -268,10 +269,11 @@ class WorkbookGUI {
                             const address = colCache.encode(row + 1, col + 1);
                             const dataValidation = global.dataValidation[this.instance.sheetNo];
                             if (dataValidation.dropDownAddresses.includes(address)) {
-                                cellProperties.selectOptions = dataValidation.dropDownData[address];
-                                cellProperties.renderer = Handsontable.renderers.DropdownRenderer;
+                                cellProperties.source = dataValidation.dropDownData[address];
+                                cellProperties.renderer = Handsontable.renderers.AutocompleteRenderer;
                                 cellProperties.editor =  Handsontable.editors.DropdownEditor;
-                                console.log('set DropdownEditor: ' + address);
+                                cellProperties.validator = Handsontable.validators.AutocompleteValidator;
+                                cellProperties.allowInvalid = false;
                                 return cellProperties;
                             }
 
@@ -295,7 +297,7 @@ class WorkbookGUI {
         }
 
         $('#nav-tab a:first-child').tab('show');
-        this.currSheet = this.sheetNames[0];
+
         hideLoadingStatus();
         const that = this;
         // setTimeout(function () {
@@ -358,6 +360,10 @@ class WorkbookGUI {
 
     getSheet(name) {
         return global.workbookData.sheets[this.sheetNames.indexOf(name)];
+    }
+
+    getDataAtSheetAndCell(sheet, row, col) {
+        return global.workbookData.sheets[this.sheetNames.indexOf(sheet)].data[row][col];
     }
 
     getTable(name) {

@@ -53,7 +53,7 @@ FormulaEditor.prototype.saveValue = function (value, ctrlDown) {
 
   if (this.type === 'text') {
     console.log(value);
-    return this.instance.setDataAtCell(this.row, this.col, value); //return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
+    return this.instance.setDataAtCell(this.row, this.col, value[0][0]); //return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
   } else if (this.type === 'formula') {
     this.rawValue.formula = value[0][0].slice(1); // re-evaluate the result
 

@@ -52,8 +52,7 @@
 <!--Message Modal-->
 <%- include('../common/messageModal'); -%>
 
-<link href="https://cdn.jsdelivr.net/npm/handsontable@5.0.2/dist/handsontable.full.min.css" rel="stylesheet"
-      media="screen">
+<link href="/node_modules/handsontable/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
 
@@ -61,7 +60,7 @@
       href="/moh.css/custom2.css">
 
 <%- include('../common/dashboardFooter', {js: [
-    'https://cdn.jsdelivr.net/npm/handsontable@5.0.2/dist/handsontable.full.min.js',
+    '/node_modules/handsontable/dist/handsontable.full.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.0/xlsx.full.min.js',
     '/dist/handsontable/col-cache.js',

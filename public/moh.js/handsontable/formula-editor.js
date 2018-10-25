@@ -62,7 +62,7 @@ FormulaEditor.prototype.saveValue = function (value, ctrlDown) {
 
     if (this.type === 'text') {
         console.log(value);
-        return this.instance.setDataAtCell(this.row, this.col, value)
+        return this.instance.setDataAtCell(this.row, this.col, value[0][0])
         //return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
     }
     else if (this.type === 'formula') {
