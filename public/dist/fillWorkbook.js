@@ -75,7 +75,7 @@ function workbookToJson(workbook) {
 }
 
 $(document).ready(function () {
-  updateLoadingStatus('downloading');
+  //updateLoadingStatus('downloading');
   var workbookName = $('#filled-workbook').val(); // default url is for fill the workbook first time
 
   var url = '/api/filled-workbook/' + encodeURIComponent(workbookName);
@@ -86,10 +86,10 @@ $(document).ready(function () {
     console.log(response);
 
     if (response.success) {
-      updateLoadingStatus('unzipping');
+      //updateLoadingStatus('unzipping');
       var start = new Date();
-      var data = unzip(response.workbook.data);
-      updateLoadingStatus('rendering');
+      var data = unzip(response.workbook.data); //updateLoadingStatus('rendering');
+
       console.log('unzipping takes: ' + (new Date() - start) + 'ms');
       console.log(data);
       gui = new WorkbookGUI('view', workbookName, data);

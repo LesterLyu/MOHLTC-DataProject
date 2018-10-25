@@ -212,16 +212,31 @@ class WorkbookGUI {
                             continue;
                         }
                         const addresses = key.split(' ');
+                        let addressSplited = [];
                         for (let i = 0; i < addresses.length; i++) {
-                            // e.g. {address: "A1", col: 1, row: 1, $col$row: "$A$1"}
-                            const address = colCache.decode(addresses[i]);
-                            global.dataValidation[sheetNo].dropDownAddresses.push(addresses[i]);
+                            //  {top: 1, left: 1, bottom: 5, right: 1, tl: "A1", …}
+                            const decoded = colCache.decode(addresses[i]);
+                            if ('top' in decoded) {
+                                for (let row = decoded.top; row < decoded.bottom + 1; row++) {
+                                    for (let col = decoded.left; col < decoded.right + 1; col++) {
+                                        addressSplited.push(colCache.encode(row, col));
+                                    }
+                                }
+                            }
+                            // {address: "A1", col: 1, row: 1, $col$row: "$A$1"}
+                            else if ('row' in decoded) {
+                                addressSplited.push(addresses[i]);
+                            }
+                        }
+
+                        for (let i = 0; i < addressSplited.length; i++) {
+                            global.dataValidation[sheetNo].dropDownAddresses.push(addressSplited[i]);
 
                             // get data
                             // situation 1: e.g. formulae: [""1,2,3,4""]
                             const formulae = dataValidation.formulae[0];
                             if (formulae.indexOf(',') > 0) {
-                                global.dataValidation[sheetNo].dropDownData[addresses[i]] = formulae.slice(1, formulae.length - 1).split(',');
+                                global.dataValidation[sheetNo].dropDownData[addressSplited[i]] = formulae.slice(1, formulae.length - 1).split(',');
                             }
                             // situation 2: e.g. formulae: ["$B$5:$K$5"]
                             else if (formulae.indexOf(':') > 0) {
@@ -231,11 +246,11 @@ class WorkbookGUI {
                                 for (let i = 0; i < parsed.length; i++) {
                                     newArr = newArr.concat(parsed[i]);
                                 }
-                                global.dataValidation[sheetNo].dropDownData[addresses[i]] = newArr;
+                                global.dataValidation[sheetNo].dropDownData[addressSplited[i]] = newArr;
                             }
                             // situation 3: e.g. formulae: ["definedName"]
                             else if (formulae in global.workbookData.definedNames) {
-                                global.dataValidation[sheetNo].dropDownData[addresses[i]] = this.getDefinedName(formulae);
+                                global.dataValidation[sheetNo].dropDownData[addressSplited[i]] = this.getDefinedName(formulae);
                             }
                             else {
                                 console.error('Unknown dataValidation formulae situation: ' + formulae);
@@ -284,8 +299,6 @@ class WorkbookGUI {
                             if (ws.style.length > 0 && ws.style[row] && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
                                 cellProperties.style = ws.style[row][col];
                             }
-                            if (address === 'E3')
-                                console.log('????')
                             cellProperties.renderer = cellRenderer;
                             cellProperties.editor = FormulaEditor;
                             return cellProperties;

@@ -242,31 +242,46 @@ function () {
               }
 
               var addresses = key.split(' ');
+              var addressSplited = [];
 
               for (var i = 0; i < addresses.length; i++) {
-                // e.g. {address: "A1", col: 1, row: 1, $col$row: "$A$1"}
-                var address = colCache.decode(addresses[i]);
-                global.dataValidation[sheetNo].dropDownAddresses.push(addresses[i]); // get data
+                //  {top: 1, left: 1, bottom: 5, right: 1, tl: "A1", …}
+                var decoded = colCache.decode(addresses[i]);
+
+                if ('top' in decoded) {
+                  for (var row = decoded.top; row < decoded.bottom + 1; row++) {
+                    for (var col = decoded.left; col < decoded.right + 1; col++) {
+                      addressSplited.push(colCache.encode(row, col));
+                    }
+                  }
+                } // {address: "A1", col: 1, row: 1, $col$row: "$A$1"}
+                else if ('row' in decoded) {
+                    addressSplited.push(addresses[i]);
+                  }
+              }
+
+              for (var _i = 0; _i < addressSplited.length; _i++) {
+                global.dataValidation[sheetNo].dropDownAddresses.push(addressSplited[_i]); // get data
                 // situation 1: e.g. formulae: [""1,2,3,4""]
 
                 var formulae = dataValidation.formulae[0];
 
                 if (formulae.indexOf(',') > 0) {
-                  global.dataValidation[sheetNo].dropDownData[addresses[i]] = formulae.slice(1, formulae.length - 1).split(',');
+                  global.dataValidation[sheetNo].dropDownData[addressSplited[_i]] = formulae.slice(1, formulae.length - 1).split(',');
                 } // situation 2: e.g. formulae: ["$B$5:$K$5"]
                 else if (formulae.indexOf(':') > 0) {
                     var parsed = parser.parse(formulae).result; // concat 2d array to 1d array
 
                     var newArr = [];
 
-                    for (var _i = 0; _i < parsed.length; _i++) {
-                      newArr = newArr.concat(parsed[_i]);
+                    for (var _i2 = 0; _i2 < parsed.length; _i2++) {
+                      newArr = newArr.concat(parsed[_i2]);
                     }
 
-                    global.dataValidation[sheetNo].dropDownData[addresses[i]] = newArr;
+                    global.dataValidation[sheetNo].dropDownData[addressSplited[_i]] = newArr;
                   } // situation 3: e.g. formulae: ["definedName"]
                   else if (formulae in global.workbookData.definedNames) {
-                      global.dataValidation[sheetNo].dropDownData[addresses[i]] = this.getDefinedName(formulae);
+                      global.dataValidation[sheetNo].dropDownData[addressSplited[_i]] = this.getDefinedName(formulae);
                     } else {
                       console.error('Unknown dataValidation formulae situation: ' + formulae);
                     }
@@ -314,7 +329,6 @@ function () {
                 cellProperties.style = ws.style[row][col];
               }
 
-              if (address === 'E3') console.log('????');
               cellProperties.renderer = cellRenderer;
               cellProperties.editor = FormulaEditor;
               return cellProperties;
