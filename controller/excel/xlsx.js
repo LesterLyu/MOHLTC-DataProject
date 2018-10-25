@@ -1,6 +1,7 @@
 const Excel = require('../../node_modules/exceljs/dist/es5/index');
 const color = require('./color');
 const XLSX = require('xlsx');
+const fs = require('fs');
 
 
 // have to hard code
@@ -37,11 +38,11 @@ function translateThemeColor(style) {
 
 }
 
-function processFile(name) {
+function processFile(filePath) {
 // read from a file
     let wb = new Excel.Workbook();
     let wbData = {sheets: {}};
-    return wb.xlsx.readFile('./uploads/' + name)
+    return wb.xlsx.readFile(filePath)
         .then(() => {
 
             // store defined names
@@ -135,8 +136,26 @@ function processFile(name) {
 
 }
 
-function exportExcel(name, workbook) {
-
+/**
+ *
+ * @param fileName without extension
+ * @param workbookData decompressed workbook data
+ * @returns {Promise<Workbook | never>}
+ */
+function exportExcel(fileName, workbookData, username) {
+    let wb = new Excel.Workbook();
+    return wb.xlsx.readFile('./uploads/' + name)
+        .then(() => {
+            wb.eachSheet(function (worksheet, sheetId) {
+                const sheetToStore = workbookData.sheets[worksheet.orderNo];
+                for (let row = 0; row < sheetToStore.length; row++) {
+                    for (let col = 0; col < sheetToStore[row].length; col++) {
+                        worksheet.getCell(row + 1, col + 1).value = sheetToStore[row][col];
+                    }
+                }
+            });
+            wb.xlsx.writeFile('./temp/' + fileName);
+        });
 }
 
 

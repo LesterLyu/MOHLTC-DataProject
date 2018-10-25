@@ -253,21 +253,23 @@ module.exports = {
         if (!req.files)
             return res.status(400).json({success: false, message: 'No files were uploaded.'});
 
-        const name = req.params.name;
+        const workbookName = req.params.workbookName;
+        const fileName = req.params.fileName;
         const username = req.session.user.username;
         const groupNumber = req.session.user.groupNumber;
 
         // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
         let excelFile = req.files.excel;
+        const path = './uploads/' + username + '_' + fileName;
 
         // Use the mv() method to place the file somewhere on your server
-        excelFile.mv('./uploads/temp.xlsx', function (err) {
+        excelFile.mv(path, function (err) {
             if (err)
                 return res.status(500).json({success: false, message: err});
 
-            excel.processFile('temp.xlsx')
+            excel.processFile(path)
                 .then(data => {
-                    FilledWorkbook.findOne({name: req.params.name, groupNumber: groupNumber}, (err, workbook) => {
+                    FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
                         if (err) {
                             console.log(err);
                             return res.status(500).json({success: false, message: err});
@@ -322,23 +324,26 @@ module.exports = {
         if (!req.files)
             return res.status(400).json({success: false, message: 'No files were uploaded.'});
 
+        const workbookName = req.params.workbookName;
+        const fileName = req.params.fileName;
+        const path = './uploads/' + fileName;
         const groupNumber = req.session.user.groupNumber;
 
         // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
         let excelFile = req.files.excel;
 
         // Use the mv() method to place the file somewhere on your server
-        excelFile.mv('./uploads/' + req.params.name + '.xlsx', function (err) {
+        excelFile.mv(path, function (err) {
             if (err)
                 return res.status(500).json({success: false, message: err});
             console.log('upload takes: ' + (new Date() - start) + 'ms');
             start = new Date();
 
-            excel.processFile(req.params.name + '.xlsx')
+            excel.processFile(path)
                 .then(data => {
                     console.log('processFile takes: ' + (new Date() - start) + 'ms');
                     start = new Date();
-                    Workbook.findOne({name: req.params.name, groupNumber: groupNumber}, (err, workbook) => {
+                    Workbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
                         if (err) {
                             console.log(err);
                             return res.status(500).json({success: false, message: err});
@@ -346,6 +351,7 @@ module.exports = {
                         if (!workbook) {
                             return res.status(400).json({success: false, message: 'Workbook does not exist.'});
                         }
+                        workbook.fileName = fileName;
                         // TO-DO check integrity
                         // compress the string
                         const dataString = JSON.stringify(data);

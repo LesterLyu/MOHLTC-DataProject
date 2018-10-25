@@ -5,12 +5,7 @@ let workbookSchema = new mongoose.Schema({
     // category: [String],
     // attribute: [String],
     groupNumber: {type: Number, required: true},
-    /**
-     * { tab1: [
-     *     [],
-     *     []...
-     * ], tab2: [[]]}
-     */
+    fileName: String,
     data: {}, // reserved for table with populated data
 });
 module.exports = mongoose.model('Workbook', workbookSchema);

@@ -136,9 +136,10 @@ $('#file-import').change(function (e) {
   var files = e.target.files,
       f = files[0];
   var formData = new FormData();
+  console.log(f.name);
   formData.append('excel', f);
   $.ajax({
-    url: '/api/upload/workbook/' + encodeURIComponent($('#filled-workbook').val()),
+    url: '/api/upload/workbook/' + encodeURIComponent($('#filled-workbook').val()) + '/' + encodeURIComponent(f.name),
     type: 'POST',
     data: formData,
     cache: false,

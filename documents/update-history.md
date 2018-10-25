@@ -1,4 +1,8 @@
 # Update History
+## Dev 0.2.8
+  - Fix bug:
+    - trim data validation strings.
+
 ## Dev 0.2.7
  - Fix bug:
     - Edit Form: first time click on a number will erase the data.

@@ -83,10 +83,10 @@ router.get('/temp1', function (req, res) {
 });
 
 // for user
-router.post('/api/upload/workbook/:name', workbookController.user_import_workbook);
+router.post('/api/upload/workbook/:workbookName/:fileName', workbookController.user_import_workbook);
 
 // for admin
-router.post('/api/upload/style/:name', workbookController.admin_upload_style);
+router.post('/api/upload/style/:workbookName/:fileName', workbookController.admin_upload_style);
 
 
 module.exports = router;
