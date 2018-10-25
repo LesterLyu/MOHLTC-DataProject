@@ -138,13 +138,13 @@ function processFile(filePath) {
 
 /**
  *
- * @param fileName without extension
+ * @param fileName with extension
  * @param workbookData decompressed workbook data
  * @returns {Promise<Workbook | never>}
  */
 function exportExcel(fileName, workbookData, username) {
     let wb = new Excel.Workbook();
-    return wb.xlsx.readFile('./uploads/' + name)
+    return wb.xlsx.readFile('./uploads/' + fileName)
         .then(() => {
             wb.eachSheet(function (worksheet, sheetId) {
                 const sheetToStore = workbookData.sheets[worksheet.orderNo];
@@ -154,7 +154,8 @@ function exportExcel(fileName, workbookData, username) {
                     }
                 }
             });
-            wb.xlsx.writeFile('./temp/' + fileName);
+            const path = './temp/export_' + username + '_' + fileName;
+            return wb.xlsx.writeFile(path);
         });
 }
 
@@ -163,5 +164,6 @@ function exportExcel(fileName, workbookData, username) {
 
 module.exports = {
     processFile: processFile,
+    exportExcel: exportExcel,
 };
 

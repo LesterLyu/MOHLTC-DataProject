@@ -189,8 +189,10 @@ $('#file-import').change(function (e) {
   });
 });
 $('#export-workbook-btn').on('click', function () {
-  if (!gui.workbookName) gui.workbookName = 'workbook1';
-  exportToExcel();
+  // if (!gui.workbookName)
+  //     gui.workbookName = 'workbook1';
+  // exportToExcel();
+  window.open('/api/admin/workbook/' + encodeURIComponent($('#workbookNameInput').val()) + '/download');
 }); // add sheet modal
 
 function addSheet() {

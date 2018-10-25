@@ -383,8 +383,28 @@ module.exports = {
         });
     },
 
-    workbook_export: (req, res, next) => {
+    admin_export_workbook: (req, res, next) => {
         const groupNumber = req.session.user.groupNumber;
+        const username = req.session.user.username;
+        const workbookName = req.params.workbookName;
+        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            if (!workbook) {
+                return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+            }
+            // found workbook
+            const fileName = workbook.fileName;
+            const workbookData = JSON.parse(pako.inflate(workbook.data, {to: 'string'}));
+            excel.exportExcel(fileName, workbookData, username)
+                .then(() => {
+                    const path = './temp/export_' + username + '_' + fileName;
+                    res.download(path, fileName);
+                })
+        });
+
     }
 
 
