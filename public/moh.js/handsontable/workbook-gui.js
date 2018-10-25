@@ -236,7 +236,9 @@ class WorkbookGUI {
                             // situation 1: e.g. formulae: [""1,2,3,4""]
                             const formulae = dataValidation.formulae[0];
                             if (formulae.indexOf(',') > 0) {
-                                global.dataValidation[sheetNo].dropDownData[addressSplited[i]] = formulae.slice(1, formulae.length - 1).split(',');
+                                let data = formulae.slice(1, formulae.length - 1).split(',');
+                                const dataTrimmed = data.map(x => x.trim());
+                                global.dataValidation[sheetNo].dropDownData[addressSplited[i]] = dataTrimmed;
                             }
                             // situation 2: e.g. formulae: ["$B$5:$K$5"]
                             else if (formulae.indexOf(':') > 0) {

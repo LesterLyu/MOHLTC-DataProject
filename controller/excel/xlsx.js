@@ -38,7 +38,6 @@ function translateThemeColor(style) {
 }
 
 function processFile(name) {
-    processFileWithSheetJs(name);
 // read from a file
     let wb = new Excel.Workbook();
     let wbData = {sheets: {}};
@@ -136,10 +135,10 @@ function processFile(name) {
 
 }
 
-function processFileWithSheetJs(name) {
-    let workbook = XLSX.readFile('./uploads/' + name);
-    workbook.SheetNames[0];
+function exportExcel(name, workbook) {
+
 }
+
 
 //processFile('wb2.xlsx');
 

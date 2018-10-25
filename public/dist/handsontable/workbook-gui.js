@@ -267,7 +267,13 @@ function () {
                 var formulae = dataValidation.formulae[0];
 
                 if (formulae.indexOf(',') > 0) {
-                  global.dataValidation[sheetNo].dropDownData[addressSplited[_i]] = formulae.slice(1, formulae.length - 1).split(',');
+                  var _data = formulae.slice(1, formulae.length - 1).split(',');
+
+                  var dataTrimmed = _data.map(function (x) {
+                    return x.trim();
+                  });
+
+                  global.dataValidation[sheetNo].dropDownData[addressSplited[_i]] = dataTrimmed;
                 } // situation 2: e.g. formulae: ["$B$5:$K$5"]
                 else if (formulae.indexOf(':') > 0) {
                     var parsed = parser.parse(formulae).result; // concat 2d array to 1d array
