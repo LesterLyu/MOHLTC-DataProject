@@ -32,6 +32,7 @@ function () {
     global.workbookData = workbookData;
     this.currSheet = '';
     this.sheetNames = [];
+    this.sheetNamesWithoutHidden = [];
     this.tables = [];
     this.tabContents = [];
     this.tabs = [];
@@ -205,7 +206,8 @@ function () {
       this.currSheet = this.sheetNames[0];
 
       for (var sheetNo in sheets) {
-        if (sheets.hasOwnProperty(sheetNo)) {
+        if (sheets.hasOwnProperty(sheetNo) && sheets[sheetNo].state !== 'hidden') {
+          this.sheetNamesWithoutHidden.push(sheets[sheetNo].name);
           var ws = sheets[sheetNo];
           var gridId = this.addTab(ws.name, ws.tabColor);
           this.applyTabs();
@@ -374,7 +376,6 @@ function () {
         if (global.workbookData.sheets.hasOwnProperty(sheetNo)) {
           var ws = global.workbookData.sheets[sheetNo];
           ws.name = this.sheetNames[cnt];
-          ws.data = this.tables[cnt].getData();
         }
 
         cnt++;

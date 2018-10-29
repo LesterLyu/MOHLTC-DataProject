@@ -126,7 +126,7 @@ $('#save-workbook-btn').on('click', function () {
 });
 
 $('#export-workbook-btn').on('click', function () {
-    exportToExcel();
+    window.open('/api/admin/workbook/' + encodeURIComponent($('#filled-workbook').val()) + '/download');
 });
 
 $('#import-workbook-btn').on('click', function () {

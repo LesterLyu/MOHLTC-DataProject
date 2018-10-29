@@ -90,4 +90,6 @@ router.post('/api/upload/style/:workbookName/:fileName', workbookController.admi
 
 router.get('/api/admin/workbook/:workbookName/download', workbookController.admin_export_workbook);
 
+router.get('/api/workbook/:workbookName/download', workbookController.user_export_workbook);
+
 module.exports = router;

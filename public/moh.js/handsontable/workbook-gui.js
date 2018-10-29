@@ -12,6 +12,7 @@ class WorkbookGUI {
         global.workbookData = workbookData;
         this.currSheet = '';
         this.sheetNames = [];
+        this.sheetNamesWithoutHidden = [];
         this.tables = [];
         this.tabContents = [];
         this.tabs = [];
@@ -178,7 +179,8 @@ class WorkbookGUI {
         this.currSheet = this.sheetNames[0];
 
         for (var sheetNo in sheets) {
-            if (sheets.hasOwnProperty(sheetNo)) {
+            if (sheets.hasOwnProperty(sheetNo) && sheets[sheetNo].state !== 'hidden') {
+                this.sheetNamesWithoutHidden.push(sheets[sheetNo].name);
                 var ws = sheets[sheetNo];
                 const gridId = this.addTab(ws.name, ws.tabColor);
                 this.applyTabs();
@@ -342,7 +344,6 @@ class WorkbookGUI {
             if (global.workbookData.sheets.hasOwnProperty(sheetNo)) {
                 let ws = global.workbookData.sheets[sheetNo];
                 ws.name = this.sheetNames[cnt];
-                ws.data = this.tables[cnt].getData();
             }
             cnt++;
         }

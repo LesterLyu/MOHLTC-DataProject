@@ -1,7 +1,11 @@
 # Update History
 ## Dev 0.2.8
   - Fix bug:
-    - trim data validation strings.
+    - Data validation strings need to be trimmed.
+    - Cannot evaluate formula start with ```=+```.
+  - Improvements:
+    - Supports hidden sheets.
+    - Export excel with styles.
 
 ## Dev 0.2.7
  - Fix bug:

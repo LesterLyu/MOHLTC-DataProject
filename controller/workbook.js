@@ -290,7 +290,11 @@ module.exports = {
                                     console.log(err);
                                     return res.status(500).json({success: false, message: err});
                                 }
-                                return res.json({success: true, workbook: updated, message: 'Successfully added filled workbook ' + name + '.'});
+                                return res.json({
+                                    success: true,
+                                    workbook: updated,
+                                    message: 'Successfully added filled workbook ' + name + '.'
+                                });
                             })
                         }
                         else {
@@ -404,6 +408,46 @@ module.exports = {
                     res.download(path, fileName);
                 })
         });
+
+    },
+
+    user_export_workbook: (req, res, next) => {
+        const groupNumber = req.session.user.groupNumber;
+        const username = req.session.user.username;
+        const workbookName = req.params.workbookName;
+        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                if (!workbook) {
+                    return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                }
+                const fileName = workbook.fileName;
+                let workbookData;
+                FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber, username: username},
+                    (err, filledWorkbook) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).json({success: false, message: err});
+                        }
+                        if (!filledWorkbook) {
+                            workbookData = JSON.parse(pako.inflate(workbook.data, {to: 'string'}));
+                        }
+                        else {
+                            // found filled workbook
+                            workbookData = JSON.parse(pako.inflate(filledWorkbook.data, {to: 'string'}));
+                        }
+                        excel.exportExcel(fileName, workbookData, username)
+                            .then(() => {
+                                const path = './temp/export_' + username + '_' + fileName;
+                                res.download(path, fileName);
+                            })
+                    })
+
+
+            }
+        );
 
     }
 

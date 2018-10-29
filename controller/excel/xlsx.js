@@ -159,9 +159,6 @@ function exportExcel(fileName, workbookData, username) {
         });
 }
 
-
-//processFile('wb2.xlsx');
-
 module.exports = {
     processFile: processFile,
     exportExcel: exportExcel,

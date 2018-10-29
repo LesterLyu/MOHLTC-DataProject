@@ -55,7 +55,9 @@ FormulaEditor.prototype.saveValue = function (value, ctrlDown) {
     console.log(value);
     return this.instance.setDataAtCell(this.row, this.col, value[0][0]); //return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
   } else if (this.type === 'formula') {
-    this.rawValue.formula = value[0][0].slice(1); // re-evaluate the result
+    this.rawValue.formula = value[0][0].slice(1); // fix '=+' bug
+
+    if (this.rawValue.formula.charAt(0) === '+') this.rawValue.formula = this.rawValue.formula.substring(1); // re-evaluate the result
 
     console.log(value[0][0]);
     var calculated = parser.parse(this.rawValue.formula);
