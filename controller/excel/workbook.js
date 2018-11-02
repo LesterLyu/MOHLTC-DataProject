@@ -215,6 +215,7 @@ class Workbook {
                         },
                         // store data validation
                         dataValidations: worksheet.dataValidations.model,
+                        hyperlinks: worksheet.hyperlinks.model,
                     };
 
                     // Note: index start with 1
