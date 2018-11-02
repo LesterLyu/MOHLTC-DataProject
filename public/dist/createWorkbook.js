@@ -86,10 +86,10 @@ $(document).ready(function () {
 
       if (response.success) {
         var start = new Date();
-        var data = unzip(response.workbook.data);
+        var extra = response.workbook.extra === undefined ? null : unzip(response.workbook.extra);
+        var data = response.workbook.data;
         console.log('unzipping takes: ' + (new Date() - start) + 'ms');
-        console.log(data);
-        gui = new WorkbookGUI('edit', workbookName, data, $(window).height() - 390);
+        gui = new WorkbookGUI('edit', workbookName, data, extra, $(window).height() - 390);
         gui.setAddSheetCallback(addSheet);
         gui.load();
         $('#loading').hide();
@@ -179,9 +179,10 @@ $('#file-import').change(function (e) {
     processData: false
   }).done(function (response) {
     if (response.success) {
-      var data = unzip(response.workbook.data);
+      var extra = unzip(response.workbook.extra);
+      var data = response.workbook.data;
       console.log(data);
-      gui.updateJson(data);
+      gui.updateJson(data, extra);
       gui.load();
     }
   }).fail(function (xhr, status, error) {
@@ -247,13 +248,13 @@ $('#save-workbook-btn').on('click', function () {
   var statusText = $('#status');
   statusText.html('<i class="fas fa-spinner fa-spin"></i> Saving');
   btn.prop('disabled', true);
-  var workbook = zip(JSON.stringify(gui.getData()));
+  var data = gui.getData();
   $.ajax({
     url: '/api/admin/workbook',
     type: mode === 'edit' ? 'PUT' : 'POST',
     contentType: 'application/json',
     data: JSON.stringify({
-      data: workbook,
+      data: data,
       oldName: $('#workbookOldName').val(),
       name: $('#workbookNameInput').val()
     })

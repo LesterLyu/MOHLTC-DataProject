@@ -5,6 +5,7 @@ const config = require('../config/config');
 const excel = require('./excel/xlsx');
 const {gzip, ungzip} = require('node-gzip');
 const pako = require('pako');
+const ExcelWorkbook = require('./excel/workbook');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(config.permissions.WORKBOOK_TEMPLATE_MANAGEMENT);
@@ -267,6 +268,12 @@ module.exports = {
             if (err)
                 return res.status(500).json({success: false, message: err});
 
+            const wb = new ExcelWorkbook(path, groupNumber);
+            wb.getData()
+                .then(data => {
+                    res.json({data: data});
+                });
+            return ;
             excel.processFile(path)
                 .then(data => {
                     FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
@@ -274,16 +281,25 @@ module.exports = {
                             console.log(err);
                             return res.status(500).json({success: false, message: err});
                         }
+                        // remove styles and useless data
+                        for (let orderNo in data.sheets) {
+                            let sheet = data.sheets[orderNo];
+                            for (let key in sheet) {
+                                if (key !== 'data' && key !== 'name') {
+                                    delete sheet[key];
+                                }
+                            }
+                        }
                         // compress the string
-                        const dataString = JSON.stringify(data);
-                        const compressedData = pako.deflate(dataString, {to: 'string'});
+                        // const dataString = JSON.stringify(data.sheets);
+                        // const compressedData = pako.deflate(dataString, {to: 'string'});
 
                         if (!workbook) {
                             let newFilledWorkbook = new FilledWorkbook({
-                                name: name,
+                                name: workbookName,
                                 username: username,
                                 groupNumber: groupNumber,
-                                data: compressedData
+                                data: data.sheets
                             });
                             newFilledWorkbook.save((err, updated) => {
                                 if (err) {
@@ -293,13 +309,13 @@ module.exports = {
                                 return res.json({
                                     success: true,
                                     workbook: updated,
-                                    message: 'Successfully added filled workbook ' + name + '.'
+                                    message: 'Successfully added filled workbook ' + workbookName + '.'
                                 });
                             })
                         }
                         else {
                             // TO-DO check integrity
-                            workbook.data = compressedData;
+                            workbook.data = data.sheets;
                             workbook.save((err, updated) => {
                                 if (err) {
                                     console.log(err);
@@ -342,9 +358,9 @@ module.exports = {
                 return res.status(500).json({success: false, message: err});
             console.log('upload takes: ' + (new Date() - start) + 'ms');
             start = new Date();
-
-            excel.processFile(path)
-                .then(data => {
+            const wb = new ExcelWorkbook(path, groupNumber);
+            wb.getAll()
+                .then(([data, extra, attMap, catMap]) => {
                     console.log('processFile takes: ' + (new Date() - start) + 'ms');
                     start = new Date();
                     Workbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
@@ -356,18 +372,20 @@ module.exports = {
                             return res.status(400).json({success: false, message: 'Workbook does not exist.'});
                         }
                         workbook.fileName = fileName;
-                        // TO-DO check integrity
                         // compress the string
-                        const dataString = JSON.stringify(data);
+                        const extraString = JSON.stringify(extra);
                         console.log('stringify takes: ' + (new Date() - start) + 'ms');
                         start = new Date();
-                        const compressedData = pako.deflate(dataString, {to: 'string'});
+                        const compressedExtra = pako.deflate(extraString, {to: 'string'});
                         console.log('gzip takes: ' + (new Date() - start) + 'ms');
                         start = new Date();
                         // calculate compression rate
-                        const buf = Buffer.from(dataString);
-                        console.info('gzip compression saved ' + (1 - (compressedData.length / buf.length)) * 100 + '% spaces!');
-                        workbook.data = compressedData;
+                        const buf = Buffer.from(extraString);
+                        console.info('gzip compression saved ' + (1 - (compressedExtra.length / buf.length)) * 100 + '% spaces!');
+                        workbook.extra = compressedExtra;
+                        workbook.data = data;
+                        workbook.attMap = attMap;
+                        workbook.catMap = catMap;
                         workbook.save((err, updated) => {
                             if (err) {
                                 console.log(err);
@@ -382,8 +400,8 @@ module.exports = {
                             })
                         });
                     });
-                });
 
+                });
         });
     },
 

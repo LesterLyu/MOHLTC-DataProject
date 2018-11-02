@@ -159,8 +159,31 @@ function exportExcel(fileName, workbookData, username) {
         });
 }
 
+function getData(filePath) {
+    // read from a file
+    let wb = new Excel.Workbook();
+    let wbData = {};
+    return wb.xlsx.readFile(filePath)
+        .then(() => {
+            wb.eachSheet(function (worksheet, sheetId) {
+                worksheet.eachRow(function (row, rowNumber) {
+                    // if the value is in Attribute table
+                    if (row.getCell(1)) {
+                        row.eachCell(function (cell, colNumber) {
+
+
+                        });
+                    }
+
+                });
+            });
+        });
+}
+
 module.exports = {
     processFile: processFile,
     exportExcel: exportExcel,
+    getData: getData,
+    translateIndexedColor: translateIndexedColor,
 };
 

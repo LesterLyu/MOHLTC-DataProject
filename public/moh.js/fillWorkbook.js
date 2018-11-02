@@ -84,11 +84,12 @@ $(document).ready(function () {
         if (response.success) {
             //updateLoadingStatus('unzipping');
             let start = new Date();
-            const data = unzip(response.workbook.data);
+            const extra = unzip(response.workbook.extra);
+            const data = response.workbook.data;
             //updateLoadingStatus('rendering');
             console.log('unzipping takes: ' + (new Date() - start) + 'ms');
             console.log(data);
-            gui = new WorkbookGUI('view', workbookName, data);
+            gui = new WorkbookGUI('view', workbookName, data, extra);
             gui.load();
         }
     }).fail(function (xhr, status, error) {

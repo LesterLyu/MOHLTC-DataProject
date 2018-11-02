@@ -88,11 +88,12 @@ $(document).ready(function () {
     if (response.success) {
       //updateLoadingStatus('unzipping');
       var start = new Date();
-      var data = unzip(response.workbook.data); //updateLoadingStatus('rendering');
+      var extra = unzip(response.workbook.extra);
+      var data = response.workbook.data; //updateLoadingStatus('rendering');
 
       console.log('unzipping takes: ' + (new Date() - start) + 'ms');
       console.log(data);
-      gui = new WorkbookGUI('view', workbookName, data);
+      gui = new WorkbookGUI('view', workbookName, data, extra);
       gui.load();
     }
   }).fail(function (xhr, status, error) {

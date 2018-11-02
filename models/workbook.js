@@ -6,6 +6,9 @@ let workbookSchema = new mongoose.Schema({
     // attribute: [String],
     groupNumber: {type: Number, required: true},
     fileName: String,
-    data: {}, // reserved for table with populated data
+    extra: {}, //store styles and other properties, compressed
+    data: {}, // store data
+    attMap: {},
+    catMap: {},
 });
 module.exports = mongoose.model('Workbook', workbookSchema);

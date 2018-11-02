@@ -84,10 +84,10 @@ $(document).ready(function () {
             console.log(response);
             if (response.success) {
                 let start = new Date();
-                const data = unzip(response.workbook.data);
+                const extra = (response.workbook.extra === undefined ? null: unzip(response.workbook.extra));
+                const data = response.workbook.data;
                 console.log('unzipping takes: ' + (new Date() - start) + 'ms');
-                console.log(data);
-                gui = new WorkbookGUI('edit', workbookName, data, $(window).height() - 390);
+                gui = new WorkbookGUI('edit', workbookName, data, extra, $(window).height() - 390);
                 gui.setAddSheetCallback(addSheet);
                 gui.load();
 
@@ -182,9 +182,10 @@ $('#file-import').change(function (e) {
         processData: false
     }).done(function (response) {
         if (response.success) {
-            const data = unzip(response.workbook.data);
+            const extra = unzip(response.workbook.extra);
+            const data = response.workbook.data;
             console.log(data);
-            gui.updateJson(data);
+            gui.updateJson(data, extra);
             gui.load();
         }
     }).fail(function (xhr, status, error) {
@@ -256,13 +257,13 @@ $('#save-workbook-btn').on('click', function () {
     var statusText = $('#status');
     statusText.html('<i class="fas fa-spinner fa-spin"></i> Saving');
     btn.prop('disabled', true);
-    const workbook = zip(JSON.stringify(gui.getData()));
+    const data = gui.getData();
 
     $.ajax({
         url: '/api/admin/workbook',
         type: (mode === 'edit' ? 'PUT' : 'POST'),
         contentType: 'application/json',
-        data: JSON.stringify({data: workbook, oldName: $('#workbookOldName').val(),name: $('#workbookNameInput').val()}),
+        data: JSON.stringify({data: data, oldName: $('#workbookOldName').val(),name: $('#workbookNameInput').val()}),
     }).done(function (response) {
         if (response.success) {
             // enable import style button once saved

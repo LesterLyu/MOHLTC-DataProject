@@ -1,5 +1,25 @@
-# Update History
-## Dev 0.2.8
+### To-DO
+<details><summary><b>(click to show)</b></summary>
+ - Add hyperlink support.
+ - Add richetext support.
+ - Add more border option.
+ - Auto re-evaluate formulas.
+ - Fix border alignment issue.
+ - Add font support.
+ - Add font underline support.
+ - Add fixed row/column support.
+ - Add data type support. ($, date format, number format, etc...)
+ - Add theme color support. (need to parse XML)
+ - Add hidden row/column support.
+</details>
+
+### Dev 0.2.9
+  - Fix bug:
+    - Cannot click 'Add' when create sheet.
+  - Improvements:
+    - optimize data structure for storing workbooks.
+
+### Dev 0.2.8
   - Fix bug:
     - Data validation strings need to be trimmed.
     - Cannot evaluate formula start with ```=+```.
@@ -7,7 +27,7 @@
     - Supports hidden sheets.
     - Export excel with styles.
 
-## Dev 0.2.7
+### Dev 0.2.7
  - Fix bug:
     - Edit Form: first time click on a number will erase the data.
     - Back-end: First row is trimmed sometimes.

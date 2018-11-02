@@ -4,12 +4,14 @@ const SCALE = 8; // scale up the column width and row height
 let global = {workbookData: {}, dataValidation: {}};
 
 class WorkbookGUI {
-    constructor(mode, workbookName, workbookData, height = $(window).height() - 360) {
+    constructor(mode, workbookName, workbookRawData, workbookRawExtra, height = $(window).height() - 360) {
         this.height = height;
         this.mode = mode; // can be 'view' or 'edit'
         this.addSheetTab = $('<a id="add-sheet-btn" class="nav-link nav-item" href="#"><i class="fas fa-plus"></i> Add Sheet</a>');
         this.workbookName = workbookName;
-        global.workbookData = workbookData;
+        global.workbookRawData = workbookRawData;
+        global.workbookRawExtra = workbookRawExtra;
+        global.workbookData = {sheets: {}}; // pre-processed data and extra
         this.currSheet = '';
         this.sheetNames = [];
         this.sheetNamesWithoutHidden = [];
@@ -141,8 +143,9 @@ class WorkbookGUI {
         $('#add-sheet-btn').on('click', cb);
     }
 
-    updateJson(workbookData) {
-        global.workbookData = workbookData;
+    updateJson(workbookRawData, workbookRawExtra) {
+        global.workbookRawData = workbookRawData;
+        global.workbookRawExtra = workbookRawExtra;
         this.sheetNames = [];
         this.tables = [];
         this.tabContents = [];
@@ -160,6 +163,7 @@ class WorkbookGUI {
         if (this.mode === 'edit')
             this._appendAddSheetTab();
 
+        this._preProcess();
         this.applyJsonWithStyle();
     }
 
@@ -185,21 +189,10 @@ class WorkbookGUI {
                 const gridId = this.addTab(ws.name, ws.tabColor);
                 this.applyTabs();
                 let container = $('#' + gridId)[0];
-                let data = ws.data;
+                let data = sheets[sheetNo].data;
 
                 // transform mergeCells
-                var merges = [];
-                for (var position in ws.merges) {
-                    if (ws.merges.hasOwnProperty(position)) {
-                        var model = ws.merges[position].model;
-                        merges.push({
-                            row: model.top - 1,
-                            col: model.left - 1,
-                            rowspan: model.bottom - model.top + 1,
-                            colspan: model.right - model.left + 1
-                        })
-                    }
-                }
+                var merges = ws.merges;
 
                 // process data validation
                 global.dataValidation[sheetNo] = {
@@ -290,7 +283,7 @@ class WorkbookGUI {
                             if (dataValidation.dropDownAddresses.includes(address)) {
                                 cellProperties.source = dataValidation.dropDownData[address];
                                 cellProperties.renderer = Handsontable.renderers.AutocompleteRenderer;
-                                cellProperties.editor =  Handsontable.editors.DropdownEditor;
+                                cellProperties.editor = Handsontable.editors.DropdownEditor;
                                 cellProperties.validator = Handsontable.validators.AutocompleteValidator;
                                 cellProperties.allowInvalid = false;
                                 return cellProperties;
@@ -300,7 +293,7 @@ class WorkbookGUI {
                             var ws = global.workbookData.sheets[this.instance.sheetNo];
 
                             cellProperties.style = null;
-                            if (ws.style.length > 0 && ws.style[row] && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
+                            if (ws.style[row] && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
                                 cellProperties.style = ws.style[row][col];
                             }
                             cellProperties.renderer = cellRenderer;
@@ -338,16 +331,30 @@ class WorkbookGUI {
     }
 
     getData() {
+        const data = {};
         let cnt = 0;
-
         for (let sheetNo in global.workbookData.sheets) {
             if (global.workbookData.sheets.hasOwnProperty(sheetNo)) {
-                let ws = global.workbookData.sheets[sheetNo];
-                ws.name = this.sheetNames[cnt];
+                const wsData = global.workbookData.sheets[sheetNo].data;
+                data[sheetNo] = {
+                    name: this.sheetNames[cnt],
+                    dimension: [wsData.length, wsData[0].length]
+                };
+                for (let rowNumber = 0; rowNumber < wsData.length; rowNumber++) {
+                    data[sheetNo][rowNumber] = {};
+                    for (let colNumber = 0; colNumber < wsData[0].length; colNumber++) {
+                        if (wsData[rowNumber][colNumber] !== null) {
+                            data[sheetNo][rowNumber][colNumber] = wsData[rowNumber][colNumber];
+                        }
+                    }
+                    if (Object.keys(data[sheetNo][rowNumber]).length === 0) {
+                        delete data[sheetNo][rowNumber];
+                    }
+                }
             }
             cnt++;
         }
-        return global.workbookData;
+        return data;
     }
 
     addSheet(sheetName, data) {
@@ -408,7 +415,71 @@ class WorkbookGUI {
         return result;
     }
 
+    _preProcess() {
+        if (global.workbookRawExtra) {
+            global.workbookData.definedNames = global.workbookRawExtra.definedNames;
+        }
+        global.workbookData.sheets = {};
+        for (let orderNo in global.workbookRawData) {
+            const wsData = global.workbookData.sheets[orderNo] = {};
+            const data = global.workbookRawData[orderNo];
+            wsData.data = [];
+            wsData.name = data.name;
+            // if has extra
+            if (global.workbookRawExtra) {
+                const extra = global.workbookRawExtra.sheets[orderNo];
+                wsData.col = {};
+                wsData.col.width = dictToList(extra.col.width, data.dimension[1], 23);
+                wsData.row = {};
+                wsData.row.height = dictToList(extra.row.height, data.dimension[0], extra.defaultRowHeight);
+                wsData.dataValidations = extra.dataValidations;
+                wsData.state = extra.state;
+                wsData.tabColor = extra.tabColor;
+                wsData.style = extra.style;
+
+                // transform mergeCells
+                const merges = wsData.merges = [];
+                for (let position in extra.merges) {
+                    if (extra.merges.hasOwnProperty(position)) {
+                        const model = extra.merges[position].model;
+                        merges.push({
+                            row: model.top - 1,
+                            col: model.left - 1,
+                            rowspan: model.bottom - model.top + 1,
+                            colspan: model.right - model.left + 1
+                        })
+                    }
+                }
+            }
+
+            for (let rowNumber = 0; rowNumber < data.dimension[0]; rowNumber++) {
+                wsData.data.push([]);
+                for (let colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
+                    if (data && data[rowNumber] && data[rowNumber][colNumber]) {
+                        wsData.data[rowNumber].push(data[rowNumber][colNumber]);
+                    }
+                    else {
+                        wsData.data[rowNumber].push(null);
+                    }
+                }
+            }
+        }
+    }
 }
+
+function dictToList(dict, length, defVal=null) {
+    let ret = [];
+    for (let i = 0; i < length; i++) {
+        if (dict[i] !== undefined) {
+            ret.push(dict[i]);
+        }
+        else {
+            ret.push(defVal);
+        }
+    }
+    return ret;
+}
+
 
 function argbToRgb(argb) {
     return argb.substring(2);
@@ -539,3 +610,6 @@ function evaluateFormula(sheetName, row, col) {
     sheet.setDataAtCell(row, col, data);
     return data;
 }
+
+
+

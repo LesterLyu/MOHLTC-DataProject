@@ -19,8 +19,8 @@ var global = {
 var WorkbookGUI =
 /*#__PURE__*/
 function () {
-  function WorkbookGUI(mode, workbookName, workbookData) {
-    var height = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : $(window).height() - 360;
+  function WorkbookGUI(mode, workbookName, workbookRawData, workbookRawExtra) {
+    var height = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : $(window).height() - 360;
 
     _classCallCheck(this, WorkbookGUI);
 
@@ -29,7 +29,12 @@ function () {
 
     this.addSheetTab = $('<a id="add-sheet-btn" class="nav-link nav-item" href="#"><i class="fas fa-plus"></i> Add Sheet</a>');
     this.workbookName = workbookName;
-    global.workbookData = workbookData;
+    global.workbookRawData = workbookRawData;
+    global.workbookRawExtra = workbookRawExtra;
+    global.workbookData = {
+      sheets: {}
+    }; // pre-processed data and extra
+
     this.currSheet = '';
     this.sheetNames = [];
     this.sheetNamesWithoutHidden = [];
@@ -169,8 +174,9 @@ function () {
     }
   }, {
     key: "updateJson",
-    value: function updateJson(workbookData) {
-      global.workbookData = workbookData;
+    value: function updateJson(workbookRawData, workbookRawExtra) {
+      global.workbookRawData = workbookRawData;
+      global.workbookRawExtra = workbookRawExtra;
       this.sheetNames = [];
       this.tables = [];
       this.tabContents = [];
@@ -186,6 +192,9 @@ function () {
       $('#nav-tab').html('');
       $('#nav-tabContent').html('');
       if (this.mode === 'edit') this._appendAddSheetTab();
+
+      this._preProcess();
+
       this.applyJsonWithStyle();
     } // apply json to GUI tables
 
@@ -212,22 +221,9 @@ function () {
           var gridId = this.addTab(ws.name, ws.tabColor);
           this.applyTabs();
           var container = $('#' + gridId)[0];
-          var data = ws.data; // transform mergeCells
+          var data = sheets[sheetNo].data; // transform mergeCells
 
-          var merges = [];
-
-          for (var position in ws.merges) {
-            if (ws.merges.hasOwnProperty(position)) {
-              var model = ws.merges[position].model;
-              merges.push({
-                row: model.top - 1,
-                col: model.left - 1,
-                rowspan: model.bottom - model.top + 1,
-                colspan: model.right - model.left + 1
-              });
-            }
-          } // process data validation
-
+          var merges = ws.merges; // process data validation
 
           global.dataValidation[sheetNo] = {
             dropDownAddresses: [],
@@ -333,7 +329,7 @@ function () {
               var ws = global.workbookData.sheets[this.instance.sheetNo];
               cellProperties.style = null;
 
-              if (ws.style.length > 0 && ws.style[row] && ws.style[row].length > col && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
+              if (ws.style[row] && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
                 cellProperties.style = ws.style[row][col];
               }
 
@@ -370,18 +366,36 @@ function () {
   }, {
     key: "getData",
     value: function getData() {
+      var data = {};
       var cnt = 0;
 
       for (var sheetNo in global.workbookData.sheets) {
         if (global.workbookData.sheets.hasOwnProperty(sheetNo)) {
-          var ws = global.workbookData.sheets[sheetNo];
-          ws.name = this.sheetNames[cnt];
+          var wsData = global.workbookData.sheets[sheetNo].data;
+          data[sheetNo] = {
+            name: this.sheetNames[cnt],
+            dimension: [wsData.length, wsData[0].length]
+          };
+
+          for (var rowNumber = 0; rowNumber < wsData.length; rowNumber++) {
+            data[sheetNo][rowNumber] = {};
+
+            for (var colNumber = 0; colNumber < wsData[0].length; colNumber++) {
+              if (wsData[rowNumber][colNumber] !== null) {
+                data[sheetNo][rowNumber][colNumber] = wsData[rowNumber][colNumber];
+              }
+            }
+
+            if (Object.keys(data[sheetNo][rowNumber]).length === 0) {
+              delete data[sheetNo][rowNumber];
+            }
+          }
         }
 
         cnt++;
       }
 
-      return global.workbookData;
+      return data;
     }
   }, {
     key: "addSheet",
@@ -449,10 +463,79 @@ function () {
 
       return result;
     }
+  }, {
+    key: "_preProcess",
+    value: function _preProcess() {
+      if (global.workbookRawExtra) {
+        global.workbookData.definedNames = global.workbookRawExtra.definedNames;
+      }
+
+      global.workbookData.sheets = {};
+
+      for (var orderNo in global.workbookRawData) {
+        var wsData = global.workbookData.sheets[orderNo] = {};
+        var data = global.workbookRawData[orderNo];
+        wsData.data = [];
+        wsData.name = data.name; // if has extra
+
+        if (global.workbookRawExtra) {
+          var extra = global.workbookRawExtra.sheets[orderNo];
+          wsData.col = {};
+          wsData.col.width = dictToList(extra.col.width, data.dimension[1], 23);
+          wsData.row = {};
+          wsData.row.height = dictToList(extra.row.height, data.dimension[0], extra.defaultRowHeight);
+          wsData.dataValidations = extra.dataValidations;
+          wsData.state = extra.state;
+          wsData.tabColor = extra.tabColor;
+          wsData.style = extra.style; // transform mergeCells
+
+          var merges = wsData.merges = [];
+
+          for (var position in extra.merges) {
+            if (extra.merges.hasOwnProperty(position)) {
+              var model = extra.merges[position].model;
+              merges.push({
+                row: model.top - 1,
+                col: model.left - 1,
+                rowspan: model.bottom - model.top + 1,
+                colspan: model.right - model.left + 1
+              });
+            }
+          }
+        }
+
+        for (var rowNumber = 0; rowNumber < data.dimension[0]; rowNumber++) {
+          wsData.data.push([]);
+
+          for (var colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
+            if (data && data[rowNumber] && data[rowNumber][colNumber]) {
+              wsData.data[rowNumber].push(data[rowNumber][colNumber]);
+            } else {
+              wsData.data[rowNumber].push(null);
+            }
+          }
+        }
+      }
+    }
   }]);
 
   return WorkbookGUI;
 }();
+
+function dictToList(dict, length) {
+  var defVal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
+  var ret = [];
+
+  for (var i = 0; i < length; i++) {
+    if (dict[i] !== undefined) {
+      ret.push(dict[i]);
+    } else {
+      ret.push(defVal);
+    }
+  }
+
+  return ret;
+}
 
 function argbToRgb(argb) {
   return argb.substring(2);

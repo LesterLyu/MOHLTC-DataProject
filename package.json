@@ -20,7 +20,7 @@
     "hot-formula-parser": "^3.0.0",
     "jsonwebtoken": "^8.3.0",
     "mongodb": "^3.1.8",
-    "mongoose": "^5.3.7",
+    "mongoose": "^5.3.8",
     "mongoose-sequence": "^4.0.1",
     "morgan": "^1.9.1",
     "node-gzip": "^1.1.2",
