@@ -487,7 +487,8 @@ function () {
           wsData.dataValidations = extra.dataValidations;
           wsData.state = extra.state;
           wsData.tabColor = extra.tabColor;
-          wsData.style = extra.style; // transform mergeCells
+          wsData.style = extra.style;
+          wsData.hyperlinks = extra.hyperlinks; // transform mergeCells
 
           var merges = wsData.merges = [];
 
@@ -671,5 +672,12 @@ function evaluateFormula(sheetName, row, col) {
 
   sheet.setDataAtCell(row, col, data);
   return data;
-}
+} // listener for hash changes
+
+
+window.onhashchange = function () {
+  if (location.hash === "#somecoolfeature") {
+    somecoolfeature();
+  }
+};
 //# sourceMappingURL=workbook-gui.js.map

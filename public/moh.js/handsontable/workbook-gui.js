@@ -436,6 +436,7 @@ class WorkbookGUI {
                 wsData.state = extra.state;
                 wsData.tabColor = extra.tabColor;
                 wsData.style = extra.style;
+                wsData.hyperlinks = extra.hyperlinks;
 
                 // transform mergeCells
                 const merges = wsData.merges = [];
@@ -611,5 +612,12 @@ function evaluateFormula(sheetName, row, col) {
     return data;
 }
 
+// listener for hash changes
+
+window.onhashchange = function () {
+    if (location.hash === "#somecoolfeature") {
+        somecoolfeature();
+    }
+};
 
 
