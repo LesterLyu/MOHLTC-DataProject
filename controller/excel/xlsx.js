@@ -147,7 +147,7 @@ function exportExcel(fileName, workbookData, username) {
     return wb.xlsx.readFile('./uploads/' + fileName)
         .then(() => {
             wb.eachSheet(function (worksheet, sheetId) {
-                const sheetToStore = workbookData.sheets[worksheet.orderNo];
+                const sheetToStore = workbookData[worksheet.orderNo];
                 for (let row = 0; row < sheetToStore.length; row++) {
                     for (let col = 0; col < sheetToStore[row].length; col++) {
                         worksheet.getCell(row + 1, col + 1).value = sheetToStore[row][col];

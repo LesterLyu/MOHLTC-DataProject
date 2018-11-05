@@ -105,13 +105,13 @@ $('#save-workbook-btn').on('click', function () {
     var statusText = $('#status');
     statusText.html('<i class="fas fa-spinner fa-spin"></i> Saving');
     btn.prop('disabled', true);
-    const workbook = zip(JSON.stringify(gui.getData()));
+    const data = gui.getData();
 
     $.ajax({
         url: '/api/filled-workbook',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({data: workbook, name: $('#filled-workbook').val()}),
+        data: JSON.stringify({data: data, name: $('#filled-workbook').val()}),
     }).done(function (response) {
         if (response.success) {
             console.log(response);

@@ -206,23 +206,7 @@ class WorkbookGUI {
                             console.error('Unsupported data validation type: ' + dataValidation.type);
                             continue;
                         }
-                        const addresses = key.split(' ');
-                        let addressSplited = [];
-                        for (let i = 0; i < addresses.length; i++) {
-                            //  {top: 1, left: 1, bottom: 5, right: 1, tl: "A1", …}
-                            const decoded = colCache.decode(addresses[i]);
-                            if ('top' in decoded) {
-                                for (let row = decoded.top; row < decoded.bottom + 1; row++) {
-                                    for (let col = decoded.left; col < decoded.right + 1; col++) {
-                                        addressSplited.push(colCache.encode(row, col));
-                                    }
-                                }
-                            }
-                            // {address: "A1", col: 1, row: 1, $col$row: "$A$1"}
-                            else if ('row' in decoded) {
-                                addressSplited.push(addresses[i]);
-                            }
-                        }
+                        let addressSplited = splitAddress(key);
 
                         for (let i = 0; i < addressSplited.length; i++) {
                             global.dataValidation[sheetNo].dropDownAddresses.push(addressSplited[i]);
@@ -289,12 +273,19 @@ class WorkbookGUI {
                                 return cellProperties;
                             }
 
+
                             // text or formula
                             var ws = global.workbookData.sheets[this.instance.sheetNo];
 
                             cellProperties.style = null;
                             if (ws.style[row] && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
                                 cellProperties.style = ws.style[row][col];
+                            }
+                            // hyperlink
+                            const hyperlinks = global.hyperlinks[this.instance.sheetNo];
+                            const addressHyperlink = colCache.encode(row + 1, col + 1);
+                            if (addressHyperlink in hyperlinks) {
+                                cellProperties.hyperlink = hyperlinks[addressHyperlink];
                             }
                             cellProperties.renderer = cellRenderer;
                             cellProperties.editor = FormulaEditor;
@@ -317,6 +308,7 @@ class WorkbookGUI {
         // add listener to tabs
         $('.nav-tabs a').on('show.bs.tab', function (event) {
             that.currSheet = $(event.target).text();         // active tab
+            location.hash = '';
             // if (!that.rendered[that.currSheet]) {
             //     updateStatus('Rendering...');
             //     setTimeout(function () {
@@ -415,16 +407,40 @@ class WorkbookGUI {
         return result;
     }
 
+    showSheet(sheetName) {
+        if (this.sheetNamesWithoutHidden.includes(sheetName)) {
+            $('#nav-tab a:nth-child(' + (1 + this.sheetNamesWithoutHidden.indexOf(sheetName)) + ')').tab('show');
+        }
+        else {
+            console.error('cannot find sheet with name: ' + sheetName);
+        }
+    }
+
     _preProcess() {
         if (global.workbookRawExtra) {
             global.workbookData.definedNames = global.workbookRawExtra.definedNames;
         }
         global.workbookData.sheets = {};
+        global.hyperlinks = {};
         for (let orderNo in global.workbookRawData) {
             const wsData = global.workbookData.sheets[orderNo] = {};
             const data = global.workbookRawData[orderNo];
             wsData.data = [];
             wsData.name = data.name;
+
+            // cell data
+            for (let rowNumber = 0; rowNumber < data.dimension[0]; rowNumber++) {
+                wsData.data.push([]);
+                for (let colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
+                    if (data && data[rowNumber] && data[rowNumber][colNumber]) {
+                        wsData.data[rowNumber].push(data[rowNumber][colNumber]);
+                    }
+                    else {
+                        wsData.data[rowNumber].push(null);
+                    }
+                }
+            }
+
             // if has extra
             if (global.workbookRawExtra) {
                 const extra = global.workbookRawExtra.sheets[orderNo];
@@ -451,24 +467,78 @@ class WorkbookGUI {
                         })
                     }
                 }
-            }
 
-            for (let rowNumber = 0; rowNumber < data.dimension[0]; rowNumber++) {
-                wsData.data.push([]);
-                for (let colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
-                    if (data && data[rowNumber] && data[rowNumber][colNumber]) {
-                        wsData.data[rowNumber].push(data[rowNumber][colNumber]);
-                    }
-                    else {
-                        wsData.data[rowNumber].push(null);
+                // pre-process hyperlinks
+                let hyperlinks = global.hyperlinks[orderNo] = {};
+                for (let key in extra.hyperlinks) {
+                    if (extra.hyperlinks.hasOwnProperty(key)) {
+                        const hyperlink = extra.hyperlinks[key];
+                        let addressSplited = splitAddress(key);
+                        // address possible bug: e.g. when there exists 'A1' and 'A1:C1' as targets,
+                        // the hyperlink in 'A1:C1' should override the hyperlink in 'A1'.
+                        if (addressSplited.length === 1 && addressSplited[0] in hyperlinks) {
+                            continue;
+                        }
+
+                        // process first one
+                        const position = colCache.decode(addressSplited[0]);
+                        let data = {};
+                        const cell = wsData.data[position.row - 1][position.col - 1];
+                        let res;
+                        if (cell !== null && cell !== undefined) {
+                            if (cell.result !== undefined) {
+                                res = cell.result;
+                            }
+                            else {
+                                res = cell;
+                            }
+                        }
+                        const encoded = encodeURIComponent(hyperlink.target);
+                        if (hyperlink.mode === 'internal') {
+                            data.html = '<a href="#' + encoded + '">' + res + '</a>';
+                        }
+                        else if (hyperlink.mode === 'external') {
+                            data.html = '<a target="_blank" href="' + hyperlink.target + '">' + res + '</a>';
+                        }
+                        hyperlinks[addressSplited[0]] = data;
+
+                        // link other hyperlinks to the first one
+                        for (let i = 1; i < addressSplited.length; i++) {
+                            hyperlinks[addressSplited[i]] = hyperlinks[addressSplited[0]];
+                        }
                     }
                 }
+
+
             }
+
+
         }
     }
 }
 
-function dictToList(dict, length, defVal=null) {
+function splitAddress(address) {
+    const addresses = address.split(' ');
+    let addressSplited = [];
+    for (let i = 0; i < addresses.length; i++) {
+        //  {top: 1, left: 1, bottom: 5, right: 1, tl: "A1", …}
+        const decoded = colCache.decode(addresses[i]);
+        if ('top' in decoded) {
+            for (let row = decoded.top; row < decoded.bottom + 1; row++) {
+                for (let col = decoded.left; col < decoded.right + 1; col++) {
+                    addressSplited.push(colCache.encode(row, col));
+                }
+            }
+        }
+        // {address: "A1", col: 1, row: 1, $col$row: "$A$1"}
+        else if ('row' in decoded) {
+            addressSplited.push(addresses[i]);
+        }
+    }
+    return addressSplited;
+}
+
+function dictToList(dict, length, defVal = null) {
     let ret = [];
     for (let i = 0; i < length; i++) {
         if (dict[i] !== undefined) {
@@ -486,83 +556,6 @@ function argbToRgb(argb) {
     return argb.substring(2);
 }
 
-function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.renderers.TextRenderer.apply(this, arguments);
-    if (('style' in cellProperties) && cellProperties.style) {
-        var style = cellProperties.style;
-        // alignment
-        var cellMeta = instance.getCellMeta(row, col);
-        var previousClass = (cellMeta.className !== undefined) ? cellMeta.className : '';
-
-        if (style.hasOwnProperty('alignment')) {
-            if (style.alignment.hasOwnProperty('horizontal')) {
-                td.style.textAlign = style.alignment.horizontal;
-            }
-            if (style.alignment.hasOwnProperty('vertical')) {
-
-                switch (style.alignment.vertical) {
-                    case 'top':
-                        instance.setCellMeta(row, col, 'className', previousClass + ' htTop');
-                        break;
-                    case 'middle':
-                        instance.setCellMeta(row, col, 'className', previousClass + ' htMiddle');
-                        break;
-                }
-            }
-        }
-        else {
-            // default bottom
-            instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
-        }
-
-        // font
-        if (style.hasOwnProperty('font')) {
-            if (style.font.hasOwnProperty('color') && style.font.color.hasOwnProperty('argb')) {
-                td.style.color = '#' + argbToRgb(style.font.color.argb);
-            }
-            if (style.font.hasOwnProperty('bold') && style.font.bold) {
-                td.style.fontWeight = 'bold';
-            }
-            if (style.font.hasOwnProperty('italic') && style.font.italic) {
-                td.style.fontStyle = 'italic';
-            }
-        }
-
-        // background
-        if (style.hasOwnProperty('fill')) {
-            if (style.fill.hasOwnProperty('fgColor') && style.fill.fgColor.hasOwnProperty('argb')) {
-                td.style.background = '#' + argbToRgb(style.fill.fgColor.argb);
-            }
-        }
-
-        // borders
-        if (style.hasOwnProperty('border')) {
-            for (var key in style.border) {
-                if (style.border.hasOwnProperty(key)) {
-                    var upper = key.charAt(0).toUpperCase() + key.slice(1);
-                    var border = style.border[key];
-                    if (border.hasOwnProperty('color') && border.color.hasOwnProperty('argb')) {
-                        td.style['border' + upper] = '1px solid #' + argbToRgb(border.color.argb);
-                    }
-                    else {
-                        // black color
-                        td.style['border' + upper] = '1px solid #000';
-                    }
-                }
-            }
-        }
-    }
-    // render formula
-    if (value && typeof value === 'object' && value.hasOwnProperty('formula')) {
-        if (value.result && value.result.error) {
-            td.innerHTML = value.result.error;
-        }
-        else {
-            td.innerHTML = value.result !== undefined ? value.result : null;
-        }
-    }
-    // render dropdown
-}
 
 function getWorkbook(sheets, sheetNames) {
     // create a workbook
@@ -615,8 +608,13 @@ function evaluateFormula(sheetName, row, col) {
 // listener for hash changes
 
 window.onhashchange = function () {
-    if (location.hash === "#somecoolfeature") {
-        somecoolfeature();
+    if (location.hash.length >  1) {
+        let hash = decodeURIComponent(location.hash.replace(/['"]+/g, ''));
+        const sheetName = hash.slice(1, hash.indexOf('!'));
+        console.log('to ' + sheetName);
+        if (gui.sheetNamesWithoutHidden.includes(sheetName)) {
+            gui.showSheet(sheetName);
+        }
     }
 };
 

@@ -1,6 +1,5 @@
 ### To-DO
 <details><summary><b>(click to show)</b></summary>
- - Add hyperlink support.
  - Add richetext support.
  - Add more border option.
  - Auto re-evaluate formulas.
@@ -18,7 +17,10 @@
     - Cannot click 'Add' when create sheet.
   - Improvements:
     - optimize data structure for storing workbooks.
-
+    - Add hyperlink support.
+    - optimize front-end innerText and innerHTML calls performance.
+  - What is broken:
+    - Cannot click 'Add sheet' when edit sheet.
 ### Dev 0.2.8
   - Fix bug:
     - Data validation strings need to be trimmed.

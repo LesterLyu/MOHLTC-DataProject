@@ -40,21 +40,23 @@ module.exports = {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
-            if (!filledWorkbook) {
-                Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
-                    if (err) {
-                        console.log(err);
-                        return res.status(500).json({success: false, message: err});
-                    }
-                    if (!workbook) {
-                        return res.status(400).json({success: false, message: 'Workbook does not exist.'});
-                    }
+            Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                if (!workbook) {
+                    return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                }
+                if (!filledWorkbook) {
                     return res.json({success: true, workbook: workbook});
-                })
-            }
-            else {
-                return res.json({success: true, workbook: filledWorkbook});
-            }
+                }
+                else {
+                    workbook.data = filledWorkbook.data;
+                    return res.json({success: true, workbook: workbook});
+                }
+            });
+
         })
     },
 
@@ -271,35 +273,18 @@ module.exports = {
             const wb = new ExcelWorkbook(path, groupNumber);
             wb.getData()
                 .then(data => {
-                    res.json({data: data});
-                });
-            return ;
-            excel.processFile(path)
-                .then(data => {
                     FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
                         if (err) {
                             console.log(err);
                             return res.status(500).json({success: false, message: err});
                         }
-                        // remove styles and useless data
-                        for (let orderNo in data.sheets) {
-                            let sheet = data.sheets[orderNo];
-                            for (let key in sheet) {
-                                if (key !== 'data' && key !== 'name') {
-                                    delete sheet[key];
-                                }
-                            }
-                        }
-                        // compress the string
-                        // const dataString = JSON.stringify(data.sheets);
-                        // const compressedData = pako.deflate(dataString, {to: 'string'});
 
                         if (!workbook) {
                             let newFilledWorkbook = new FilledWorkbook({
                                 name: workbookName,
                                 username: username,
                                 groupNumber: groupNumber,
-                                data: data.sheets
+                                data: data
                             });
                             newFilledWorkbook.save((err, updated) => {
                                 if (err) {
@@ -315,7 +300,7 @@ module.exports = {
                         }
                         else {
                             // TO-DO check integrity
-                            workbook.data = data.sheets;
+                            workbook.data = data;
                             workbook.save((err, updated) => {
                                 if (err) {
                                     console.log(err);
@@ -324,12 +309,14 @@ module.exports = {
                                 return res.json({
                                     success: true,
                                     workbook: updated,
-                                    message: 'Successfully updated workbook style' + req.params.name + '.',
+                                    message: 'Successfully updated workbook' + req.params.name + '.',
                                 })
                             });
                         }
                     });
                 });
+
+
 
         });
     },
@@ -409,7 +396,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         const username = req.session.user.username;
         const workbookName = req.params.workbookName;
-        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
+        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, 'fileName data', (err, workbook) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
@@ -419,8 +406,8 @@ module.exports = {
             }
             // found workbook
             const fileName = workbook.fileName;
-            const workbookData = JSON.parse(pako.inflate(workbook.data, {to: 'string'}));
-            excel.exportExcel(fileName, workbookData, username)
+
+            excel.exportExcel(fileName, workbook.data, username)
                 .then(() => {
                     const path = './temp/export_' + username + '_' + fileName;
                     res.download(path, fileName);
@@ -433,7 +420,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         const username = req.session.user.username;
         const workbookName = req.params.workbookName;
-        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
+        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, 'fileName data', (err, workbook) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).json({success: false, message: err});
@@ -450,11 +437,11 @@ module.exports = {
                             return res.status(500).json({success: false, message: err});
                         }
                         if (!filledWorkbook) {
-                            workbookData = JSON.parse(pako.inflate(workbook.data, {to: 'string'}));
+                            workbookData = workbook.data;
                         }
                         else {
                             // found filled workbook
-                            workbookData = JSON.parse(pako.inflate(filledWorkbook.data, {to: 'string'}));
+                            workbookData = filledWorkbook.data;
                         }
                         excel.exportExcel(fileName, workbookData, username)
                             .then(() => {

@@ -63,7 +63,7 @@ module.exports = function (grunt) {
                 },
             },
             excelFrontend: {
-                files: ['public/moh.js/handsontable/*.js'],
+                files: ['public/moh.js/handsontable/**/*.js'],
                 tasks: ["concat", "configureBabel", "babel"],
                 options: {
                     spawn: false,
