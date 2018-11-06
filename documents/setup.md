@@ -40,7 +40,8 @@ Clone github repos and install dependencies
     in ```http://localhost:3000```
 
 ## Step 4
-Registration.
+Registration. Since Will is working the registration process, for now you cannot
+resister a user when there are no user predefined in the database.
   1. open MongoDB Compass and navigate to ```dataproject.users```
   1. Add document:
       ```
