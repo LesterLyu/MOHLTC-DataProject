@@ -68,3 +68,4 @@ resister a user when there are no user predefined in the database.
            "__v":0
         }
       ```
+  1. Log in with username: ```lester``` and password: ```lester```
