@@ -41,7 +41,6 @@ Clone github repos and install dependencies
 
 ## Step 4
 Registration.
-  1. sign up an account, **DO NOT FORGET TO INPUT AN GROUP NUMBER!**
   1. open MongoDB Compass and navigate to ```dataproject.users```
   1. Add document:
       ```
