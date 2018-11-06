@@ -198,6 +198,7 @@ class Workbook {
                     }
                     // init data structure
                     let wsData = wbData.sheets[worksheet.orderNo] = {
+                        name: worksheet.name,
                         tabColor: tabColor,
                         defaultRowHeight: worksheet.properties.defaultRowHeight,
                         state: worksheet.state,
@@ -216,6 +217,7 @@ class Workbook {
                         // store data validation
                         dataValidations: worksheet.dataValidations.model,
                         hyperlinks: worksheet.hyperlinks.model,
+                        views: worksheet.views,
                     };
 
                     // Note: index start with 1

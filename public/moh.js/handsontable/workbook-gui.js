@@ -35,9 +35,10 @@ class WorkbookGUI {
      * @param colWidths
      * @param merges
      * @param sheetNo
+     * @param views
      * @param cells
      */
-    addTable(container, width, height, data, rowHeights, colWidths, merges, sheetNo, cells) {
+    addTable(container, width, height, data, rowHeights, colWidths, merges, sheetNo, views, cells) {
         let prop = {};
         if (typeof rowHeights === 'number') {
             prop.rowHeights = rowHeights;
@@ -50,6 +51,13 @@ class WorkbookGUI {
             prop.colWidths = colWidths.map(function (x) {
                 return Math.round(x * SCALE);
             });
+        }
+        // check frozen view
+        let fixedRowsTop = 0, fixedColumnsLeft = 0;
+        // default using first view
+        if (views[0].state === 'frozen') {
+            fixedRowsTop = views[0].ySplit;
+            fixedColumnsLeft = views[0].xSplit;
         }
         var spec = {
             data: data,
@@ -70,12 +78,20 @@ class WorkbookGUI {
             autoColumnSize: false,
             contextMenu: ['copy'],
             renderAllRows: false,
+            fixedRowsTop: fixedRowsTop,
+            fixedColumnsLeft: fixedColumnsLeft,
             cells: cells,
         };
         const that = this;
         let createdTable = new Handsontable(container, spec);
         createdTable.sheetNo = sheetNo;
         that.tables.push(createdTable);
+        Handsontable.hooks.add('beforeOnCellMouseDown', (event, coords, TD, blockCalculations) => {
+            blockCalculations.row = true;
+            blockCalculations.cell = true;
+            blockCalculations.col = true;
+            console.log(blockCalculations);
+        } , createdTable);
         return createdTable;
     }
 
@@ -244,7 +260,7 @@ class WorkbookGUI {
                 // worksheet has no style
                 if (!ws.row) {
                     this.addTable(container, $('#nav-tab').width(), this.height, data,
-                        23, 80, true, sheetNo, function (row, col) {
+                        23, 80, true, sheetNo, null, function (row, col) {
                             let cellProperties = {};
                             cellProperties.editor = FormulaEditor;
                             cellProperties.renderer = cellRenderer;
@@ -253,7 +269,7 @@ class WorkbookGUI {
                 }
                 else {
                     const table = this.addTable(container, $('#nav-tab').width(), this.height, data,
-                        ws.row.height, ws.col.width, merges, sheetNo, function (row, col) {
+                        ws.row.height, ws.col.width, merges, sheetNo, ws.views, function (row, col) {
                             let cellProperties = {};
                             if (!('sheetNo' in this.instance)) {
                                 this.instance.sheetNo = sheetNo;
@@ -409,7 +425,7 @@ class WorkbookGUI {
 
     showSheet(sheetName) {
         if (this.sheetNamesWithoutHidden.includes(sheetName)) {
-            $('#nav-tab a:nth-child(' + (1 + this.sheetNamesWithoutHidden.indexOf(sheetName)) + ')').tab('show');
+            $('#nav-tab a:nth-child(' + (1 + this.sheetNamesWithoutHidden.indexOf(sheetName)) + ')').click();
         }
         else {
             console.error('cannot find sheet with name: ' + sheetName);
@@ -453,6 +469,7 @@ class WorkbookGUI {
                 wsData.tabColor = extra.tabColor;
                 wsData.style = extra.style;
                 wsData.hyperlinks = extra.hyperlinks;
+                wsData.views = extra.views;
 
                 // transform mergeCells
                 const merges = wsData.merges = [];
