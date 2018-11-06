@@ -86,12 +86,11 @@ class WorkbookGUI {
         let createdTable = new Handsontable(container, spec);
         createdTable.sheetNo = sheetNo;
         that.tables.push(createdTable);
-        Handsontable.hooks.add('beforeOnCellMouseDown', (event, coords, TD, blockCalculations) => {
-            blockCalculations.row = true;
-            blockCalculations.cell = true;
-            blockCalculations.col = true;
-            console.log(blockCalculations);
-        } , createdTable);
+        Handsontable.hooks.add('afterOnCellMouseDown', (event, coords, element) => {
+            if (element.getElementsByTagName('a').length !== 0) {
+                event.stopImmediatePropagation();
+            }
+        });
         return createdTable;
     }
 
@@ -117,7 +116,7 @@ class WorkbookGUI {
         var newTab;
         // edit mode have edit button in tabs
         if (this.mode === 'edit') {
-            newTab = $('<a id="' + tabId + '" class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '"> ' + sheetName
+            newTab = $('<a id="' + tabId + '" class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '">' + sheetName
                 + '<i onclick="editSheet(' + this.tabCounter + ')" class="fas fa-pen ml-2"></i></a>');
         }
         else {
@@ -324,7 +323,7 @@ class WorkbookGUI {
         // add listener to tabs
         $('.nav-tabs a').on('show.bs.tab', function (event) {
             that.currSheet = $(event.target).text();         // active tab
-            location.hash = '';
+            location.hash = that.currSheet;
             // if (!that.rendered[that.currSheet]) {
             //     updateStatus('Rendering...');
             //     setTimeout(function () {
@@ -424,11 +423,16 @@ class WorkbookGUI {
     }
 
     showSheet(sheetName) {
-        if (this.sheetNamesWithoutHidden.includes(sheetName)) {
-            $('#nav-tab a:nth-child(' + (1 + this.sheetNamesWithoutHidden.indexOf(sheetName)) + ')').click();
-        }
-        else {
-            console.error('cannot find sheet with name: ' + sheetName);
+        if (gui.currSheet !== sheetName) {
+            if (this.sheetNamesWithoutHidden.includes(sheetName)) {
+                setTimeout(() => {
+                    $('#nav-tab a:nth-child(' + (1 + this.sheetNamesWithoutHidden.indexOf(sheetName)) + ')').click();
+                }, 30);
+
+            }
+            else {
+                console.error('cannot find sheet with name: ' + sheetName);
+            }
         }
     }
 
@@ -628,7 +632,6 @@ window.onhashchange = function () {
     if (location.hash.length >  1) {
         let hash = decodeURIComponent(location.hash.replace(/['"]+/g, ''));
         const sheetName = hash.slice(1, hash.indexOf('!'));
-        console.log('to ' + sheetName);
         if (gui.sheetNamesWithoutHidden.includes(sheetName)) {
             gui.showSheet(sheetName);
         }
