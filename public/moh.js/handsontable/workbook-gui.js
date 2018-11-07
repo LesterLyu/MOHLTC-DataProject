@@ -21,6 +21,7 @@ class WorkbookGUI {
         this.tabCounter = 0;
         this.gridIds = [];
         this.definedNames = {};
+        this.lastHash = '#';
 
         this._appendAddSheetTab();
     }
@@ -86,9 +87,16 @@ class WorkbookGUI {
         let createdTable = new Handsontable(container, spec);
         createdTable.sheetNo = sheetNo;
         that.tables.push(createdTable);
-        Handsontable.hooks.add('afterOnCellMouseDown', (event, coords, element) => {
-            if (element.getElementsByTagName('a').length !== 0) {
-                event.stopImmediatePropagation();
+        Handsontable.hooks.add('afterOnCellMouseDown', (event, coords, TD, blockCalculations) => {
+            if (parseInt(sheetNo) === this.sheetNames.indexOf(this.currSheet) && coords.row > 0 && coords.col > 0) {
+                const hyperlinks = global.hyperlinks[sheetNo];
+                const addressHyperlink = colCache.encode(coords.row + 1, coords.col + 1);
+                if (addressHyperlink in hyperlinks) {
+                    event.stopImmediatePropagation();
+                    createdTable.deselectCell();
+                    console.log('afterOnCellMouseDown success')
+                }
+
             }
         });
         return createdTable;
@@ -125,6 +133,12 @@ class WorkbookGUI {
         if (tabColor && tabColor.argb) {
             newTab.css('border-bottom', '3px solid #' + argbToRgb(tabColor.argb));
         }
+        newTab.on('click',  (event) => {
+            event.preventDefault();
+            console.log('232');
+            gui.showSheet(sheetName);
+            event.stopImmediatePropagation();
+        });
         this.tabs.push(newTab);
 
         this.tabCounter++;
@@ -195,7 +209,6 @@ class WorkbookGUI {
         for (var sheetNo in sheets) {
             this.sheetNames.push(sheets[sheetNo].name);
         }
-        this.currSheet = this.sheetNames[0];
 
         for (var sheetNo in sheets) {
             if (sheets.hasOwnProperty(sheetNo) && sheets[sheetNo].state !== 'hidden') {
@@ -312,28 +325,16 @@ class WorkbookGUI {
             }
         }
 
+        this.currSheet = this.sheetNamesWithoutHidden[0];
         $('#nav-tab a:first-child').tab('show');
 
         hideLoadingStatus();
         const that = this;
-        // setTimeout(function () {
-        //     that.tables[0].render();
-        //     hideLoadingStatus();
-        // }, 0);
-        // add listener to tabs
         $('.nav-tabs a').on('show.bs.tab', function (event) {
             that.currSheet = $(event.target).text();         // active tab
-            location.hash = that.currSheet;
-            // if (!that.rendered[that.currSheet]) {
-            //     updateStatus('Rendering...');
-            //     setTimeout(function () {
-            //         const table = that.tables[that.sheetNames.indexOf(that.currSheet)];
-            //         table.render();
-            //         clearStatus();
-            //     }, 10);
-            //     that.rendered[that.currSheet] = true;
-            // }
         });
+        // this callback will be called after every time the table rendered.
+
         console.log("Time consumed: ", Date.now() - timerStart + 'ms');
     }
 
@@ -425,10 +426,7 @@ class WorkbookGUI {
     showSheet(sheetName) {
         if (gui.currSheet !== sheetName) {
             if (this.sheetNamesWithoutHidden.includes(sheetName)) {
-                setTimeout(() => {
-                    $('#nav-tab a:nth-child(' + (1 + this.sheetNamesWithoutHidden.indexOf(sheetName)) + ')').click();
-                }, 30);
-
+                $('#nav-tab a:nth-child(' + (1 + this.sheetNamesWithoutHidden.indexOf(sheetName)) + ')').tab('show');
             }
             else {
                 console.error('cannot find sheet with name: ' + sheetName);
@@ -503,7 +501,7 @@ class WorkbookGUI {
 
                         // process first one
                         const position = colCache.decode(addressSplited[0]);
-                        let data = {};
+                        let data = {mode: hyperlink.mode, target: hyperlink.target};
                         const cell = wsData.data[position.row - 1][position.col - 1];
                         let res;
                         if (cell !== null && cell !== undefined) {
@@ -517,6 +515,12 @@ class WorkbookGUI {
                         const encoded = encodeURIComponent(hyperlink.target);
                         if (hyperlink.mode === 'internal') {
                             data.html = '<a href="#' + encoded + '">' + res + '</a>';
+                            let targetNoQuote = hyperlink.target.replace(/['"]+/g, '');
+                            const index = targetNoQuote.indexOf('!');
+                            if (index !== -1) {
+                                data.sheetName = targetNoQuote.slice(0, index);
+                                data.cell = targetNoQuote.slice(index + 1);
+                            }
                         }
                         else if (hyperlink.mode === 'external') {
                             data.html = '<a target="_blank" href="' + hyperlink.target + '">' + res + '</a>';
@@ -629,13 +633,15 @@ function evaluateFormula(sheetName, row, col) {
 // listener for hash changes
 
 window.onhashchange = function () {
-    if (location.hash.length >  1) {
-        let hash = decodeURIComponent(location.hash.replace(/['"]+/g, ''));
-        const sheetName = hash.slice(1, hash.indexOf('!'));
-        if (gui.sheetNamesWithoutHidden.includes(sheetName)) {
-            gui.showSheet(sheetName);
-        }
-    }
+    console.log('hash changed')
+    // if (location.hash.length > 1) {
+    //     let hash = decodeURIComponent(location.hash.replace(/['"]+/g, ''));
+    //     const sheetName = hash.slice(1, hash.indexOf('!'));
+    //     if (gui.sheetNamesWithoutHidden.includes(sheetName)) {
+    //         console.log(document.readyState);
+    //         gui.showSheet(sheetName);
+    //     }
+    // }
 };
 
 

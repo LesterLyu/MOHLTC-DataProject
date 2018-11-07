@@ -75,16 +75,32 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         }
     }
     // render formula
+    let result = value;
     if (value && typeof value === 'object' && value.hasOwnProperty('formula')) {
         if (value.result && value.result.error) {
-            Handsontable.dom.fastInnerText(td, value.result.error);
+            result =  value.result.error;
         }
         else {
-            Handsontable.dom.fastInnerText(td, value.result !== undefined ? value.result : null);
+            result = value.result !== undefined ? value.result : null;
         }
+        Handsontable.dom.fastInnerText(td, result);
     }
 
     if (cellProperties.hyperlink) {
-        Handsontable.dom.fastInnerHTML(td, cellProperties.hyperlink.html);
+        const a = document.createElement('a');
+        if (cellProperties.hyperlink.mode === 'internal') {
+            a.href = '#' + cellProperties.hyperlink.target;
+            a.onclick = (event) => {
+                gui.showSheet(cellProperties.hyperlink.sheetName);
+            };
+
+        }
+        else {
+            a.href = cellProperties.hyperlink.target;
+        }
+
+        a.innerText = result;
+        Handsontable.dom.fastInnerText(td, '');
+        td.appendChild(a);
     }
 }
