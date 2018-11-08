@@ -135,27 +135,18 @@ class Workbook {
                     // Note: index start with 1
                     worksheet.eachRow(function (row, rowNumber) {
                         self.storedData[orderNo][rowNumber - 1] = {};
-                        // if the value is in Attribute table
-                        if (rowNumber === 1) {
-                            row.eachCell((cell, colNumber) => {
-                                if (!ENABLE_CHECK || self._isAttribute(cell.value)) {
-                                    self.attMap[orderNo][cell.value] = colNumber - 1;
-                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
-                                }
-                            });
-                        }
-                        else {
-                            row.eachCell((cell, colNumber) => {
-                                // if the value is in Category table
-                                if (colNumber === 1 && (!ENABLE_CHECK || self._isCategory(cell.value))) {
-                                    self.catMap[orderNo][cell.value] = rowNumber - 1;
-                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
-                                }
-                                else if (colNumber !== 1) {
-                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
-                                }
-                            })
-                        }
+                        row.eachCell((cell, colNumber) => {
+                            // create attribute map
+                            if (rowNumber === 1 && (!ENABLE_CHECK || self._isAttribute(cell.value)) && typeof cell.value !== "object") {
+                                self.attMap[orderNo][cell.value] = colNumber - 1;
+                            }
+                            // create category map
+                            if (colNumber === 1 && (!ENABLE_CHECK || self._isCategory(cell.value)) && typeof cell.value !== "object") {
+                                self.catMap[orderNo][cell.value] = rowNumber - 1;
+                            }
+                            self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
+                        });
+
                         console.log('finish row ' + rowNumber)
                     });
                 });
@@ -235,42 +226,34 @@ class Workbook {
                             wsData.row.hidden.push(rowNumber - 1);
                         }
 
-                        // if the value is in Attribute table
-                        if (rowNumber === 1) {
-                            row.eachCell((cell, colNumber) => {
-                                if (!ENABLE_CHECK || self._isAttribute(cell.value)) {
-                                    self.attMap[orderNo][cell.value] = colNumber - 1;
+                        row.eachCell({includeEmpty: true}, (cell, colNumber) => {
+                            // create attribute map
+                            if (rowNumber === 1 && (!ENABLE_CHECK || self._isAttribute(cell.value)) && typeof cell.value !== "object") {
+                                self.attMap[orderNo][cell.value] = colNumber - 1;
+                            }
+                            // create category map
+                            if (colNumber === 1 && (!ENABLE_CHECK || self._isCategory(cell.value)) && typeof cell.value !== "object") {
+                                self.catMap[orderNo][cell.value] = rowNumber - 1;
+                            }
+                            // style
+                            if (cell.style) {
+                                wsData.style[rowNumber - 1][colNumber - 1] = xlsx.translateIndexedColor(cell.style)
+                            }
+                            if (cell.value) {
+                                // transfer sharedFormula to formula
+                                if (cell.formulaType === Excel.FormulaType.Shared) {
+                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = {
+                                        formula: cell.formula,
+                                        result: cell.value.result
+                                    };
+                                }
+                                else {
                                     self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
                                 }
-                            });
-                        }
-                        else {
-                            row.eachCell({includeEmpty: true}, (cell, colNumber) => {
-                                // if the value is in Category table
-                                if (colNumber === 1 && (!ENABLE_CHECK || self._isCategory(cell.value))) {
-                                    self.catMap[orderNo][cell.value] = rowNumber - 1;
-                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
-                                }
-                                else if (colNumber !== 1) {
-                                    // style
-                                    if (cell.style) {
-                                        wsData.style[rowNumber - 1][colNumber - 1] = xlsx.translateIndexedColor(cell.style)
-                                    }
-                                    if (cell.value) {
-                                        // transfer sharedFormula to formula
-                                        if (cell.formulaType === Excel.FormulaType.Shared) {
-                                            self.storedData[orderNo][rowNumber - 1][colNumber - 1] = {
-                                                formula: cell.formula,
-                                                result: cell.value.result
-                                            };
-                                        }
-                                        else {
-                                            self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
-                                        }
-                                    }
-                                }
-                            }); // end each cell
-                        }
+                            }
+
+                        }); // end each cell
+
                         if (Object.keys(wsData.style[rowNumber - 1]).length === 0) {
                             delete wsData.style[rowNumber - 1];
                         }
