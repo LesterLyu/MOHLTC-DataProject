@@ -12,6 +12,14 @@
  - Add hidden row/column support.
 </details>
 
+### Dev 0.3.0
+ - Fix bug:
+    - Hyperlink may lead into some performance issues.
+    - Minor bug fixes
+ - Breakthrough:
+    - Support hidden column and row.
+    - Support fixed column and row.
+
 ### Dev 0.2.9
   - Fix bug:
     - Cannot click 'Add' when create sheet.
