@@ -6,10 +6,8 @@
  - Fix border alignment issue.
  - Add font support.
  - Add font underline support.
- - Add fixed row/column support.
  - Add data type support. ($, date format, number format, etc...)
  - Add theme color support. (need to parse XML)
- - Add hidden row/column support.
 </details>
 
 ### Dev 0.3.0
