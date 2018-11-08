@@ -135,7 +135,6 @@ class WorkbookGUI {
         }
         newTab.on('click',  (event) => {
             event.preventDefault();
-            console.log('232');
             gui.showSheet(sheetName);
             event.stopImmediatePropagation();
         });
@@ -463,9 +462,9 @@ class WorkbookGUI {
             if (global.workbookRawExtra) {
                 const extra = global.workbookRawExtra.sheets[orderNo];
                 wsData.col = {};
-                wsData.col.width = dictToList(extra.col.width, data.dimension[1], 23);
+                wsData.col.width = dictToList(extra.col.width, data.dimension[1], 23, extra.col.hidden);
                 wsData.row = {};
-                wsData.row.height = dictToList(extra.row.height, data.dimension[0], extra.defaultRowHeight);
+                wsData.row.height = dictToList(extra.row.height, data.dimension[0], extra.defaultRowHeight, extra.row.hidden);
                 wsData.dataValidations = extra.dataValidations;
                 wsData.state = extra.state;
                 wsData.tabColor = extra.tabColor;
@@ -563,10 +562,14 @@ function splitAddress(address) {
     return addressSplited;
 }
 
-function dictToList(dict, length, defVal = null) {
+function dictToList(dict, length, defVal = null, hidden) {
     let ret = [];
+    // set hidden row/col height/width to 0.1
     for (let i = 0; i < length; i++) {
-        if (dict[i] !== undefined) {
+        if (hidden.includes(i)) {
+            ret.push(0.1);
+        }
+        else if (dict[i] !== undefined) {
             ret.push(dict[i]);
         }
         else {

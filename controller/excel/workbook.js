@@ -140,6 +140,7 @@ class Workbook {
                             row.eachCell((cell, colNumber) => {
                                 if (!ENABLE_CHECK || self._isAttribute(cell.value)) {
                                     self.attMap[orderNo][cell.value] = colNumber - 1;
+                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
                                 }
                             });
                         }
@@ -148,6 +149,7 @@ class Workbook {
                                 // if the value is in Category table
                                 if (colNumber === 1 && (!ENABLE_CHECK || self._isCategory(cell.value))) {
                                     self.catMap[orderNo][cell.value] = rowNumber - 1;
+                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
                                 }
                                 else if (colNumber !== 1) {
                                     self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
@@ -238,6 +240,7 @@ class Workbook {
                             row.eachCell((cell, colNumber) => {
                                 if (!ENABLE_CHECK || self._isAttribute(cell.value)) {
                                     self.attMap[orderNo][cell.value] = colNumber - 1;
+                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
                                 }
                             });
                         }
@@ -246,6 +249,7 @@ class Workbook {
                                 // if the value is in Category table
                                 if (colNumber === 1 && (!ENABLE_CHECK || self._isCategory(cell.value))) {
                                     self.catMap[orderNo][cell.value] = rowNumber - 1;
+                                    self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
                                 }
                                 else if (colNumber !== 1) {
                                     // style
