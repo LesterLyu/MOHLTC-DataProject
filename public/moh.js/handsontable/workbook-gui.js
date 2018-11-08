@@ -87,18 +87,7 @@ class WorkbookGUI {
         let createdTable = new Handsontable(container, spec);
         createdTable.sheetNo = sheetNo;
         that.tables.push(createdTable);
-        Handsontable.hooks.add('afterOnCellMouseDown', (event, coords, TD, blockCalculations) => {
-            if (parseInt(sheetNo) === this.sheetNames.indexOf(this.currSheet) && coords.row > 0 && coords.col > 0) {
-                const hyperlinks = global.hyperlinks[sheetNo];
-                const addressHyperlink = colCache.encode(coords.row + 1, coords.col + 1);
-                if (addressHyperlink in hyperlinks) {
-                    event.stopImmediatePropagation();
-                    createdTable.deselectCell();
-                    console.log('afterOnCellMouseDown success')
-                }
 
-            }
-        });
         return createdTable;
     }
 
@@ -397,7 +386,7 @@ class WorkbookGUI {
     }
 
     getTable(name) {
-        return this.tables[this.sheetNames.indexOf(name)];
+        return this.tables[this.sheetNamesWithoutHidden.indexOf(name)];
     }
 
     getDefinedName(definedName) {
@@ -562,7 +551,7 @@ function splitAddress(address) {
     return addressSplited;
 }
 
-function dictToList(dict, length, defVal = null, hidden) {
+function dictToList(dict, length, defVal = null, hidden=[]) {
     let ret = [];
     // set hidden row/col height/width to 0.1
     for (let i = 0; i < length; i++) {
@@ -633,10 +622,10 @@ function evaluateFormula(sheetName, row, col) {
     return data;
 }
 
-// listener for hash changes
 
+// listener for hash changes
 window.onhashchange = function () {
-    console.log('hash changed')
+    //console.log('hash changed')
     // if (location.hash.length > 1) {
     //     let hash = decodeURIComponent(location.hash.replace(/['"]+/g, ''));
     //     const sheetName = hash.slice(1, hash.indexOf('!'));

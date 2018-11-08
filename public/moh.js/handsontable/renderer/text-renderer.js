@@ -10,6 +10,21 @@
  */
 function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
+
+    // check if this row/col should be hidden
+    if (global.workbookData.sheets[instance.sheetNo].col.width[col] === 0.1) {
+        return;
+    }
+
+    if (global.workbookData.sheets[instance.sheetNo].row.height[row] === 0.1) {
+        if (td.parentNode)
+            td.parentNode.style.display = 'none';
+        return;
+    }
+    else {
+        td.parentNode.style.display = '';
+    }
+
     if (('style' in cellProperties) && cellProperties.style) {
         var style = cellProperties.style;
         // alignment
@@ -91,6 +106,8 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         if (cellProperties.hyperlink.mode === 'internal') {
             a.href = '#' + cellProperties.hyperlink.target;
             a.onclick = (event) => {
+                // a trick to move mouse out of window, to fix hyperlink performance bug
+                eventFire($('ol')[0], 'mousedown');
                 gui.showSheet(cellProperties.hyperlink.sheetName);
             };
 
@@ -102,5 +119,19 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         a.innerText = result;
         Handsontable.dom.fastInnerText(td, '');
         td.appendChild(a);
+    }
+
+
+}
+
+
+
+function eventFire(el, etype){
+    if (el.fireEvent) {
+        el.fireEvent('on' + etype);
+    } else {
+        var evObj = document.createEvent('Events');
+        evObj.initEvent(etype, true, false);
+        el.dispatchEvent(evObj);
     }
 }
