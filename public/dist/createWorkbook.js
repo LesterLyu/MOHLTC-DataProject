@@ -90,8 +90,8 @@ $(document).ready(function () {
         var data = response.workbook.data;
         console.log('unzipping takes: ' + (new Date() - start) + 'ms');
         gui = new WorkbookGUI('edit', workbookName, data, extra, $(window).height() - 350);
-        gui.setAddSheetCallback(addSheet);
         gui.load();
+        gui.setAddSheetCallback(addSheet);
         $('#loading').hide();
       }
     }).fail(function (xhr, status, error) {
