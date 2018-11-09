@@ -103,7 +103,7 @@ $(document).ready(function () {
   else {
       console.log('add mode');
       $('#import-workbook-btn').prop('disabled', true);
-      gui = new WorkbookGUI('edit', workbookName, {}, $(window).height() - 390);
+      gui = new WorkbookGUI('edit', workbookName, {}, $(window).height() - 350);
       gui.setAddSheetCallback(addSheet);
     }
 });

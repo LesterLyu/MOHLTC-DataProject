@@ -57,7 +57,7 @@ class WorkbookGUI {
         // check frozen view
         let fixedRowsTop = 0, fixedColumnsLeft = 0;
         // default using first view
-        if (views[0].state === 'frozen') {
+        if (views && views[0].state === 'frozen') {
             fixedRowsTop = views[0].ySplit;
             fixedColumnsLeft = views[0].xSplit;
         }
@@ -394,7 +394,7 @@ class WorkbookGUI {
         this.applyTabs();
         let container = $('#' + gridId)[0];
         let table = this.addTable(container, $('#nav-tab').width(), this.height, data,
-            23, 80, true, sheetNo, function (row, col) {
+            23, 80, true, sheetNo, null, function (row, col) {
                 let cellProperties = {};
                 cellProperties.editor = FormulaEditor;
                 cellProperties.renderer = cellRenderer;
@@ -408,6 +408,7 @@ class WorkbookGUI {
         $('.nav-tabs a').on('show.bs.tab', function (event) {
             this.currSheet = $(event.target).text();         // active tab
         });
+        this._enableTabScroll();
     }
 
     getSheet(name) {
