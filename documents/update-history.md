@@ -17,7 +17,7 @@
  - Breakthrough:
     - Supports hide grid lines.
     - Move sheet tabs to the bottom, add scroll button:
-        ![bottom tabs]("documents/img/bottom-tabs.png")
+        <img src="https://raw.githubusercontent.com/LesterLyu/MOHLTC-DataProject/dev-lester/documents/img/bottom-tabs.jpg" height="50" alt="bottom tabs"/>
     - Support auto-resize, but very slow...
 ### Dev 0.3.0
  - Fix bug:
