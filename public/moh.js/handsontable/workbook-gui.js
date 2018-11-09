@@ -123,7 +123,7 @@ class WorkbookGUI {
         if (tabColor && tabColor.argb) {
             newTab.css('border-bottom', '3px solid #' + argbToRgb(tabColor.argb));
         }
-        newTab.on('click',  (event) => {
+        newTab.on('click', (event) => {
             event.preventDefault();
             gui.showSheet(sheetName);
             event.stopImmediatePropagation();
@@ -338,7 +338,7 @@ class WorkbookGUI {
 
         const maxWidth = navTab[0].scrollWidth - navTab[0].clientWidth;
 
-        scrollerRight.click(function() {
+        scrollerRight.click(function () {
             gui.navPosition += navWrapper.outerWidth() * 3 / 4;
             if (gui.navPosition > maxWidth) {
                 gui.navPosition = maxWidth
@@ -348,7 +348,7 @@ class WorkbookGUI {
             }, 200);
         });
 
-        scrollerLeft.click(function() {
+        scrollerLeft.click(function () {
             gui.navPosition -= navWrapper.outerWidth() * 3 / 4;
             if (gui.navPosition < 0) {
                 gui.navPosition = 0
@@ -473,11 +473,13 @@ class WorkbookGUI {
                 for (let colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
                     if (data && data[rowNumber] && data[rowNumber][colNumber]) {
                         wsData.data[rowNumber].push(data[rowNumber][colNumber]);
+                        delete data[rowNumber][colNumber];
                     }
                     else {
                         wsData.data[rowNumber].push(null);
                     }
                 }
+               delete data[rowNumber];
             }
 
             // if has extra
@@ -557,14 +559,19 @@ class WorkbookGUI {
             }
         }
     }
+
     resize(width, height) {
+
+        const currSheet = this.currSheet;
         for (let i = 0; i < this.tables.length; i++) {
             this.tables[i].updateSettings({
                 width: width,
                 height: height,
             });
+            this.showSheet(this.sheetNamesWithoutHidden[i]);
             this.tables[i].render();
         }
+        this.showSheet(currSheet);
     }
 }
 
@@ -589,7 +596,7 @@ function splitAddress(address) {
     return addressSplited;
 }
 
-function dictToList(dict, length, defVal = null, hidden=[]) {
+function dictToList(dict, length, defVal = null, hidden = []) {
     let ret = [];
     // set hidden row/col height/width to 0.1
     for (let i = 0; i < length; i++) {
@@ -665,8 +672,11 @@ window.onresize = function () {
     if (resize) {
         clearTimeout(resize);
     }
+    const statusText = $('#status');
+    statusText.html('<i class="fas fa-spinner fa-spin"></i> Rendering...');
     resize = setTimeout(() => {
         gui.resize($('#nav-tabContent').width(), $(window).height() - gui.heightOffset);
+        statusText.html('');
     }, 300);
 
 };

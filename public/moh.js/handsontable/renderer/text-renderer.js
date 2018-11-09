@@ -11,6 +11,12 @@
 function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
 
+    // grid lines
+    const showGridLines = global.workbookData.sheets[instance.sheetNo].views[0].showGridLines;
+    if (!showGridLines) {
+        td.style.borderColor = '#fff0';
+    }
+
     // check if this row/col should be hidden
     if (global.workbookData.sheets[instance.sheetNo].col.width[col] === 0.1) {
         return;
@@ -89,6 +95,8 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             }
         }
     }
+
+
     // render formula
     let result = value;
     if (value && typeof value === 'object' && value.hasOwnProperty('formula')) {
