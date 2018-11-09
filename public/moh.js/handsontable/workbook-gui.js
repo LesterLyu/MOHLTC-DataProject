@@ -6,6 +6,7 @@ let global = {workbookData: {}, dataValidation: {}};
 class WorkbookGUI {
     constructor(mode, workbookName, workbookRawData, workbookRawExtra, height = $(window).height() - 360) {
         this.height = height;
+        this.heightOffset = $(window).height() - height;
         this.mode = mode; // can be 'view' or 'edit'
         this.addSheetTab = $('<a id="add-sheet-btn" class="nav-link nav-item" href="#"><i class="fas fa-plus"></i> Add Sheet</a>');
         this.workbookName = workbookName;
@@ -553,11 +554,16 @@ class WorkbookGUI {
                         }
                     }
                 }
-
-
             }
-
-
+        }
+    }
+    resize(width, height) {
+        for (let i = 0; i < this.tables.length; i++) {
+            this.tables[i].updateSettings({
+                width: width,
+                height: height,
+            });
+            this.tables[i].render();
         }
     }
 }
@@ -654,6 +660,16 @@ function evaluateFormula(sheetName, row, col) {
     return data;
 }
 
+let resize;
+window.onresize = function () {
+    if (resize) {
+        clearTimeout(resize);
+    }
+    resize = setTimeout(() => {
+        gui.resize($('#nav-tabContent').width(), $(window).height() - gui.heightOffset);
+    }, 300);
+
+};
 
 // listener for hash changes
 window.onhashchange = function () {
