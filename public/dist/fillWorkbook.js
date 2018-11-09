@@ -88,7 +88,7 @@ $(document).ready(function () {
     if (response.success) {
       //updateLoadingStatus('unzipping');
       var start = new Date();
-      var extra = unzip(response.workbook.extra);
+      var extra = response.workbook.extra === undefined ? null : unzip(response.workbook.extra);
       var data = response.workbook.data; //updateLoadingStatus('rendering');
 
       console.log('unzipping takes: ' + (new Date() - start) + 'ms');
