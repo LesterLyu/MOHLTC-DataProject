@@ -21,7 +21,7 @@ class WorkbookGUI {
         this.tabCounter = 0;
         this.gridIds = [];
         this.definedNames = {};
-        this.lastHash = '#';
+        this.navPosition = 0;
 
         this._appendAddSheetTab();
     }
@@ -182,6 +182,7 @@ class WorkbookGUI {
 
         this._preProcess();
         this.applyJsonWithStyle();
+        this._enableTabScroll();
     }
 
     // apply json to GUI tables
@@ -268,7 +269,7 @@ class WorkbookGUI {
                         });
                 }
                 else {
-                    const table = this.addTable(container, $('#nav-tab').width(), this.height, data,
+                    const table = this.addTable(container, $('#nav-tabContent').width(), this.height, data,
                         ws.row.height, ws.col.width, merges, sheetNo, ws.views, function (row, col) {
                             let cellProperties = {};
                             if (!('sheetNo' in this.instance)) {
@@ -324,6 +325,37 @@ class WorkbookGUI {
         // this callback will be called after every time the table rendered.
 
         console.log("Time consumed: ", Date.now() - timerStart + 'ms');
+    }
+
+    _enableTabScroll() {
+        const navWrapper = $('#nav-wrapper');
+        const navTab = $('#nav-tab');
+        const scrollerRight = $('.scroller-right');
+        const scrollerLeft = $('.scroller-left');
+        scrollerRight.css('display', 'flex');
+        scrollerLeft.css('display', 'flex');
+
+        const maxWidth = navTab[0].scrollWidth - navTab[0].clientWidth;
+
+        scrollerRight.click(function() {
+            gui.navPosition += navWrapper.outerWidth() * 3 / 4;
+            if (gui.navPosition > maxWidth) {
+                gui.navPosition = maxWidth
+            }
+            $('#nav-tab').animate({
+                scrollLeft: gui.navPosition
+            }, 200);
+        });
+
+        scrollerLeft.click(function() {
+            gui.navPosition -= navWrapper.outerWidth() * 3 / 4;
+            if (gui.navPosition < 0) {
+                gui.navPosition = 0
+            }
+            $('#nav-tab').animate({
+                scrollLeft: gui.navPosition
+            }, 200);
+        });
     }
 
     getData() {

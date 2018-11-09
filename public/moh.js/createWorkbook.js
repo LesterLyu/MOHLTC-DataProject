@@ -87,7 +87,7 @@ $(document).ready(function () {
                 const extra = (response.workbook.extra === undefined ? null: unzip(response.workbook.extra));
                 const data = response.workbook.data;
                 console.log('unzipping takes: ' + (new Date() - start) + 'ms');
-                gui = new WorkbookGUI('edit', workbookName, data, extra, $(window).height() - 390);
+                gui = new WorkbookGUI('edit', workbookName, data, extra, $(window).height() - 350);
                 gui.setAddSheetCallback(addSheet);
                 gui.load();
 

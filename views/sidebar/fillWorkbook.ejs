@@ -43,10 +43,16 @@
     <div class="tab-content" id="nav-tabContent">
 
     </div>
-    <nav>
+
+
+    <a class="scroller scroller-left"><i class="fa fa-chevron-left"></i></a>
+    <a class="scroller scroller-right"><i class="fa fa-chevron-right"></i></a>
+    <div id="nav-wrapper">
         <div class="nav nav-tabs" id="nav-tab">
         </div>
-    </nav>
+    </div>
+
+
 
 </div>
 
@@ -57,15 +63,14 @@
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
 
-<link rel="stylesheet"
-      href="/moh.css/custom2.css">
+<link rel="stylesheet" href="/moh.css/custom2.css">
 
 <%- include('../common/dashboardFooter', {js: [
-    '/node_modules/handsontable/dist/handsontable.full.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
-    'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.0/xlsx.full.min.js',
-    '/js/formula-parser.js',
-    '/dist/excel-web.js',
-    '/node_modules/pako/dist/pako.min.js',
-    '/dist/fillWorkbook.js',
+'/node_modules/handsontable/dist/handsontable.full.min.js',
+'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
+'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.0/xlsx.full.min.js',
+'/js/formula-parser.js',
+'/dist/excel-web.js',
+'/node_modules/pako/dist/pako.min.js',
+'/dist/fillWorkbook.js',
 ]}); -%>
