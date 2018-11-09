@@ -93,7 +93,7 @@ $(document).ready(function () {
 
       console.log('unzipping takes: ' + (new Date() - start) + 'ms');
       console.log(data);
-      gui = new WorkbookGUI('view', workbookName, data, extra, $(window).height() - 295);
+      gui = new WorkbookGUI('view', workbookName, data, extra, $(window).height() - 305);
       gui.load();
     }
   }).fail(function (xhr, status, error) {

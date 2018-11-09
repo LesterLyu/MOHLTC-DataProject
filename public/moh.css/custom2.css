@@ -74,9 +74,15 @@ a.nav-item.active.show {
 .scroller {
     cursor: pointer;
     background-color: #f3f3f3;
-    padding: .65rem .25rem;
+    padding: .60rem .25rem;
     float: left;
     display: none;
+}
+
+#scroller-wrapper {
+    float: left;
+    box-shadow: 1px 0px 4px 0px black;
+    margin-right: 3px;
 }
 
 .handsontable td, .handsontable th {
