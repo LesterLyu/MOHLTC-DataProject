@@ -10,6 +10,16 @@
  - Add theme color support. (need to parse XML)
 </details>
 
+### Dev 0.3.2
+ - Breakthrough supports:
+    - Font size
+    - Font family
+    - Underlined Font
+    - Overflowed Display
+    - Wrap text
+  - Fix:
+    - Default vertical alignment is not consistent.
+
 ### Dev 0.3.1
  - Fix bug:
     - Cannot click 'Add Sheet'.
