@@ -72,6 +72,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
                 instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
             }
 
+            // font text wrap
             if ('wrapText' in style.alignment && style.alignment.wrapText) {
                 td.style.wrapText = 'break-word';
                 td.style.whiteSpace = 'pre-wrap';
