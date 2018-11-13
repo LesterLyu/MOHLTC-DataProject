@@ -140,8 +140,12 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         else {
             result = value.result !== undefined ? value.result : null;
         }
-        Handsontable.dom.fastInnerText(td, result);
     }
+    const span = document.createElement('span');
+    span.innerText = result;
+    Handsontable.dom.fastInnerText(td, '');
+    span.style.pointerEvents = 'none';
+    td.appendChild(span);
 
     if (cellProperties.hyperlink) {
         const a = document.createElement('a');
