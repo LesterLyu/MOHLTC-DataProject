@@ -21,17 +21,29 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
 
         // check if this row/col should be hidden
         if (sheet.col.width[col] === 0.1) {
+            td.style.display = 'none';
             return;
         }
 
         if (sheet.row.height[row] === 0.1) {
-            if (td.parentNode)
+            if (td.parentNode) {
                 td.parentNode.style.display = 'none';
+            }
+            td.style.display = 'none';
             return;
         }
         else {
             td.parentNode.style.display = '';
         }
+    }
+
+    // text overflow if right cell is empty
+    const rightCell = instance.getDataAtCell(row, col + 1);
+    if (rightCell === '' || rightCell === null || rightCell === undefined ||
+        (typeof rightCell === 'object' && 'formula' in rightCell) &&
+        (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined)) {
+        td.style.overflow = 'visible';
+        td.style.textOverflow = 'clip';
     }
 
     if (('style' in cellProperties) && cellProperties.style) {
@@ -55,6 +67,15 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
                         break;
                 }
             }
+            else {
+                // default bottom
+                instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
+            }
+
+            if ('wrapText' in style.alignment && style.alignment.wrapText) {
+                td.style.wrapText = 'break-word';
+                td.style.whiteSpace = 'pre-wrap';
+            }
         }
         else {
             // default bottom
@@ -71,6 +92,15 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             }
             if (style.font.hasOwnProperty('italic') && style.font.italic) {
                 td.style.fontStyle = 'italic';
+            }
+            if ('size' in style.font) {
+                td.style.fontSize = style.font.size + 'pt';
+            }
+            if ('name' in style.font) {
+                td.style.fontFamily = style.font.name;
+            }
+            if ('underline' in style.font && style.font.underline) {
+                td.style.textDecoration = 'underline';
             }
         }
 
@@ -104,7 +134,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     let result = value;
     if (value && typeof value === 'object' && value.hasOwnProperty('formula')) {
         if (value.result && value.result.error) {
-            result =  value.result.error;
+            result = value.result.error;
         }
         else {
             result = value.result !== undefined ? value.result : null;
@@ -136,8 +166,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
 }
 
 
-
-function eventFire(el, etype){
+function eventFire(el, etype) {
     if (el.fireEvent) {
         el.fireEvent('on' + etype);
     } else {

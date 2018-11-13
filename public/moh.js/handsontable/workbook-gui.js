@@ -1,6 +1,6 @@
 // Workbook GUI functions...
 
-const SCALE = 8; // scale up the column width and row height
+const SCALE = 7; // scale up the column width and row height
 let global = {workbookData: {}, dataValidation: {}};
 
 class WorkbookGUI {
@@ -183,6 +183,7 @@ class WorkbookGUI {
 
         this._preProcess();
         this.applyJsonWithStyle();
+        this._enableHiddenRow();
         this._enableTabScroll();
     }
 
@@ -477,7 +478,7 @@ class WorkbookGUI {
                         delete data[rowNumber][colNumber];
                     }
                     else {
-                        wsData.data[rowNumber].push(null);
+                        wsData.data[rowNumber].push('');
                     }
                 }
                delete data[rowNumber];
@@ -573,6 +574,23 @@ class WorkbookGUI {
             this.tables[i].render();
         }
         this.showSheet(currSheet);
+    }
+
+    _enableHiddenRow() {
+        // enable hidden row that does not have frozen view.
+        for (let sheetNo in global.workbookRawExtra.sheets) {
+            const extra = global.workbookRawExtra.sheets[sheetNo];
+            const gridId = this.gridIds[this.sheetNamesWithoutHidden.indexOf(this.sheetNames[sheetNo])];
+            if (gridId) {
+                // row
+                const trs = document.querySelector('#' + gridId + ' .ht_clone_left .htCore tbody').children;
+                for (let row = 0; row < extra.row.hidden.length; row++) {
+                    if (trs) {
+                        trs[row].style.display = 'none';
+                    }
+                }
+            }
+        }
     }
 }
 

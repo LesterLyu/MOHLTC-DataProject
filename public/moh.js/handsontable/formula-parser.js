@@ -9,7 +9,7 @@ var parser = new formulaParser.Parser();
  * }
  */
 parser.on('callCellValue', function (cellCoord, done) {
-    //console.log('get ' + cellCoord.label);
+    console.log('get ' + cellCoord.label);
     let sheet;
     if (cellCoord.hasOwnProperty('sheet')) {
         if (!gui.sheetNames.includes(cellCoord.sheet)) {
