@@ -584,8 +584,8 @@ class WorkbookGUI {
             if (gridId) {
                 // row
                 const trs = document.querySelector('#' + gridId + ' .ht_clone_left .htCore tbody').children;
-                for (let row = 0; row < extra.row.hidden.length; row++) {
-                    if (trs) {
+                for (let row in extra.row) {
+                    if (trs && trs[row]) {
                         trs[row].style.display = 'none';
                     }
                 }
