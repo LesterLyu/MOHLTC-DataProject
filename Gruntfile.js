@@ -3,6 +3,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-compress');
+    grunt.loadNpmTasks('grunt-contrib-clean');
 
     let config = {
         pkg: grunt.file.readJSON('package.json'),
@@ -72,6 +75,55 @@ module.exports = function (grunt) {
             },
         },
 
+        copy: {
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        src: [
+                            'public/**',
+                            'config/**',
+                            'controller/**',
+                            'documents/**',
+                            'models/**',
+                            'routes/**',
+                            'app.js',
+                            'Gruntfile.js',
+                            'Gruntfile.js',
+                            'package.json',
+
+                        ],
+                        dest: 'build/zip/'
+                    },
+                    {
+                        expand: true,
+                        cwd: '../Data-Project-Config/',
+                        src: [
+                            '.ebextensions/**',
+                            'config/**'
+                        ],
+                        dest: 'build/zip/'
+                    }
+                ]
+            }
+        },
+
+        compress: {
+            main: {
+                options: {
+                    archive: 'release-beta.zip'
+                },
+                expand: true,
+                cwd: 'build/zip',
+                src: ['**/*', '.*'],
+                dest: '',
+            }
+        },
+
+        clean: ['build', 'public/dist', 'release-beta.zip'],
+
+
+
     };
 
     grunt.registerTask("configureBabel", "configures babel options", function() {
@@ -80,6 +132,14 @@ module.exports = function (grunt) {
 
     grunt.initConfig(config);
 
-    grunt.registerTask("default", ["concat", "configureBabel", "babel"]);
+    // mkdir for zip archive
+    grunt.registerTask("mkdir", function () {
+        grunt.file.mkdir('build/zip/temp');
+        grunt.file.mkdir('build/zip/uploads');
+    });
+
+    grunt.registerTask("default", ["clean", "concat", "configureBabel", "babel"]);
+    grunt.registerTask("prod", ["clean", "concat", "configureBabel", "babel", "copy", "mkdir", "compress"]);
+
 
 };
