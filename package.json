@@ -64,7 +64,8 @@
     "prestart": "./node_modules/.bin/grunt",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "./node_modules/.bin/grunt",
-    "watch": "./node_modules/.bin/grunt watch"
+    "watch": "./node_modules/.bin/grunt watch",
+    "prod": "./node_modules/.bin/grunt prod"
   },
   "repository": {
     "type": "git",
