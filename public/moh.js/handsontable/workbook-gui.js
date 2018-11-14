@@ -694,7 +694,7 @@ window.onresize = function () {
     const statusText = $('#status');
     statusText.html('<i class="fas fa-spinner fa-spin"></i> Rendering...');
     resize = setTimeout(() => {
-        gui.resize($('#nav-tabContent').width(), $(window).height() - gui.heightOffset);
+        // gui.resize($('#nav-tabContent').width(), $(window).height() - gui.heightOffset);
         statusText.html('');
     }, 300);
 
