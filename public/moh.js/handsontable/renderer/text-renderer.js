@@ -85,7 +85,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
 
         // font
         if ('font' in style) {
-            setFont(td, style.font);
+            setFontStyle(td, style.font);
         }
 
         // background
@@ -133,10 +133,14 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             const span = document.createElement('span');
             span.innerText = rt.text;
             if ('font' in rt) {
-                setFont(span, rt.font);
+                setFontStyle(span, rt.font);
+            }
+            else if ('font' in style) {
+                setFontStyle(span, style.font);
             }
             mainSpan.appendChild(span);
         }
+        removeFontStyle(td);
         result = mainSpan.innerHTML;
     }
 
@@ -182,7 +186,7 @@ function eventFire(el, etype) {
     }
 }
 
-function setFont(element, font) {
+function setFontStyle(element, font) {
     if ('color' in font && 'argb' in font.color) {
         element.style.color = '#' + argbToRgb(font.color.argb);
     }
@@ -201,4 +205,13 @@ function setFont(element, font) {
     if ('underline' in font && font.underline) {
         element.style.textDecoration = 'underline';
     }
+}
+
+function removeFontStyle(element) {
+    element.style.color = '';
+    element.style.fontWeight = '';
+    element.style.fontStyle = '';
+    element.style.fontSize = '';
+    element.style.fontFamily = '';
+    element.style.textDecoration = '';
 }
