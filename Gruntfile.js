@@ -87,6 +87,7 @@ module.exports = function (grunt) {
                             'documents/**',
                             'models/**',
                             'routes/**',
+                            'views/**',
                             'app.js',
                             'Gruntfile.js',
                             'Gruntfile.js',
