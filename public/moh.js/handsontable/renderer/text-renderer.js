@@ -84,25 +84,8 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         }
 
         // font
-        if (style.hasOwnProperty('font')) {
-            if (style.font.hasOwnProperty('color') && style.font.color.hasOwnProperty('argb')) {
-                td.style.color = '#' + argbToRgb(style.font.color.argb);
-            }
-            if (style.font.hasOwnProperty('bold') && style.font.bold) {
-                td.style.fontWeight = 'bold';
-            }
-            if (style.font.hasOwnProperty('italic') && style.font.italic) {
-                td.style.fontStyle = 'italic';
-            }
-            if ('size' in style.font) {
-                td.style.fontSize = style.font.size + 'pt';
-            }
-            if ('name' in style.font) {
-                td.style.fontFamily = style.font.name;
-            }
-            if ('underline' in style.font && style.font.underline) {
-                td.style.textDecoration = 'underline';
-            }
+        if ('font' in style) {
+            setFont(td, style.font);
         }
 
         // background
@@ -141,12 +124,32 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             result = value.result !== undefined ? value.result : null;
         }
     }
+
+    // rich text
+    if (value && Array.isArray(value.richText)) {
+        const mainSpan = document.createElement('span');
+        for (let i = 0; i < value.richText.length; i++) {
+            const rt = value.richText[i];
+            const span = document.createElement('span');
+            span.innerText = rt.text;
+            if ('font' in rt) {
+                setFont(span, rt.font);
+            }
+            mainSpan.appendChild(span);
+        }
+        result = mainSpan.innerHTML;
+    }
+
+
+    // wrap the value, this fix the clicking issue for overflowed text
     const span = document.createElement('span');
-    span.innerText = result;
+    span.innerHTML = result;
     Handsontable.dom.fastInnerText(td, '');
     span.style.pointerEvents = 'none';
     td.appendChild(span);
 
+
+    // hyperlink
     if (cellProperties.hyperlink) {
         const a = document.createElement('a');
         if (cellProperties.hyperlink.mode === 'internal') {
@@ -162,12 +165,10 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             a.href = cellProperties.hyperlink.target;
         }
 
-        a.innerText = result;
+        a.innerHTML = result;
         Handsontable.dom.fastInnerText(td, '');
         td.appendChild(a);
     }
-
-
 }
 
 
@@ -178,5 +179,26 @@ function eventFire(el, etype) {
         var evObj = document.createEvent('Events');
         evObj.initEvent(etype, true, false);
         el.dispatchEvent(evObj);
+    }
+}
+
+function setFont(element, font) {
+    if ('color' in font && 'argb' in font.color) {
+        element.style.color = '#' + argbToRgb(font.color.argb);
+    }
+    if ('bold' in font && font.bold) {
+        element.style.fontWeight = 'bold';
+    }
+    if ('italic' in font && font.italic) {
+        element.style.fontStyle = 'italic';
+    }
+    if ('size' in font) {
+        element.style.fontSize = font.size + 'pt';
+    }
+    if ('name' in font) {
+        element.style.fontFamily = font.name;
+    }
+    if ('underline' in font && font.underline) {
+        element.style.textDecoration = 'underline';
     }
 }
