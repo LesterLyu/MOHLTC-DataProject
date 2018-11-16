@@ -12,7 +12,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
 
     const sheet = global.workbookData.sheets[instance.sheetNo];
-    if (sheet) {
+    if (sheet && sheet.views) {
         // grid lines
         const showGridLines = sheet.views[0].showGridLines;
         if (!showGridLines) {

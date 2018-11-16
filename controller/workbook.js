@@ -317,7 +317,6 @@ module.exports = {
                 });
 
 
-
         });
     },
 
@@ -405,7 +404,7 @@ module.exports = {
                 return res.status(400).json({success: false, message: 'Workbook does not exist.'});
             }
             // found workbook
-            const fileName = workbook.fileName;
+            const fileName = workbook.fileName ? workbook.fileName : workbookName + '_new.xlsx';
 
             excel.exportExcel(fileName, workbook.data, username)
                 .then(() => {
@@ -428,7 +427,8 @@ module.exports = {
                 if (!workbook) {
                     return res.status(400).json({success: false, message: 'Workbook does not exist.'});
                 }
-                const fileName = workbook.fileName;
+                const fileName = workbook.fileName ? workbook.fileName : workbookName + '_new.xlsx';
+
                 let workbookData;
                 FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber, username: username},
                     (err, filledWorkbook) => {

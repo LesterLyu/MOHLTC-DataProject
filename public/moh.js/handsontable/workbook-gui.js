@@ -366,9 +366,10 @@ class WorkbookGUI {
         for (let sheetNo in global.workbookData.sheets) {
             if (global.workbookData.sheets.hasOwnProperty(sheetNo)) {
                 const wsData = global.workbookData.sheets[sheetNo].data;
+
                 data[sheetNo] = {
                     name: this.sheetNames[cnt],
-                    dimension: [wsData.length, wsData[0].length]
+                    dimension: [wsData.length, wsData[0] ? wsData[0].length: 0]
                 };
                 for (let rowNumber = 0; rowNumber < wsData.length; rowNumber++) {
                     data[sheetNo][rowNumber] = {};
@@ -577,16 +578,18 @@ class WorkbookGUI {
     }
 
     _enableHiddenRow() {
-        // enable hidden row that does not have frozen view.
-        for (let sheetNo in global.workbookRawExtra.sheets) {
-            const extra = global.workbookRawExtra.sheets[sheetNo];
-            const gridId = this.gridIds[this.sheetNamesWithoutHidden.indexOf(this.sheetNames[sheetNo])];
-            if (gridId) {
-                // row
-                const trs = document.querySelector('#' + gridId + ' .ht_clone_left .htCore tbody').children;
-                for (let row in extra.row) {
-                    if (trs && trs[row]) {
-                        trs[row].style.display = 'none';
+        if (global.workbookRawExtra) {
+            // enable hidden row that does not have frozen view.
+            for (let sheetNo in global.workbookRawExtra.sheets) {
+                const extra = global.workbookRawExtra.sheets[sheetNo];
+                const gridId = this.gridIds[this.sheetNamesWithoutHidden.indexOf(this.sheetNames[sheetNo])];
+                if (gridId) {
+                    // row
+                    const trs = document.querySelector('#' + gridId + ' .ht_clone_left .htCore tbody').children;
+                    for (let row in extra.row) {
+                        if (trs && trs[row]) {
+                            trs[row].style.display = 'none';
+                        }
                     }
                 }
             }

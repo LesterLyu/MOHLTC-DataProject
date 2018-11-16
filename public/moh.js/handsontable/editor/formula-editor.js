@@ -29,6 +29,12 @@ FormulaEditor.prototype.prepare = function (row, col, prop, td, originalValue, c
         this.type = 'text';
         TextEditor.prototype.prepare.apply(this, [row, col, prop, td, originalValue, cellProperties]);
     }
+    else if (originalValue !== null && (typeof originalValue === 'object' && 'richText' in originalValue)) {
+        this.type = 'richtext';
+        const val = originalValue.richText.map(({ text }) => text).join('');
+        TextEditor.prototype.prepare.apply(this, [row, col, prop, td, val, cellProperties]);
+    }
+
     else {
         TextEditor.prototype.prepare.apply(this, [row, col, prop, td, originalValue, cellProperties]);
     }
@@ -37,6 +43,7 @@ FormulaEditor.prototype.prepare = function (row, col, prop, td, originalValue, c
 
 FormulaEditor.prototype.getValue = function () {
     return this.TEXTAREA.value;
+
 };
 
 
@@ -47,10 +54,15 @@ FormulaEditor.prototype.setValue = function (newValue) {
     else if (this.type === 'text') {
         this.TEXTAREA.value = newValue;
     }
+    else if(this.type === 'richtext') {
+        this.TEXTAREA.value = newValue;
+    }
 };
 
 
 FormulaEditor.prototype.saveValue = function (value, ctrlDown) {
+    if (this.type === 'richtext')
+        return;
     // check if it is formula now
     if (value[0][0] !== undefined && value[0][0].length > 0 && value[0][0].charAt(0) === '=') {
         this.type = 'formula';
