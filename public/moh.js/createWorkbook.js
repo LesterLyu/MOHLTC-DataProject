@@ -87,7 +87,7 @@ $(document).ready(function () {
                 const extra = (response.workbook.extra === undefined ? null: unzip(response.workbook.extra));
                 const data = response.workbook.data;
                 console.log('unzipping takes: ' + (new Date() - start) + 'ms');
-                gui = new WorkbookGUI('edit', workbookName, data, extra, $(window).height() - 350);
+                gui = new WorkbookGUI('edit', workbookName, data, extra, $(window).height() - 265);
                 gui.load();
                 gui.setAddSheetCallback(addSheet);
 
@@ -103,7 +103,7 @@ $(document).ready(function () {
     else {
         console.log('add mode');
         $('#import-workbook-btn').prop('disabled', true);
-        gui = new WorkbookGUI('edit', workbookName, {}, $(window).height() - 350);
+        gui = new WorkbookGUI('edit', workbookName, {}, $(window).height() - 265);
         gui.setAddSheetCallback(addSheet);
 
     }

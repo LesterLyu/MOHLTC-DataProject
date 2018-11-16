@@ -73,7 +73,7 @@ function workbookToJson(workbook) {
 
 $(document).ready(function () {
     //updateLoadingStatus('downloading');
-    const workbookName = $('#filled-workbook').val();
+    const workbookName = $('#workbookNameInput').val();
     // default url is for fill the workbook first time
     var url = '/api/filled-workbook/' + encodeURIComponent(workbookName);
     $.ajax({
@@ -89,7 +89,7 @@ $(document).ready(function () {
             //updateLoadingStatus('rendering');
             console.log('unzipping takes: ' + (new Date() - start) + 'ms');
             console.log(data);
-            gui = new WorkbookGUI('view', workbookName, data, extra, $(window).height() - 305);
+            gui = new WorkbookGUI('view', workbookName, data, extra, $(window).height() - 265);
             gui.load();
         }
     }).fail(function (xhr, status, error) {
@@ -111,7 +111,7 @@ $('#save-workbook-btn').on('click', function () {
         url: '/api/filled-workbook',
         type: 'POST',
         contentType: 'application/json',
-        data: JSON.stringify({data: data, name: $('#filled-workbook').val()}),
+        data: JSON.stringify({data: data, name: $('#workbookNameInput').val()}),
     }).done(function (response) {
         if (response.success) {
             console.log(response);
@@ -127,7 +127,7 @@ $('#save-workbook-btn').on('click', function () {
 });
 
 $('#export-workbook-btn').on('click', function () {
-    window.open('/api/workbook/' + encodeURIComponent($('#filled-workbook').val()) + '/download');
+    window.open('/api/workbook/' + encodeURIComponent($('#workbookNameInput').val()) + '/download');
 });
 
 $('#import-workbook-btn').on('click', function () {
@@ -141,7 +141,7 @@ $('#file-import').change(function (e) {
     formData.append('excel', f);
 
     $.ajax({
-        url: '/api/upload/workbook/' + encodeURIComponent($('#filled-workbook').val()) + '/' + encodeURIComponent(f.name),
+        url: '/api/upload/workbook/' + encodeURIComponent($('#workbookNameInput').val()) + '/' + encodeURIComponent(f.name),
         type: 'POST',
         data: formData,
         cache: false,

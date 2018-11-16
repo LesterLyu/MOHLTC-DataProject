@@ -78,20 +78,28 @@ FormulaEditor.prototype.saveValue = function (value, ctrlDown) {
         //return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
     }
     else if (this.type === 'formula') {
-        this.rawValue.formula = value[0][0].slice(1);
-        // fix '=+' bug
-        if (this.rawValue.formula.charAt(0) === '+')
-            this.rawValue.formula = this.rawValue.formula.substring(1);
-        // re-evaluate the result
-        console.log(value[0][0]);
-        var calculated = parser.parse(this.rawValue.formula);
-        if (calculated.error) {
-            this.rawValue.result = calculated;
-        }
-        else {
-            this.rawValue.result = calculated.result;
-        }
-        console.log(this.rawValue)
-        this.instance.setDataAtCell(this.row, this.col, this.rawValue);
+        const res = parseNewFormula(value[0][0]);
+        console.log(res);
+        this.instance.setDataAtCell(this.row, this.col, res);
     }
 };
+
+function parseNewFormula(newValue) {
+    const value = {
+        formula: newValue.slice(1),
+        result: ''
+    };
+    // fix '=+' bug
+    let calculated;
+    if (value.formula.charAt(0) === '+')
+        calculated = parser.parse(value.formula.slice(1));
+    else
+        calculated = parser.parse(value.formula);
+    if (calculated.error) {
+        value.result = calculated;
+    }
+    else {
+        value.result = calculated.result;
+    }
+    return value;
+}

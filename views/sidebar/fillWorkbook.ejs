@@ -4,57 +4,13 @@
     <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="/workbooks">Workbooks</a>
+            <a href="/workbooks">Fill Workbooks</a>
         </li>
-        <li class="breadcrumb-item active">Fill Workbook</li>
+        <li class="breadcrumb-item active"><%=workbook%></li>
     </ol>
 
     <!--Transfer data from EJS to front-end-->
-    <input class="hide" id="filled-workbook" value="<%= workbook %>">
-
-    <h2>
-        <%= workbook %>
-    </h2>
-    <div class="container row align-items-center" id="save-row">
-        <div class="col-auto p-1">
-            <div class="input-group">
-                <button id="import-workbook-btn" class="btn btn-primary">Import</button>
-                <form id="upload-form" enctype="multipart/form-data">
-                    <input name="excel" id="file-import" type="file" class="hide">
-                </form>
-            </div>
-        </div>
-        <div class="col-auto p-1">
-            <button type="button" id="export-workbook-btn" class="btn-save btn btn-primary">Export</button>
-        </div>
-        <div class="col-auto p-1">
-            <button type="button" id="save-workbook-btn" class="btn-save btn btn-primary">Save Workbook</button>
-        </div>
-        <div class="col-auto">
-            <div id="status"></div>
-        </div>
-    </div>
-    <br>
-
-    <div id="loading">
-        <br>
-        <h4><i class="fas fa-spinner fa-spin"></i> <i id="loadingText"> Loading...</i></h4>
-    </div>
-    <div class="tab-content" id="nav-tabContent">
-
-    </div>
-
-
-    <div id="scroller-wrapper">
-        <a class="scroller scroller-left"><i class="fa fa-caret-left"></i></a>
-        <a class="scroller scroller-right"><i class="fa fa-caret-right"></i></a>
-    </div>
-    <div id="nav-wrapper">
-        <div class="nav nav-tabs" id="nav-tab">
-        </div>
-    </div>
-
-
+    <%- include('../excel-web/excel-web'); -%>
 
 </div>
 

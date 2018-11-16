@@ -8,55 +8,22 @@
     <!-- Breadcrumbs-->
     <ol class="breadcrumb">
         <li class="breadcrumb-item">
-            <a href="/manage-workbook-templates">Workbook Templates</a>
+            <a href="/manage-workbook-templates">Fill Workbooks</a>
         </li>
-        <li id="currentPageName" class="breadcrumb-item active"><%=title%></li>
+        <li class="breadcrumb-item active"><%=workbook%></li>
     </ol>
 
-    <form id="create-workbook-form">
-        <div class="form-group col-sm-10 col-md-6 col-lg-4 px-0">
-            <label for="workbookNameInput">Workbook Name:</label>
-            <input type="text" class="form-control" id="workbookNameInput" name="workbookName" placeholder="" value="<%=workbook%>">
-            <small class="form-text text-muted">A workbook may contain multiple sheets.</small>
-        </div>
+    <!--<form id="create-workbook-form">-->
+        <!--<div class="form-group col-sm-10 col-md-6 col-lg-4 px-0">-->
+            <!--<label for="workbookNameInput">Workbook Name:</label>-->
+            <!--<input type="text" class="form-control" id="workbookNameInput" name="workbookName" placeholder="" value="<%=workbook%>">-->
+            <!--<small class="form-text text-muted">A workbook may contain multiple sheets.</small>-->
+        <!--</div>-->
 
-    </form>
+    <!--</form>-->
 
-    <div class="tab-content" id="nav-tabContent">
-        <div id="loading" class="<%=(mode === 'edit' ? '' : 'hide')%>">
-            <br>
-            <h4><i class="fas fa-spinner fa-spin"></i> <i id="loadingText"> Loading...</i></h4>
-        </div>
-    </div>
+    <%- include('../excel-web/excel-web'); -%>
 
-    <a class="scroller scroller-left"><i class="fa fa-caret-left"></i></a>
-    <a class="scroller scroller-right"><i class="fa fa-caret-right"></i></a>
-    <div id="nav-wrapper">
-        <div class="nav nav-tabs" id="nav-tab">
-        </div>
-    </div>
-
-    <div class="container row align-items-center" id="save-row">
-
-        <div class="col-auto p-1">
-            <button type="button" id="export-workbook-btn" class="btn-save btn btn-primary">Export Workbook</button>
-        </div>
-        <div class="col-auto p-1">
-            <div class="input-group">
-                <button id="import-workbook-btn" class="btn btn-primary">Import Styled Workbook</button>
-
-                <form id="upload-form" enctype="multipart/form-data">
-                    <input name="excel" id="file-import" type="file" class="hide">
-                </form>
-            </div>
-        </div>
-        <div class="col-auto p-1">
-            <button type="button" id="save-workbook-btn" class="btn-save btn btn-primary">Save Workbook</button>
-        </div>
-        <div class="col-auto">
-            <div id="status"> </div>
-        </div>
-    </div>
 
     <!--<hr>-->
     <!--<div class="container-fluid d-none d-md-block">-->

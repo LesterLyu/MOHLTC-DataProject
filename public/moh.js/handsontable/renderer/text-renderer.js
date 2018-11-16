@@ -115,15 +115,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
 
 
     // render formula
-    let result = value;
-    if (value && typeof value === 'object' && value.hasOwnProperty('formula')) {
-        if (value.result && value.result.error) {
-            result = value.result.error;
-        }
-        else {
-            result = value.result !== undefined ? value.result : null;
-        }
-    }
+    let result = calcResult(value);
 
     // rich text
     if (value && Array.isArray(value.richText)) {
@@ -214,4 +206,17 @@ function removeFontStyle(element) {
     element.style.fontSize = '';
     element.style.fontFamily = '';
     element.style.textDecoration = '';
+}
+
+function calcResult(cellValue) {
+    let result = cellValue;
+    if (cellValue && typeof cellValue === 'object' && cellValue.hasOwnProperty('formula')) {
+        if (cellValue.result && cellValue.result.error) {
+            result = cellValue.result.error;
+        }
+        else {
+            result = cellValue.result !== undefined ? cellValue.result : null;
+        }
+    }
+    return result;
 }

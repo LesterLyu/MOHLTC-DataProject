@@ -23,6 +23,7 @@ class WorkbookGUI {
         this.gridIds = [];
         this.definedNames = {};
         this.navPosition = 0;
+        this.selectedCell = [-1, -1];
 
         this._appendAddSheetTab();
     }
@@ -88,6 +89,20 @@ class WorkbookGUI {
         let createdTable = new Handsontable(container, spec);
         createdTable.sheetNo = sheetNo;
         that.tables.push(createdTable);
+
+        Handsontable.hooks.add('afterSelection', (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
+            gui.selectedCell[0] = row;
+            gui.selectedCell[1] = column;
+            const cellValue = global.workbookData.sheets[sheetNo].data[row][column];
+            let res = cellValue;
+            if (cellValue && typeof cellValue === 'object' && 'formula' in cellValue) {
+                res = '=' + cellValue.formula;
+            }
+            else if (cellValue && typeof cellValue === 'object' && 'richText' in cellValue) {
+                res = cellValue.richText.map(({text}) => text).join('');
+            }
+            gui.setFormula(res);
+        }, createdTable);
 
         return createdTable;
     }
@@ -185,6 +200,9 @@ class WorkbookGUI {
         this.applyJsonWithStyle();
         this._enableHiddenRow();
         this._enableTabScroll();
+        this._hookRedoUndoButtons();
+        this._hookFormulaButtons();
+        this._hookSelectZoom();
     }
 
     // apply json to GUI tables
@@ -369,7 +387,7 @@ class WorkbookGUI {
 
                 data[sheetNo] = {
                     name: this.sheetNames[cnt],
-                    dimension: [wsData.length, wsData[0] ? wsData[0].length: 0]
+                    dimension: [wsData.length, wsData[0] ? wsData[0].length : 0]
                 };
                 for (let rowNumber = 0; rowNumber < wsData.length; rowNumber++) {
                     data[sheetNo][rowNumber] = {};
@@ -417,12 +435,20 @@ class WorkbookGUI {
         return global.workbookData.sheets[this.sheetNames.indexOf(name)];
     }
 
+    getCurentSheet() {
+        return global.workbookData.sheets[this.sheetNames.indexOf(this.currSheet)];
+    }
+
     getDataAtSheetAndCell(sheet, row, col) {
         return global.workbookData.sheets[this.sheetNames.indexOf(sheet)].data[row][col];
     }
 
     getTable(name) {
         return this.tables[this.sheetNamesWithoutHidden.indexOf(name)];
+    }
+
+    getCurrentTable() {
+        return this.tables[this.sheetNamesWithoutHidden.indexOf(this.currSheet)];
     }
 
     getDefinedName(definedName) {
@@ -476,13 +502,13 @@ class WorkbookGUI {
                 for (let colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
                     if (data && data[rowNumber] && data[rowNumber][colNumber]) {
                         wsData.data[rowNumber].push(data[rowNumber][colNumber]);
-                        delete data[rowNumber][colNumber];
+                        // delete data[rowNumber][colNumber];
                     }
                     else {
                         wsData.data[rowNumber].push('');
                     }
                 }
-               delete data[rowNumber];
+                // delete data[rowNumber];
             }
 
             // if has extra
@@ -594,6 +620,58 @@ class WorkbookGUI {
                 }
             }
         }
+    }
+
+    _hookRedoUndoButtons() {
+        $('#redo-btn').on('click', (e) => {
+            this.getCurrentTable().redo();
+        });
+        $('#undo-btn').on('click', (e) => {
+            this.getCurrentTable().undo();
+        });
+    }
+
+    setFormula(val) {
+        $('#formula-input').val(val);
+    }
+
+    _hookFormulaButtons() {
+        $('#save-formula-btn').on('click', (e) => {
+            if (gui.selectedCell[0] === -1) {
+                return;
+            }
+            const newValue = $('#formula-input').val();
+            const cellValue = gui.getCurentSheet().data[gui.selectedCell[0]][gui.selectedCell[1]];
+            // formula
+            if (newValue.charAt(0) === '=') {
+                gui.getCurrentTable().setDataAtCell(gui.selectedCell[0], gui.selectedCell[1], parseNewFormula(newValue));
+            }
+            else if (typeof cellValue === 'object' && 'richText' in cellValue) {
+                // do nothing, we can't modify richText for now
+            }
+            else {
+                gui.getCurrentTable().setDataAtCell(gui.selectedCell[0], gui.selectedCell[1], newValue);
+            }
+        });
+        $('#reset-formula-btn').on('click', (e) => {
+            $('#formula-input').val('');
+        });
+        $('#formula-input').on('keypress', (e) => {
+            const key = e.which;
+            if (key === 13) {
+                $('#save-formula-btn').click();
+            }
+        });
+    }
+    _hookSelectZoom() {
+        $('#select-zoom').on('change', (e) => {
+            const perc = e.currentTarget.value;
+            $('#nav-tabContent').css('zoom', perc);
+            const number = parseInt(perc.slice(0, perc.indexOf('%'))) / 100;
+            console.log(number);
+            this.height = ($(window).height() - this.heightOffset) / number;
+            this.load()
+        });
     }
 }
 
