@@ -50,23 +50,23 @@ i.e. http://localhost:3000/123/
 
   3. What will be the Express route for updating a specific user given an 'id'
 
-     A. app.get('/users', (req, res) => { ... })
+     A. ```app.get('/users', (req, res) => { ... })```
 
-     B. app.get('/users/id', (req, res) => { ... })
+     B. ```app.get('/users/id', (req, res) => { ... })```
 
-     C. app.put('/users/:id', (req, res) => { ... })
+     C. ```app.put('/users/:id', (req, res) => { ... })```
 
-     D. app.get('/users/:id', (req, res) => { ... })
+     D. ```app.get('/users/:id', (req, res) => { ... })```
 
   4. What will be the best possible RESTful endpoint for adding a NEW comment for a specific user given his 'id'
 
-     A. app.get('/users/comments', handler)
+     A. ```app.get('/users/comments', handler)```
 
-     B. app.put('/users/comments', handler)
+     B. ```app.put('/users/comments', handler)```
 
-     C. app.post('/users/:id/comments', handler)
+     C. ```app.post('/users/:id/comments', handler)```
 
-     D. app.post('/users/:id/comments/:comment_id', handler)
+     D. ```app.post('/users/:id/comments/:comment_id', handler)```
 
   5. What is the response header used to send cookies from server to user agent?
 
@@ -81,7 +81,7 @@ i.e. http://localhost:3000/123/
 
       NOTE: Let us assume we use res.redirect('route_path') to redirect to the specified 'route_path', res.render('somepage.html') to render the specified html page, and res.cookies object contains the cookies
 
-      ```
+      ```javascript
       app.get('/dashboard', (req, res) => {
 
           // checking if user's cookie is set
