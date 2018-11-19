@@ -6,12 +6,12 @@ module.exports = {
         port: 465,
         secure: true,
         auth: {
-            user: "w767089351@gmail.com",
-            pass: "wkw1234567"
+            user: "lyulester@gmail.com",
+            pass: "password"
         },
-sender: '"Will Wang" <w767089351@gmail.com>'
+sender: '"Lester Lyu" <lyulester@gmail.com>'
 },
-serverHostname: "localhost:3000", //used for receive validation link
+serverHostname: "http://localhost:3000", //used for receive validation link
     permissions: {
     //FILL_WORKBOOK: 'fill-workbook', // not implemented, fow now, everyone can fill workbooks
     WORKBOOK_TEMPLATE_MANAGEMENT: 'CRUD-workbook-template',
@@ -19,5 +19,5 @@ serverHostname: "localhost:3000", //used for receive validation link
         USER_MANAGEMENT: 'user-management',
         SYSTEM_MANAGEMENT: 'system-management'
 },
-disableEmailValidation: true,
+disableEmailValidation: false,
 };
