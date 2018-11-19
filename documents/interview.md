@@ -1,4 +1,19 @@
-### Node.js
+### MongoDB
+ - MongoDB uses BSON to represent document structures. True or False?
+<br><br><br><br>
+ - Compare SQL databases and MongoDB at a high level.
+<br><br><br><br>
+ - Explain some important features of MongoDB.
+<br><br><br><br>
+### Node.js Related
+  - What is Node js? <br><br><br><br>
+
+  - Explain CLI?<br><br><br><br>
+
+  - Explain ECMAScript?<br><br><br><br>
+
+
+### Node.js Coding
 
   1. How to get query parameters 'id' in Express.js?
 i.e. http://localhost:3000/?id=123
