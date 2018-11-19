@@ -34,4 +34,9 @@
 
     ECMAScript is the standard on which Javascript is based on.
 
-  -
+
+### Coding:
+  1-5: BACCB
+
+  6: A
+
