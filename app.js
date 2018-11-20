@@ -42,6 +42,8 @@ const systemManagementRouter = require('./routes/systemManagement');
 
 const User = require('./models/user');
 
+const setup = require('./controller/setup');
+
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
@@ -87,7 +89,7 @@ app.use(fileUpload({
     limits: { fileSize: 50 * 1024 * 1024 },
 }));
 
-
+setup.setup();
 
 // home page
 app.use('/', indexRouter);

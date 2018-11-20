@@ -10,7 +10,7 @@ let userSchema = new mongoose.Schema({
     phoneNumber: String,
     organization: String,
     validated: Boolean,
-    type: {type: Number, required: true}, // system admin=0, form manager=1, user=2
+    // type: {type: Number, required: true}, // system admin=0, form manager=1, user=2
     email: {type: String, unique: true},
     groupNumber: Number,
     active: {type: Boolean, default: true}, // you can disable a user

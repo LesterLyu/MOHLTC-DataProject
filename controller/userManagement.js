@@ -35,8 +35,7 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-        const permission = req.body.data.permission;
-        const actives = req.body.data.actives;
+        const permission = req.body.permissions;
         let fails = [],
             promiseArr = [],
             activesArr = [];
@@ -56,7 +55,8 @@ module.exports = {
 
             // add to promise chain
             promiseArr.push(new Promise((resolve, reject) => {
-                User.findOneAndUpdate({username: username}, {permissions: filteredPermissions})
+                User.findOneAndUpdate({username: username}, {permissions: filteredPermissions,
+                    active: permission[i].active})
                     .then(result => resolve())
                     .catch(err => {
                         console.log(err);
@@ -64,19 +64,7 @@ module.exports = {
                     })
             }));
         }
-        for (var i = 0; i< actives.length; i++) {
-            const username = actives[i].username;
-            const active = actives[i].active;
-            activesArr.push(new Promise((resolve, reject) => {
-                User.findOneAndUpdate({username: username}, {active: active})
-                    .then(result => resolve())
-                    .catch(err => {
-                        console.log(err);
-                        fails.push(username);
-                    })
-            }));
 
-        }
         Promise.all(promiseArr).then(() => {
             if (fails.length !== 0) {
                 return res.json({
@@ -164,12 +152,6 @@ module.exports = {
                     });
                 });
             });
-
-
-
-
-
-
         }
     },
 
@@ -179,9 +161,12 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-
         const groupNumber = req.session.user.groupNumber;
-        User.find({groupNumber: groupNumber}, (err, users) => {
+        let query = {groupNumber: groupNumber};
+        if (parseInt(groupNumber) === 0) {
+            query = {}
+        }
+        User.find(query, (err, users) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});

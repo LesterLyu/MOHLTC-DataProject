@@ -1,5 +1,6 @@
 const express = require('express');
 const user_controller = require('../controller/user');
+const registration_local_controller = require('../controller/registration/local');
 let router = express.Router();
 
 router.get('/login', function (req, res) {
@@ -15,8 +16,11 @@ router.get('/signup', function (req, res) {
 
 router.get('/api/organization_details', user_controller.getOrganizationDetails);
 
-// POST request for user sign up
+// POST request for user sign up from ldap server
 router.post('/api/signup', user_controller.user_sign_up);
+
+// POST request for user sign up locally
+router.post('/api/signup/local', registration_local_controller.user_sign_up_local);
 
 router.get('/register-success-submit', function (req, res) {
     res.render('registerSuccessSubmit.ejs');

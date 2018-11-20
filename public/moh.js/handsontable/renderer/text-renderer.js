@@ -46,11 +46,14 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         td.style.textOverflow = 'clip';
     }
 
+    // default alignment
+    var cellMeta = instance.getCellMeta(row, col);
+    var previousClass = (cellMeta.className !== undefined) ? cellMeta.className : '';
+    instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
+
     if (('style' in cellProperties) && cellProperties.style) {
         var style = cellProperties.style;
         // alignment
-        var cellMeta = instance.getCellMeta(row, col);
-        var previousClass = (cellMeta.className !== undefined) ? cellMeta.className : '';
 
         if (style.hasOwnProperty('alignment')) {
             if (style.alignment.hasOwnProperty('horizontal')) {
@@ -67,20 +70,12 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
                         break;
                 }
             }
-            else {
-                // default bottom
-                instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
-            }
 
             // font text wrap
             if ('wrapText' in style.alignment && style.alignment.wrapText) {
                 td.style.wrapText = 'break-word';
                 td.style.whiteSpace = 'pre-wrap';
             }
-        }
-        else {
-            // default bottom
-            instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
         }
 
         // font

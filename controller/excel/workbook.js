@@ -129,7 +129,10 @@ class Workbook {
             .then(() => {
                 self.workbook.eachSheet(function (worksheet, sheetId) {
                     const orderNo = worksheet.orderNo;
-                    self.storedData[orderNo] = {};
+                    self.storedData[orderNo] = {
+                        name: worksheet.name,
+                        dimension: [worksheet.rowCount, worksheet.columnCount]
+                    };
                     self.attMap[orderNo] = {};
                     self.catMap[orderNo] = {};
                     // Note: index start with 1
@@ -144,7 +147,16 @@ class Workbook {
                             if (colNumber === 1 && (!ENABLE_CHECK || self._isCategory(cell.value)) && typeof cell.value !== "object") {
                                 self.catMap[orderNo][cell.value] = rowNumber - 1;
                             }
-                            self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
+                            // transfer sharedFormula to formula
+                            if (cell.formulaType === Excel.FormulaType.Shared) {
+                                self.storedData[orderNo][rowNumber - 1][colNumber - 1] = {
+                                    formula: cell.formula,
+                                    result: cell.value.result
+                                };
+                            }
+                            else {
+                                self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
+                            }
                         });
 
                         console.log('finish row ' + rowNumber)
@@ -239,7 +251,7 @@ class Workbook {
                             if (cell.style) {
                                 wsData.style[rowNumber - 1][colNumber - 1] = xlsx.translateIndexedColor(cell.style)
                             }
-                            if (cell.value) {
+                            if ('value' in cell) {
                                 // transfer sharedFormula to formula
                                 if (cell.formulaType === Excel.FormulaType.Shared) {
                                     self.storedData[orderNo][rowNumber - 1][colNumber - 1] = {

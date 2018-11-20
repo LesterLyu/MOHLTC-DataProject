@@ -3,6 +3,8 @@
 const SCALE = 7; // scale up the column width and row height
 let global = {workbookData: {}, dataValidation: {}};
 
+const $$ = (x) => document.querySelector(x);
+
 class WorkbookGUI {
     constructor(mode, workbookName, workbookRawData, workbookRawExtra, height = $(window).height() - 360) {
         this.height = height;
@@ -178,7 +180,10 @@ class WorkbookGUI {
 
     updateJson(workbookRawData, workbookRawExtra) {
         global.workbookRawData = workbookRawData;
-        global.workbookRawExtra = workbookRawExtra;
+        if (workbookRawExtra) {
+            global.workbookRawExtra = workbookRawExtra;
+        }
+
         this.sheetNames = [];
         this.tables = [];
         this.tabContents = [];
@@ -410,6 +415,7 @@ class WorkbookGUI {
         const sheetNo = this.sheetNames.length;
         global.workbookData.sheets[sheetNo] = {name: sheetName, data: data};
         this.sheetNames.push(sheetName);
+        this.sheetNamesWithoutHidden.push(sheetName);
         const gridId = this.addTab(sheetName);
         this.applyTabs();
         let container = $('#' + gridId)[0];
@@ -420,15 +426,18 @@ class WorkbookGUI {
                 cellProperties.renderer = cellRenderer;
                 return cellProperties;
             });
-        this.tables.push(table);
 
-        $('#nav-tab a:first-child').tab('show');
-        this.currSheet = this.sheetNames[0];
+        $('#nav-tab a:nth-child(' + (sheetNo + 1) + ')').tab('show');
+        this.currSheet = sheetName;
         // add listener to tabs
+        const that = this;
         $('.nav-tabs a').on('show.bs.tab', function (event) {
-            this.currSheet = $(event.target).text();         // active tab
+            that.currSheet = $(event.target).text();         // active tab
         });
         this._enableTabScroll();
+        this._hookRedoUndoButtons();
+        this._hookFormulaButtons();
+        this._hookSelectZoom();
     }
 
     getSheet(name) {
@@ -500,7 +509,7 @@ class WorkbookGUI {
             for (let rowNumber = 0; rowNumber < data.dimension[0]; rowNumber++) {
                 wsData.data.push([]);
                 for (let colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
-                    if (data && data[rowNumber] && data[rowNumber][colNumber]) {
+                    if (data && data[rowNumber] && data[rowNumber][colNumber] !== undefined) {
                         wsData.data[rowNumber].push(data[rowNumber][colNumber]);
                         // delete data[rowNumber][colNumber];
                     }
@@ -664,14 +673,18 @@ class WorkbookGUI {
         });
     }
     _hookSelectZoom() {
-        $('#select-zoom').on('change', (e) => {
+        $$('#select-zoom').onchange = (e) => {
             const perc = e.currentTarget.value;
             $('#nav-tabContent').css('zoom', perc);
             const number = parseInt(perc.slice(0, perc.indexOf('%'))) / 100;
             console.log(number);
             this.height = ($(window).height() - this.heightOffset) / number;
+            this.tables = [];
+            this.tabs = [];
+            this.sheetNamesWithoutHidden = [];
+            this.sheetNames = [];
             this.load()
-        });
+        };
     }
 }
 

@@ -127,6 +127,7 @@ $('#save-workbook-btn').on('click', function () {
 });
 
 $('#export-workbook-btn').on('click', function () {
+
     window.open('/api/workbook/' + encodeURIComponent($('#workbookNameInput').val()) + '/download');
 });
 
@@ -149,8 +150,7 @@ $('#file-import').change(function (e) {
         processData: false
     }).done(function (response) {
         if (response.success) {
-            const data = unzip(response.workbook.data);
-            console.log(data);
+            const data = response.workbook.data;
             gui.updateJson(data);
             gui.load();
         }

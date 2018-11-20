@@ -22,13 +22,33 @@ $(document).ready(function () {
     });
 });
 
+document.querySelector('#signUpMethodSelect').onchange = (e) => {
+    const elementsToHideInLocal = ['#organization', '#role'];
+    const elementsToUnhideInLocal = ['#password'];
+    if (e.target.value === 'local') {
+        for (let i = 0; i < elementsToHideInLocal.length; i++) {
+            document.querySelector(elementsToHideInLocal[i]).classList.add('hide')
+        }
+        for (let i = 0; i < elementsToUnhideInLocal.length; i++) {
+            document.querySelector(elementsToUnhideInLocal[i]).classList.remove('hide')
+        }
+    }
+    else if (e.target.value === 'ldap') {
+        for (let i = 0; i < elementsToHideInLocal.length; i++) {
+            document.querySelector(elementsToHideInLocal[i]).classList.remove('hide')
+        }
+        for (let i = 0; i < elementsToUnhideInLocal.length; i++) {
+            document.querySelector(elementsToUnhideInLocal[i]).classList.add('hide')
+        }
+    }
+};
+
 
 $("#signupForm").submit(function(e) {
     e.preventDefault();
-  //  console.log($('#OrganizationDropDown').val());
- //   var dropdown = $('#OrganizationDropDown').val();
+    const signUpMethod = document.querySelector('#signUpMethodSelect').value;
     $.ajax({
-        url: '/api/signup',
+        url: '/api/signup' + (signUpMethod === 'local' ? '/local' : ''),
         type: 'POST',
         data: $('#signupForm').serialize()
     }).done(function (response) {

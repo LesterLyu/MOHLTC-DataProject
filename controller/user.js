@@ -75,7 +75,7 @@ module.exports = {
                 return res.json({success: false, message: err});
             }
             if (user) {
-                if (user._id == req.session.user._id) {
+                if (user._id === req.session.user._id) {
                     user.username=req.body.username;
                     user.firstName=req.body.firstName;
                     user.lastName=req.body.lastName;
