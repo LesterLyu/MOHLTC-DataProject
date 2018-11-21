@@ -127,9 +127,26 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         }
 
         // borders
+        // check if bottom cell has top border
+        if (sheet.style[row + 1] && sheet.style[row + 1][col]) {
+            const bottomCell = sheet.style[row + 1][col];
+            if ('border' in bottomCell && 'top' in bottomCell.border) {
+                const color = argbToRgb(bottomCell.border.top.color) || '000';
+                td.style['borderBottom'] = '1px solid #' + color;
+            }
+        }
+        // check if left cell has left border
+        if (sheet.style[row] && sheet.style[row][col + 1]) {
+            const rightCell = sheet.style[row][col + 1];
+            if ('border' in rightCell && 'left' in rightCell.border) {
+                const color = argbToRgb(rightCell.border.left.color) || '000';
+                td.style['borderRight'] = '1px solid #' + color;
+            }
+        }
+
         if (style.hasOwnProperty('border')) {
             for (var key in style.border) {
-                if (style.border.hasOwnProperty(key)) {
+                if ((key === 'right' || key === 'bottom') && style.border.hasOwnProperty(key)) {
                     var upper = key.charAt(0).toUpperCase() + key.slice(1);
                     var border = style.border[key];
                     if (border.hasOwnProperty('color') && border.color.hasOwnProperty('argb')) {
@@ -143,14 +160,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             }
         }
     }
-
-
-
-
-
-
-
-
+    result = span.innerHTML;
 
     // hyperlink
     if (cellProperties.hyperlink) {

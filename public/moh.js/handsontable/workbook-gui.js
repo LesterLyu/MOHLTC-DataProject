@@ -319,7 +319,7 @@ class WorkbookGUI {
                             // text or formula
                             var ws = global.workbookData.sheets[this.instance.sheetNo];
 
-                            cellProperties.style = null;
+                            cellProperties.style = {};
                             if (ws.style[row] && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
                                 cellProperties.style = ws.style[row][col];
                             }
@@ -548,6 +548,10 @@ class WorkbookGUI {
                     }
                 }
 
+                //pre-process borders
+
+
+
                 // pre-process hyperlinks
                 let hyperlinks = global.hyperlinks[orderNo] = {};
                 for (let key in extra.hyperlinks) {
@@ -732,6 +736,8 @@ function dictToList(dict, length, defVal = null, hidden = []) {
 
 
 function argbToRgb(argb) {
+    if (argb === undefined)
+        return undefined;
     return argb.substring(2);
 }
 
