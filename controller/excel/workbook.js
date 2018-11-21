@@ -77,7 +77,7 @@ class Workbook {
                     Workbook.attributes[this.groupNumber] = attributes.reduce((map, obj) => {
                         map[obj.id] = obj.attribute;
                         return map;
-                    });
+                    }, {});
                     resolve()
                 });
             });
@@ -90,7 +90,7 @@ class Workbook {
                     Workbook.categories[this.groupNumber] = categories.reduce((map, obj) => {
                         map[obj.id] = obj.category;
                         return map;
-                    });
+                    }, {});
                     resolve();
                 });
             });
