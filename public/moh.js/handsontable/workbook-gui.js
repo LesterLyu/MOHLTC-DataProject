@@ -26,7 +26,7 @@ class WorkbookGUI {
         this.definedNames = {};
         this.navPosition = 0;
         this.selectedCell = [-1, -1];
-
+        this.state = 'idle';
         this._appendAddSheetTab();
     }
 
@@ -599,7 +599,7 @@ class WorkbookGUI {
     }
 
     resize(width, height) {
-
+        console.log('resize to ' + width + 'x' + height);
         const currSheet = this.currSheet;
         for (let i = 0; i < this.tables.length; i++) {
             this.tables[i].updateSettings({
@@ -617,15 +617,18 @@ class WorkbookGUI {
             // enable hidden row that does not have frozen view.
             for (let sheetNo in global.workbookRawExtra.sheets) {
                 const extra = global.workbookRawExtra.sheets[sheetNo];
-                const gridId = this.gridIds[this.sheetNamesWithoutHidden.indexOf(this.sheetNames[sheetNo])];
-                if (gridId) {
-                    // row
-                    const trs = document.querySelector('#' + gridId + ' .ht_clone_left .htCore tbody').children;
-                    for (let row in extra.row) {
-                        if (trs && trs[row]) {
-                            trs[row].style.display = 'none';
+                if (extra.views[0].state === 'normal') {
+                    const gridId = this.gridIds[this.sheetNamesWithoutHidden.indexOf(this.sheetNames[sheetNo])];
+                    if (gridId) {
+                        // row
+                        const trs = document.querySelector('#' + gridId + ' .ht_clone_left .htCore tbody').children;
+                        for (let row in extra.row.hidden) {
+                            if (trs && trs[row]) {
+                                trs[row].style.display = 'none';
+                            }
                         }
                     }
+
                 }
             }
         }
@@ -672,6 +675,7 @@ class WorkbookGUI {
             }
         });
     }
+
     _hookSelectZoom() {
         $$('#select-zoom').onchange = (e) => {
             const perc = e.currentTarget.value;
@@ -744,17 +748,6 @@ function getWorkbook(sheets, sheetNames) {
     return workbook;
 }
 
-function exportToExcel(workbook, name) {
-    var fileExtension = '.xlsx';
-    // empty params
-    if (typeof workbook === 'undefined') {
-        return XLSX.writeFile(getWorkbook(gui.tables, gui.sheetNames), gui.workbookName + fileExtension);
-    }
-    else {
-        XLSX.writeFile(workbook, name + fileExtension);
-    }
-}
-
 // re-evaluate formula
 function evaluateFormula(sheetName, row, col) {
     if (!sheetNames.includes(sheetName)) {
@@ -788,7 +781,7 @@ window.onresize = function () {
     const statusText = $('#status');
     statusText.html('<i class="fas fa-spinner fa-spin"></i> Rendering...');
     resize = setTimeout(() => {
-        // gui.resize($('#nav-tabContent').width(), $(window).height() - gui.heightOffset);
+        gui.resize($('#nav-tabContent').width(), $(window).height() - gui.heightOffset);
         statusText.html('');
     }, 300);
 
@@ -806,5 +799,10 @@ window.onhashchange = function () {
     //     }
     // }
 };
+
+$(document).ready(function () {
+    // enable bootstrap tooltip
+    $('[data-toggle="tooltip"]').tooltip();
+});
 
 

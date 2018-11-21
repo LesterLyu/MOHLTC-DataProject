@@ -37,6 +37,37 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         }
     }
 
+    const style = cellProperties.style || {};
+
+    // render formula
+    let result = calcResult(value);
+
+    // rich text
+    if (value && Array.isArray(value.richText)) {
+        const mainSpan = document.createElement('span');
+        for (let i = 0; i < value.richText.length; i++) {
+            const rt = value.richText[i];
+            const span = document.createElement('span');
+            span.innerText = rt.text;
+            if ('font' in rt) {
+                setFontStyle(span, rt.font);
+            }
+            else if ('font' in style) {
+                setFontStyle(span, style.font);
+            }
+            mainSpan.appendChild(span);
+        }
+        // removeFontStyle(td);
+        result = mainSpan.innerHTML;
+    }
+
+    // wrap the value, this fix the clicking issue for overflowed text
+    const span = document.createElement('span');
+    span.innerHTML = result;
+    Handsontable.dom.fastInnerText(td, '');
+    span.style.pointerEvents = 'none';
+    td.appendChild(span);
+
     // text overflow if right cell is empty
     const rightCell = instance.getDataAtCell(row, col + 1);
     if (rightCell === '' || rightCell === null || rightCell === undefined ||
@@ -52,9 +83,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
 
     if (('style' in cellProperties) && cellProperties.style) {
-        var style = cellProperties.style;
         // alignment
-
         if (style.hasOwnProperty('alignment')) {
             if (style.alignment.hasOwnProperty('horizontal')) {
                 td.style.textAlign = style.alignment.horizontal;
@@ -76,10 +105,17 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
                 td.style.wrapText = 'break-word';
                 td.style.whiteSpace = 'pre-wrap';
             }
+
+            // textRotation
+            if ('textRotation' in style.alignment && typeof style.alignment.textRotation === 'number') {
+                span.style.display = 'block';
+                span.style.transform = 'rotate(-' + style.alignment.textRotation + 'deg)';
+            }
+
         }
 
         // font
-        if ('font' in style) {
+        if ('font' in style && !(value && Array.isArray(value.richText))) {
             setFontStyle(td, style.font);
         }
 
@@ -109,35 +145,11 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     }
 
 
-    // render formula
-    let result = calcResult(value);
-
-    // rich text
-    if (value && Array.isArray(value.richText)) {
-        const mainSpan = document.createElement('span');
-        for (let i = 0; i < value.richText.length; i++) {
-            const rt = value.richText[i];
-            const span = document.createElement('span');
-            span.innerText = rt.text;
-            if ('font' in rt) {
-                setFontStyle(span, rt.font);
-            }
-            else if ('font' in style) {
-                setFontStyle(span, style.font);
-            }
-            mainSpan.appendChild(span);
-        }
-        removeFontStyle(td);
-        result = mainSpan.innerHTML;
-    }
 
 
-    // wrap the value, this fix the clicking issue for overflowed text
-    const span = document.createElement('span');
-    span.innerHTML = result;
-    Handsontable.dom.fastInnerText(td, '');
-    span.style.pointerEvents = 'none';
-    td.appendChild(span);
+
+
+
 
 
     // hyperlink

@@ -137,6 +137,14 @@ Excel-web
     background: #ddd;
 }
 
+#reset-formula-btn {
+    color: darkred;
+}
+
+#save-formula-btn {
+    color: green;
+}
+
 #fx {
     font-size: 20px;
     font-family: "Times New Roman", serif;

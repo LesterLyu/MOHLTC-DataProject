@@ -1,13 +1,13 @@
 
-<div class="container row align-items-center taskbar">
+<div class="container-fluid row align-items-center taskbar">
     <div class="col-auto p-0" style="display: <%= typeof mode !== "undefined" ? '' : 'none'%>">
         <input class="form-control workbookName has-border" id="workbookNameInput" value="<%=workbook%>" size="10">
     </div>
     <div class="col-auto p-0">
-        <button type="button" id="undo-btn" class="btn btn-taskbar"><i class="fas fa-undo"></i> Undo</button>
+        <button data-toggle="tooltip" data-placement="bottom" title="Redo" type="button" id="undo-btn" class="btn btn-taskbar"><i class="fas fa-undo"></i></button>
     </div>
     <div class="col-auto p-0">
-        <button type="button" id="redo-btn" class="btn btn-taskbar"><i class="fas fa-redo"></i> Redo</button>
+        <button data-toggle="tooltip" data-placement="bottom" title="Undo" type="button" id="redo-btn" class="btn btn-taskbar"><i class="fas fa-redo"></i></button>
     </div>
     <div class="col-auto p-0">
         <select class="custom-select" id="select-zoom">
@@ -25,17 +25,17 @@
 
     <div class="col-auto p-0">
         <div class="input-group">
-            <button id="import-workbook-btn" class="btn btn-taskbar"><i class="fas fa-file-import"></i> Import</button>
+            <button data-toggle="tooltip" data-placement="bottom" title="Import" id="import-workbook-btn" class="btn btn-taskbar"><i class="fas fa-file-import"></i></button>
             <form id="upload-form" enctype="multipart/form-data">
                 <input name="excel" id="file-import" type="file" class="hide">
             </form>
         </div>
     </div>
     <div class="col-auto p-0">
-        <button type="button" id="export-workbook-btn" class="btn-save btn btn-taskbar"><i class="fas fa-file-export"></i> Export</button>
+        <button data-toggle="tooltip" data-placement="bottom" title="Export" type="button" id="export-workbook-btn" class="btn-save btn btn-taskbar"><i class="fas fa-file-export"></i></button>
     </div>
     <div class="col-auto p-0">
-        <button type="button" id="save-workbook-btn" class="btn-save btn btn-taskbar"><i class="fas fa-save"></i> Save</button>
+        <button data-toggle="tooltip" data-placement="bottom" title="Save" type="button" id="save-workbook-btn" class="btn-save btn btn-taskbar"><i class="fas fa-save"></i></button>
     </div>
     <div class="col-auto p-0">
 
@@ -44,12 +44,12 @@
         <div id="status"></div>
     </div>
 </div>
-<div class="container row align-items-center taskbar">
+<div class="container-fluid row align-items-center taskbar">
     <div class="col-auto p-0">
-        <button type="button" id="reset-formula-btn" class="btn-save btn btn-taskbar"><i class="fas fa-times"></i></button>
+        <button data-toggle="tooltip" data-placement="bottom" title="Cancel" type="button" id="reset-formula-btn" class="btn btn-taskbar"><i class="fas fa-times"></i></button>
     </div>
     <div class="col-auto p-0">
-        <button type="button" id="save-formula-btn" class="btn-save btn btn-taskbar"><i class="fas fa-check"></i></button>
+        <button data-toggle="tooltip" data-placement="bottom" title="Enter" type="button" id="save-formula-btn" class="btn btn-taskbar"><i class="fas fa-check"></i></button>
     </div>
     <div class="col-auto p-0" id="fx">
          fx
