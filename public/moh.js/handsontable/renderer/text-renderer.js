@@ -135,7 +135,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
                 td.style['borderBottom'] = '1px solid #' + color;
             }
         }
-        // check if left cell has left border
+        // check if right cell has left border
         if (sheet.style[row] && sheet.style[row][col + 1]) {
             const rightCell = sheet.style[row][col + 1];
             if ('border' in rightCell && 'left' in rightCell.border && 'color' in rightCell.border.left) {

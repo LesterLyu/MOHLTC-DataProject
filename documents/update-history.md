@@ -1,14 +1,14 @@
 ### To-DO
-<details><summary><b>(click to show)</b></summary>
- - Add richetext support.
- - Add more border option.
- - Auto re-evaluate formulas.
- - Fix border alignment issue.
- - Add font support.
- - Add font underline support.
- - Add data type support. ($, date format, number format, etc...)
- - Add theme color support. (need to parse XML)
-</details>
+- [x] Add richetext support.
+- [ ] Add more border option.
+- [ ] Auto re-evaluate formulas.
+- [x] Fix border alignment issue.
+- [x] Add font support.
+- [x] Add font underline support.
+- [ ] Add data type support. ($, date format, number format, etc...)
+- [ ] Add theme color support. (need to parse XML)
+- [ ] Border with merge cell issue
+
 
 ### Dev 0.3.2
  - Breakthrough supports:
