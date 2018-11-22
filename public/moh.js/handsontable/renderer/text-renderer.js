@@ -23,7 +23,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         // grid lines
         const showGridLines = sheet.views[0].showGridLines;
         if (!showGridLines) {
-            td.style.borderColor = '#fff0';
+            td.style.borderColor = 'rgba(0,0,0,0)';
         }
 
         // check if this row/col should be hidden
@@ -191,7 +191,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             a.href = hyperlink.target;
         }
 
-        Handsontable.dom.fastInnerText(a, result);
+        Handsontable.dom.fastInnerHTML(a, result);
         Handsontable.dom.fastInnerText(td, '');
         td.appendChild(a);
     }
