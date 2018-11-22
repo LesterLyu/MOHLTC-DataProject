@@ -138,7 +138,7 @@ class WorkbookGUI {
             newTab = $('<a class="nav-item nav-link active show" data-toggle="tab" href="#' + tabContentId + '">' + sheetName + '</a>');
         }
         if (tabColor && tabColor.argb) {
-            newTab.css('border-bottom', '3px solid #' + argbToRgb(tabColor.argb));
+            newTab.css('border-bottom', '3px solid #' + argbToRgb(tabColor));
         }
         newTab.on('click', (event) => {
             event.preventDefault();
@@ -208,6 +208,7 @@ class WorkbookGUI {
         this._hookRedoUndoButtons();
         this._hookFormulaButtons();
         this._hookSelectZoom();
+        showTimes();
     }
 
     // apply json to GUI tables
@@ -296,6 +297,8 @@ class WorkbookGUI {
                 else {
                     const table = this.addTable(container, $('#nav-tabContent').width(), this.height, data,
                         ws.row.height, ws.col.width, merges, sheetNo, ws.views, function (row, col) {
+                            cntCells++;
+                            let start = Date.now();
                             let cellProperties = {};
                             if (!('sheetNo' in this.instance)) {
                                 this.instance.sheetNo = sheetNo;
@@ -306,7 +309,7 @@ class WorkbookGUI {
                             // TO-DO move data validation to ws.style, this should improve the efficient
                             const address = colCache.encode(row + 1, col + 1);
                             const dataValidation = global.dataValidation[this.instance.sheetNo];
-                            if (dataValidation.dropDownAddresses.includes(address)) {
+                            if (dataValidation.dropDownData[address]) {
                                 cellProperties.source = dataValidation.dropDownData[address];
                                 cellProperties.renderer = Handsontable.renderers.AutocompleteRenderer;
                                 cellProperties.editor = Handsontable.editors.DropdownEditor;
@@ -314,23 +317,11 @@ class WorkbookGUI {
                                 cellProperties.allowInvalid = false;
                                 return cellProperties;
                             }
-
-
-                            // text or formula
-                            var ws = global.workbookData.sheets[this.instance.sheetNo];
-
-                            cellProperties.style = {};
-                            if (ws.style[row] && ws.style[row][col] && Object.keys(ws.style[row][col]).length !== 0) {
-                                cellProperties.style = ws.style[row][col];
-                            }
-                            // hyperlink
-                            const hyperlinks = global.hyperlinks[this.instance.sheetNo];
-                            const addressHyperlink = colCache.encode(row + 1, col + 1);
-                            if (addressHyperlink in hyperlinks) {
-                                cellProperties.hyperlink = hyperlinks[addressHyperlink];
-                            }
                             cellProperties.renderer = cellRenderer;
                             cellProperties.editor = FormulaEditor;
+
+                            timeCells += Date.now() - start;
+                            start = Date.now();
                             return cellProperties;
                         });
 
@@ -524,8 +515,10 @@ class WorkbookGUI {
             if (global.workbookRawExtra) {
                 const extra = global.workbookRawExtra.sheets[orderNo];
                 wsData.col = {};
+                wsData.col.hidden = extra.col.hidden;
                 wsData.col.width = dictToList(extra.col.width, data.dimension[1], 23, extra.col.hidden);
                 wsData.row = {};
+                wsData.row.hidden = extra.row.hidden;
                 wsData.row.height = dictToList(extra.row.height, data.dimension[0], extra.defaultRowHeight, extra.row.hidden);
                 wsData.dataValidations = extra.dataValidations;
                 wsData.state = extra.state;
@@ -547,10 +540,6 @@ class WorkbookGUI {
                         })
                     }
                 }
-
-                //pre-process borders
-
-
 
                 // pre-process hyperlinks
                 let hyperlinks = global.hyperlinks[orderNo] = {};
@@ -735,10 +724,10 @@ function dictToList(dict, length, defVal = null, hidden = []) {
 }
 
 
-function argbToRgb(argb) {
-    if (argb === undefined)
+function argbToRgb(color) {
+    if (color === undefined || color.argb === undefined)
         return undefined;
-    return argb.substring(2);
+    return color.argb.substring(2);
 }
 
 
@@ -778,6 +767,7 @@ function evaluateFormula(sheetName, row, col) {
     sheet.setDataAtCell(row, col, data);
     return data;
 }
+
 
 let resize;
 window.onresize = function () {

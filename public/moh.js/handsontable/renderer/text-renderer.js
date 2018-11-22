@@ -1,3 +1,9 @@
+let timeHidden = 0, timeRichText = 0, timeSpan = 0, timeStyles = 0, timeHyperlinks = 0, timeCells = 0;
+let cntCells = 0, cntCellRenderer = 0;
+
+const SPAN_TEMPLATE = document.createElement('span');
+SPAN_TEMPLATE.style.pointerEvents = 'none';
+
 /**
  * Text and formula renderer
  * @param instance
@@ -9,8 +15,9 @@
  * @param cellProperties
  */
 function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.renderers.TextRenderer.apply(this, arguments);
-
+    // Handsontable.renderers.TextRenderer.apply(this, arguments);
+    let start = Date.now();
+    cntCellRenderer++;
     const sheet = global.workbookData.sheets[instance.sheetNo];
     if (sheet && sheet.views) {
         // grid lines
@@ -20,12 +27,12 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         }
 
         // check if this row/col should be hidden
-        if (sheet.col.width[col] === 0.1) {
+        if (sheet.col.hidden.includes(col)) {
             td.style.display = 'none';
             return;
         }
 
-        if (sheet.row.height[row] === 0.1) {
+        if (sheet.row.hidden.includes(row)) {
             if (td.parentNode) {
                 td.parentNode.style.display = 'none';
             }
@@ -36,8 +43,10 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             td.parentNode.style.display = '';
         }
     }
+    timeHidden += Date.now() - start;
+    start = Date.now();
 
-    const style = cellProperties.style || {};
+    const style = sheet.style[row] ? (sheet.style[row][col] || {}) : {};
 
     // render formula
     let result = calcResult(value);
@@ -48,11 +57,11 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         for (let i = 0; i < value.richText.length; i++) {
             const rt = value.richText[i];
             const span = document.createElement('span');
-            span.innerText = rt.text;
-            if ('font' in rt) {
+            Handsontable.dom.fastInnerText(span, rt.text);
+            if (rt.font) {
                 setFontStyle(span, rt.font);
             }
-            else if ('font' in style) {
+            else if (style.font) {
                 setFontStyle(span, style.font);
             }
             mainSpan.appendChild(span);
@@ -60,12 +69,14 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         // removeFontStyle(td);
         result = mainSpan.innerHTML;
     }
+    timeRichText += Date.now() - start;
+    start = Date.now();
 
     // wrap the value, this fix the clicking issue for overflowed text
-    const span = document.createElement('span');
-    span.innerHTML = result;
-    Handsontable.dom.fastInnerText(td, '');
-    span.style.pointerEvents = 'none';
+    const span = SPAN_TEMPLATE.cloneNode(false);
+    // span.innerHTML = result;
+    Handsontable.dom.fastInnerHTML(span, result);
+    Handsontable.dom.fastInnerHTML(td, '');
     td.appendChild(span);
 
     // text overflow if right cell is empty
@@ -76,112 +87,115 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         td.style.overflow = 'visible';
         td.style.textOverflow = 'clip';
     }
+    timeSpan += Date.now() - start;
+    start = Date.now();
 
     // default alignment
     var cellMeta = instance.getCellMeta(row, col);
     var previousClass = (cellMeta.className !== undefined) ? cellMeta.className : '';
     instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
 
-    if (('style' in cellProperties) && cellProperties.style) {
-        // alignment
-        if (style.hasOwnProperty('alignment')) {
-            if (style.alignment.hasOwnProperty('horizontal')) {
-                td.style.textAlign = style.alignment.horizontal;
-            }
-            if (style.alignment.hasOwnProperty('vertical')) {
-
-                switch (style.alignment.vertical) {
-                    case 'top':
-                        instance.setCellMeta(row, col, 'className', previousClass + ' htTop');
-                        break;
-                    case 'middle':
-                        instance.setCellMeta(row, col, 'className', previousClass + ' htMiddle');
-                        break;
-                }
-            }
-
-            // font text wrap
-            if ('wrapText' in style.alignment && style.alignment.wrapText) {
-                td.style.wrapText = 'break-word';
-                td.style.whiteSpace = 'pre-wrap';
-            }
-
-            // textRotation
-            if ('textRotation' in style.alignment && typeof style.alignment.textRotation === 'number') {
-                span.style.display = 'block';
-                span.style.transform = 'rotate(-' + style.alignment.textRotation + 'deg)';
-            }
-
+    // styles
+    // alignment
+    if (style.alignment) {
+        if (style.alignment.hasOwnProperty('horizontal')) {
+            td.style.textAlign = style.alignment.horizontal;
         }
+        if (style.alignment.hasOwnProperty('vertical')) {
 
-        // font
-        if ('font' in style && !(value && Array.isArray(value.richText))) {
-            setFontStyle(td, style.font);
-        }
-
-        // background
-        if (style.hasOwnProperty('fill')) {
-            if (style.fill.hasOwnProperty('fgColor') && style.fill.fgColor.hasOwnProperty('argb')) {
-                td.style.background = '#' + argbToRgb(style.fill.fgColor.argb);
+            switch (style.alignment.vertical) {
+                case 'top':
+                    instance.setCellMeta(row, col, 'className', previousClass + ' htTop');
+                    break;
+                case 'middle':
+                    instance.setCellMeta(row, col, 'className', previousClass + ' htMiddle');
+                    break;
             }
         }
 
-        // borders
-        // check if bottom cell has top border
-        if (sheet.style[row + 1] && sheet.style[row + 1][col]) {
-            const bottomCell = sheet.style[row + 1][col];
-            if ('border' in bottomCell && 'top' in bottomCell.border && 'color' in bottomCell.border.top) {
-                const color = argbToRgb(bottomCell.border.top.color.argb) || '000';
-                td.style['borderBottom'] = '1px solid #' + color;
-            }
-        }
-        // check if right cell has left border
-        if (sheet.style[row] && sheet.style[row][col + 1]) {
-            const rightCell = sheet.style[row][col + 1];
-            if ('border' in rightCell && 'left' in rightCell.border && 'color' in rightCell.border.left) {
-                const color = argbToRgb(rightCell.border.left.color.argb) || '000';
-                td.style['borderRight'] = '1px solid #' + color;
-            }
+        // font text wrap
+        if (style.alignment.wrapText) {
+            td.style.wrapText = 'break-word';
+            td.style.whiteSpace = 'pre-wrap';
         }
 
-        if (style.hasOwnProperty('border')) {
-            for (var key in style.border) {
-                if ((key === 'right' || key === 'bottom') && style.border.hasOwnProperty(key)) {
-                    var upper = key.charAt(0).toUpperCase() + key.slice(1);
-                    var border = style.border[key];
-                    if (border.hasOwnProperty('color') && border.color.hasOwnProperty('argb')) {
-                        td.style['border' + upper] = '1px solid #' + argbToRgb(border.color.argb);
-                    }
-                    else {
-                        // black color
-                        td.style['border' + upper] = '1px solid #000';
-                    }
-                }
+        // textRotation
+        if (typeof style.alignment.textRotation === 'number') {
+            span.style.display = 'block';
+            span.style.transform = 'rotate(-' + style.alignment.textRotation + 'deg)';
+        }
+    }
+
+    // set font style if cell is not a richText
+    if (style.font && !(value && Array.isArray(value.richText))) {
+        setFontStyle(td, style.font);
+    }
+
+    // background
+    if (style.fill) {
+        if (style.fill.fgColor) {
+            td.style.background = '#' + argbToRgb(style.fill.fgColor);
+        }
+    }
+
+    // borders
+    // check if bottom cell has top border
+    if (sheet.style[row + 1] && sheet.style[row + 1][col]) {
+        const bottomCell = sheet.style[row + 1][col];
+        if ('border' in bottomCell && 'top' in bottomCell.border) {
+            const color = argbToRgb(bottomCell.border.top.color) || '000';
+            td.style.borderBottom = '1px solid #' + color;
+        }
+    }
+    // check if right cell has left border
+    if (sheet.style[row] && sheet.style[row][col + 1]) {
+        const rightCell = sheet.style[row][col + 1];
+        if ('border' in rightCell && 'left' in rightCell.border) {
+            const color = argbToRgb(rightCell.border.left.color) || '000';
+            td.style.borderRight = '1px solid #' + color;
+        }
+    }
+
+    if (style.border) {
+        for (var key in style.border) {
+            if ((key === 'right' || key === 'bottom') && style.border.hasOwnProperty(key)) {
+                var upper = key.charAt(0).toUpperCase() + key.slice(1);
+                var border = style.border[key];
+                const color = argbToRgb(border.color) || '000';
+                td.style['border' + upper] = '1px solid #' + color;
             }
         }
     }
+
+    timeStyles += Date.now() - start;
+    start = Date.now();
+
     result = span.innerHTML;
 
     // hyperlink
-    if (cellProperties.hyperlink) {
+    const hyperlinks = global.hyperlinks[instance.sheetNo];
+    const address = colCache.encode(row + 1, col + 1);
+    const hyperlink = hyperlinks[address];
+    if (hyperlink) {
+
         const a = document.createElement('a');
-        if (cellProperties.hyperlink.mode === 'internal') {
-            a.href = '#' + cellProperties.hyperlink.target;
+        if (hyperlink.mode === 'internal') {
+            a.href = '#' + hyperlink.target;
             a.onclick = (event) => {
                 // a trick to move mouse out of window, to fix hyperlink performance bug
                 eventFire($('ol')[0], 'mousedown');
-                gui.showSheet(cellProperties.hyperlink.sheetName);
+                gui.showSheet(hyperlink.sheetName);
             };
-
         }
         else {
-            a.href = cellProperties.hyperlink.target;
+            a.href = hyperlink.target;
         }
 
-        a.innerHTML = result;
+        Handsontable.dom.fastInnerText(a, result);
         Handsontable.dom.fastInnerText(td, '');
         td.appendChild(a);
     }
+    timeHyperlinks += Date.now() - start;
 }
 
 
@@ -196,22 +210,22 @@ function eventFire(el, etype) {
 }
 
 function setFontStyle(element, font) {
-    if ('color' in font && 'argb' in font.color) {
-        element.style.color = '#' + argbToRgb(font.color.argb);
+    if (font.color) {
+        element.style.color = '#' + argbToRgb(font.color);
     }
-    if ('bold' in font && font.bold) {
+    if (font.bold) {
         element.style.fontWeight = 'bold';
     }
-    if ('italic' in font && font.italic) {
+    if (font.italic) {
         element.style.fontStyle = 'italic';
     }
     if ('size' in font) {
         element.style.fontSize = font.size + 'pt';
     }
-    if ('name' in font) {
+    if (font.name) {
         element.style.fontFamily = font.name;
     }
-    if ('underline' in font && font.underline) {
+    if (font.underline) {
         element.style.textDecoration = 'underline';
     }
 }
@@ -232,8 +246,19 @@ function calcResult(cellValue) {
             result = cellValue.result.error;
         }
         else {
-            result = cellValue.result !== undefined ? cellValue.result : null;
+            result = cellValue.result;
+
         }
     }
-    return result;
+    return result || '';
+}
+
+function showTimes() {
+    console.log('timeHidden: ' + timeHidden);
+    console.log('timeRichText: ' + timeRichText);
+    console.log('timeSpan: ' + timeSpan);
+    console.log('timeStyles: ' + timeStyles);
+    console.log('timeHyperlinks: ' + timeHyperlinks);
+    console.log('timeCells: ' + timeCells);
+    console.log('-----\n cntCells, cntCellRenderer: ', cntCells, cntCellRenderer);
 }
