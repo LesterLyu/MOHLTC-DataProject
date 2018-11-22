@@ -1,5 +1,7 @@
 function showChangeLog() {
-    const converter = new showdown.Converter();
+    const converter = new showdown.Converter({
+        tasklists: true,
+    });
 
     fetch('/documents/update-history.md')
         .then(response => {

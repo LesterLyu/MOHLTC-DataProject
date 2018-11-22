@@ -1,4 +1,4 @@
-let timeHidden = 0, timeRichText = 0, timeSpan = 0, timeStyles = 0, timeHyperlinks = 0, timeCells = 0;
+let timeHidden = 0, timeRichText = 0, timeSpan = 0, timeStyles = 0, timeHyperlinks = 0, timeRenderers = 0, timeCells = 0;
 let cntCells = 0, cntCellRenderer = 0;
 
 const SPAN_TEMPLATE = document.createElement('span');
@@ -16,6 +16,7 @@ SPAN_TEMPLATE.style.pointerEvents = 'none';
  */
 function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     // Handsontable.renderers.TextRenderer.apply(this, arguments);
+    let start2 = Date.now();
     let start = Date.now();
     cntCellRenderer++;
     const sheet = global.workbookData.sheets[instance.sheetNo];
@@ -40,7 +41,9 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             return;
         }
         else {
-            td.parentNode.style.display = '';
+            if (td.parentNode) {
+                td.parentNode.style.display = '';
+            }
         }
     }
     timeHidden += Date.now() - start;
@@ -91,9 +94,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     start = Date.now();
 
     // default alignment
-    var cellMeta = instance.getCellMeta(row, col);
-    var previousClass = (cellMeta.className !== undefined) ? cellMeta.className : '';
-    instance.setCellMeta(row, col, 'className', previousClass + ' htBottom');
+    td.classList.add('htBottom');
 
     // styles
     // alignment
@@ -105,10 +106,12 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
 
             switch (style.alignment.vertical) {
                 case 'top':
-                    instance.setCellMeta(row, col, 'className', previousClass + ' htTop');
+                    td.classList.remove('htBottom');
+                    td.classList.add('htTop');
                     break;
                 case 'middle':
-                    instance.setCellMeta(row, col, 'className', previousClass + ' htMiddle');
+                    td.classList.remove('htBottom');
+                    td.classList.add('htMiddle');
                     break;
             }
         }
@@ -188,6 +191,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
             };
         }
         else {
+            a.target = '_black';
             a.href = hyperlink.target;
         }
 
@@ -196,6 +200,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         td.appendChild(a);
     }
     timeHyperlinks += Date.now() - start;
+    timeRenderers += Date.now() - start2;
 }
 
 
@@ -259,6 +264,7 @@ function showTimes() {
     console.log('timeSpan: ' + timeSpan);
     console.log('timeStyles: ' + timeStyles);
     console.log('timeHyperlinks: ' + timeHyperlinks);
+    console.log('-----\ntimeRenderers: ' + timeRenderers);
     console.log('timeCells: ' + timeCells);
-    console.log('-----\n cntCells, cntCellRenderer: ', cntCells, cntCellRenderer);
+    console.log('-----\ncntCells, cntCellRenderer: ', cntCells, cntCellRenderer);
 }

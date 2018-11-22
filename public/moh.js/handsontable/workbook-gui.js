@@ -26,7 +26,7 @@ class WorkbookGUI {
         this.definedNames = {};
         this.navPosition = 0;
         this.selectedCell = [-1, -1];
-        this.state = 'idle';
+        this.state = {loaded: []};
         this._appendAddSheetTab();
     }
 
@@ -83,6 +83,8 @@ class WorkbookGUI {
             autoColumnSize: false,
             contextMenu: ['copy'],
             renderAllRows: false,
+            viewportRowRenderingOffset: 0,
+            viewportColumnRenderingOffset: 0,
             fixedRowsTop: fixedRowsTop,
             fixedColumnsLeft: fixedColumnsLeft,
             cells: cells,
@@ -91,6 +93,7 @@ class WorkbookGUI {
         let createdTable = new Handsontable(container, spec);
         createdTable.sheetNo = sheetNo;
         that.tables.push(createdTable);
+        this.state.loaded.push(false);
 
         Handsontable.hooks.add('afterSelection', (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
             gui.selectedCell[0] = row;
@@ -244,6 +247,7 @@ class WorkbookGUI {
                 };
                 for (let key in ws.dataValidations) {
                     if (ws.dataValidations.hasOwnProperty(key)) {
+                        this.currSheet = sheets[sheetNo].name;
                         const dataValidation = ws.dataValidations[key];
                         if (dataValidation.type !== 'list') {
                             console.error('Unsupported data validation type: ' + dataValidation.type);
@@ -307,6 +311,7 @@ class WorkbookGUI {
 
                             // dropdown
                             // TO-DO move data validation to ws.style, this should improve the efficient
+                            col = col === -1 ? 16383 : col;
                             const address = colCache.encode(row + 1, col + 1);
                             const dataValidation = global.dataValidation[this.instance.sheetNo];
                             if (dataValidation.dropDownData[address]) {
@@ -332,6 +337,8 @@ class WorkbookGUI {
 
         this.currSheet = this.sheetNamesWithoutHidden[0];
         $('#nav-tab a:first-child').tab('show');
+        this.getCurrentTable().updateSettings({viewportRowRenderingOffset: 20, viewportColumnRenderingOffset: 10});
+        this.state.loaded[0] = true;
 
         hideLoadingStatus();
         const that = this;
@@ -476,7 +483,14 @@ class WorkbookGUI {
     showSheet(sheetName) {
         if (gui.currSheet !== sheetName) {
             if (this.sheetNamesWithoutHidden.includes(sheetName)) {
-                $('#nav-tab a:nth-child(' + (1 + this.sheetNamesWithoutHidden.indexOf(sheetName)) + ')').tab('show');
+                const index = this.sheetNamesWithoutHidden.indexOf(sheetName);
+                $('#nav-tab a:nth-child(' + (1 + index) + ')').tab('show');
+                if (!this.state.loaded[index]) {
+                    this.getCurrentTable().updateSettings({
+                        viewportRowRenderingOffset: 20, viewportColumnRenderingOffset: 10
+                    });
+                    this.state.loaded[index] = true;
+                }
             }
             else {
                 console.error('cannot find sheet with name: ' + sheetName);
@@ -553,22 +567,10 @@ class WorkbookGUI {
                             continue;
                         }
 
-                        // process first one
-                        const position = colCache.decode(addressSplited[0]);
                         let data = {mode: hyperlink.mode, target: hyperlink.target};
-                        const cell = wsData.data[position.row - 1][position.col - 1];
-                        let res;
-                        if (cell !== null && cell !== undefined) {
-                            if (cell.result !== undefined) {
-                                res = cell.result;
-                            }
-                            else {
-                                res = cell;
-                            }
-                        }
-                        const encoded = encodeURIComponent(hyperlink.target);
+
                         if (hyperlink.mode === 'internal') {
-                            data.html = '<a href="#' + encoded + '">' + res + '</a>';
+                            // find sheet name and cell position
                             let targetNoQuote = hyperlink.target.replace(/['"]+/g, '');
                             const index = targetNoQuote.indexOf('!');
                             if (index !== -1) {
@@ -576,9 +578,7 @@ class WorkbookGUI {
                                 data.cell = targetNoQuote.slice(index + 1);
                             }
                         }
-                        else if (hyperlink.mode === 'external') {
-                            data.html = '<a target="_blank" href="' + hyperlink.target + '">' + res + '</a>';
-                        }
+
                         hyperlinks[addressSplited[0]] = data;
 
                         // link other hyperlinks to the first one

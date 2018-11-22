@@ -21,7 +21,7 @@ parser.on('callCellValue', function (cellCoord, done) {
         sheet = gui.currSheet;
     }
     var data = gui.getDataAtSheetAndCell(sheet, cellCoord.row.index, cellCoord.column.index);
-    if (data === null) {
+    if (data === null || data === undefined) {
         done('')
     }
     else if (data.hasOwnProperty('result')) {
@@ -56,7 +56,7 @@ parser.on('callRangeValue', function (startCellCoord, endCellCoord, done) {
         for (var col = startCellCoord.column.index; col <= endCellCoord.column.index; col++) {
             var data =  gui.getDataAtSheetAndCell(sheet, row, col);
             //console.log(data);
-            if (data === null) {
+            if (data === null || data === undefined) {
                 colFragment.push('')
             }
             else if (data.hasOwnProperty('result')) {
