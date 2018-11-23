@@ -1,4 +1,5 @@
-let timeHidden = 0, timeRichText = 0, timeSpan = 0, timeStyles = 0, timeHyperlinks = 0, timeRenderers = 0, timeCells = 0;
+let timeHidden = 0, timeRichText = 0, timeSpan = 0, timeStyles = 0, timeHyperlinks = 0, timeRenderers = 0,
+    timeCells = 0;
 let cntCells = 0, cntCellRenderer = 0;
 
 const SPAN_TEMPLATE = document.createElement('span');
@@ -34,10 +35,10 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
         }
 
         if (sheet.row.hidden.includes(row)) {
+            td.style.display = 'none';
             if (td.parentNode) {
                 td.parentNode.style.display = 'none';
             }
-            td.style.display = 'none';
             return;
         }
         else {

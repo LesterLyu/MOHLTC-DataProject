@@ -51,7 +51,8 @@ class WorkbookGUI {
         }
         else {
             prop.rowHeights = rowHeights.map(function (x) {
-                return Math.round(x * SCALE / 5.5385);
+                const height = Math.round(x * SCALE / 5.5385);
+                return height > 23 ? height : 23;
             });
             prop.colWidths = colWidths.map(function (x) {
                 return Math.round(x * SCALE);
@@ -442,7 +443,7 @@ class WorkbookGUI {
         return global.workbookData.sheets[this.sheetNames.indexOf(name)];
     }
 
-    getCurentSheet() {
+    getCurrentSheet() {
         return global.workbookData.sheets[this.sheetNames.indexOf(this.currSheet)];
     }
 
@@ -486,10 +487,20 @@ class WorkbookGUI {
                 const index = this.sheetNamesWithoutHidden.indexOf(sheetName);
                 $('#nav-tab a:nth-child(' + (1 + index) + ')').tab('show');
                 if (!this.state.loaded[index]) {
-                    this.getCurrentTable().updateSettings({
-                        viewportRowRenderingOffset: 20, viewportColumnRenderingOffset: 10
-                    });
                     this.state.loaded[index] = true;
+
+                    const settings = {
+                        viewportRowRenderingOffset: 10,
+                        viewportColumnRenderingOffset: 10
+                    };
+                    const table = this.getCurrentTable();
+                    const extra = global.workbookRawExtra.sheets[table.sheetNo];
+                    if (extra.views[0].state === 'frozen') {
+                        settings.viewportRowRenderingOffset += extra.views[0].ySplit;
+                        settings.viewportColumnRenderingOffset += extra.views[0].xSplit;
+                    }
+
+                    this.getCurrentTable().updateSettings(settings);
                 }
             }
             else {
@@ -615,7 +626,8 @@ class WorkbookGUI {
                     if (gridId) {
                         // row
                         const trs = document.querySelector('#' + gridId + ' .ht_clone_left .htCore tbody').children;
-                        for (let row in extra.row.hidden) {
+                        for (let i = 0; i < extra.row.hidden.length; i++) {
+                            const row = extra.row.hidden[i];
                             if (trs && trs[row]) {
                                 trs[row].style.display = 'none';
                             }
@@ -646,7 +658,7 @@ class WorkbookGUI {
                 return;
             }
             const newValue = $('#formula-input').val();
-            const cellValue = gui.getCurentSheet().data[gui.selectedCell[0]][gui.selectedCell[1]];
+            const cellValue = gui.getCurrentSheet().data[gui.selectedCell[0]][gui.selectedCell[1]];
             // formula
             if (newValue.charAt(0) === '=') {
                 gui.getCurrentTable().setDataAtCell(gui.selectedCell[0], gui.selectedCell[1], parseNewFormula(newValue));
