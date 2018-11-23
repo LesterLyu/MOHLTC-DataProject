@@ -32,6 +32,7 @@
     "path": "^0.12.7",
     "reload": "^2.3.1",
     "showdown": "^1.9.0",
+    "ssf": "^0.10.2",
     "systeminformation": "^3.49.3",
     "tinytinycolor": "0.0.4",
     "xlsx": "^0.12.13",

@@ -53,7 +53,7 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     const style = sheet.style[row] ? (sheet.style[row][col] || {}) : {};
 
     // render formula
-    let result = calcResult(value);
+    let result = calcResult(value, style.numFmt);
 
     // rich text
     if (value && Array.isArray(value.richText)) {
@@ -245,7 +245,7 @@ function removeFontStyle(element) {
     element.style.textDecoration = '';
 }
 
-function calcResult(cellValue) {
+function calcResult(cellValue, numFmt) {
     let result = cellValue;
     if (cellValue && typeof cellValue === 'object' && cellValue.hasOwnProperty('formula')) {
         if (cellValue.result && cellValue.result.error) {
@@ -256,7 +256,11 @@ function calcResult(cellValue) {
 
         }
     }
-    return result || '';
+    result = result === null || result === undefined ? '' : result;
+    if (numFmt !== null && numFmt !== undefined) {
+        result = SSF.format(numFmt, result);
+    }
+    return result;
 }
 
 function showTimes() {
@@ -268,4 +272,12 @@ function showTimes() {
     console.log('-----\ntimeRenderers: ' + timeRenderers);
     console.log('timeCells: ' + timeCells);
     console.log('-----\ncntCells, cntCellRenderer: ', cntCells, cntCellRenderer);
+}
+
+// for debugging
+function printSelected() {
+    const sheet = gui.getCurrentSheet();
+    const index = gui.getCurrentTable().getSelected()[0];
+    console.log(sheet.data[index[0]][index[1]]);
+    console.log(sheet.style[index[0]][index[1]]);
 }

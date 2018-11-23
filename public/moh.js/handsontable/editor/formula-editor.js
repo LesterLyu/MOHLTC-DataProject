@@ -19,7 +19,7 @@ var FormulaEditor = TextEditor.prototype.extend();
 
 
 FormulaEditor.prototype.prepare = function (row, col, prop, td, originalValue, cellProperties) {
-    this.rawValue = {};
+    this.originalType = typeof originalValue;
     // set editor type
     if (originalValue !== null && originalValue !== undefined && originalValue.hasOwnProperty('formula')) {
         this.type = 'formula';
@@ -42,8 +42,12 @@ FormulaEditor.prototype.prepare = function (row, col, prop, td, originalValue, c
 
 
 FormulaEditor.prototype.getValue = function () {
-    return this.TEXTAREA.value;
-
+    if (this.TEXTAREA.value === '') {
+        return '';
+    }
+    // try to convert to number
+    let res = Number(this.TEXTAREA.value);
+    return isNaN(res) ? this.TEXTAREA.value : res;
 };
 
 
@@ -75,7 +79,7 @@ FormulaEditor.prototype.saveValue = function (value, ctrlDown) {
     if (this.type === 'text') {
         console.log(value);
         return this.instance.setDataAtCell(this.row, this.col, value[0][0])
-        //return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
+        // return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
     }
     else if (this.type === 'formula') {
         const res = parseNewFormula(value[0][0]);
