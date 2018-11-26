@@ -34,6 +34,8 @@ const usersRouter = require('./routes/users');
 
 const workbookRouter = require('./routes/workbook');
 
+const workbookQueryRouter = require('./routes/workbook-query');
+
 const attCatRouter = require('./routes/attCat');
 
 const userManagementRouter = require('./routes/userManagement');
@@ -99,6 +101,7 @@ app.use('/', usersRouter); // API or pages below this requires authentication
 
 app.use('/', attCatRouter);
 app.use('/', workbookRouter);
+app.use('/', workbookQueryRouter);
 app.use('/', userManagementRouter);
 app.use('/', systemManagementRouter);
 

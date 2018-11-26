@@ -49,6 +49,15 @@ a.nav-item.active.show {
 }
 
 /**
+User managemant
+ */
+
+#user-table_wrapper {
+    overflow: auto;
+    min-height: 400px;
+}
+
+/**
 Excel-web
  */
 

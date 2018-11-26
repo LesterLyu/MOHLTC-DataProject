@@ -17,7 +17,8 @@ module.exports = {
         WORKBOOK_TEMPLATE_MANAGEMENT: 'CRUD-workbook-template',
         ATTRIBUTE_CATEGORY_MANAGEMENT: 'create-delete-attribute-category',
         USER_MANAGEMENT: 'user-management',
-        SYSTEM_MANAGEMENT: 'system-management'
+        SYSTEM_MANAGEMENT: 'system-management',
+        WORKBOOK_QUERY: 'workbook-query'
     },
     disableEmailValidation: true,
 };

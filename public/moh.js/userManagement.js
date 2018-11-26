@@ -29,6 +29,7 @@ $(document).ready(function () {
 
 function initDatatable(permissions) {
     $('#user-table').DataTable({
+        pageResize: true,
         ajax: {
             url: '/api/user/details',
             dataSrc: 'users'
