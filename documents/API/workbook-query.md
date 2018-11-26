@@ -2,7 +2,7 @@
 
 Query user entered workbook data **for your group**.
 
-**URL** : `/api/workbook/query/`
+**URL** : `/api/query/workbook/`
 
 **Method** : `GET`
 
