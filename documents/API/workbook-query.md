@@ -4,7 +4,7 @@ Query user entered workbook data **for your group**.
 
 **URL** : `/api/query/workbook/`
 
-**Method** : `GET`
+**Method** : `POST`
 
 **Permission required** : ```config.permissions.WORKBOOK_QUERY```
 
