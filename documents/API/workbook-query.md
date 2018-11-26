@@ -1,6 +1,6 @@
 # Workbook Query
 
-Query user entered workbook data.
+Query user entered workbook data **for your group**.
 
 **URL** : `/api/workbook/query/`
 
