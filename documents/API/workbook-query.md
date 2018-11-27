@@ -13,7 +13,7 @@ Query user entered workbook data **for your group**.
 | Name        |Type           | Default  | Description |
 | ----------- |:-------------:| :--------: | :---------- |
 | wbName | `String`       |     | Name of the workbook you want to query |
-| onlyFilled | ` Object`   |   `false`  | exclude the user who does not fill the workbook  |
+| onlyFilled | ` Object`   |   `true`  | exclude the user who does not fill the workbook  |
 | queryData (*see below) | ` Object`   |     | Query data |
 
 **queryData constraints:**
