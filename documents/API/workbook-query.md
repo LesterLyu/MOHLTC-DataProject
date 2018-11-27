@@ -13,7 +13,7 @@ Query user entered workbook data **for your group**.
 | Name        |Type           | Default  | Description |
 | ----------- |:-------------:| :--------: | :---------- |
 | wbName | `String`       |     | Name of the workbook you want to query |
-| onlyFilled | `Boolean`   |   `true`  | exclude the user who does not fill the workbook  |
+| onlyFilled (not implemented yet) | `Boolean`   |   `true`  | exclude the user who does not fill the workbook  |
 | includeCatAttId | `Boolean`   |   `false`  | if `true`, result will include `attId` and `catId`, i.e.  `{"username": "username1", "catId": "1212", "attId": "1234", "data": "some data"}`|
 | queryData (*see below) | `Object`   |     | Query data |
 
