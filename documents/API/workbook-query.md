@@ -56,7 +56,7 @@ queryData:
             [
                {"username": "username1", "catId": "1232", "attId": "1235", "data": "some data"},
                {"username": "username2", "catId": "1232", "attId": "1235", "data": "some data"},
-               {"username": "username2", "catId": "1232", "attId": "1235", "data": "some data"},
+               {"username": "username3", "catId": "1232", "attId": "1235", "data": "some data"},
             ],
             [ 
                {"username": "username1", "catId": "5432", "attId": "1335", "data": "some data"},
