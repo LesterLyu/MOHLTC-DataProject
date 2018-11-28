@@ -211,7 +211,12 @@ module.exports = {
                     }
                     // set user info in the session
                     req.session.user = user;
-                    return res.json({success: true, username: user.username, redirect: '/profile'});
+                    let redirectUrl = '/profile';
+                    if (req.session.originalUrl) {
+                        redirectUrl = req.session.originalUrl;
+                        delete req.session.originalUrl;
+                    }
+                    return res.json({success: true, username: user.username, redirect: redirectUrl});
                 });
             })(req, res, next);
 

@@ -54,6 +54,7 @@ router.get('/validate/:token', user_controller.user_validate);
 router.use((req, res, next) => {
 
     if (!req.isAuthenticated()) {
+        req.session.originalUrl = req.originalUrl;
         return res.redirect('/login');
     }
     else {
