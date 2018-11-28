@@ -102,8 +102,9 @@ document.querySelector('#select-att').onchange = (e) => {
 };
 
 document.querySelector('#select-cat').onchange = (e) => {
-    if (e.target.value !== '' && $('#select-att').val() !== '')
-        requestDate($('#select-workbook').val(), $('#select-worksheet').val(), $('#select-cat').val(), $('#select-att').val());
+    const selectAtt = $('#select-att');
+    if (e.target.value !== '' && selectAtt.val() !== '')
+        requestDate($('#select-workbook').val(), $('#select-worksheet').val(), $('#select-cat').val(), selectAtt.val());
 };
 
 function requestDate(wb, ws, attId, catId) {
@@ -132,7 +133,7 @@ function requestDate(wb, ws, attId, catId) {
                 li.innerText = 'user: ' + data[i].username + ', data: ' + JSON.stringify(data[i].data);
                 ul.appendChild(li);
             }
-            resultDiv.innerHTML = '';
+            resultDiv.innerHTML = data.length + ' data available: <br>';
             resultDiv.appendChild(ul);
 
             if (data.length === 0)

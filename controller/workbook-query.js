@@ -83,7 +83,7 @@ async function getDataAtLocation(includeAttCatId, onlyFilled, groupNumber, wbNam
                     let data;
                     if (filledWorkbooks[i].data[sheetNo][row] && filledWorkbooks[i].data[sheetNo][row][col] !== undefined) {
                         data = filledWorkbooks[i].data[sheetNo][row][col];
-                        if (typeof data === "object" && 'result' in data) {
+                        if (data !== null && typeof data === "object" && 'result' in data) {
                             data = data.result;
                         }
                     }
@@ -134,7 +134,8 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-        Workbook.find({}, {name: 1}, (err, docs) => {
+        const groupNumber = req.session.user.groupNumber;
+        Workbook.find({groupNumber: groupNumber}, {name: 1}, (err, docs) => {
             if (err) {
                 console.log(err);
                 return res.status(400).json({success: false, message: err});

@@ -7,4 +7,5 @@ let fillerWorkbookSchema = new mongoose.Schema({
     groupNumber: {type: Number, required: true},
     data: {},
 });
+fillerWorkbookSchema.index({name: 1, username: 1}, {unique: true});
 module.exports = mongoose.model('FillerWorkbook', fillerWorkbookSchema);

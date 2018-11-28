@@ -1,5 +1,6 @@
 const express = require('express');
 const workbookQueryController = require('../controller/workbook-query');
+const batch = require('../controller/batch');
 let router = express.Router();
 
 const error = require('../config/error');
@@ -15,6 +16,9 @@ router.get('/api/query/workbook/names', workbookQueryController.get_workbook_nam
 
 router.get('/api/query/workbook/detail', workbookQueryController.get_workbook_query_detail);
 
+// only internal use!!!
+router.post('/api/batch/signup', batch.multiSignUp);
 
+router.post('/api/batch/save/workbook', batch.saveWorkbookToAllUsers);
 
 module.exports = router;
