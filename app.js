@@ -52,7 +52,7 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public/moh.css')));
 
 // MongoDB
-mongoose.connect(config.database, {
+mongoose.connect(process.env.NODE_ENV === 'test' ? config.testDatabase : config.database, {
     useNewUrlParser: true
 });
 let db = mongoose.connection;
