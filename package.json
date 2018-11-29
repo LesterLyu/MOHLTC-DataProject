@@ -67,7 +67,7 @@
   "scripts": {
     "start": "node app.js",
     "prestart": "./node_modules/.bin/grunt",
-    "test": "./node_modules/.bin/mocha --recursive",
+    "test": "./node_modules/.bin/mocha ./test/main.js ./test/ --recursive --exit",
     "build": "./node_modules/.bin/grunt",
     "watch": "./node_modules/.bin/grunt watch",
     "prod": "./node_modules/.bin/grunt prod"
