@@ -6,6 +6,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-clean');
+    grunt.loadNpmTasks('grunt-run');
 
     let config = {
         pkg: grunt.file.readJSON('package.json'),
@@ -124,6 +125,11 @@ module.exports = function (grunt) {
 
         clean: ['build', 'public/dist', 'release-beta.zip'],
 
+        run: {
+            report: {
+                exec: '"./node_modules/.bin/mocha" ./test/main.js ./test/ --recursive --exit --check-leaks -R mochawesome'
+            }
+        }
 
 
     };
@@ -141,7 +147,7 @@ module.exports = function (grunt) {
     });
 
     grunt.registerTask("default", ["clean", "concat", "configureBabel", "babel"]);
-    grunt.registerTask("prod", ["clean", "concat", "configureBabel", "babel", "copy", "mkdir", "compress"]);
+    grunt.registerTask("prod", ["clean", "concat", "configureBabel", "babel", "run:report", "copy", "mkdir", "compress"]);
 
 
 };
