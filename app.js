@@ -69,6 +69,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use('/documents', express.static(path.join(__dirname, 'documents')));
+app.use('/test', express.static(path.join(__dirname, 'mochawesome-report')));
 
 app.use(session({
     secret: config.superSecret,
@@ -124,8 +125,15 @@ app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error');
 });
+const server = http.createServer(app);
 
-http.createServer(app).listen(app.get('port'), function () {
+server.on('error', (e) => {
+    if (e.code === 'EADDRINUSE') {
+        console.log('Address in use, exited...');
+    }
+});
+
+server.listen(app.get('port'), function () {
     console.log("Express server listening on port " + app.get('port'));
 });
 module.exports = app;

@@ -3,6 +3,7 @@ const Attribute = require('../../models/attribute');
 const Category = require('../../models/category');
 const color = require('./color');
 const xlsx = require('./xlsx');
+const xmlparser = require('fast-xml-parser');
 const ENABLE_CHECK = false;
 
 class Workbook {
@@ -17,6 +18,7 @@ class Workbook {
         this.catMap = {};
         this.storedData = {};
         this.storedExtra = {};
+        this.themeColor = [];
         Workbook.attributes = {};
         Workbook.categories = {};
     }
@@ -184,6 +186,7 @@ class Workbook {
                         wbData.definedNames[name].push(cell);
                     });
                 });
+                self.themeColor = processThemes(wb._themes);
 
                 wb.eachSheet(function (worksheet, sheetId) {
                     const orderNo = worksheet.orderNo;
@@ -290,6 +293,17 @@ class Workbook {
                 return [self.storedData, self.storedExtra, self.attMap, self.catMap];
             });
     }
+}
+
+function processThemes(themes) {
+    const res = [];
+    for (let key in themes) {
+        const theme = xmlparser.parse(themes[key], {
+            ignoreAttributes: false
+        });
+        res.push(theme)
+    }
+    return res;
 }
 
 module.exports = Workbook;

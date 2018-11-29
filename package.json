@@ -62,12 +62,14 @@
     "grunt-contrib-watch": "^1.1.0",
     "load-grunt-tasks": "^4.0.0",
     "mocha": "^5.2.0",
+    "mochawesome": "^3.1.1",
     "uglify-js": "^3.4.9"
   },
   "scripts": {
     "start": "node app.js",
     "prestart": "./node_modules/.bin/grunt",
-    "test": "./node_modules/.bin/mocha ./test/main.js ./test/ --recursive --exit",
+    "test": "./node_modules/.bin/mocha ./test/main.js ./test/ --recursive --exit --check-leaks -R mochawesome",
+    "posttest": "start ./mochawesome-report/mochawesome.html",
     "build": "./node_modules/.bin/grunt",
     "watch": "./node_modules/.bin/grunt watch",
     "prod": "./node_modules/.bin/grunt prod"
