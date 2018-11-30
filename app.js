@@ -46,7 +46,7 @@ const User = require('./models/user');
 
 const setup = require('./controller/setup');
 
-app.set('port', process.env.PORT || 3000);
+app.set('port', process.env.PORT || process.env.NODE_ENV === 'test' ? 3005 : 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public/moh.css')));
