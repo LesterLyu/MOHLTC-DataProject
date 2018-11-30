@@ -14,10 +14,11 @@
     - Real time Workbook Query 'Workbook Query -> Query workbooks'
     - Test file, test scripts
     - view test report in 'System -> Test Report'
+    - Auto redirect to the last page you visit after login
  - Fix:
-   - Fix border alignment issue.
-   - Optimize front-end performance, half the loading time!
-   - Many other bugs
+    - Fix border alignment issue.
+    - Optimize front-end performance, half the loading time!
+    - Many other bugs
 
 ### Dev 0.3.2
  - Breakthrough supports:

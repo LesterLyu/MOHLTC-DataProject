@@ -54,7 +54,8 @@ router.get('/validate/:token', user_controller.user_validate);
 router.use((req, res, next) => {
 
     if (!req.isAuthenticated()) {
-        req.session.originalUrl = req.originalUrl;
+        if (req.method === 'GET' && !req.originalUrl.includes('api'))
+            req.session.originalUrl = req.originalUrl;
         return res.redirect('/login');
     }
     else {
@@ -99,7 +100,7 @@ router.get('/profile', function (req, res) {
 
 // update profile
 
-router.post('/api/update-profile',user_controller.update_user_info);
+router.post('/api/update-profile', user_controller.update_user_info);
 
 
 router.get('/update-profile', function (req, res) {
