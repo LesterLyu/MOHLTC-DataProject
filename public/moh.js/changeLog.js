@@ -3,12 +3,9 @@ function showChangeLog() {
         tasklists: true,
     });
 
-    fetch('/documents/update-history.md')
-        .then(response => {
-            return response.text()
-        })
-        .then(data => {
+    $.get('/documents/update-history.md')
+        .done(data => {
             const html = converter.makeHtml(data);
             $('#changelog-modal').find('h5').html('Changelog').end().find('p').html(html).end().modal('show');
         })
-    }
+}
