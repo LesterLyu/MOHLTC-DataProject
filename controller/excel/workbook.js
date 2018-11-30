@@ -157,6 +157,11 @@ class Workbook {
                                 };
                             }
                             else {
+                                if (cell.type === Excel.ValueType.RichText) {
+                                    for (let i = 0; i < cell.value.richText.length; i++) {
+                                        translateColor(cell.value.richText[i]);
+                                    }
+                                }
                                 self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
                             }
                         });
@@ -263,6 +268,11 @@ class Workbook {
                                     };
                                 }
                                 else {
+                                    if (cell.type === Excel.ValueType.RichText) {
+                                        for (let i = 0; i < cell.value.richText.length; i++) {
+                                            translateColor(cell.value.richText[i]);
+                                        }
+                                    }
                                     self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
                                 }
                             }
@@ -342,7 +352,7 @@ function translateColor(style, themeColor) {
                 hsl.l = hsl.l * (1 + tint);
                 style.font.color = {argb: 'ff' + tinycolor(hsl).toHex()}
             }
-            else if (tint > 0){
+            else if (tint > 0) {
                 hsl.l = hsl.l * (1 - tint) + tint;
                 style.font.color = {argb: 'ff' + tinycolor(hsl).toHex()}
             }
