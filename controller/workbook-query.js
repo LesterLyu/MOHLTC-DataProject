@@ -5,7 +5,6 @@ const Workbook = require('../models/workbook');
 const FilledWorkbook = require('../models/filledWorkbook');
 const error = require('../config/error');
 const config = require('../config/config');
-const excel = require('./excel/xlsx');
 const {gzip, ungzip} = require('node-gzip');
 const pako = require('pako');
 const ExcelWorkbook = require('./excel/workbook');
