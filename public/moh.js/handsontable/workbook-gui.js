@@ -499,6 +499,8 @@ class WorkbookGUI {
                         settings.viewportRowRenderingOffset += extra.views[0].ySplit;
                         settings.viewportColumnRenderingOffset += extra.views[0].xSplit;
                     }
+                    // TO-DO: if more than 10 consequent rows/cols are hidden, viewportRowRenderingOffset and
+                    // viewportColumnRenderingOffset should be changed to max number of consequent hidden row/col.
 
                     this.getCurrentTable().updateSettings(settings);
                 }
