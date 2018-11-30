@@ -159,7 +159,7 @@ class Workbook {
                             else {
                                 if (cell.type === Excel.ValueType.RichText) {
                                     for (let i = 0; i < cell.value.richText.length; i++) {
-                                        translateColor(cell.value.richText[i]);
+                                        translateColor(cell.value.richText[i], self.themeColor);
                                     }
                                 }
                                 self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
@@ -270,7 +270,7 @@ class Workbook {
                                 else {
                                     if (cell.type === Excel.ValueType.RichText) {
                                         for (let i = 0; i < cell.value.richText.length; i++) {
-                                            translateColor(cell.value.richText[i]);
+                                            translateColor(cell.value.richText[i], self.themeColor);
                                         }
                                     }
                                     self.storedData[orderNo][rowNumber - 1][colNumber - 1] = cell.value;
