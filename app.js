@@ -129,7 +129,11 @@ const server = http.createServer(app);
 
 server.on('error', (e) => {
     if (e.code === 'EADDRINUSE') {
-        console.log('Address in use, exited...');
+        // exit when not in testing mode
+        if (process.env.NODE_ENV !== 'test') {
+            console.log('Address in use, exited...');
+            process.exit(1);
+        }
     }
 });
 

@@ -74,7 +74,8 @@
     "posttest": "start ./mochawesome-report/mochawesome.html",
     "build": "./node_modules/.bin/grunt",
     "watch": "./node_modules/.bin/grunt watch",
-    "prod": "./node_modules/.bin/grunt prod"
+    "prod": "./node_modules/.bin/grunt prod",
+    "aws": "npm install && npm run prod && npm start"
   },
   "repository": {
     "type": "git",
