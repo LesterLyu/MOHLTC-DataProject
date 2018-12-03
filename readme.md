@@ -1,5 +1,5 @@
 # DataProject
-## Live on http://ec2-18-218-171-151.us-east-2.compute.amazonaws.com/
+## Live on http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com
 ## TO-DO
   - [ ] Read excel styles in back-end
   - [ ] API for upload excel and apply style to workbook
@@ -10,7 +10,7 @@
  - [X] "Change Password" in Profile page
  - [X] "Change Profile" in Profile page
  - [X] Warning when delete attribute/category that is used in the system
- 
+
 ## Documents
 - [User Types](documents/user-types.md)
 - [Excel Indexed Colors](https://github.com/ClosedXML/ClosedXML/wiki/Excel-Indexed-Colors)
