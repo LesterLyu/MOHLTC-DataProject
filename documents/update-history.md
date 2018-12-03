@@ -1,8 +1,10 @@
 ### To-DO
 
-- [ ] Add more border option.
-- [ ] Auto re-evaluate formulas.
+- [ ] Add more border option
+- [ ] Auto re-evaluate formulas
 - [ ] Border with merge cell issue
+- [ ] Border with empty row/col issue
+- [ ] RichText row alignment issue
 
 ### Dev 0.3.6
  - Breakthrough supports:

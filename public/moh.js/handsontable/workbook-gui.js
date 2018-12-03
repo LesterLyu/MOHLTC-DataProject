@@ -28,6 +28,7 @@ class WorkbookGUI {
         this.selectedCell = [-1, -1];
         this.state = {loaded: []};
         this._appendAddSheetTab();
+        this.calculationChain = new CalculationChain();
     }
 
     /**
