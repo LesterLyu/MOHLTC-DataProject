@@ -1,11 +1,11 @@
 # DataProject
 ## Live on http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com
 ## TO-DO
-  - [ ] Read excel styles in back-end
-  - [ ] API for upload excel and apply style to workbook
-  - [ ] Show workbooks with excel styles
+  - [X] Read excel styles in back-end
+  - [X] API for upload excel and apply style to workbook
+  - [X] Show workbooks with excel styles
   - [ ] Warning when delete workbook that is filled by user
-  - [ ] Setup page (First time run)
+  - [X] Setup page (First time run)
 ## Finished
  - [X] "Change Password" in Profile page
  - [X] "Change Profile" in Profile page
