@@ -89,6 +89,7 @@ module.exports = function (grunt) {
                             'models/**',
                             'routes/**',
                             'views/**',
+                            'test/**',
                             'mochawesome-report/**',
                             'app.js',
                             'Gruntfile.js',

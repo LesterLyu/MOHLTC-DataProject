@@ -8,7 +8,6 @@
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.18.3",
     "compression": "^1.7.3",
-    "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.3",
     "ejs": "^2.6.1",
     "exceljs": "git+https://github.com/LesterLyu/exceljs.git#beta",
@@ -70,12 +69,13 @@
   "scripts": {
     "start": "node app.js",
     "prestart": "./node_modules/.bin/grunt",
-    "test": "./node_modules/.bin/mocha ./test/main.js ./test/ --recursive --exit --check-leaks -R mochawesome",
+    "test": "./node_modules/.bin/mocha test/main.js test/ --recursive --exit --check-leaks -R mochawesome",
     "posttest": "start ./mochawesome-report/mochawesome.html",
     "build": "./node_modules/.bin/grunt",
     "watch": "./node_modules/.bin/grunt watch",
     "prod": "./node_modules/.bin/grunt prod",
-    "aws": "npm install && npm run prod && npm start"
+    "aws": "NODE_ENV=production&& node app.js",
+    "preaws": "npm run prod"
   },
   "repository": {
     "type": "git",

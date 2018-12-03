@@ -22,8 +22,6 @@ const logger = require('morgan'); //Note logger = morgan~!
 
 const session = require('express-session');
 
-const flash = require('connect-flash');
-
 const fileUpload = require('express-fileupload');
 
 const config = require('./config/config');
@@ -46,7 +44,7 @@ const User = require('./models/user');
 
 const setup = require('./controller/setup');
 
-app.set('port', process.env.PORT || process.env.NODE_ENV === 'test' ? 3005 : 3000);
+app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public/moh.css')));
@@ -57,7 +55,7 @@ mongoose.connect(process.env.NODE_ENV === 'test' ? config.testDatabase : config.
 });
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function() {
+db.once('open', function () {
     // we're connected!
     console.log('MongoDB connected!')
 });
@@ -86,10 +84,9 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
 
 app.use(fileUpload({
-    limits: { fileSize: 50 * 1024 * 1024 },
+    limits: {fileSize: 50 * 1024 * 1024},
 }));
 
 setup.setup();
@@ -105,7 +102,6 @@ app.use('/', workbookRouter);
 app.use('/', workbookQueryRouter);
 app.use('/', userManagementRouter);
 app.use('/', systemManagementRouter);
-
 
 
 // catch 404 and forward to error handler
@@ -129,15 +125,14 @@ const server = http.createServer(app);
 
 server.on('error', (e) => {
     if (e.code === 'EADDRINUSE') {
-        // exit when not in testing mode
-        if (process.env.NODE_ENV !== 'test') {
-            console.log('Address in use, exited...');
-            process.exit(1);
-        }
+        console.log('Address in use, exited...');
+        process.exit(1);
     }
 });
-
-server.listen(app.get('port'), function () {
-    console.log("Express server listening on port " + app.get('port'));
-});
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(app.get('port'), function () {
+        console.log("Express server listening on port " + app.get('port'));
+    });
+}
+console.log('in ' + process.env.NODE_ENV + ' mode');
 module.exports = app;
