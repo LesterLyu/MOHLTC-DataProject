@@ -108,7 +108,7 @@ Excel-web
 
 .workbookName {
     border: 1px solid #fff0;
-    font-size: 20px;
+    font-size: 16px;
     font-weight: bold;
     /*padding: 0;*/
 }
@@ -123,7 +123,7 @@ Excel-web
 }
 
 .workbookName.has-border {
-    border: 1px solid #ced4da;
+    /*border: 1px solid #ced4da;*/
     border-radius: .25rem;
 }
 

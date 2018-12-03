@@ -814,6 +814,11 @@ window.onhashchange = function () {
 $(document).ready(function () {
     // enable bootstrap tooltip
     $('[data-toggle="tooltip"]').tooltip();
+    const nameInput = document.querySelector('#workbookNameInput');
+    nameInput.setAttribute('size', nameInput.value.length);
+    nameInput.onchange = (e) => {
+        e.srcElement.setAttribute('size',  e.target.value.length);
+    }
 });
 
 
