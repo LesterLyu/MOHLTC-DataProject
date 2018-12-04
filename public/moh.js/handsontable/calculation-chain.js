@@ -28,6 +28,21 @@ class CalculationChain {
         this.parser.parse(formula)
     }
 
+    change(currSheet, row, col) {
+        evaluateFormula(currSheet, row, col);
+        const curr = currSheet + '/' + colCache.encode(row + 1, col + 1);
+        if (curr in this.data) {
+            for (let idx = 0; idx < this.data[curr].length; idx++) {
+                const needToUpdate = this.data[curr][idx];
+                const i = needToUpdate.indexOf('/');
+                const sheet = needToUpdate.substring(0, i);
+                const cell = needToUpdate.substring(i + 1);
+                const decoded = colCache.decode(cell);
+                this.change(sheet, decoded.row - 1, decoded.col - 1);
+            }
+        }
+    }
+
     _initParser() {
         const self = this;
         this.parser.on('callCellValue', (cellCoord, done) => {

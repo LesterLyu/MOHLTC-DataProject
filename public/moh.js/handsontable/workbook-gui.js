@@ -111,6 +111,11 @@ class WorkbookGUI {
             gui.setFormula(res);
         }, createdTable);
 
+        Handsontable.hooks.add('afterChange', (changes, source) => {
+            if (source === 'edit')
+                that.calculationChain.change(sheetNo, changes[0][0], changes[0][1])
+        }, createdTable);
+
         return createdTable;
     }
 
@@ -456,6 +461,10 @@ class WorkbookGUI {
         return this.tables[this.sheetNamesWithoutHidden.indexOf(name)];
     }
 
+    getTableBySheetNo(sheetNo) {
+        return this.getTable(this.sheetNames[sheetNo])
+    }
+
     getCurrentTable() {
         return this.tables[this.sheetNamesWithoutHidden.indexOf(this.currSheet)];
     }
@@ -537,7 +546,7 @@ class WorkbookGUI {
                     if (data && data[rowNumber] && data[rowNumber][colNumber] !== undefined) {
                         const cellData = data[rowNumber][colNumber];
                         wsData.data[rowNumber].push(cellData);
-                        if (cellData && typeof cellData === 'object' && 'formula' in cellData){
+                        if (cellData && typeof cellData === 'object' && 'formula' in cellData) {
                             this.calculationChain.addCell(orderNo, rowNumber, colNumber, cellData.formula)
                         }
                         // delete data[rowNumber][colNumber];
@@ -769,12 +778,8 @@ function getWorkbook(sheets, sheetNames) {
 }
 
 // re-evaluate formula
-function evaluateFormula(sheetName, row, col) {
-    if (!sheetNames.includes(sheetName)) {
-        console.log('Error: sheetName not found.');
-        return
-    }
-    var sheet = sheets[sheetNames.indexOf(sheetName)];
+function evaluateFormula(orderNo, row, col) {
+    var sheet = gui.getTableBySheetNo(orderNo);
     var data = sheet.getDataAtCell(row, col);
     if (!data.hasOwnProperty('formula')) {
         console.log('Error: evaluateFormula(): cell provided is not a formula');
@@ -789,7 +794,7 @@ function evaluateFormula(sheetName, row, col) {
         data.result = calculated.result;
     }
 
-    sheet.setDataAtCell(row, col, data);
+    sheet.setDataAtCell(row, col, data, 'reevaluate');
     return data;
 }
 
@@ -827,7 +832,7 @@ $(document).ready(function () {
     const nameInput = document.querySelector('#workbookNameInput');
     nameInput.setAttribute('size', nameInput.value.length);
     nameInput.addEventListener('input', (e) => {
-        e.srcElement.setAttribute('size',  e.target.value.length);
+        e.srcElement.setAttribute('size', e.target.value.length);
     });
 });
 
