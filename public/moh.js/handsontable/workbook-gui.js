@@ -518,6 +518,12 @@ class WorkbookGUI {
         }
         global.workbookData.sheets = {};
         global.hyperlinks = {};
+
+        this.sheetNames = [];
+        for (let orderNo in global.workbookRawData) {
+            this.sheetNames.push(global.workbookRawData[orderNo].name);
+        }
+
         for (let orderNo in global.workbookRawData) {
             const wsData = global.workbookData.sheets[orderNo] = {};
             const data = global.workbookRawData[orderNo];
@@ -529,7 +535,11 @@ class WorkbookGUI {
                 wsData.data.push([]);
                 for (let colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
                     if (data && data[rowNumber] && data[rowNumber][colNumber] !== undefined) {
-                        wsData.data[rowNumber].push(data[rowNumber][colNumber]);
+                        const cellData = data[rowNumber][colNumber];
+                        wsData.data[rowNumber].push(cellData);
+                        if (cellData && typeof cellData === 'object' && 'formula' in cellData){
+                            this.calculationChain.addCell(orderNo, rowNumber, colNumber, cellData.formula)
+                        }
                         // delete data[rowNumber][colNumber];
                     }
                     else {

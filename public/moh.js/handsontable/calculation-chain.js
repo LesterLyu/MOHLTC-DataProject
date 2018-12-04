@@ -1,11 +1,79 @@
 class CalculationChain {
     constructor() {
+        /**
+         * Change sheetNo1!A1 's value will result in re-calculating sheetNo2!B1,
+         * i.e. sheetNo2!B1 depends on sheetNo1!A1
+         * {
+         *     sheetNo1: {
+         *         'A1': {
+         *             sheetNo2: [
+         *                 'B1', ...
+         *             ]
+         *         }
+         *     }
+         * }
+         */
         this.data = {};
-        this.CELL = /('?[A-Za-z0-9]+'?!)?(\$?[A-Za-z]+\$?[0-9]+)(?![0-9]*!)/g;
 
+        // init parser
+        this.parser = new formulaParser.Parser();
+        this._initParser();
+        this.state = {currSheet: null, currCell: null};
     }
 
-    addCell(sheet, row, col, formula) {
+    addCell(currSheet, row, col, formula) {
+        this.state.currSheet = currSheet;
+        this.state.currCell = colCache.encode(row + 1, col + 1);
+        this.state.curr = this.state.currSheet + '/' + this.state.currCell;
+        this.parser.parse(formula)
+    }
+
+    _initParser() {
+        const self = this;
+        this.parser.on('callCellValue', (cellCoord, done) => {
+            let sheet;
+            if ('sheet' in cellCoord) {
+                sheet = gui.sheetNames.indexOf(cellCoord.sheet);
+            }
+            else {
+                sheet = self.state.currSheet;
+            }
+            const dep = sheet + '/' + cellCoord.label;
+
+            if (!(dep in self.data)) {
+                self.data[dep] = []
+            }
+
+            self.data[dep].push(self.state.curr);
+            done(0);
+        });
+
+        this.parser.on('callRangeValue', (startCellCoord, endCellCoord, done) => {
+            let sheet;
+            if ('sheet' in startCellCoord) {
+                sheet = gui.sheetNames.indexOf(startCellCoord.sheet);
+            }
+            else {
+                sheet = self.state.currSheet;
+            }
+            // const fragment = [];
+            for (let row = startCellCoord.row.index; row <= endCellCoord.row.index; row++) {
+                // const colFragment = [];
+                for (let col = startCellCoord.column.index; col <= endCellCoord.column.index; col++) {
+                    const label = colCache.encode(row + 1, col + 1);
+                    const dep = sheet + '/' + label;
+
+                    if (!(dep in self.data)) {
+                        self.data[dep] = []
+                    }
+
+                    self.data[dep].push(self.state.curr);
+                    // colFragment.push(0);
+                }
+                // fragment.push(colFragment);
+            }
+            done(0)
+        })
 
     }
 }
@@ -13,3 +81,6 @@ class CalculationChain {
 function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
+
+
+
