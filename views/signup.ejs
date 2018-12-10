@@ -1,5 +1,6 @@
 <%- include('./common/header', {title: 'Sign Up'}); -%>
 
+
 <div class="container col-sm-8 col-md-6 col-lg-5 col-xl-4 vertical-gap">
 
     <div class="loginBox">
@@ -60,7 +61,8 @@
                 <input type="email" id="email" name="email" class="form-control singupinput"/>
                 <br/>
                 <label class="signuplabel" for="contactPhone">Phone number: </label>
-                <input type="number" id="phoneNumber" name="phoneNumber" placeholder="2269799881"
+                <br/>
+                <input type="tel" id="phone"  name="phoneNumber" placeholder="2269799881"
                        class="form-control singupinput"/>
             </div>
             <div class="form-group">
@@ -85,6 +87,12 @@
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
 
+<link rel="stylesheet" href="../node_modules/intl-tel-input/build/css/intlTelInput.css">
+<script src="../node_modules/intl-tel-input/build/js/intlTelInput.js"></script>
+
+<script>
+
+</script>
 
 <script
         src="https://code.jquery.com/jquery-3.3.1.min.js"

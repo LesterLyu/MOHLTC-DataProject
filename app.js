@@ -34,6 +34,8 @@ const workbookRouter = require('./routes/workbook');
 
 const workbookQueryRouter = require('./routes/workbook-query');
 
+const LdapStrategy = require('passport-ldapauth');
+
 const attCatRouter = require('./routes/attCat');
 
 const userManagementRouter = require('./routes/userManagement');
@@ -43,6 +45,7 @@ const systemManagementRouter = require('./routes/systemManagement');
 const User = require('./models/user');
 
 const setup = require('./controller/setup');
+
 
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -91,6 +94,15 @@ app.use(fileUpload({
 
 setup.setup();
 
+//app.post('/api/login', passport.authenticate('ldapauth', {session: false}, function(err, user, info){
+  //  console.log(err);
+    //console.log(user.username);
+    //console.log(info);
+//}), function (req, res){
+  //  console.log("ss");
+   // res.send({status: 'ok'});
+//});
+
 // home page
 app.use('/', indexRouter);
 // user authentication related
@@ -103,6 +115,8 @@ app.use('/', workbookQueryRouter);
 app.use('/', userManagementRouter);
 app.use('/', systemManagementRouter);
 
+
+app.listen(8080);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

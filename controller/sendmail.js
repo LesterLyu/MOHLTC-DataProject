@@ -84,7 +84,6 @@ module.exports = {
     },
 
 
-
     sendRegisterFailEmail: function(to, callback) {
         let mailOptions = {
             from: config.mailServer.sender, // sender address
@@ -101,6 +100,26 @@ module.exports = {
             console.log('Message sent: %s', info.messageId);
             callback('Email sent.');
         });
-    }
+    },
+
+    sendRequestRemindEmail: function (to, username, callback) {
+        let mailOptions = {
+            from: config.mailServer.sender, // sender address
+            to: to, // list of receivers
+            subject: 'Registration Request', // Subject line
+            text: '', // plain text body
+            html: '<html>' + username + ' has submitted his registration request. Please log in your account and approve/disapprove his request.' + '<br>'
+                + config.serverHostname +'/login' + ' <html>'
+        };
+
+        smtpTransport.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                return console.log(error);
+            }
+            console.log('Message sent: %s', info.messageId);
+            callback('Email sent.');
+        });
+    },
+
 
 };

@@ -49,6 +49,17 @@ a.nav-item.active.show {
 }
 
 /**
+Phone number validate
+ */
+
+.iti-flag {background-image: url("../../node_modules/intl-tel-input/build/img/flags.png");}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .iti-flag {background-image: url("../../node_modules/intl-tel-input/build/img/flags@2x.png");}
+}
+
+
+/**
 User managemant
  */
 

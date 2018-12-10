@@ -1,7 +1,13 @@
 const express = require('express');
+const passport = require('passport');
+const LdapStrategy = require('passport-ldapauth');
+const config = require('../config/config');
 const user_controller = require('../controller/user');
 const registration_local_controller = require('../controller/registration/local');
+const registration_ldap_controller = require('../controller/registration/ldap');
 let router = express.Router();
+
+passport.use(new LdapStrategy(config.OPTS));
 
 router.get('/login', function (req, res) {
     if (req.isAuthenticated()) {
@@ -14,11 +20,13 @@ router.get('/signup', function (req, res) {
     res.render('signup.ejs');
 });
 
+
+
 router.get('/api/organization_details', user_controller.getOrganizationDetails);
 
 // POST request for user sign up from ldap server
-router.post('/api/signup', user_controller.user_sign_up);
 
+router.post('/api/signup', registration_ldap_controller.user_ldap_signup);
 // POST request for user sign up locally
 router.post('/api/signup/local', registration_local_controller.user_sign_up_local);
 
@@ -27,9 +35,9 @@ router.get('/register-success-submit', function (req, res) {
 });
 
 // POST request for user sign in
-router.post('/api/login', user_controller.user_log_in);
+router.post('/api/login/local', user_controller.user_log_in);
 
-
+router.post('/api/login/ldap', registration_ldap_controller.user_auth_login);
 // reset password by email
 router.get('/enter-your-email', function (req, res) {
     res.render('ForgetPasswordReset.ejs');

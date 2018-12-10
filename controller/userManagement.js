@@ -3,6 +3,7 @@ const RegisterRequest = require('../models/registerRequest');
 const passport = require('passport');
 const sendMail = require('./sendmail');
 const jwt = require('jsonwebtoken');
+const registration_ldap_controller = require('./registration/ldap');
 const config = require('../config/config'); // get our config file
 const error = require('../config/error');
 
@@ -35,7 +36,8 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-        const permission = req.body.permissions;
+        const permission = req.body.data.permission;
+        const actives = req.body.data.actives;
         let fails = [],
             promiseArr = [],
             activesArr = [];
@@ -55,8 +57,7 @@ module.exports = {
 
             // add to promise chain
             promiseArr.push(new Promise((resolve, reject) => {
-                User.findOneAndUpdate({username: username}, {permissions: filteredPermissions,
-                    active: permission[i].active})
+                User.findOneAndUpdate({username: username}, {permissions: filteredPermissions})
                     .then(result => resolve())
                     .catch(err => {
                         console.log(err);
@@ -64,7 +65,19 @@ module.exports = {
                     })
             }));
         }
+        for (var i = 0; i< actives.length; i++) {
+            const username = actives[i].username;
+            const active = actives[i].active;
+            activesArr.push(new Promise((resolve, reject) => {
+                User.findOneAndUpdate({username: username}, {active: active})
+                    .then(result => resolve())
+                    .catch(err => {
+                        console.log(err);
+                        fails.push(username);
+                    })
+            }));
 
+        }
         Promise.all(promiseArr).then(() => {
             if (fails.length !== 0) {
                 return res.json({
@@ -101,6 +114,9 @@ module.exports = {
                 if (err) {
                     return res.status(501).json({success: false, message: err});
                 }
+
+                registration_ldap_controller.user_ldap_register(req, res, user, next);
+
                 var permissions = [];
                 if (req.body.data.role === "user") {
                     permissions.push("CRUD-workbook-template");
@@ -125,13 +141,13 @@ module.exports = {
                     permissions: permissions
                 });
                 var temporaryPassword = Math.random().toString(36).slice(-8);
-                User.register(newUser, temporaryPassword, (err, user) => {
+                User.register(newUser, user.password, (err, user) => {
                     if (err) {
                         console.log(err);
                         return res.json({success: false, message: err});
                     }
                     console.log('success register');
-                    sendMail.sendRegisterSuccessEmail(user.email, temporaryPassword, (info) => {
+                    sendMail.sendRegisterSuccessEmail(user.email, user.password, (info) => {
                         RegisterRequest.findOneAndDelete({username: username}, function(err) {
                             if (err) {
                                 return res.status(501).json({success: false, message: err});
@@ -152,21 +168,51 @@ module.exports = {
                     });
                 });
             });
+
+
+
+
+
+
         }
     },
 
+    create_organization: (req, res, next)=> {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
 
+        const organization = req.body.organization;
+        if (organization === '') {
+            return res.status(400).json({success: false, message: 'Organization cannot be empty.'});
+        } else if (organization in config.organizations) {
+            return res.status(400).json({success: false, message: 'Organization ' + organization.name + ' exists.'});
+        } else {
+            var groupNum = config.maxGroupNumber + 1;
+            let newOrganization = new Organization({
+                groupNumber: groupNum,
+                name: req.body.organization,
+            });
+            newOrganization.save((err, updatedOrganization) => {
+                if (err) {
+                    console.log(err);
+                    return next(err);
+                }
+                config.maxGroupNumber += 1;
+                config.organizations[req.body.organization] = groupNum;
+                return res.json({success: true, message: 'Organization ' + updatedOrganization.name + ' has been added'})
+            });
+        }
+
+    },
 
     admin_get_all_users_with_details: (req, res, next) => {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
+
         const groupNumber = req.session.user.groupNumber;
-        let query = {groupNumber: groupNumber};
-        if (parseInt(groupNumber) === 0) {
-            query = {}
-        }
-        User.find(query, (err, users) => {
+        User.find({groupNumber: groupNumber}, (err, users) => {
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});

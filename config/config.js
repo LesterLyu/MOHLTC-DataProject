@@ -7,11 +7,21 @@ module.exports = {
         port: 465,
         secure: true,
         auth: {
-            user: "lyulester@gmail.com",
-            pass: "password"
+            user: "w767089351@gmail.com",
+            pass: "wkw1234567"
         },
-        sender: '"Lester Lyu" <lyulester@gmail.com>'
+        sender: '"Will Wang" <w767089351@gmail.com>'
     },
+    OPTS: {
+        server: {
+            url: 'ldap://HSCGIQDCAPWSA06:389',
+            bindDN: 'cn=root',
+            bindCredentials: 'passw0rd',
+            searchBase: 'DC=HEALTHINFO,DC=MOH.GOV.ON.CA',
+            searchFilter: '(uid={{username}})'
+        }
+    },
+
     serverHostname: "http://localhost:3000", //used for receive validation link
     permissions: {
         //FILL_WORKBOOK: 'fill-workbook', // not implemented, fow now, everyone can fill workbooks
@@ -22,4 +32,6 @@ module.exports = {
         WORKBOOK_QUERY: 'workbook-query'
     },
     disableEmailValidation: true,
+    organizations: [],
+    maxGroupNumber: 0
 };

@@ -1,3 +1,9 @@
+var input = document.querySelector("#phone");
+window.intlTelInput(input, {
+    utilsScript: "../../node_modules/intl-tel-input/build/js/utils.js"
+});
+
+
 $(document).ready(function () {
     $.ajax({
         url: '/api/organization_details',
@@ -24,7 +30,7 @@ $(document).ready(function () {
 
 document.querySelector('#signUpMethodSelect').onchange = (e) => {
     const elementsToHideInLocal = ['#organization', '#role'];
-    const elementsToUnhideInLocal = ['#password'];
+    const elementsToUnhideInLocal = [];
     if (e.target.value === 'local') {
         for (let i = 0; i < elementsToHideInLocal.length; i++) {
             document.querySelector(elementsToHideInLocal[i]).classList.add('hide')

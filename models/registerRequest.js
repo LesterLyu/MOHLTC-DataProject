@@ -5,6 +5,7 @@ let registerRequestSchema = new mongoose.Schema({
     firstName: String,
     lastName: String,
     groupNumber: Number,
+    password: String,
     phoneNumber: String,
     organization: String,
     email: String,

@@ -1,7 +1,8 @@
 $("#loginForm").submit(function(e) {
     e.preventDefault();
+    const loginMethod = document.querySelector('#loginMethodSelect').value;
     $.ajax({
-        url: '/api/login',
+        url: '/api/login' + (loginMethod === 'local' ? '/local' : '/ldap'),
         type: 'POST',
         data: $('#loginForm').serialize(),
     }).done(function (response) {

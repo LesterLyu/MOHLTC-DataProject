@@ -59,8 +59,14 @@ router.get('/user/management', (req, res, next) => {
     }
 });
 
+router.post('/api/create-organization', user_management_controller.create_organization);
 
 router.post('/api/user/register_management', user_management_controller.register_management);
+
+router.get('/user/create_organization', (req, res, next) => {
+    res.render('sidebar/createOrganization.ejs');
+});
+
 
 router.get('/user/register_management', (req, res, next) => {
     if (user_management_controller.checkPermission(req)) {
