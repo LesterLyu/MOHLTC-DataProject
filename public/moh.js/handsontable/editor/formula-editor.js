@@ -82,15 +82,15 @@ FormulaEditor.prototype.saveValue = function (value, ctrlDown) {
         // return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
     }
     else if (this.type === 'formula') {
-        const res = parseNewFormula(value[0][0]);
+        const res = parseNewFormula(value[0][0], true);
         console.log(res);
         this.instance.setDataAtCell(this.row, this.col, res);
     }
 };
 
-function parseNewFormula(newValue) {
+function parseNewFormula(newValue, hasEqualPrefix) {
     const value = {
-        formula: newValue.slice(1),
+        formula: newValue.slice(hasEqualPrefix ? 1 : 0),
         result: ''
     };
     // fix '=+' bug
