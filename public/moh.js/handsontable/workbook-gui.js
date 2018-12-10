@@ -111,6 +111,21 @@ class WorkbookGUI {
             gui.setFormula(res);
         }, createdTable);
 
+        Handsontable.hooks.add('afterChange', (changes, source) => {
+            if (source === 'edit') {
+                const oldValue = changes[0][2], newValue = changes[0][3];
+                if (typeof oldValue !== typeof newValue ||
+                    (typeof oldValue === 'number' && oldValue !== newValue) ||
+                    (typeof oldValue === 'object' && (oldValue === null || oldValue.result !== newValue.result)) ||
+                    (typeof oldValue === 'string' && oldValue !== newValue))
+                    setTimeout(() => {
+                        that.calculationChain.change(sheetNo, changes[0][0], changes[0][1])
+                        gui.getCurrentTable().render();
+                    }, 0);
+            }
+
+        }, createdTable);
+
         return createdTable;
     }
 
@@ -452,8 +467,24 @@ class WorkbookGUI {
         return global.workbookData.sheets[this.sheetNames.indexOf(sheet)].data[row][col];
     }
 
+    setDataAtSheetAndCell(row, col, val, sheetNo, sheetName) {
+        if (sheetNo !== undefined) {
+            global.workbookData.sheets[sheetNo].data[row][col] = val;
+        }
+        else if (sheetName !== undefined) {
+            global.workbookData.sheets[this.sheetNames.indexOf(sheetName)].data[row][col] = val;
+        }
+        else {
+            console.error('At least one of sheetNo or sheetName should be provides.')
+        }
+    }
+
     getTable(name) {
         return this.tables[this.sheetNamesWithoutHidden.indexOf(name)];
+    }
+
+    getTableBySheetNo(sheetNo) {
+        return this.getTable(this.sheetNames[sheetNo])
     }
 
     getCurrentTable() {
@@ -505,6 +536,9 @@ class WorkbookGUI {
 
                     this.getCurrentTable().updateSettings(settings);
                 }
+                else {
+                    this.getCurrentTable().render();
+                }
             }
             else {
                 console.error('cannot find sheet with name: ' + sheetName);
@@ -518,6 +552,12 @@ class WorkbookGUI {
         }
         global.workbookData.sheets = {};
         global.hyperlinks = {};
+
+        this.sheetNames = [];
+        for (let orderNo in global.workbookRawData) {
+            this.sheetNames.push(global.workbookRawData[orderNo].name);
+        }
+
         for (let orderNo in global.workbookRawData) {
             const wsData = global.workbookData.sheets[orderNo] = {};
             const data = global.workbookRawData[orderNo];
@@ -529,7 +569,11 @@ class WorkbookGUI {
                 wsData.data.push([]);
                 for (let colNumber = 0; colNumber < data.dimension[1]; colNumber++) {
                     if (data && data[rowNumber] && data[rowNumber][colNumber] !== undefined) {
-                        wsData.data[rowNumber].push(data[rowNumber][colNumber]);
+                        const cellData = data[rowNumber][colNumber];
+                        wsData.data[rowNumber].push(cellData);
+                        if (cellData && typeof cellData === 'object' && 'formula' in cellData) {
+                            this.calculationChain.addCell(orderNo, rowNumber, colNumber, cellData.formula)
+                        }
                         // delete data[rowNumber][colNumber];
                     }
                     else {
@@ -664,7 +708,7 @@ class WorkbookGUI {
             const cellValue = gui.getCurrentSheet().data[gui.selectedCell[0]][gui.selectedCell[1]];
             // formula
             if (newValue.charAt(0) === '=') {
-                gui.getCurrentTable().setDataAtCell(gui.selectedCell[0], gui.selectedCell[1], parseNewFormula(newValue));
+                gui.getCurrentTable().setDataAtCell(gui.selectedCell[0], gui.selectedCell[1], parseNewFormula(newValue, true));
             }
             else if (typeof cellValue === 'object' && 'richText' in cellValue) {
                 // do nothing, we can't modify richText for now
@@ -745,41 +789,18 @@ function argbToRgb(color) {
     return color.argb.substring(2);
 }
 
-
-function getWorkbook(sheets, sheetNames) {
-    // create a workbook
-    var workbook = XLSX.utils.book_new();
-    for (var i = 0; i < sheets.length; i++) {
-        var ws_data = sheets[i].getData();
-        var worksheet = XLSX.utils.aoa_to_sheet(ws_data);
-        // Add the worksheet to the workbook
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheetNames[i]);
-    }
-    return workbook;
-}
-
 // re-evaluate formula
-function evaluateFormula(sheetName, row, col) {
-    if (!sheetNames.includes(sheetName)) {
-        console.log('Error: sheetName not found.');
-        return
-    }
-    var sheet = sheets[sheetNames.indexOf(sheetName)];
-    var data = sheet.getDataAtCell(row, col);
+function evaluateFormula(orderNo, row, col) {
+    const sheet = gui.getTableBySheetNo(orderNo);
+    const data = sheet.getDataAtCell(row, col);
     if (!data.hasOwnProperty('formula')) {
-        console.log('Error: evaluateFormula(): cell provided is not a formula');
+        console.log('Skipped: evaluateFormula(): cell provided is not a formula');
         return
     }
 
-    var calculated = parser.parse(data.formula);
-    if (calculated.error) {
-        data.result = calculated;
-    }
-    else {
-        data.result = calculated.result;
-    }
-
-    sheet.setDataAtCell(row, col, data);
+    const calculated = parseNewFormula(data.formula, false);
+    gui.setDataAtSheetAndCell(row, col, calculated, orderNo);
+    // sheet.setDataAtCell(row, col, calculated, 'reevaluate');
     return data;
 }
 
@@ -817,7 +838,7 @@ $(document).ready(function () {
     const nameInput = document.querySelector('#workbookNameInput');
     nameInput.setAttribute('size', nameInput.value.length);
     nameInput.addEventListener('input', (e) => {
-        e.srcElement.setAttribute('size',  e.target.value.length);
+        e.srcElement.setAttribute('size', e.target.value.length);
     });
 });
 

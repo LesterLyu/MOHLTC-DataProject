@@ -9,7 +9,7 @@ var parser = new formulaParser.Parser();
  * }
  */
 parser.on('callCellValue', function (cellCoord, done) {
-    console.log('get ' + cellCoord.label);
+    // console.log('get ' + cellCoord.label);
     let sheet;
     if (cellCoord.hasOwnProperty('sheet')) {
         if (!gui.sheetNames.includes(cellCoord.sheet)) {
@@ -34,7 +34,7 @@ parser.on('callCellValue', function (cellCoord, done) {
 
 
 parser.on('callRangeValue', function (startCellCoord, endCellCoord, done) {
-    console.log('get range ' + startCellCoord.label + ' to ' + endCellCoord.label);
+    // console.log('get range ' + startCellCoord.label + ' to ' + endCellCoord.label);
     var fragment = [];
 
     // find sheet
