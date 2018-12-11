@@ -206,6 +206,9 @@ class Workbook {
                     if (worksheet.properties.tabColor && 'indexed' in worksheet.properties.tabColor) {
                         tabColor = {argb: color[worksheet.properties.tabColor.indexed]}
                     }
+                    else if (worksheet.properties.tabColor && 'theme' in worksheet.properties.tabColor) {
+                        tabColor = themeColorToArgb(worksheet.properties.tabColor, self.themeColor);
+                    }
                     else if (worksheet.properties.tabColor) {
                         tabColor = worksheet.properties.tabColor;
                     }
@@ -339,30 +342,7 @@ function translateColor(style, themeColor) {
         style.font.color = {argb: color[style.font.color.indexed]}
     }
     if ('font' in style && 'color' in style.font && 'theme' in style.font.color) {
-        const color = style.font.color;
-        if (!('tint' in color)) {
-            style.font.color = {argb: themeColor[color.theme]}
-        }
-        else {
-            // has tint value, the following link tells how to calculate given a tint value.
-            // https://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.tabcolor.aspx
-            const tint = parseFloat(color.tint);
-            const hsl = tinycolor(themeColor[color.theme].substring(2)).toHsl();
-            if (tint < 0) {
-                hsl.l = hsl.l * (1 + tint);
-                style.font.color = {argb: 'ff' + tinycolor(hsl).toHex()}
-            }
-            else if (tint > 0) {
-                hsl.l = hsl.l * (1 - tint) + tint;
-                style.font.color = {argb: 'ff' + tinycolor(hsl).toHex()}
-            }
-            else {
-                // no change
-                style.font.color = {argb: themeColor[color.theme]}
-            }
-
-        }
-
+        style.font.color = themeColorToArgb(style.font.color, themeColor);
     }
     if (style.hasOwnProperty('border')) {
         if ('top' in style.border && 'color' in style.border.top && 'indexed' in style.border.top.color) {
@@ -377,6 +357,20 @@ function translateColor(style, themeColor) {
         if ('right' in style.border && 'color' in style.border.right && 'indexed' in style.border.right.color) {
             style.border.right.color = {argb: color[style.border.right.color.indexed]}
         }
+
+        // theme color
+        if ('top' in style.border && 'color' in style.border.top && 'theme' in style.border.top.color) {
+            style.border.top.color = themeColorToArgb(style.border.top.color, themeColor);
+        }
+        if ('left' in style.border && 'color' in style.border.left && 'theme' in style.border.left.color) {
+            style.border.left.color = themeColorToArgb(style.border.left.color, themeColor);
+        }
+        if ('bottom' in style.border && 'color' in style.border.bottom && 'theme' in style.border.bottom.color) {
+            style.border.bottom.color = themeColorToArgb(style.border.bottom.color, themeColor);
+        }
+        if ('right' in style.border && 'color' in style.border.right && 'theme' in style.border.right.color) {
+            style.border.right.color = themeColorToArgb(style.border.right.color, themeColor);
+        }
     }
     if (style.hasOwnProperty('fill')) {
         if (style.fill.hasOwnProperty('fgColor') && style.fill.fgColor.hasOwnProperty('indexed')) {
@@ -385,8 +379,41 @@ function translateColor(style, themeColor) {
         if (style.fill.hasOwnProperty('bgColor') && style.fill.bgColor.hasOwnProperty('indexed')) {
             style.fill.bgColor = {argb: color[style.fill.bgColor.indexed]}
         }
+
+        // theme color
+        if (style.fill.hasOwnProperty('fgColor') && style.fill.fgColor.hasOwnProperty('theme')) {
+            style.fill.fgColor = themeColorToArgb(style.fill.fgColor, themeColor);
+        }
+        if (style.fill.hasOwnProperty('bgColor') && style.fill.bgColor.hasOwnProperty('theme')) {
+            style.fill.bgColor = themeColorToArgb(style.fill.bgColor, themeColor);
+        }
     }
     return style;
+}
+
+function themeColorToArgb(color, themeColor) {
+    if (!('tint' in color)) {
+        return {argb: themeColor[color.theme]}
+    }
+    else {
+        // has tint value, the following link tells how to calculate given a tint value.
+        // https://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.tabcolor.aspx
+        const tint = parseFloat(color.tint);
+        const hsl = tinycolor(themeColor[color.theme].substring(2)).toHsl();
+        if (tint < 0) {
+            hsl.l = hsl.l * (1 + tint);
+            return {argb: 'ff' + tinycolor(hsl).toHex()}
+        }
+        else if (tint > 0) {
+            hsl.l = hsl.l * (1 - tint) + tint;
+            return {argb: 'ff' + tinycolor(hsl).toHex()}
+        }
+        else {
+            // no change
+            return {argb: themeColor[color.theme]}
+        }
+
+    }
 }
 
 module.exports = Workbook;
