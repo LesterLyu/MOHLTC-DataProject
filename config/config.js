@@ -32,6 +32,7 @@ module.exports = {
         WORKBOOK_QUERY: 'workbook-query'
     },
     disableEmailValidation: true,
+    disableLdap: true,
     organizations: [],
     maxGroupNumber: 0
 };

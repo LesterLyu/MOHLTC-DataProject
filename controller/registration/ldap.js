@@ -7,17 +7,18 @@ const config = require('../../config/config'); // get our config file
 
 passport.use(new LdapStrategy(config.OPTS));
 
-var client = ldap.createClient({
-    url: 'ldap://HSCGIQDCAPWSA06:389',
-});
-
-
-client.bind('cn=root', 'passw0rd', function(err) {
-    if (err) {
-        console.log("ss");
-        console.log(err);
-    }
-});
+let client;
+if (!config.disableLdap) {
+    client = ldap.createClient({
+        url: config.OPTS.server.url,
+    });
+    client.bind(config.OPTS.server.bindDN, config.OPTS.server.bindCredentials, function(err) {
+        if (err) {
+            console.log("ss");
+            console.log(err);
+        }
+    });
+}
 
 module.exports = {
     user_auth_login: (req, res, next) => {
@@ -45,7 +46,7 @@ module.exports = {
             scope: 'sub',
             attributes: ['dn', 'sn', 'cn']
         };
-        client.search('DC=HEALTHINFO,DC=MOH.GOV.ON.CA', opts, function(err, res) {
+        client.search(config.OPTS.server.searchBase, opts, function(err, res) {
             var found = false;
 
             res.on('searchEntry', function(entry) {
