@@ -11,8 +11,7 @@ Colors in font, border, tabs, etc...
     - Current implementation: parse indexed color to normal argb colors in back-end.
  - [X] ARGB Colors (Custom color in Excel)
     - Able to display directly on webpages
-#### Not supported
- - [ ] [Theme Colors](https://www.google.ca/search?{google:acceptedSuggestion}oq=excel+theme+colors&sourceid=chrome&ie=UTF-8&q=excel+theme+colors)
+ - [X] [Theme Colors](https://www.google.ca/search?{google:acceptedSuggestion}oq=excel+theme+colors&sourceid=chrome&ie=UTF-8&q=excel+theme+colors)
     - Theme colors are stored in each excel file in XML format
 
 ## Fonts and Styles
@@ -23,11 +22,9 @@ Colors in font, border, tabs, etc...
  - [X] Background color
  - [X] Alignments
     - top, middle, bottom, left, center, right
- 
-#### Not supported
- - [ ] Fonts
- - [ ] Font size
- - [ ] All other font styles...
+ - [X] Fonts
+ - [X] Font size
+ - [X] Almost other font styles...
 
 ## Borders
 #### Supported
@@ -56,16 +53,11 @@ A buggy library.
   
 #### Supported
   - [X] Cell, sheet reference
-  
-#### Not supported
-  - [ ] re-evaluate upon other value changes
+  - [X] re-evaluate upon other value changes
   
 ## Richtext
-#### Not yet Supported.
+  - [X] fully supported
 
 ## Data validation
-#### Not yet Supported.
+  - [X] list data validation
 
-
-## Data types
-#### Not yet Supported.
