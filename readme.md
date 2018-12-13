@@ -1,20 +1,25 @@
 # DataProject
 ## Live on http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com
 ## TO-DO
-  - [X] Read excel styles in back-end
-  - [X] API for upload excel and apply style to workbook
-  - [X] Show workbooks with excel styles
   - [ ] Warning when delete workbook that is filled by user
-  - [X] Setup page (First time run)
+  - [ ] Use [xlsx-populate](https://github.com/dtjohnson/xlsx-populate) to export excel. This library preserve the original style and less buggy.
+  
+
 ## Finished
  - [X] "Change Password" in Profile page
  - [X] "Change Profile" in Profile page
  - [X] Warning when delete attribute/category that is used in the system
+ - [X] Read excel styles in back-end
+ - [X] API for upload excel and apply style to workbook
+ - [X] Show workbooks with excel styles
+ - [X] Setup page (First time run)
 
 ## Documents
-- [User Types](documents/user-types.md)
+- [Update history](documents/update-history.md)
+- [First time setup](documents/setup.md)
 - [Excel Indexed Colors](https://github.com/ClosedXML/ClosedXML/wiki/Excel-Indexed-Colors)
-- [Excel Display](documents/excel-display.md)
+- [Supported excel styles to display in front-end](documents/excel-display.md)
+- [How it parses and stores excel in database](documents/excel-parse.md)
 
 
 # Purpose
