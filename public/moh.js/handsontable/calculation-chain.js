@@ -29,7 +29,11 @@ class CalculationChain {
     }
 
     change(currSheet, row, col) {
-        evaluateFormula(currSheet, row, col);
+        // change currSheet temporarily for correct formula calculation
+        const currSheetBackup = gui.currSheet;
+        gui.currSheet = gui.sheetNames[currSheet];
+        // calculation in order
+        const calculations = [];
         // check cellValue
         if (currSheet in this.data.cellValue) {
             const rowCol = colCache.encode(row + 1, col + 1);
@@ -37,7 +41,8 @@ class CalculationChain {
                 const needToUpdate = this.data.cellValue[currSheet][rowCol];
                 for (let idx = 0; idx < needToUpdate.length; idx++) {
                     const curr = needToUpdate[idx];
-                    this.change(curr.sheet, curr.row, curr.col);
+                    calculations.push(curr);
+                    evaluateFormula(curr.sheet, curr.row, curr.col);
                 }
             }
         }
@@ -53,13 +58,22 @@ class CalculationChain {
                             const needToUpdate = this.data.rangeValue[currSheet][rows[i]][cols[j]];
                             for (let idx = 0; idx < needToUpdate.length; idx++) {
                                 const curr = needToUpdate[idx];
-                                this.change(curr.sheet, curr.row, curr.col);
+                                calculations.push(curr);
+                                evaluateFormula(curr.sheet, curr.row, curr.col);
                             }
                         }
                     }
                 }
             }
         }
+        // do calculation in next level
+        for (let i = 0; i < calculations.length; i++) {
+            const curr = calculations[i];
+            this.change(curr.sheet, curr.row, curr.col);
+        }
+        // revert currSheet
+        gui.currSheet = currSheetBackup;
+
     }
 
     _initParser() {

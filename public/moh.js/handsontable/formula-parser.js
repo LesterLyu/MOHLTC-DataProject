@@ -20,7 +20,7 @@ parser.on('callCellValue', function (cellCoord, done) {
     else {
         sheet = gui.currSheet;
     }
-    var data = gui.getDataAtSheetAndCell(sheet, cellCoord.row.index, cellCoord.column.index);
+    var data = gui.getDataAtSheetAndCell(cellCoord.row.index, cellCoord.column.index, null, sheet);
     if (data === null || data === undefined) {
         done('')
     }
@@ -54,7 +54,7 @@ parser.on('callRangeValue', function (startCellCoord, endCellCoord, done) {
         var colFragment = [];
 
         for (var col = startCellCoord.column.index; col <= endCellCoord.column.index; col++) {
-            var data =  gui.getDataAtSheetAndCell(sheet, row, col);
+            var data =  gui.getDataAtSheetAndCell(row, col, null, sheet);
             //console.log(data);
             if (data === null || data === undefined) {
                 colFragment.push('')

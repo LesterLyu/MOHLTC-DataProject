@@ -463,15 +463,23 @@ class WorkbookGUI {
         return global.workbookData.sheets[this.sheetNames.indexOf(this.currSheet)];
     }
 
-    getDataAtSheetAndCell(sheet, row, col) {
-        return global.workbookData.sheets[this.sheetNames.indexOf(sheet)].data[row][col];
+    getDataAtSheetAndCell(row, col, sheetNo, sheetName) {
+        if (sheetNo !== null) {
+            return global.workbookData.sheets[sheetNo].data[row][col];
+        }
+        else if (sheetName !== null) {
+            return global.workbookData.sheets[this.sheetNames.indexOf(sheetName)].data[row][col];
+        }
+        else {
+            console.error('At least one of sheetNo or sheetName should be provides.')
+        }
     }
 
     setDataAtSheetAndCell(row, col, val, sheetNo, sheetName) {
-        if (sheetNo !== undefined) {
+        if (sheetNo !== null) {
             global.workbookData.sheets[sheetNo].data[row][col] = val;
         }
-        else if (sheetName !== undefined) {
+        else if (sheetName !== null) {
             global.workbookData.sheets[this.sheetNames.indexOf(sheetName)].data[row][col] = val;
         }
         else {
@@ -588,9 +596,11 @@ class WorkbookGUI {
                 const extra = global.workbookRawExtra.sheets[orderNo];
                 wsData.col = {};
                 wsData.col.hidden = extra.col.hidden;
+                wsData.col.style = extra.col.style;
                 wsData.col.width = dictToList(extra.col.width, data.dimension[1], 23, extra.col.hidden);
                 wsData.row = {};
                 wsData.row.hidden = extra.row.hidden;
+                wsData.row.style = extra.row.style;
                 wsData.row.height = dictToList(extra.row.height, data.dimension[0], extra.defaultRowHeight, extra.row.hidden);
                 wsData.dataValidations = extra.dataValidations;
                 wsData.state = extra.state;
@@ -791,8 +801,7 @@ function argbToRgb(color) {
 
 // re-evaluate formula
 function evaluateFormula(orderNo, row, col) {
-    const sheet = gui.getTableBySheetNo(orderNo);
-    const data = sheet.getDataAtCell(row, col);
+    const data = gui.getDataAtSheetAndCell(row, col, orderNo);
     if (!data.hasOwnProperty('formula')) {
         console.log('Skipped: evaluateFormula(): cell provided is not a formula');
         return
