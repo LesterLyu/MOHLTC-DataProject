@@ -2,7 +2,7 @@
 ## Live on http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com
 ## TO-DO
   - [ ] Warning when delete workbook that is filled by user
-  - [ ] Use [xlsx-populate](https://github.com/dtjohnson/xlsx-populate) to export excel. This library preserve the original style and less buggy.
+ 
   
 
 ## Finished
@@ -13,6 +13,7 @@
  - [X] API for upload excel and apply style to workbook
  - [X] Show workbooks with excel styles
  - [X] Setup page (First time run)
+ - [X] Use [xlsx-populate](https://github.com/dtjohnson/xlsx-populate) to export excel. This library preserve the original style and less buggy.
 
 ## Documents
 - [Update history](documents/update-history.md)
