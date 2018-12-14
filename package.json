@@ -41,6 +41,7 @@
     "tinycolor2": "^1.4.1",
     "tinytinycolor": "0.0.4",
     "xlsx": "^0.12.13",
+    "xlsx-populate": "^1.17.0",
     "xml2js": "^0.4.19"
   },
   "engine": {
