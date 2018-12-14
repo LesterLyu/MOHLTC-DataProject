@@ -37,7 +37,7 @@ describe('Local Authentication', function () {
 
     it('Log in to the registered account', (done) => {
 
-        requester.post('/api/login')
+        requester.post('/api/login/local')
             .send({
                 username: 'test',
                 password: 'test'
