@@ -9,6 +9,7 @@
     "body-parser": "^1.18.3",
     "compression": "^1.7.3",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
     "ejs": "^2.6.1",
     "exceljs": "git+https://github.com/LesterLyu/exceljs.git#beta",
     "express": "^4.16.4",

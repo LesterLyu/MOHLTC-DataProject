@@ -24,6 +24,8 @@ const session = require('express-session');
 
 const fileUpload = require('express-fileupload');
 
+const cors = require('cors');
+
 const config = require('./config/config');
 
 const indexRouter = require('./routes/index');
@@ -91,6 +93,7 @@ app.use(passport.session());
 app.use(fileUpload({
     limits: {fileSize: 50 * 1024 * 1024},
 }));
+app.use(cors());
 
 setup.setup();
 
@@ -102,7 +105,6 @@ setup.setup();
   //  console.log("ss");
    // res.send({status: 'ok'});
 //});
-
 // home page
 app.use('/', indexRouter);
 // user authentication related
