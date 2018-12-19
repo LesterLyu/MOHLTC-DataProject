@@ -1,13 +1,25 @@
-# How to setup on local machine
+# User Register Process
 
-## Step 1
-Install software.
- - [MongoDB](https://fastdl.mongodb.org/win32/mongodb-win32-x86_64-2008plus-ssl-4.0.3-signed.msi) or latest community version from [here](https://www.mongodb.com/download-center/community)
- - [MongoDB Compass](https://downloads.mongodb.com/compass/mongodb-compass-community-1.15.4-win32-x64.exe) or latest community version from [here](https://www.mongodb.com/download-center/compass)
- - Your favorite IDE for Javascript, I prefer [Webstorm](https://www.jetbrains.com/webstorm/).
- - Node.js [latest version](https://nodejs.org/en/), this includes npm.
- - [Git for windows](https://git-scm.com/)
+## Register in Local Server
 
+ - Choose "sign up to Local Server"
+ - Type in User Information
+ - Click "Next"
+ - User is registered in local database and login to user profile page
+ 
+## Register in LDAP Server
+
+ - Choose "sign up to LDAP Server"
+ - Type in User Information
+ - Click "Next"
+ - Username is checked in LDAP server
+      - Username exists in LDAP server, then LDAP will check the correctness of Password, then Register Request is registered in local server
+      - Username does not exist in LDAP server, then Register Request is registered in local server
+ - User receives an email reminding that Register Request has been submitted
+ - Manager login to manager account and approve Register Request in register-request-management page
+ - User is registered in local server and LDAP server (if User has existed in LDAP server, user information will be updated into LDAP server instead of registering)
+ - User receive an email reminding that his Register Request has been approved
+ 
 ## Step 2 (Skip this if you are not using government internet)
 Set up proxy in MOHLTC network. Our internet has huge restrictions and not stable, but guest wifi works perfectly fine.
  - Setup npm proxy:
