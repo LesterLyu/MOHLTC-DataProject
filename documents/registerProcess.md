@@ -9,7 +9,7 @@
  
 ## Important Function
 - Local Server
-  ```
+ ```
   router.post('/api/login/local', user_controller.user_log_in);
   user_log_in: (req, res, next) => {
   ...
@@ -19,7 +19,7 @@
   return res.json({redirect: redirectUrl});   // redirect to profile page
   ...
   }
-  ```
+ ```
  - LDAP Server
  ```
   router.post('/api/login/ldap', registration_ldap_controller.user_auth_login);
