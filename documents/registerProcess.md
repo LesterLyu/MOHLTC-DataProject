@@ -72,7 +72,6 @@
  - Role is the role of User. Different role has diffrernt permissions. User only can access pages with permissions.
  
 ## Installation
-
 ```
 npm install ldapjs
 ```
