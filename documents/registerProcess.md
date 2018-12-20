@@ -13,10 +13,10 @@
   router.post('/api/login/local', user_controller.user_log_in);
   user_log_in: (req, res, next) => {
   ...
-  passport.authenticate(){}   // authenticate in local server
+  passport.authenticate(){}                                    // authenticate in local server
   
   let redirectUrl = '/profile';
-  return res.json({redirect: redirectUrl});   // redirect to profile page
+  return res.json({redirect: redirectUrl});                    // redirect to profile page
   ...
   }
  ```
@@ -26,17 +26,17 @@
   
   user_auth_login: (req, res, next) => {
   ...
-  passport.authenticate() {}   // authenticate in LDAP server
-  user_controller.user_log_in()   // call user_log_in
+  passport.authenticate() {}                                  // authenticate in LDAP server
+  user_controller.user_log_in()                               // call user_log_in
   ...
   }
   
   user_log_in: (req, res, next) => {
   ...
-  passport.authenticate(){}   // authenticate in local server
+  passport.authenticate(){}                                   // authenticate in local server
   
   let redirectUrl = '/profile';
-  return res.json({redirect: redirectUrl});   // redirect to profile page
+  return res.json({redirect: redirectUrl});                   // redirect to profile page
   ...
   }
  ```
@@ -88,8 +88,8 @@ npm install passport-ldapauth
  user_sign_up_local: (req, res, next) => {
  ...
  User.findOne()=> {                       
- ...                                                      // authenticate and register new user
-  return res.json({redirect: '/profile'});                // redirect to profile page
+ ...                                                             // authenticate and register new user
+  return res.json({redirect: '/profile'});                       // redirect to profile page
  ...
  }
  }
@@ -100,8 +100,8 @@ npm install passport-ldapauth
  
  user_ldap_signup: (req, res, next) => {
   passport.authenticate(){
-  ...                                                    // authenticate in LDAP server
-  user_controller.user_sign_up(req, res, next);          // call user_sign_up function
+  ...                                                           // authenticate in LDAP server
+  user_controller.user_sign_up(req, res, next);                 // call user_sign_up function
   ... 
   }                              
   }
@@ -109,8 +109,8 @@ npm install passport-ldapauth
   user_sign_up: (req, res, next) => {
  ...
  User.findOne()=> {                       
- ...                                                      // authenticate and submit new register request
-  return res.json({redirect: '/register-success-submit'});             // redirect to register-success-submit page
+ ...                                                            // authenticate and submit new register request
+  return res.json({redirect: '/register-success-submit'});      // redirect to register-success-submit page
  ...
  }
  }
@@ -122,14 +122,14 @@ npm install passport-ldapauth
   register_management: (req, res, next) => {
   ...                                                    
    User.register() => {
-  ...                                                       // register user in local server
-  registration_ldap_controller.user_ldap_register(req, res, user, next);        // call user_ldap_register function
+  ...                                                           // register user in local server
+  registration_ldap_controller.user_ldap_register(req, res, user, next);       // call user_ldap_register function
   
   }
   }
   
   user_ldap_register: (req, res, user, next) => {
- ...                                                         // register user in LDAp server
+ ...                                                            // register user in LDAp server
  }
  ```
  
