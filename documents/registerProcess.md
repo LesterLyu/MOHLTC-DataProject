@@ -71,6 +71,14 @@
  - Organization is the organization of User. In back ground, mapping function maps each organization with one distinct integer as Group Number.
  - Role is the role of User. Different role has diffrernt permissions. User only can access pages with permissions.
  
+## Installation
+
+```
+npm install ldapjs
+```
+```
+npm install passport-ldapauth
+```
 ## Important Function
  
  - Local Server
