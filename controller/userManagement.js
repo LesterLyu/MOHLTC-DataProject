@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const Organization = require('../models/organization');
 const RegisterRequest = require('../models/registerRequest');
 const passport = require('passport');
 const sendMail = require('./sendmail');
@@ -28,6 +29,23 @@ function generateToken(username, expireTime) {
         expiresIn: expireTime * 60
     });
 }
+
+function update_organization() {
+    Organization.find({}, function(err, organizations){
+        if (err)
+            console.log(err);
+
+        if (organizations) {
+            for (var i = 0; i < organizations.length; i++) {
+                config.organizations.push(organizations[i].name);
+                if (organizations[i].groupNumber > config.maxGroupNumber) {
+                    config.maxGroupNumber = organizations[i].groupNumber;
+                }
+            }
+        }
+    });
+}
+update_organization();
 
 module.exports = {
     checkPermission: checkPermission,
@@ -128,7 +146,7 @@ module.exports = {
                     email: user.email,
                     permissions: permissions
                 });
-                var temporaryPassword = Math.random().toString(36).slice(-8);
+             //   var temporaryPassword = Math.random().toString(36).slice(-8);
                 User.register(newUser, user.password, (err, user) => {
                     if (err) {
                         console.log(err);
@@ -165,6 +183,8 @@ module.exports = {
         }
     },
 
+
+
     create_organization: (req, res, next)=> {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
@@ -187,7 +207,7 @@ module.exports = {
                     return next(err);
                 }
                 config.maxGroupNumber += 1;
-                config.organizations[req.body.organization] = groupNum;
+                config.organizations.push(organization);
                 return res.json({success: true, message: 'Organization ' + updatedOrganization.name + ' has been added'})
             });
         }

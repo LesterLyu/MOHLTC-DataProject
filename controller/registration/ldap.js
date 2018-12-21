@@ -14,7 +14,6 @@ if (!config.disableLdap) {
     });
     client.bind(config.OPTS.server.bindDN, config.OPTS.server.bindCredentials, function(err) {
         if (err) {
-            console.log("ss");
             console.log(err);
         }
     });
@@ -95,9 +94,7 @@ module.exports = {
                         telephonenumber: phoneNumber
                     };
                     client.add('uid=' + username + ' ,cn=users, DC=HEALTHINFO,DC=MOH.GOV.ON.CA', entry, function(err) {
-                        console.log('ww');
                         if (err) {
-                            console.log("aa");
                             console.log(err);
                         }
                     });
@@ -115,6 +112,7 @@ module.exports = {
             }
             if (!user){
                 var username = req.body.username;
+                // console.log(username);
                 var opts = {
                     filter: '(uid=' + username +')',
                     scope: 'sub',
