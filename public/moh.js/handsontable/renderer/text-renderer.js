@@ -50,7 +50,11 @@ function cellRenderer(instance, td, row, col, prop, value, cellProperties) {
     timeHidden += Date.now() - start;
     start = Date.now();
 
-    const style = sheet.style[row] ? (sheet.style[row][col] || {}) : {};
+    let style = sheet.style[row] ? (sheet.style[row][col] || {}) : {};
+    const rowStyle = sheet.row.style[row] || {};
+    const colStyle = sheet.col.style[row] || {};
+
+    // style = styleDecider(style, rowStyle, colStyle);
 
     // render formula
     let result = calcResult(value, style.numFmt);
@@ -261,6 +265,38 @@ function calcResult(cellValue, numFmt) {
         result = SSF.format(numFmt, result);
     }
     return result;
+}
+
+/**
+ * https://github.com/guyonroche/exceljs#styles
+ *
+ * When a style is applied to a row or column, it will be applied to all currently existing cells
+ * in that row or column. Also, any new cell that is created will inherit its initial styles from
+ * the row and column it belongs to.
+ *
+ * If a cell's row and column both define a specific style (e.g. font), the cell will use the row
+ * style over the column style. However if the row and column define different styles
+ * (e.g. column.numFmt and row.font), the cell will inherit the font from the row and the numFmt
+ * from the column.
+ * @param cellStyle
+ * @param rowStyle
+ * @param colStyle
+ * @returns {*}
+ */
+function styleDecider(cellStyle, rowStyle, colStyle) {
+    const style = Object.assign({}, colStyle, rowStyle, cellStyle);
+
+    // special case, numFmt: cell > col > row
+    if (!('numFmt' in cellStyle)) {
+        if ('numFmt' in colStyle) {
+            style.numFmt = colStyle.numFmt;
+        }
+        else if ('numFmt' in rowStyle) {
+            style.numFmt = rowStyle.numFmt;
+        }
+    }
+
+    return style;
 }
 
 function showTimes() {

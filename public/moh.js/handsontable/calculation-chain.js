@@ -123,7 +123,25 @@ class CalculationChain {
             self.data.rangeValue[sheetNo][rowRange][colRange].push(self.state.curr);
 
             done(0)
-        })
+        });
+
+        // this.parser.on('callVariable', function(name, done) {
+        //     // speedup lookup
+        //     if (name.toUpperCase() === 'TRUE') {
+        //         return true;
+        //     }
+        //     else if (name.toUpperCase() === 'FALSE') {
+        //         return false;
+        //     }
+        //     else if (name.toUpperCase() === 'NULL') {
+        //         return null;
+        //     }
+        //     let variable = gui.getDefinedName(name);
+        //     if (variable.length === 1){
+        //         variable = variable[0];
+        //     }
+        //     done(variable);
+        // });
 
     }
 }
