@@ -44,6 +44,14 @@
 
 # User Register Process
 
+## Installation
+```
+npm install ldapjs
+```
+```
+npm install passport-ldapauth
+```
+
 ## Register in Local Server
 
  - Choose "sign up to Local Server"
@@ -92,13 +100,6 @@
  ```
  The username is "will" and password is "wkw1234567"
  
-## Installation
-```
-npm install ldapjs
-```
-```
-npm install passport-ldapauth
-```
 ## Important Function
  
  - Local Server
