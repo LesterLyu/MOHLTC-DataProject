@@ -25,8 +25,9 @@
   - Front end codes for LDAP signup and LDAP login are in views/signup.ejs, views/login.ejs, public/moh.js/login.js and public/moh.js/signup.js
   
 # About User/Registration Request Management
-  - 
-  
+  - User Management page can manage all users and manage their permissions and active. Back end code for user management is in controller/userManagement.js. Front end code for user management is in views/sidebar/userManagement.ejs and public/moh.js/userManagement.js
+  - Registration Request Management page approves or disapproves register requests. This page can only be accessed by manager account. If approved, one new user will be created in LDAP and local server.
+  - Back end code for Registration Request Management page is in controller/userManagement.js. Front end code for user management is in views/sidebar/registerManagement.ejs and public/moh.js/registerManagement.js
 # Something unfinished
   - In Sign Up page, add the label "Choose Organization" and "Choose role" to local server.
   - In Sign Up page, decline the label "Organization Number" for local server and ldap server. User only need to Choose Organization Name. We have a mapping function in the back end to map each organization name with a organization number. About Sign Up page, you can talk with Lester for details.
