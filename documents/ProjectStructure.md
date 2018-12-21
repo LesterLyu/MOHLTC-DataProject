@@ -21,9 +21,14 @@
   npm install ldapjs
   npm install passport-ldapauth
   ```
-  - All codes for LDAP access are in controller/registration/ldap.js
+  - Back end codes for LDAP signup and LDAP login are in controller/registration/ldap.js and controller/user.js
+  - Front end codes for LDAP signup and LDAP login are in views/signup.ejs, views/login.ejs, public/moh.js/login.js and public/moh.js/signup.js
+  
+# About User/Registration Request Management
+  - 
   
 # Something unfinished
   - In Sign Up page, add the label "Choose Organization" and "Choose role" to local server.
   - In Sign Up page, decline the label "Organization Number" for local server and ldap server. User only need to Choose Organization Name. We have a mapping function in the back end to map each organization name with a organization number. About Sign Up page, you can talk with Lester for details.
   - In Register Request Management page, Group Number should be shown up.
+  - In create organization page, add "delete" and "motify" organization options.
