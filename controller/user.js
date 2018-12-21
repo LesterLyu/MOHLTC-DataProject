@@ -183,7 +183,6 @@ module.exports = {
                 if (! schema.validate(req.body.password)) {
                     return res.status(400).json({success: false, message: 'Password is not valid.'});
                 }
-                console.log(req.body.organization + "ss");
                 console.log(req.body.phoneNumber);
                 var groupNumber = config.organizations[req.body.organization];
                 let newRequest = new RegisterRequest({
