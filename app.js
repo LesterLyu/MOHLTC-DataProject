@@ -104,11 +104,11 @@ setup.setup();
   //  console.log("ss");
    // res.send({status: 'ok'});
 //});
-var whitelist = ['http://localhost:3003'];
+var whitelist = ['http://localhost:3003', 'http://localhost:3000'];
 var corsOptions = {
     credentials: true,
     origin: function (origin, callback) {
-        if (whitelist.indexOf(origin) !== -1) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
             callback(null, true)
         } else {
             callback(new Error('Not allowed by CORS'))
