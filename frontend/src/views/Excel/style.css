@@ -1,0 +1,7 @@
+.handsontable td, .handsontable th {
+  white-space: pre;
+}
+
+.handsontable th {
+  font-size: 14px;
+}
