@@ -29,7 +29,10 @@ class UserManager {
   }
 
   logout() {
-    this.props.history.push('/login');
+    axios.get(config.server + '/api/logout', {withCredentials: true})
+      .then(() => {
+        this.props.history.push('/login');
+      });
   }
 
   /**

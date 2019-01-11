@@ -33,15 +33,13 @@ const styles = theme => ({
   },
 });
 
-class SheetCard extends Component{
+class SheetCard extends Component {
 
   render() {
-    const {classes, fileName, editHref,} = this.props;
+    const {classes, fileName, editHref, deleteCb} = this.props;
 
     return (
       <Card className={classes.card}>
-
-
         <Tooltip title={fileName} placement="bottom" enterDelay={300}>
           <Link to={editHref}>
             <CardActionArea>
@@ -67,10 +65,10 @@ class SheetCard extends Component{
               Edit
             </Button>
           </Link>
+          {deleteCb ?  <Button size="small" color="primary" onClick={() => {deleteCb(fileName)}}>
+            Delete
+          </Button> : ''}
 
-            <Button size="small" color="primary">
-              Delete
-            </Button>
 
         </CardActions>
       </Card>

@@ -26,24 +26,40 @@ class Workbooks extends Component {
 
   constructor(props) {
     super(props);
+    this.mode = this.props.params.mode; // can be user or
     this.state = {
       loading: true
     };
-    WorkbookManager.getAllWorkbooks()
-      .then(data => {
-        this.workbooks = data;
-        this.setState({loading: false});
-      })
+    this.workbookManager = new WorkbookManager(props);
+    if (this.mode === 'user') {
+      this.workbookManager.getAllWorkbooksForUser()
+        .then(data => {
+          if (!data)
+            return;
+          this.workbooks = data;
+          this.setState({loading: false});
+        })
+    }
+    else if (this.mode === 'admin') {
+      this.workbookManager.getAllWorkbooksForAdmin()
+        .then(data => {
+          if (!data)
+            return;
+          this.workbooks = data;
+          this.setState({loading: false});
+        })
+    }
+
   }
 
   filledWorkbooks() {
     const list = [];
-    const filledWorkbooks = this.workbooks[0].filledWorkbooks;
+    const filledWorkbooks = this.workbooks[0];
     for (let i = 0; i < filledWorkbooks.length; i++) {
       const name = filledWorkbooks[i].name;
       list.push(
         <Grid key={i} item>
-          <SheetCard fileName={name} editHref={'/workbooks/fill/' + name}/>
+          <SheetCard fileName={name} deleteCb={this.deleteWorkbookForUser} editHref={'/workbooks/fill/' + name}/>
         </Grid>
       )
     }
@@ -52,7 +68,7 @@ class Workbooks extends Component {
 
   unFilledWorkbooks() {
     const list = [];
-    const workbooks = this.workbooks[1].workbooks;
+    const workbooks = this.workbooks[1];
     for (let i = 0; i < workbooks.length; i++) {
       const name = workbooks[i].name;
       list.push(
@@ -62,6 +78,28 @@ class Workbooks extends Component {
       )
     }
     return list;
+  }
+
+  allWorkbooks() {
+    const list = [];
+    const workbooks = this.workbooks;
+    for (let i = 0; i < workbooks.length; i++) {
+      const name = workbooks[i].name;
+      list.push(
+        <Grid key={i} item>
+          <SheetCard fileName={name} deleteCb={this.deleteWorkbookForAdmin} editHref={'/workbooks/template/' + name}/>
+        </Grid>
+      )
+    }
+    return list;
+  }
+
+  deleteWorkbookForUser(workbook) {
+      console.log('user delete workbook ', workbook)
+  }
+
+  deleteWorkbookForAdmin(workbook) {
+    console.log('admin delete workbook ', workbook)
   }
 
   render() {
@@ -75,7 +113,7 @@ class Workbooks extends Component {
         </div>
       );
     }
-    else {
+    else if (this.mode === 'user') {
       return (
         <div className="animated fadeIn">
           <Paper className={classes.root} elevation={1}>
@@ -97,9 +135,34 @@ class Workbooks extends Component {
               </Grid>
               {this.filledWorkbooks()}
             </Grid>
+
           </Paper>
         </div>
       )
+    }
+    else if (this.mode === 'admin') {
+      return (
+        <div className="animated fadeIn">
+          <Paper className={classes.root} elevation={1}>
+            <Grid container spacing={16}>
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  All Workbooks
+                </Typography>
+              </Grid>
+              {this.allWorkbooks()}
+            </Grid>
+          </Paper>
+        </div>
+      )
+    }
+    else {
+      return (
+        <Typography variant="h6" gutterBottom>
+          Error: Illegal params.
+        </Typography>
+      )
+
     }
   }
 

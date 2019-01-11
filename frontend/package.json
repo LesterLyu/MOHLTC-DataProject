@@ -56,7 +56,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:ut": "cross-env PUBLIC_URL=https://individual.utoronto.ca/lester/moh react-scripts build",
+    "build:aws": "cross-env NODE_ENV=production PUBLIC_URL=http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com/react react-scripts build",
     "test": "react-scripts test",
     "test:cov": "react-scripts test --coverage",
     "test:debug": "react-scripts --inspect-brk test --runInBand",

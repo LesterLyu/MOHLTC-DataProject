@@ -10,11 +10,9 @@ import './excel.css'
 import {init, unzip, preProcess, argbToRgb, colCache, Parser, CalculationChain} from './helpers';
 import Renderer from './renderer';
 import Editor from './editor';
-import axios from "axios";
 import tinycolor from 'tinycolor2';
-import config from "../../config/config";
-
 import './style.css';
+import WorkbookManager from "../../controller/workbookManager";
 
 const styles = theme => ({
   root: {
@@ -147,6 +145,8 @@ class Excel extends Component {
         currentSheetIdx: 0,
       }
     };
+
+    this.workbookManager = new WorkbookManager(props);
 
     this.parser = new Parser(this);
     this.calculationChain = new CalculationChain(this);
@@ -332,8 +332,11 @@ class Excel extends Component {
     });
     this.setState({loadingMessage: 'Downloading...', completed: 5});
 
-    axios.get(config.server + '/api/workbook/' + this.props.match.params.name, {withCredentials: true})
+    this.workbookManager.getWorkbook(this.props.match.params.name)
       .then(response => {
+        if (!response) {
+          return;
+        }
         this.setState((prevState) => {
           return {loadingMessage: 'Unzipping...', completed: 40}
         });
