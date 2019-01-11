@@ -78,10 +78,11 @@
     "test": "./node_modules/.bin/mocha test/main.js test/ --recursive --exit --check-leaks -R mochawesome",
     "posttest": "start ./mochawesome-report/mochawesome.html",
     "build": "./node_modules/.bin/grunt",
+    "build:frontend": "cd ./frontend/ && npm run build:aws",
     "watch": "./node_modules/.bin/grunt watch",
     "prod": "./node_modules/.bin/grunt prod",
     "aws": "NODE_ENV=production&& node app.js",
-    "preaws": "npm run prod"
+    "preaws": "./node_modules/.bin/grunt aws"
   },
   "repository": {
     "type": "git",

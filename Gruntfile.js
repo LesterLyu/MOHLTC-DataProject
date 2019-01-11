@@ -95,7 +95,6 @@ module.exports = function (grunt) {
                             'Gruntfile.js',
                             'Gruntfile.js',
                             'package.json',
-
                         ],
                         dest: 'build/zip/'
                     },
@@ -107,6 +106,14 @@ module.exports = function (grunt) {
                             'config/**'
                         ],
                         dest: 'build/zip/'
+                    },
+                    {
+                        expand: true,
+                        cwd: './frontend/build/',
+                        src: [
+                            '**'
+                        ],
+                        dest: 'build/zip/public/react'
                     }
                 ]
             }
@@ -120,7 +127,7 @@ module.exports = function (grunt) {
                 expand: true,
                 cwd: 'build/zip',
                 src: ['**/*', '.*/*'],
-                dest: '',
+                dest: './',
             }
         },
 
@@ -129,6 +136,9 @@ module.exports = function (grunt) {
         run: {
             report: {
                 exec: '"./node_modules/.bin/mocha" ./test/main.js ./test/ --recursive --exit --check-leaks -R mochawesome'
+            },
+            buildFrontend: {
+                exec: 'npm run build:frontend'
             }
         }
 
@@ -145,10 +155,13 @@ module.exports = function (grunt) {
     grunt.registerTask("mkdir", function () {
         grunt.file.mkdir('build/zip/temp');
         grunt.file.mkdir('build/zip/uploads');
+        grunt.file.mkdir('build/zip/public/react');
     });
 
+
     grunt.registerTask("default", ["clean", "concat", "configureBabel", "babel"]);
-    grunt.registerTask("prod", ["clean", "concat", "configureBabel", "babel", "run:report", "copy", "mkdir", "compress"]);
+    grunt.registerTask("prod", ["clean", "concat", "configureBabel", "babel", "run:report", "run:buildFrontend", "mkdir", "copy", "compress"]);
+    grunt.registerTask("aws", ["clean", "concat", "configureBabel", "babel", "run:report"]);
 
 
 };

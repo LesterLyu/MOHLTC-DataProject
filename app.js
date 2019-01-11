@@ -65,6 +65,25 @@ db.once('open', function () {
     console.log('MongoDB connected!')
 });
 
+const whitelist = [
+    'http://localhost:3003',
+    'http://localhost:3000',
+    'http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com',
+    'http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com/react',
+    'http://dataproject-env.u2t3prjsea.us-east-2.elasticbeanstalk.com',
+    'http://dataproject-env.u2t3prjsea.us-east-2.elasticbeanstalk.com/react'];
+const corsOptions = {
+    credentials: true,
+    origin: function (origin, callback) {
+        if (!origin || whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    }
+};
+app.use(cors(corsOptions));
+
 app.use(logger('dev')); //log every request to the CONSOLE.
 app.use(bodyParser.json({limit: '50mb'}));
 app.use(bodyParser.urlencoded({extended: false, limit: '50mb'}));
@@ -104,18 +123,7 @@ setup.setup();
   //  console.log("ss");
    // res.send({status: 'ok'});
 //});
-var whitelist = ['http://localhost:3003', 'http://localhost:3000'];
-var corsOptions = {
-    credentials: true,
-    origin: function (origin, callback) {
-        if (!origin || whitelist.indexOf(origin) !== -1) {
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed by CORS'))
-        }
-    }
-}
-app.use(cors(corsOptions));
+
 
 // home page
 app.use('/', indexRouter);
