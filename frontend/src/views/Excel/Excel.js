@@ -357,10 +357,12 @@ class Excel extends Component {
        });
 
     window.addEventListener('resize', () => {
-      this.setState({
-        sheetWidth: this.sheetContainerRef.current.offsetWidth,
-        sheetHeight: this.sheetContainerRef.current.offsetHeight
-      })
+      if (this.sheetContainerRef.current) {
+        this.setState({
+          sheetWidth: this.sheetContainerRef.current.offsetWidth,
+          sheetHeight: this.sheetContainerRef.current.offsetHeight
+        })
+      }
     })
   }
 
