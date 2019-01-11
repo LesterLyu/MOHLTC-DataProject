@@ -25,6 +25,7 @@ export function preProcess(workbookRawData, workbookRawExtra) {
     hyperlinks: {},
     sheetNames: [],
   };
+  excelInstance.currentSheetName = workbookRawData[0].name;
 
   for (let orderNo in workbookRawData) {
     global.sheetNames.push(workbookRawData[orderNo].name);

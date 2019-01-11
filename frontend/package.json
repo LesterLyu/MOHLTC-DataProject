@@ -31,6 +31,7 @@
     "handsontable": "^6.2.2",
     "hot-formula-parser": "git+https://github.com/LesterLyu/formula-parser.git#develop",
     "material-table": "^1.11.0",
+    "mdi-material-ui": "^5.8.0",
     "node-sass": "^4.10.0",
     "pako": "^1.0.7",
     "prop-types": "^15.6.2",

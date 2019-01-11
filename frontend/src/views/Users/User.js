@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Card, CardBody, CardHeader, Col, Row, Table } from 'reactstrap';
 
-import UserManager from "../../firebase/userManager";
+import UserManager from "../../controller/userManager";
 
 class User extends Component {
 
@@ -12,7 +12,7 @@ class User extends Component {
       msg: (<span> <i className="text-muted fa fa-spin fa-spinner"/> loading... </span>)
     };
     const self = this;
-    new UserManager(props).getAllAdminPanelUsersUseCache()
+    new UserManager(props).getAllUsersWithCache()
       .then(userList => {
         self.setState({msg:  (<span> <i className="text-muted fa fa-spin fa-spinner"/> Not Found </span>)});
         self.userList = userList;

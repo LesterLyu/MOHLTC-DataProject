@@ -6,23 +6,121 @@ export default {
       icon: 'icon-speedometer',
       badge: {
         variant: 'info',
-        text: 'NEW',
+        // text: 'NEW',
       },
     },
     {
       title: true,
-      name: 'Accounts',
+      name: 'User',
+    },
+
+    {
+      name: 'My Profile',
+      url: '/123',
+      icon: 'icon-pencil',
     },
     {
-      name: 'All Accounts',
-      url: '/users',
-      icon: 'icon-people',
+      name: 'Fill Workbook',
+      url: '/workbooks/fill',
+      icon: 'icon-pencil',
+    },
+
+    {
+      title: true,
+      name: 'System',
     },
     {
-      name: 'Add Account',
-      url: '/user/add',
-      icon: 'icon-user-follow',
+      name: 'Workbooks',
+      url: '/2',
+      icon: 'icon-pencil',
+      children: [
+        {
+          name: 'All Workbooks',
+          url: '/3',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Create Workbook',
+          url: '/3',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Attributes',
+          url: '/4',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Categories',
+          url: '/5',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Query',
+          url: '/5',
+          icon: 'icon-puzzle',
+        },
+      ]
     },
+    {
+      name: 'Users',
+      url: '/2',
+      icon: 'icon-pencil',
+      children: [
+        {
+          name: 'All Users',
+          url: '/users',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Registration Requests',
+          url: '/3',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Add Organization',
+          url: '/4',
+          icon: 'icon-puzzle',
+        },
+      ]
+    },
+    {
+      name: 'Server',
+      url: '/2',
+      icon: 'icon-pencil',
+      children: [
+        {
+          name: 'Server Info',
+          url: '/3',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Configuration',
+          url: '/3',
+          icon: 'icon-puzzle',
+        },
+        {
+          name: 'Last Auto-test Report',
+          url: '/4',
+          icon: 'icon-puzzle',
+        },
+      ]
+    },
+
+
+    // {
+    //   title: true,
+    //   name: 'Accounts',
+    // },
+    // {
+    //   name: 'All Accounts',
+    //   url: '/users',
+    //   icon: 'icon-people',
+    // },
+    // {
+    //   name: 'Add Account',
+    //   url: '/user/add',
+    //   icon: 'icon-user-follow',
+    // },
     {
       title: true,
       name: 'Theme',
@@ -273,7 +371,7 @@ export default {
       name: 'Disabled',
       url: '/dashboard',
       icon: 'icon-ban',
-      attributes: { disabled: true },
+      attributes: {disabled: true},
     },
     {
       name: 'Excel',

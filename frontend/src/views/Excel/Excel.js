@@ -332,7 +332,7 @@ class Excel extends Component {
     });
     this.setState({loadingMessage: 'Downloading...', completed: 5});
 
-    axios.get(config.server + '/api/workbook/2018-19%20CAPS%20LHIN%20Managed%20BLANK%20V1', {withCredentials: true})
+    axios.get(config.server + '/api/workbook/' + this.props.match.params.name, {withCredentials: true})
       .then(response => {
         this.setState((prevState) => {
           return {loadingMessage: 'Unzipping...', completed: 40}
@@ -373,7 +373,7 @@ class Excel extends Component {
     const {currentSheetIdx} = this.state.global;
     if (!this.isLoaded) {
       return (
-        <div style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 25px)'}} ref={this.sheetContainerRef}>
+        <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 25px)'}} ref={this.sheetContainerRef}>
           <h3>{this.state.loadingMessage}</h3><br/>
 
           <LinearProgress variant="determinate" value={this.state.completed}/>

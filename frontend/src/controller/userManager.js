@@ -78,11 +78,12 @@ class UserManager {
 
   }
 
-  getAllAdminPanelUsers() {
+  getAllUsers() {
+
 
   }
 
-  getAllAdminPanelUsersUseCache() {
+  getAllUsersWithCache() {
 
   }
 

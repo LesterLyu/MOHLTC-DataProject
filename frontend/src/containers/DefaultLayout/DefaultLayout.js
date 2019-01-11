@@ -17,7 +17,7 @@ import {
 import navigation from '../../_nav';
 // routes config
 import routes from '../../routes';
-import UserManager from "../../firebase/userManager";
+import UserManager from "../../controller/userManager";
 
 const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));

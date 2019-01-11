@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import UserManager from "../../../firebase/userManager";
+import UserManager from "../../../controller/userManager";
 import {
   Button,
   Card,

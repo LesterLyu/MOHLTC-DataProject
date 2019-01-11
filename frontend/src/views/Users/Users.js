@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
-import {Badge, Col, Row,} from 'reactstrap';
+import {Badge} from 'reactstrap';
 import MaterialTable from 'material-table'
-import UserManager from "../../firebase/userManager";
+import UserManager from "../../controller/userManager";
 
 class Users extends Component {
 
@@ -13,12 +13,12 @@ class Users extends Component {
       userList: []
     };
 
-    this.user.getAllAdminPanelUsers()
-      .then(users => {
-        this.setState({userList: users});
-        this.forceUpdate();
-        console.log(this.state.userList)
-      });
+    this.user.getAllUsers()
+      // .then(users => {
+      //   this.setState({userList: users});
+      //   this.forceUpdate();
+      //   console.log(this.state.userList)
+      // });
   }
 
   render() {
@@ -27,34 +27,36 @@ class Users extends Component {
 
     return (
       <div className="animated fadeIn">
-        <Row>
-          <Col xl={6}>
-            <div style={{maxWidth: '100%'}}>
-              <MaterialTable
-                columns={[
-                  {title: 'username', field: 'username',
-                    render: rowData => {
-                      const userLink = `/users/${rowData.uid}`;
-                      return (<Link to={userLink}>{rowData.username}</Link>)
-                  }},
-                  {title: 'email', field: 'email'},
-                  {title: 'Register Time', field: 'timestamp', type: 'date',
-                    render: rowData => {
-                      return new Date(rowData.timestamp).toLocaleString()
-                    }},
-                  {title: 'permissions', field: 'permissions'},
-                  {title: 'status', field: 'disabled',
-                    render: rowData => {
-                      return (<Badge
-                          color={rowData.disabled === false ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
-                    }}
-                ]}
-                data={userList}
-                title="All Accounts"
-              />
-            </div>
-          </Col>
-        </Row>
+        <div style={{maxWidth: '100%'}}>
+          <MaterialTable
+            columns={[
+              {
+                title: 'username', field: 'username',
+                render: rowData => {
+                  const userLink = `/users/${rowData.uid}`;
+                  return (<Link to={userLink}>{rowData.username}</Link>)
+                }
+              },
+              {title: 'email', field: 'email'},
+              {
+                title: 'Register Time', field: 'timestamp', type: 'date',
+                render: rowData => {
+                  return new Date(rowData.timestamp).toLocaleString()
+                }
+              },
+              {title: 'permissions', field: 'permissions'},
+              {
+                title: 'status', field: 'disabled',
+                render: rowData => {
+                  return (<Badge
+                    color={rowData.disabled === false ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
+                }
+              }
+            ]}
+            data={userList}
+            title="All Accounts"
+          />
+        </div>
       </div>
     )
   }
