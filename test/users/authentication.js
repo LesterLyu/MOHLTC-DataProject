@@ -15,6 +15,7 @@ describe('Local Authentication', function () {
         })
     });
     it('register an account to local server', (done) => {
+		this.timeout(10000);
         requester.post('/api/signup/local')
             .send({
                 username: 'test',
