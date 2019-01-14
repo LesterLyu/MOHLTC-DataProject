@@ -20,6 +20,19 @@ class WorkbookManager {
     return instance;
   }
 
+  /**
+   * check if login needed
+   * @param response
+   * @returns {boolean}
+   */
+  check(response) {
+    if (response.headers['content-type'].includes('html')) {
+      this.props.history.push('/login');
+      return false;
+    }
+    return true;
+  };
+
   getAllWorkbooksForUser() {
     const arr = [];
     arr.push(
@@ -27,23 +40,19 @@ class WorkbookManager {
       axios.get(config.server + '/api/workbooks', axiosConfig));
     return Promise.all(arr)
       .then(response => {
-        if (response[1].headers['content-type'].includes('html')
-          || response[1].headers['content-type'].includes('html')) {
-          this.props.history.push('/login');
-          return null;
+        if (this.check(response[0]) && this.check(response[1])) {
+          // [filled workbook, unfilled workbook]
+          return [response[0].data.filledWorkbooks, response[1].data.workbooks];
         }
-        return [response[0].data.filledWorkbooks, response[1].data.workbooks]; // [filled workbook, unfilled workbook]
       })
   }
 
   getAllWorkbooksForAdmin() {
     return axios.get(config.server + '/api/admin/workbooks', axiosConfig)
       .then(response => {
-        if (response.headers['content-type'].includes('html')) {
-          this.props.history.push('/login');
-          return null;
+        if (this.check(response)) {
+          return response.data.workbookse;
         }
-        return response.data.workbooks;
 
       })
   }
@@ -52,15 +61,47 @@ class WorkbookManager {
     return axios.get(config.server + '/api/workbook/' + name, axiosConfig)
       .then(response => {
         console.log(response)
-        if (!response.headers['content-type'].includes('json')) {
-          this.props.history.push('/login');
-          return null;
-        }
-        else
+        if (this.check(response)) {
           return response;
+        }
       })
   }
 
+  addCategory(category) {
+    return axios.post(config.server + '/api/add-cat', {category}, axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+  }
+
+  addAttribute(attribute) {
+    return axios.post(config.server + '/api/add-att', {attribute}, axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+  }
+
+  getAttributes() {
+    return axios.get(config.server + '/api/attributes', axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data.attributes;
+        }
+      })
+  }
+
+  getCategories() {
+    return axios.get(config.server + '/api/categories', axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data.categories;
+        }
+      })
+  }
 }
 
 export default WorkbookManager;

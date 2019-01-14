@@ -53,12 +53,12 @@ export default {
         },
         {
           name: 'Attributes',
-          url: '/4fghfgh',
+          url: '/workbooks/attributes',
           icon: 'icon-puzzle',
         },
         {
           name: 'Categories',
-          url: '/5fghgfh',
+          url: '/workbooks/categories',
           icon: 'icon-puzzle',
         },
         {

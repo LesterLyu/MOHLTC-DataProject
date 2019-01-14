@@ -26,7 +26,7 @@ class Workbooks extends Component {
 
   constructor(props) {
     super(props);
-    this.mode = this.props.params.mode; // can be user or
+    this.mode = this.props.params.mode; // can be user or admin
     this.state = {
       loading: true
     };

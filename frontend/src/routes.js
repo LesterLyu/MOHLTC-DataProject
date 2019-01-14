@@ -39,6 +39,8 @@ const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 const Workbooks = React.lazy(() => import('./views/Workbooks/Workbooks'));
 
+const AttCat = React.lazy(() => import('./views/AttCat/AttCat'));
+
 const Excel = React.lazy(() => import('./views/Excel/Excel'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -90,6 +92,9 @@ const routes = [
   {path: '/workbooks/fill/:name', exact: true, name: 'Fill Workbook', component: Excel, params: {mode: 'user'}},
   {path: '/workbooks/template', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'admin'}},
   {path: '/workbooks/template/:name', exact: true, name: 'Workbooks', component: Excel, params: {mode: 'admin'}},
+
+  {path: '/workbooks/attributes', exact: true, name: 'Attributes', component: AttCat, params: {mode: 'att'}},
+  {path: '/workbooks/categories', exact: true, name: 'Categories', component: AttCat, params: {mode: 'cat'}},
 
 ];
 
