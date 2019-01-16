@@ -14,6 +14,10 @@ router.delete('/api/delete-cat', att_cat_controller.user_delete_cat);
 
 router.delete('/api/delete-att', att_cat_controller.user_delete_att);
 
+router.delete('/api/cats/delete', att_cat_controller.user_delete_cats);
+
+router.delete('/api/atts/delete', att_cat_controller.user_delete_atts);
+
 router.get('/api/attributes', att_cat_controller.get_attributes);
 
 router.get('/api/categories', att_cat_controller.get_categories);

@@ -161,6 +161,77 @@ module.exports = {
         });
     },
 
+    user_delete_atts: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const ids = req.body.ids;
+        let fails = [],
+            promiseArr = [];
+
+        for (let i = 0; i < ids.length; i++) {
+            const id = ids[i];
+            // add to promise chain
+            promiseArr.push(new Promise((resolve, reject) => {
+                Attribute.deleteOne({id, groupNumber})
+                    .then(result => resolve())
+                    .catch(err => {
+                        console.log(err);
+                        fails.push(id);
+                    })
+            }));
+        }
+
+        Promise.all(promiseArr).then(() => {
+            if (fails.length !== 0) {
+                return res.json({
+                    success: false,
+                    message: 'Failed to remove attribute id: ' + fails
+                })
+            }
+            return res.json({
+                success: true,
+                message: 'Success removed attribute id: ' + ids + '.'
+            })
+        })
+    },
+
+    user_delete_cats: (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const ids = req.body.ids;
+        let fails = [],
+            promiseArr = [];
+
+        for (let i = 0; i < ids.length; i++) {
+            const id = ids[i];
+            // add to promise chain
+            promiseArr.push(new Promise((resolve, reject) => {
+                Category.deleteOne({id, groupNumber})
+                    .then(result => resolve())
+                    .catch(err => {
+                        console.log(err);
+                        fails.push(id);
+                    })
+            }));
+        }
+
+        Promise.all(promiseArr).then(() => {
+            if (fails.length !== 0) {
+                return res.json({
+                    success: false,
+                    message: 'Failed to remove category id: ' + fails
+                })
+            }
+            return res.json({
+                success: true,
+                message: 'Success removed category id: ' + ids + '.'
+            })
+        })
+    },
 
     user_add_cat: (req, res, next) => {
         if (!checkPermission(req)) {

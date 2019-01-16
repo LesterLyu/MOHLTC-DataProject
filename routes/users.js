@@ -20,7 +20,12 @@ router.get('/signup', function (req, res) {
     res.render('signup.ejs');
 });
 
-
+router.get('/api/isloggedin', function (req, res) {
+    if (req.isAuthenticated()) {
+        return res.json({isLoggedIn: true})
+    }
+    return res.json({isLoggedIn: false})
+});
 
 router.get('/api/organization_details', user_controller.getOrganizationDetails);
 
