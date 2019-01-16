@@ -4,7 +4,6 @@ import { Container } from 'reactstrap';
 
 import {
   AppBreadcrumb,
-  AppFooter,
   AppHeader,
   AppSidebar,
   AppSidebarFooter,
@@ -19,7 +18,6 @@ import navigation from '../../_nav';
 import routes from '../../routes';
 import UserManager from "../../controller/userManager";
 
-const DefaultFooter = React.lazy(() => import('./DefaultFooter'));
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
 class DefaultLayout extends Component {
@@ -27,11 +25,12 @@ class DefaultLayout extends Component {
   constructor(props) {
     super(props);
     this.user = new UserManager(props);
-    this.user.isLoggedIn(IsSignedIn => {
-      if (!IsSignedIn) {
-        props.history.push('/login');
-      }
-    });
+    this.user.isLoggedIn()
+      .then(IsSignedIn => {
+        if (!IsSignedIn) {
+          props.history.push('/login');
+        }
+      });
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
@@ -82,11 +81,6 @@ class DefaultLayout extends Component {
             </Container>
           </main>
         </div>
-        <AppFooter>
-          <Suspense fallback={this.loading()}>
-            <DefaultFooter />
-          </Suspense>
-        </AppFooter>
       </div>
     );
   }

@@ -21,11 +21,12 @@ class UserManager {
   /**
    * Check if the user is logged in, result will go to call back function.
    * Available to use right after the web page refreshes, to check if there is a user logged in.
-   * @param cb cb({Boolean})
    */
-  isLoggedIn(cb) {
-    // TO-DO
-    cb(true);
+  isLoggedIn() {
+    return axios.get(config.server + '/api/isloggedin', {withCredentials: true})
+      .then((response => {
+        return response.data.isLoggedIn;
+      }));
   }
 
   logout() {

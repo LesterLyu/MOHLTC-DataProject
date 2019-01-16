@@ -51,7 +51,7 @@ class WorkbookManager {
     return axios.get(config.server + '/api/admin/workbooks', axiosConfig)
       .then(response => {
         if (this.check(response)) {
-          return response.data.workbookse;
+          return response.data.workbooks;
         }
 
       })
@@ -85,11 +85,27 @@ class WorkbookManager {
       })
   }
 
+  add(what, newValue) {
+    if (what === 'att')
+      return this.addAttribute(newValue);
+    else if (what === 'cat')
+      return this.addCategory(newValue);
+    else {
+      throw new Error('first parameter must be att or cat');
+    }
+  }
+
   getAttributes() {
     return axios.get(config.server + '/api/attributes', axiosConfig)
       .then(response => {
         if (this.check(response)) {
-          return response.data.attributes;
+          const atts = response.data.attributes;
+          const res = [];
+          for (let i = 0; i < atts.length; i++) {
+            res.push([atts[i].id, atts[i].attribute])
+          }
+          return res;
+
         }
       })
   }
@@ -98,7 +114,31 @@ class WorkbookManager {
     return axios.get(config.server + '/api/categories', axiosConfig)
       .then(response => {
         if (this.check(response)) {
-          return response.data.categories;
+          const cats = response.data.categories;
+          const res = [];
+          for (let i = 0; i < cats.length; i++) {
+            res.push([cats[i].id, cats[i].category])
+          }
+          return res;
+        }
+      })
+  }
+
+  get(what, newValue) {
+    if (what === 'att')
+      return this.getAttributes(newValue);
+    else if (what === 'cat')
+      return this.getCategories(newValue);
+    else {
+      throw new Error('first parameter must be att or cat');
+    }
+  }
+
+  delete(what, ids) {
+    return axios.delete(config.server + '/api/' + what + 's/delete', {data: {ids: ids}, withCredentials: axiosConfig.withCredentials})
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
         }
       })
   }
