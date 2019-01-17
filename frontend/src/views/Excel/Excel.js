@@ -25,6 +25,8 @@ const styles = theme => ({
     textTransform: 'initial',
     padding: '0',
     fontFamily: 'inherit',
+    fontSize: '0.8125rem',
+    minWidth: 72,
     // background: '#ffffff',
     '&:hover': {
       color: '#33c2ff',
@@ -35,16 +37,21 @@ const styles = theme => ({
     },
   },
   tabSelected: {
-    background: '#1890ff1f',
+    // background: '#1890ff1f',
     color: '#1890ff',
+  },
+  labelContainer: {
+    // padding: '6px 12px',
+    width: '100%',
+    boxSizing: 'border-box'
   },
   tabsRoot: {
     minHeight: '30px'
     // borderBottom: '1px solid #e8e8e8',
   },
   indicator: {
-    height: '5px',
-    backgroundColor: '#1890ff',
+    height: '35px',
+    backgroundColor: 'rgba(24, 144, 255, 0.15)',
   },
 
 });
@@ -256,7 +263,7 @@ class Excel extends Component {
       const rgb = tinycolor(argbToRgb(this.getSheet(i).tabColor) || 'f5f5f5');
 
       tabs.push(<Tab
-        classes={{root: classes.tabRoot, selected: classes.tabSelected}}
+        classes={{root: classes.tabRoot, selected: classes.tabSelected, labelContainer: classes.labelContainer}}
         style={{borderBottom: '3px solid ' + rgb}}
         // className={this.props.classes.tab}
         key={sheetNames[i]}
@@ -357,7 +364,7 @@ class Excel extends Component {
           console.log(global)
           this.setState({global: Object.assign(this.state.global, global), loadingMessage: '', loaded: true});
         }, 2)
-       });
+      });
 
     window.addEventListener('resize', () => {
       if (this.sheetContainerRef.current) {
@@ -378,7 +385,8 @@ class Excel extends Component {
     const {currentSheetIdx} = this.state.global;
     if (!this.isLoaded) {
       return (
-        <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 25px)'}} ref={this.sheetContainerRef}>
+        <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 25px)'}}
+             ref={this.sheetContainerRef}>
           <h3>{this.state.loadingMessage}</h3><br/>
 
           <LinearProgress variant="determinate" value={this.state.completed}/>
