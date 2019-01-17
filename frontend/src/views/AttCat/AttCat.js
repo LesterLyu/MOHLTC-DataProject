@@ -11,13 +11,11 @@ import {
   DialogContent,
   DialogContentText,
   TextField,
-  Snackbar,
 } from "@material-ui/core";
 import {withStyles} from "@material-ui/core/es";
 import PropTypes from "prop-types";
 
 import CustomToolbar from "./components/CustomToolbar";
-import CustomSnackbarContent from "./components/CustomSnackbarContent";
 
 
 const styles = theme => ({
@@ -35,11 +33,10 @@ class AttCat extends Component {
     super(props);
     this.mode = this.props.params.mode; // can be att or cat
     this.workbookManager = new WorkbookManager(props);
-    this.queue = [];
     this.state = {
-      loading: true, openDialog: false, openSnackbar: false, newValue: '',
-      messageInfo: {}
+      loading: true, openDialog: false, newValue: '',
     };
+    this.showMessage = this.props.showMessage;
     this.getData();
   }
 
@@ -51,45 +48,6 @@ class AttCat extends Component {
         this.setState({loading: false, data});
       })
   }
-
-  // Snackbar methods
-  showMessage = (message, variant) => {
-    this.queue.push({
-      message,
-      variant,
-      key: new Date().getTime(),
-    });
-
-    if (this.state.openSnackbar) {
-      // immediately begin dismissing current message
-      // to start showing new one
-      this.setState({openSnackbar: false});
-    } else {
-      this.processQueue();
-    }
-  };
-
-  processQueue = () => {
-    if (this.queue.length > 0) {
-      this.setState({
-        messageInfo: this.queue.shift(),
-        openSnackbar: true,
-      });
-    }
-  };
-
-  handleCloseSnackbar = (event, reason) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-
-    this.setState({openSnackbar: false});
-  };
-
-  handleExitedSnackbar = () => {
-    this.processQueue();
-  };
-
 
   // add dialog
   handleNewValue = name => event => {
@@ -110,20 +68,19 @@ class AttCat extends Component {
     this.workbookManager.add(this.mode, newValue)
       .then(data => {
         if (data.success) {
-          this.showMessage(data.message, 'success')
+          this.showMessage(data.message, 'success');
         }
         else {
           this.showMessage(data.message, 'error')
         }
         this.getData();
-        // this.setState({newValue: ''});
       })
       .catch(err => {
         try {
           this.showMessage(err.response.data.message, 'error')
         }
         catch (e) {
-          this.showMessage(err)
+          this.showMessage(err.message, 'error')
         }
       });
   };
@@ -147,22 +104,32 @@ class AttCat extends Component {
         else {
           this.showMessage(data.message, 'error')
         }
-        // return true;
-        // this.setState({newValue: ''});
       })
       .catch(err => {
         try {
           this.showMessage(err.response.data.message, 'error')
         }
         catch (e) {
-          this.showMessage(err)
+          this.showMessage(err.message, 'error')
         }
       });
   };
 
+  /**
+   * Override default behaviour to prevent some re-renders
+   * @param nextProps
+   * @param nextState
+   * @param nextContent
+   * @returns {boolean}
+   */
+  shouldComponentUpdate(nextProps, nextState, nextContent) {
+    return !(this.state.loading === nextState.loading
+      && this.state.openDialog === nextState.openDialog
+      && this.state.data.length === nextState.data.length);
+  }
+
   render() {
-    const {classes} = this.props;
-    const {loading, data, messageInfo} = this.state;
+    const {loading, data} = this.state;
     const idTitle = this.mode === 'att' ? 'Attribute ID' : 'Category ID';
     const key = this.mode === 'att' ? 'attribute' : 'category';
     const title = this.mode === 'att' ? 'All Attributes' : 'All Categories';
@@ -234,22 +201,6 @@ class AttCat extends Component {
           </DialogActions>
         </Dialog>
 
-        <Snackbar
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'left',
-          }}
-          open={this.state.openSnackbar}
-          autoHideDuration={6000}
-          onClose={this.handleCloseSnackbar}
-          onExited={this.handleExitedSnackbar}
-        >
-          <CustomSnackbarContent
-            onClose={this.handleCloseSnackbar}
-            variant={messageInfo.variant}
-            message={messageInfo.message}
-          />
-        </Snackbar>
       </div>
     )
   }
