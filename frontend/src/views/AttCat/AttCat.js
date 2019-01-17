@@ -137,8 +137,11 @@ class AttCat extends Component {
     return this.workbookManager.delete(this.mode, ids)
       .then(data => {
         if (data.success) {
-          // const data =
-          // To-DO remove from data array
+          // remove from data array
+          let newData = this.state.data.slice(0);
+          newData = newData.filter(curr => !ids.includes(curr[0]));
+          this.setState({data: newData});
+
           this.showMessage(data.message, 'success')
         }
         else {
