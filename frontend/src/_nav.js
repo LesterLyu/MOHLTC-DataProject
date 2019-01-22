@@ -16,7 +16,7 @@ export default {
 
     {
       name: 'My Profile',
-      url: '/123',
+      url: '/1',
       icon: 'icon-pencil',
     },
     {
