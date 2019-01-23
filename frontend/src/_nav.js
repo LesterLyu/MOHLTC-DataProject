@@ -1,3 +1,5 @@
+import config from "./config/config";
+
 export default {
   items: [
     {
@@ -48,7 +50,7 @@ export default {
         },
         {
           name: 'Create Workbook',
-          url: '/3fghgfh',
+          url: '/workbooks/create',
           icon: 'icon-puzzle',
         },
         {
@@ -105,8 +107,9 @@ export default {
         },
         {
           name: 'Last Auto-test Report',
-          url: '/4fgergr',
+          url: config.server + '/test/mochawesome.html',
           icon: 'icon-puzzle',
+          attributes: {target: '_blank'}
         },
       ]
     },

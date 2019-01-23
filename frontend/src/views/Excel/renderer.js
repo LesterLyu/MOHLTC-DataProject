@@ -14,6 +14,11 @@ export default class Renderer {
     global = instance.state.global;
   }
 
+  cellRendererForCreateExcel(instance, td, row, col, prop, value, cellProperties) {
+    let result = calcResult(value, null);
+    Handsontable.dom.fastInnerHTML(td, result);
+  }
+
   /**
    * Text and formula renderer
    * @param instance

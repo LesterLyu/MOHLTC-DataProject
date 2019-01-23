@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
+import XlsxPopulate from "xlsx-populate";
 
 const axiosConfig = {withCredentials: true};
 
@@ -141,6 +142,30 @@ class WorkbookManager {
           return response.data;
         }
       })
+  }
+
+  // methods for modifying workbook
+  createWorkbookLocal() {
+    return XlsxPopulate.fromBlankAsync()
+  }
+
+  downloadWorkbook(workbook) {
+    return workbook.outputAsync()
+      .then(function (blob) {
+        if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+          // If IE, you must uses a different method.
+          window.navigator.msSaveOrOpenBlob(blob, "out.xlsx");
+        } else {
+          var url = window.URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          document.body.appendChild(a);
+          a.href = url;
+          a.download = "out.xlsx";
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        }
+      });
   }
 }
 

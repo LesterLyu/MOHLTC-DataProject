@@ -51,6 +51,9 @@ const styles = theme => ({
     height: '35px',
     backgroundColor: 'rgba(24, 144, 255, 0.15)',
   },
+  scrollButtons: {
+    width: 20,
+  },
 
 });
 
@@ -215,19 +218,23 @@ class Excel extends Component {
         fixedColumnsLeft = sheet.views[0].xSplit;
       }
 
+      const settings = {
+        rowHeights: rowHeights,
+        colWidths: colWidths,
+        mergeCells: sheets[sheetNo].merges,
+        fixedRowsTop,
+        fixedColumnsLeft,
+        data: sheets[sheetNo].data,
+        width: this.state.sheetWidth,
+        height: this.state.sheetHeight,
+      };
+
       list.push(<Worksheet
-        width={this.state.sheetWidth}
-        height={this.state.sheetHeight}
-        rowHeights={rowHeights}
-        colWidths={colWidths}
-        mergeCells={sheets[sheetNo].merges}
-        fixedRowsTop={fixedRowsTop}
-        fixedColumnsLeft={fixedColumnsLeft}
+        settings={settings}
         renderer={this.renderer.cellRenderer}
         editor={this.editor.FormulaEditor}
         key={idx} id={'worksheet-' + sheetNo}
         hide={currentSheetIdx !== parseInt(sheetNo)}
-        data={sheets[sheetNo].data}
         global={this.state.global}
         context={this}
         forwardedRef={this.sheetRef}/>
@@ -325,7 +332,7 @@ class Excel extends Component {
 
               <AppBar position="static" color="default">
                 <Tabs
-                  classes={{root: classes.tabsRoot, indicator: classes.indicator}}
+                  classes={{root: classes.tabsRoot, indicator: classes.indicator, scrollButtons: classes.scrollButtons}}
                   value={currentSheetIdx}
                   onChange={this.handleChange}
                   variant="scrollable"

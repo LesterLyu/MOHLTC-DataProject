@@ -48,7 +48,8 @@
     "reactstrap": "^6.5.0",
     "simple-line-icons": "^2.4.1",
     "ssf": "^0.10.2",
-    "tinycolor2": "^1.4.1"
+    "tinycolor2": "^1.4.1",
+    "xlsx-populate": "git+https://github.com/LesterLyu/xlsx-populate.git#beta"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
