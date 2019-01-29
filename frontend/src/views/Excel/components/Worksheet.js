@@ -7,7 +7,21 @@ import React from "react";
 class Worksheet extends Component {
   constructor(props) {
     super(props);
-    if (props.mode === 'admin') {
+  }
+
+  // shouldComponentUpdate(nextProps, nextState, nextContext) {
+  //   if (nextState.settings.width !== this.state.settings.width
+  //     || nextState.settings.height !== this.state.settings.height) {
+  //     return true;
+  //   }
+  //   return true;
+  // }
+
+  render() {
+    // combine settings
+    const props = this.props;
+    const {mode, settings} = this.props;
+    if (mode === 'admin') {
       this.settings = {
         rowHeaders: true,
         colHeaders: true,
@@ -20,7 +34,16 @@ class Worksheet extends Component {
         autoWrapRow: false,
         autoRowSize: false,
         autoColumnSize: false,
-        contextMenu: ['copy'],
+        comments: true,
+        customBorders: [],
+        contextMenu: {
+          items: {
+            'copy' : {},
+            '---------': {},
+            'borders': {}
+          }
+
+        },
         renderAllRows: false,
         viewportRowRenderingOffset: 20,
         viewportColumnRenderingOffset: 10,
@@ -78,16 +101,14 @@ class Worksheet extends Component {
               (typeof oldValue === 'string' && oldValue !== newValue))
               setTimeout(() => {
                 props.context.calculationChain.change(props.global.currentSheetIdx, changes[0][0], changes[0][1]);
-                props.context.sheetRef.current.hotInstance.render()
+                props.context.sheetRefs[props.global.currentSheetIdx].current.hotInstance.render()
               }, 0);
           }
         }
       };
     }
-    Object.assign(this.settings, props.settings || {});
-  }
+    Object.assign(this.settings, settings || {});
 
-  render() {
     if (this.props.hide) {
       return null;
     } else {

@@ -57,8 +57,7 @@ export function preProcess(workbookRawData, workbookRawExtra) {
               }, 0);
             }
             // delete data[rowNumber][colNumber];
-          }
-          else {
+          } else {
             wsData.data[rowNumber].push('');
           }
         }
@@ -187,8 +186,7 @@ export function preProcess(workbookRawData, workbookRawExtra) {
           // situation 3: e.g. formulae: ["definedName"]
           else if (formulae in global.definedNames) {
             global.dataValidations[orderNo].dropDownData[addressSplited[i]] = excelInstance.getDefinedName(formulae);
-          }
-          else {
+          } else {
             console.error('Unknown dataValidation formulae situation: ' + formulae);
           }
         }
@@ -233,11 +231,9 @@ function dictToList(dict, length, defVal = null, hidden = []) {
   for (let i = 0; i < length; i++) {
     if (hidden.includes(i)) {
       ret.push(0.1);
-    }
-    else if (dict[i] !== undefined) {
+    } else if (dict[i] !== undefined) {
       ret.push(dict[i]);
-    }
-    else {
+    } else {
       ret.push(defVal);
     }
   }
@@ -246,7 +242,37 @@ function dictToList(dict, length, defVal = null, hidden = []) {
 
 
 export function argbToRgb(color) {
+  if (typeof color === 'string') {
+    return color;
+  }
   if (color === undefined || color.argb === undefined)
     return undefined;
   return color.argb.substring(2);
+}
+
+export function generateTableData(rowNum, colNum) {
+  const res = [];
+  for (let i = 0; i < rowNum; i++) {
+    if (i === 0) {
+      const firstRow = [];
+      for (let j = 0; j < colNum; j++) {
+        firstRow.push(null);
+      }
+      res.push(firstRow)
+    } else {
+      res.push([])
+    }
+  }
+  return res;
+}
+
+export function generateTableStyle(rowNum, colNum) {
+  const res = {};
+  for (let i = 0; i < rowNum; i++) {
+    res[i] = {};
+    for (let j = 0; j < colNum; j++) {
+      res[i][j] = {};
+    }
+  }
+  return res;
 }

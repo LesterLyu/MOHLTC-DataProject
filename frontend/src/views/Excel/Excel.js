@@ -52,7 +52,7 @@ const styles = theme => ({
     backgroundColor: 'rgba(24, 144, 255, 0.15)',
   },
   scrollButtons: {
-    width: 20,
+    width: 25,
   },
 
 });
@@ -84,7 +84,7 @@ class Excel extends Component {
     this.currentSheetName = null; // for calculation
     init(this); // init helper functions
     this.sheetContainerRef = React.createRef();
-    this.sheetRef = React.createRef();
+    this.sheetRefs = {};
 
     window.excel = this;
 
@@ -110,10 +110,6 @@ class Excel extends Component {
     this.setState({global: Object.assign(this.state.global, {currentSheetIdx})})
   }
 
-  switchSheet(sheetName) {
-    this.currentSheetIdx = this.state.global.sheetNames.indexOf(sheetName);
-  }
-
   getDefinedName(definedName) {
     const definedNames = this.state.global.definedNames;
     if (!(definedName in definedNames)) {
@@ -125,11 +121,9 @@ class Excel extends Component {
     for (let i = 0; i < currName.length; i++) {
       const cell = this.getSheetByName(currName[i].sheetName).data[currName[i].row - 1][currName[i].col - 1];
       if (cell === null) {
-      }
-      else if (typeof cell === 'object' && 'result' in cell) {
+      } else if (typeof cell === 'object' && 'result' in cell) {
         result.push(cell.result);
-      }
-      else {
+      } else {
         result.push(cell);
       }
     }
@@ -140,11 +134,9 @@ class Excel extends Component {
     const global = this.state.global;
     if (sheetNo !== null) {
       return global.workbookData.sheets[sheetNo].data[row][col];
-    }
-    else if (sheetName !== null) {
+    } else if (sheetName !== null) {
       return global.workbookData.sheets[global.sheetNames.indexOf(sheetName)].data[row][col];
-    }
-    else {
+    } else {
       console.error('At least one of sheetNo or sheetName should be provides.')
     }
   }
@@ -154,11 +146,9 @@ class Excel extends Component {
     const global = this.state.global;
     if (sheetNo !== null) {
       global.workbookData.sheets[sheetNo].data[row][col] = val;
-    }
-    else if (sheetName !== null) {
+    } else if (sheetName !== null) {
       global.workbookData.sheets[this.sheetNames.indexOf(sheetName)].data[row][col] = val;
-    }
-    else {
+    } else {
       console.error('At least one of sheetNo or sheetName should be provides.');
     }
   }
@@ -171,9 +161,14 @@ class Excel extends Component {
     return this.getSheet(this.state.global.sheetNames.indexOf(sheetName))
   }
 
+  switchSheet(sheetName) {
+    this.currentSheetIdx = this.state.global.sheetNames.indexOf(sheetName);
+    this.currentSheetName = sheetName;
+  }
+
   handleChange = (event, value) => {
     this.currentSheetName = this.state.global.sheetNames[value];
-    this.setState({global: Object.assign(this.state.global, {currentSheetIdx: value})});
+    this.currentSheetIdx = value;
   };
 
   workbookTabs() {
@@ -227,6 +222,7 @@ class Excel extends Component {
         data: sheets[sheetNo].data,
         width: this.state.sheetWidth,
         height: this.state.sheetHeight,
+        outsideClickDeselects: false,
       };
 
       list.push(<Worksheet
@@ -237,7 +233,7 @@ class Excel extends Component {
         hide={currentSheetIdx !== parseInt(sheetNo)}
         global={this.state.global}
         context={this}
-        forwardedRef={this.sheetRef}/>
+        forwardedRef={this.sheetRefs[idx]}/>
       )
     }
     return list;
@@ -288,6 +284,9 @@ class Excel extends Component {
         setTimeout(() => {
           const global = preProcess(rawData, rawExtra);
           console.log(global)
+          for (let i = 0; i < Object.keys(global.sheetNames).length; i++) {
+            this.sheetRefs[i] = React.createRef();
+          }
           this.setState({global: Object.assign(this.state.global, global), loadingMessage: '', loaded: true});
         }, 2)
       });
@@ -297,7 +296,7 @@ class Excel extends Component {
         this.setState({
           sheetWidth: this.sheetContainerRef.current.offsetWidth,
           sheetHeight: this.sheetContainerRef.current.offsetHeight
-        })
+        });
       }
     })
   }
@@ -318,8 +317,7 @@ class Excel extends Component {
           <LinearProgress variant="determinate" value={this.state.completed}/>
         </div>
       );
-    }
-    else {
+    } else {
       return (
         <div className="animated fadeIn">
           <Card xs={12}>

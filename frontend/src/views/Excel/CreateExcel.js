@@ -2,16 +2,20 @@ import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import 'handsontable/dist/handsontable.full.css';
 import {withStyles} from '@material-ui/core/styles';
-import {AppBar, Tabs, Tab, Card, LinearProgress, IconButton, Grid} from "@material-ui/core";
-import AddIcon from '@material-ui/icons/Add';
+import {AppBar, Tabs, Tab, Card, LinearProgress, IconButton, Grid, Button, Toolbar} from "@material-ui/core";
+import {
+  Add as AddIcon,
+  ZoomIn, ZoomOut, Save, FormatBold, FormatColorFill, FormatAlignCenter, SaveAlt
+} from '@material-ui/icons';
 
-import {init, unzip, preProcess, argbToRgb, Parser, CalculationChain} from './helpers';
+import {init, generateTableData, generateTableStyle, argbToRgb, Parser, CalculationChain} from './helpers';
 import Renderer from './renderer';
 import Editor from './editor';
 import tinycolor from 'tinycolor2';
 import './style.css';
 import WorkbookManager from "../../controller/workbookManager";
 import Worksheet from './components/Worksheet'
+import ExcelToolBar from './components/ExcelToolBar';
 
 const styles = theme => ({
   root: {
@@ -53,10 +57,10 @@ const styles = theme => ({
     backgroundColor: 'rgba(24, 144, 255, 0.15)',
   },
   scrollButtons: {
-    width: 20,
+    width: 25,
   },
   addSheetButton: {
-    padding: '7px 7px 7px 7px'
+    padding: 7,
   }
 });
 
@@ -79,7 +83,8 @@ class Excel extends Component {
         {
           merges: [],
           tabColor: undefined,
-          data: [[1, 2, 3], [], [], [], [], []],
+          data: generateTableData(200, 26),
+          styles: generateTableStyle(200, 26),
           name: 'Sheet1',
           state: 'visible',
           views: []
@@ -87,7 +92,8 @@ class Excel extends Component {
         {
           merges: [],
           tabColor: undefined,
-          data: [[]],
+          data: generateTableData(200, 26),
+          styles: generateTableStyle(200, 26),
           name: 'Sheet2',
           state: 'visible',
           views: []
@@ -101,7 +107,7 @@ class Excel extends Component {
     this.calculationChain = new CalculationChain(this);
     this.renderer = new Renderer(this);
     this.editor = new Editor(this);
-    this.currentSheetName = null; // for calculation
+    this.currentSheetName = 'Sheet1'; // for calculation
     init(this); // init helper functions
     this.sheetContainerRef = React.createRef();
     this.sheetRef = React.createRef();
@@ -130,8 +136,8 @@ class Excel extends Component {
     this.setState({currentSheetIdx})
   }
 
-  switchSheet(sheetName) {
-    this.currentSheetIdx = this.state.sheetNames.indexOf(sheetName);
+  get hotInstance() {
+    return this.sheetRef.current.hotInstance;
   }
 
   getDefinedName(definedName) {
@@ -139,11 +145,25 @@ class Excel extends Component {
   }
 
   getDataAtSheetAndCell(row, col, sheetNo, sheetName) {
-
+    const global = this.global;
+    if (sheetNo !== null) {
+      return global.sheets[sheetNo].data[row][col];
+    } else if (sheetName !== null) {
+      return global.sheets[global.sheetNames.indexOf(sheetName)].data[row][col];
+    } else {
+      console.error('At least one of sheetNo or sheetName should be provides.')
+    }
   }
 
   setDataAtSheetAndCell(row, col, val, sheetNo, sheetName) {
-
+    const global = this.global;
+    if (sheetNo !== null) {
+      global.sheets[sheetNo].data[row][col] = val;
+    } else if (sheetName !== null) {
+      global.sheets[this.sheetNames.indexOf(sheetName)].data[row][col] = val;
+    } else {
+      console.error('At least one of sheetNo or sheetName should be provides.');
+    }
   }
 
   getSheet(idx) {
@@ -152,6 +172,11 @@ class Excel extends Component {
 
   getSheetByName(sheetName) {
     return this.getSheet(this.global.sheetNames.indexOf(sheetName))
+  }
+
+  switchSheet(sheetName) {
+    this.currentSheetName = sheetName;
+    this.currentSheetIdx = this.state.sheetNames.indexOf(sheetName);
   }
 
   handleChange = (event, value) => {
@@ -182,7 +207,6 @@ class Excel extends Component {
     const {currentSheetIdx} = this.state;
     const list = [];
 
-
     for (let idx = 0; idx < sheets.length; idx++) {
       const sheet = sheets[idx];
       const settings = {
@@ -191,11 +215,31 @@ class Excel extends Component {
         width: this.state.sheetWidth,
         height: this.state.sheetHeight,
         data: sheet.data,
+        outsideClickDeselects: false,
+        afterChange: (changes, source) => {
+          console.log(changes, source);
+          if (source === 'edit') {
+            if (changes) {
+              for (let i = 0; i < changes.length; i++) {
+                let row = changes[0][0], col = changes[0][1], oldData = changes[0][2], newData = changes[0][3];
+                const cell = this.workbook.sheets()[0].cell(row + 1, col + 1);
+                if (newData == null || newData === '') {
+                  cell.value(null);
+                } else if (typeof newData === 'string'|| typeof newData === 'number' || typeof newData === 'boolean'){
+                  cell.value(newData);
+                } else if (newData.formula) {
+                  cell.value(newData.result);
+                  cell.formula(newData.formula);
+                }
+              }
+            }
+          }
+
+        },
       };
+      console.log(settings.width, settings.height)
       list.push(<Worksheet
         mode="admin"
-        width={this.state.sheetWidth}
-        height={this.state.sheetHeight}
         renderer={this.renderer.cellRendererForCreateExcel}
         editor={this.editor.FormulaEditor}
         key={idx} id={'worksheet-' + idx}
@@ -231,6 +275,10 @@ class Excel extends Component {
     })
   }
 
+  renderCurrentSheet() {
+    this.sheetRef.current.hotInstance.render();
+  }
+
   componentDidUpdate(prevProps, prevState, snapshot) {
     // this._enableHiddenRow();
   }
@@ -252,19 +300,25 @@ class Excel extends Component {
         <div className="animated fadeIn">
           <Card xs={12}>
             {this.state.loadingMessage}
+            <ExcelToolBar context={this}/>
             <div style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 25px)'}} ref={this.sheetContainerRef}>
               {this.worksheets()}
             </div>
             <AppBar position="static" color="default">
               <Grid container className={classes.root}>
-                <Grid item xs={"auto"} id="addSheetButton" >
-                  <IconButton aria-label="Add Sheet" className={classes.addSheetButton} onClick={() => console.log('1')}>
-                    <AddIcon fontSize="small" />
+                <Grid item xs={"auto"} id="addSheetButton">
+                  <IconButton aria-label="Add Sheet" className={classes.addSheetButton}
+                              onClick={() => console.log('1')}>
+                    <AddIcon fontSize="small"/>
                   </IconButton>
                 </Grid>
                 <Grid item xs={"auto"}>
                   <Tabs
-                    classes={{root: classes.tabsRoot, indicator: classes.indicator, scrollButtons: classes.scrollButtons}}
+                    classes={{
+                      root: classes.tabsRoot,
+                      indicator: classes.indicator,
+                      scrollButtons: classes.scrollButtons
+                    }}
                     value={currentSheetIdx}
                     onChange={this.handleChange}
                     variant="scrollable"

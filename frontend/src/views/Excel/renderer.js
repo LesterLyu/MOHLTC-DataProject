@@ -8,6 +8,11 @@ const SPAN_TEMPLATE = document.createElement('span');
 SPAN_TEMPLATE.style.pointerEvents = 'none';
 let excelInstance, global;
 
+const supported = {
+  horizontalAlignment: ['left', 'right', 'center', 'justify'],
+  verticalAlignment: ['top', 'center', 'bottom']
+};
+
 export default class Renderer {
   constructor(instance) {
     excelInstance = instance;
@@ -15,8 +20,81 @@ export default class Renderer {
   }
 
   cellRendererForCreateExcel(instance, td, row, col, prop, value, cellProperties) {
-    let result = calcResult(value, null);
-    Handsontable.dom.fastInnerHTML(td, result);
+    if (excelInstance.workbook) {
+      const style = excelInstance.currentSheet.styles[row][col];
+      let result = calcResult(value, style.numberFormat);
+
+      setFontStyle(td, {
+        bold: style.bold,
+        italic: style.italic,
+        underline: style.underline,
+        size: style.fontSize,
+        name: style.fontFamily,
+        color: style.fontColor,
+        strikethrough: style.strikethrough,
+      });
+
+      // wrap the value, this fix the clicking issue for overflowed text
+      const span = SPAN_TEMPLATE.cloneNode(false);
+      Handsontable.dom.fastInnerHTML(span, result);
+      Handsontable.dom.fastInnerHTML(td, '');
+      td.appendChild(span);
+
+      // text overflow if right cell is empty
+      const rightCell = instance.getDataAtCell(row, col + 1);
+      if (rightCell === '' || rightCell === null || rightCell === undefined ||
+        ((typeof rightCell === 'object' && 'formula' in rightCell) &&
+          (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))) {
+        td.style.overflow = 'visible';
+        td.style.textOverflow = 'clip';
+      }
+
+      if (style.fill) {
+        if (style.fill.type === 'solid') {
+          td.style.background = '#' + style.fill.color.rgb;
+        }
+      }
+
+      // horizontalAlignment
+      if (style.horizontalAlignment && supported.horizontalAlignment.includes(style.horizontalAlignment)) {
+        td.style.textAlign = style.horizontalAlignment;
+      } else {
+        // default
+        td.style.textAlign = 'left';
+      }
+
+      // verticalAlignment
+      if (style.verticalAlignment && supported.verticalAlignment.includes(style.verticalAlignment)) {
+        switch (style.verticalAlignment) {
+          case 'top':
+            td.classList.add('htTop');
+            break;
+          case 'center':
+            td.classList.add('htMiddle');
+            break;
+          case 'bottom':
+            td.classList.add('htBottom');
+            break;
+        }
+      } else {
+        //default
+        td.classList.add('htBottom');
+      }
+
+      // font text wrap
+      if (style.wrapText) {
+        td.style.wrapText = 'break-word';
+        td.style.whiteSpace = 'pre-wrap';
+      }
+
+      // textRotation
+      if (typeof style.textRotation === 'number') {
+        span.style.display = 'block';
+        span.style.transform = 'rotate(-' + style.textRotation + 'deg)';
+      }
+
+
+    }
   }
 
   /**
@@ -51,8 +129,7 @@ export default class Renderer {
           td.parentNode.style.display = 'none';
         }
         return;
-      }
-      else {
+      } else {
         if (td.parentNode) {
           td.parentNode.style.display = '';
         }
@@ -77,8 +154,7 @@ export default class Renderer {
         Handsontable.dom.fastInnerText(span, rt.text);
         if (rt.font) {
           setFontStyle(span, rt.font);
-        }
-        else if (style.font) {
+        } else if (style.font) {
           setFontStyle(span, style.font);
         }
         mainSpan.appendChild(span);
@@ -98,7 +174,7 @@ export default class Renderer {
     const rightCell = instance.getDataAtCell(row, col + 1);
     if (rightCell === '' || rightCell === null || rightCell === undefined ||
       ((typeof rightCell === 'object' && 'formula' in rightCell) &&
-      (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))){
+        (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))) {
       td.style.overflow = 'visible';
       td.style.textOverflow = 'clip';
     }
@@ -198,8 +274,7 @@ export default class Renderer {
           // eventFire($('ol')[0], 'mousedown');
           // gui.showSheet(hyperlink.sheetName);
         };
-      }
-      else {
+      } else {
         a.target = '_black';
         a.href = hyperlink.target;
       }
@@ -225,12 +300,19 @@ function setFontStyle(element, font) {
   }
   if ('size' in font) {
     element.style.fontSize = font.size + 'pt';
+    element.style.lineHeight = 'normal';
   }
   if (font.name) {
     element.style.fontFamily = font.name;
   }
   if (font.underline) {
     element.style.textDecoration = 'underline';
+  }
+  if (font.strikethrough) {
+    if (element.style.textDecoration)
+      element.style.textDecoration += ' line-through';
+    else
+      element.style.textDecoration = 'line-through';
   }
 }
 
@@ -239,8 +321,7 @@ function calcResult(cellValue, numFmt) {
   if (cellValue && typeof cellValue === 'object' && cellValue.hasOwnProperty('formula')) {
     if (cellValue.result && cellValue.result.error) {
       result = cellValue.result.error;
-    }
-    else {
+    } else {
       result = cellValue.result;
 
     }
