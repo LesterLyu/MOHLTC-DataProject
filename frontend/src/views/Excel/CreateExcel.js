@@ -5,7 +5,6 @@ import {withStyles} from '@material-ui/core/styles';
 import {AppBar, Tabs, Tab, Card, LinearProgress, IconButton, Grid, Button, Toolbar} from "@material-ui/core";
 import {
   Add as AddIcon,
-  ZoomIn, ZoomOut, Save, FormatBold, FormatColorFill, FormatAlignCenter, SaveAlt
 } from '@material-ui/icons';
 
 import {init, generateTableData, generateTableStyle, argbToRgb, Parser, CalculationChain} from './helpers';
@@ -16,6 +15,17 @@ import './style.css';
 import WorkbookManager from "../../controller/workbookManager";
 import Worksheet from './components/Worksheet'
 import ExcelToolBar from './components/ExcelToolBar';
+
+const defaultSheet = {
+  merges: [],
+  tabColor: undefined,
+  data: generateTableData(200, 26),
+  styles: generateTableStyle(200, 26),
+  name: 'Sheet1',
+  state: 'visible',
+  views: [],
+  borders: [],
+};
 
 const styles = theme => ({
   root: {
@@ -78,26 +88,9 @@ class Excel extends Component {
       currentSheetIdx: 0,
     };
     this.global = {
-      sheetNames: ['Sheet1', 'Sheet2'],
+      sheetNames: ['Sheet1'],
       sheets: [
-        {
-          merges: [],
-          tabColor: undefined,
-          data: generateTableData(200, 26),
-          styles: generateTableStyle(200, 26),
-          name: 'Sheet1',
-          state: 'visible',
-          views: []
-        },
-        {
-          merges: [],
-          tabColor: undefined,
-          data: generateTableData(200, 26),
-          styles: generateTableStyle(200, 26),
-          name: 'Sheet2',
-          state: 'visible',
-          views: []
-        }
+        defaultSheet,
       ]
     };
 
@@ -176,7 +169,7 @@ class Excel extends Component {
 
   switchSheet(sheetName) {
     this.currentSheetName = sheetName;
-    this.currentSheetIdx = this.state.sheetNames.indexOf(sheetName);
+    this.currentSheetIdx = this.global.sheetNames.indexOf(sheetName);
   }
 
   handleChange = (event, value) => {
@@ -216,6 +209,7 @@ class Excel extends Component {
         height: this.state.sheetHeight,
         data: sheet.data,
         outsideClickDeselects: false,
+        customBorders: sheet.borders,
         afterChange: (changes, source) => {
           console.log(changes, source);
           if (source === 'edit') {
@@ -225,7 +219,7 @@ class Excel extends Component {
                 const cell = this.workbook.sheets()[0].cell(row + 1, col + 1);
                 if (newData == null || newData === '') {
                   cell.value(null);
-                } else if (typeof newData === 'string'|| typeof newData === 'number' || typeof newData === 'boolean'){
+                } else if (typeof newData === 'string' || typeof newData === 'number' || typeof newData === 'boolean') {
                   cell.value(newData);
                 } else if (newData.formula) {
                   cell.value(newData.result);
@@ -252,6 +246,26 @@ class Excel extends Component {
     }
     return list;
   }
+
+  addSheet = () => {
+    // generate new name
+    let newSheetNumber = this.global.sheetNames.length + 1;
+    for (let i = 0; i < this.global.sheetNames.length; i++) {
+      const name = this.global.sheetNames[i];
+      const match = name.match(/^Sheet(\d+)$/);
+      if (match) {
+        if (newSheetNumber <= match[1]) {
+          newSheetNumber++;
+        }
+      }
+    }
+    const newSheetName = 'Sheet' + newSheetNumber;
+    const newSheet = Object.assign(defaultSheet, {name: newSheetName});
+    this.global.sheets.push(newSheet);
+    this.global.sheetNames.push(newSheetName);
+    this.workbook.addSheet(newSheetName);
+    this.switchSheet(newSheetName);
+  };
 
   componentDidMount() {
     this.setState({
@@ -308,7 +322,7 @@ class Excel extends Component {
               <Grid container className={classes.root}>
                 <Grid item xs={"auto"} id="addSheetButton">
                   <IconButton aria-label="Add Sheet" className={classes.addSheetButton}
-                              onClick={() => console.log('1')}>
+                              onClick={this.addSheet}>
                     <AddIcon fontSize="small"/>
                   </IconButton>
                 </Grid>

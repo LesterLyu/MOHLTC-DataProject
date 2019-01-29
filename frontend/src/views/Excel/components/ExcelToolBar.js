@@ -2,20 +2,16 @@ import React, {Component} from "react";
 import {
   AppBar,
   Button,
-  Card,
   Grid,
   withStyles,
   Popover,
-  FormControl,
-  MenuItem,
-  TextField,
-  Input
 } from "@material-ui/core";
 import {
   FormatBold, FormatColorFill, Save, SaveAlt, ZoomIn, ZoomOut,
   FormatItalic, FormatUnderlined, FormatStrikethrough, FormatColorText,
-  FormatAlignCenter, FormatAlignLeft,  FormatAlignRight, FormatAlignJustify,
+  FormatAlignCenter, FormatAlignLeft, FormatAlignRight, FormatAlignJustify,
   VerticalAlignBottom, VerticalAlignCenter, VerticalAlignTop,
+  BorderTop, BorderRight, BorderBottom, BorderLeft, BorderOuter, BorderAll,
 } from "@material-ui/icons";
 import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
@@ -43,11 +39,15 @@ class ExcelToolBar extends Component {
     this.otherAttributes = ['fontSize', 'fontFamily', 'fontColor', 'horizontalAlignment',
       'indent', 'verticalAlignment', 'textDirection', 'textRotation', 'fill', 'border', 'borderColor',
       'borderStyle',];
-    const fontSizeOptions = [6,7,8,9,10,11,12,14,18,24,36,48,60,72];
+    const fontSizeOptions = [6, 7, 8, 9, 10, 11, 12, 14, 18, 24, 36, 48, 60, 72];
     this.fontSizeOptions = [];
     for (let i = 0; i < fontSizeOptions.length; i++) {
       this.fontSizeOptions.push({value: fontSizeOptions[i], label: fontSizeOptions[i] + ''});
     }
+  }
+
+  get hotInstance() {
+    return this.excel.hotInstance;
   }
 
   getSelected() {
@@ -61,10 +61,10 @@ class ExcelToolBar extends Component {
       })
   };
 
-  style = (name, value) => {
+  style = (name, value, ranges = this.getSelected()) => {
     const {excel} = this;
     const styles = excel.currentSheet.styles;
-    const ranges = this.getSelected();
+    // const ranges = ranges || this.getSelected();
     if (!ranges) {
       return;
     }
@@ -112,6 +112,58 @@ class ExcelToolBar extends Component {
       })
     } else if (styleName === 'fontColor') {
       this.style(styleName, color.hex.substring(1))
+    }
+  };
+
+  /**
+   *
+   * @param borderPosition {string} [left|right|bottom|top]
+   * @param style {string} [thin|medium|thick]
+   * @param color {string} hex rgb color without #
+   * @return {Function}
+   */
+  setBorder = (borderPosition, style = 'thin', color = '000000') => () => {
+    let ranges = this.getSelected();
+    const customBordersPlugin = this.hotInstance.getPlugin('customBorders');
+    const style2Width = {thin: 1, medium: 2, thick: 3};
+
+    if (borderPosition === 'all') {
+      this.style('border',
+        {
+          left: {style, color},
+          right: {style, color},
+          top: {style, color},
+          bottom: {style, color},
+        }, ranges);
+      customBordersPlugin.setBorders(ranges, {
+        left: {width: style2Width[style], color: `#${color}`},
+        right: {width: style2Width[style], color: `#${color}`},
+        top: {width: style2Width[style], color: `#${color}`},
+        bottom: {width: style2Width[style], color: `#${color}`},
+      });
+    } else {
+      // separate borders
+      for (let i = 0; i < ranges.length; i++) {
+        const range = ranges[i];
+        switch (borderPosition) {
+          case 'top':
+            range[2] = range[0];
+            break;
+          case 'bottom':
+            range[0] = range[2];
+            break;
+          case 'right':
+            range[1] = range[3];
+            break;
+          case 'left':
+            range[3] = range[1];
+            break;
+        }
+      }
+      this.style('border', {[borderPosition]: {style, color}}, ranges);
+      customBordersPlugin.setBorders(ranges, {
+        [borderPosition]: {width: style2Width[style], color: `#${color}`}
+      })
     }
   };
 
@@ -216,6 +268,29 @@ class ExcelToolBar extends Component {
           <Button aria-label="Vertical Align Bottom" className={classes.button}
                   onClick={() => this.style('verticalAlignment', 'bottom')}>
             <VerticalAlignBottom fontSize="small"/>
+          </Button>
+
+          <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>
+
+          <Button aria-label="Bottom Border" className={classes.button}
+                  onClick={this.setBorder('bottom')}>
+            <BorderBottom fontSize="small"/>
+          </Button>
+          <Button aria-label="Top Border" className={classes.button}
+                  onClick={this.setBorder('top')}>
+            <BorderTop fontSize="small"/>
+          </Button>
+          <Button aria-label="Left Border" className={classes.button}
+                  onClick={this.setBorder('left')}>
+            <BorderLeft fontSize="small"/>
+          </Button>
+          <Button aria-label="Right Border" className={classes.button}
+                  onClick={this.setBorder('right')}>
+            <BorderRight fontSize="small"/>
+          </Button>
+          <Button aria-label="All Border" className={classes.button}
+                  onClick={this.setBorder('all')}>
+            <BorderAll fontSize="small"/>
           </Button>
 
           <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>

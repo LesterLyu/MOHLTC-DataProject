@@ -35,7 +35,6 @@ class Worksheet extends Component {
         autoRowSize: false,
         autoColumnSize: false,
         comments: true,
-        customBorders: [],
         contextMenu: {
           items: {
             'copy' : {},
