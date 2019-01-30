@@ -7,7 +7,7 @@ import {
   Add as AddIcon,
 } from '@material-ui/icons';
 
-import {init, generateTableData, generateTableStyle, argbToRgb, Parser, CalculationChain} from './helpers';
+import {init, generateTableData, generateTableStyle, argbToRgb, Parser, CalculationChain, createArray} from './helpers';
 import Renderer from './renderer';
 import Editor from './editor';
 import tinycolor from 'tinycolor2';
@@ -24,7 +24,9 @@ const defaultSheet = {
   name: 'Sheet1',
   state: 'visible',
   views: [],
-  borders: [],
+  mergeCells: [],
+  rowHeights: createArray(24, 200),
+  colWidths: createArray(80, 26),
 };
 
 const styles = theme => ({
@@ -207,16 +209,18 @@ class Excel extends Component {
         startRows: 200,
         width: this.state.sheetWidth,
         height: this.state.sheetHeight,
+        rowHeights: sheet.rowHeights,
+        colWidths: sheet.colWidths,
         data: sheet.data,
         outsideClickDeselects: false,
-        customBorders: sheet.borders,
+        mergeCells: sheet.mergeCells,
         afterChange: (changes, source) => {
           console.log(changes, source);
           if (source === 'edit') {
             if (changes) {
               for (let i = 0; i < changes.length; i++) {
                 let row = changes[0][0], col = changes[0][1], oldData = changes[0][2], newData = changes[0][3];
-                const cell = this.workbook.sheets()[0].cell(row + 1, col + 1);
+                const cell = this.workbook.sheet(this.currentSheetIdx).cell(row + 1, col + 1);
                 if (newData == null || newData === '') {
                   cell.value(null);
                 } else if (typeof newData === 'string' || typeof newData === 'number' || typeof newData === 'boolean') {
@@ -228,7 +232,24 @@ class Excel extends Component {
               }
             }
           }
-
+        },
+        modifyRowHeight: (height, row) => {
+          const rowHeights = this.currentSheet.rowHeights;
+          if (rowHeights[row] !== height) {
+            rowHeights[row] = height;
+            setImmediate(() => {
+              this.workbook.sheet(this.currentSheetIdx).row(row + 1).height(height * 0.6)
+            });
+          }
+        },
+        modifyColWidth: (width, col) => {
+          const colWidths = this.currentSheet.colWidths;
+          if (colWidths[col] !== width) {
+            colWidths[col] = width;
+            setImmediate(() => {
+              this.workbook.sheet(this.currentSheetIdx).column(col + 1).width(width * 0.11)
+            });
+          }
         },
       };
       console.log(settings.width, settings.height)

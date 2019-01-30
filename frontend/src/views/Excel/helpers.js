@@ -276,3 +276,11 @@ export function generateTableStyle(rowNum, colNum) {
   }
   return res;
 }
+
+export function createArray(value, length) {
+  const res = [];
+  for (let i = 0; i < length; i++) {
+    res.push(value);
+  }
+  return res;
+}

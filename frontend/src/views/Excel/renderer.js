@@ -13,6 +13,8 @@ const supported = {
   verticalAlignment: ['top', 'center', 'bottom']
 };
 
+const borderStyle2Width = {thin: 1, medium: 2, thick: 3};
+
 export default class Renderer {
   constructor(instance) {
     excelInstance = instance;
@@ -21,8 +23,19 @@ export default class Renderer {
 
   cellRendererForCreateExcel(instance, td, row, col, prop, value, cellProperties) {
     if (excelInstance.workbook) {
+
       const style = excelInstance.currentSheet.styles[row][col];
       let result = calcResult(value, style.numberFormat);
+
+      // wrap the value, this fix the clicking issue for overflowed text
+      const span = SPAN_TEMPLATE.cloneNode(false);
+      Handsontable.dom.fastInnerHTML(span, result);
+      Handsontable.dom.fastInnerHTML(td, '');
+      td.appendChild(span);
+
+      if (Object.keys(style).length === 0) {
+        return;
+      }
 
       setFontStyle(td, {
         bold: style.bold,
@@ -34,11 +47,7 @@ export default class Renderer {
         strikethrough: style.strikethrough,
       });
 
-      // wrap the value, this fix the clicking issue for overflowed text
-      const span = SPAN_TEMPLATE.cloneNode(false);
-      Handsontable.dom.fastInnerHTML(span, result);
-      Handsontable.dom.fastInnerHTML(td, '');
-      td.appendChild(span);
+
 
       // text overflow if right cell is empty
       const rightCell = instance.getDataAtCell(row, col + 1);
@@ -93,6 +102,36 @@ export default class Renderer {
         span.style.transform = 'rotate(-' + style.textRotation + 'deg)';
       }
 
+      // borders
+      // // check if bottom cell has top border
+      // const bottomCell = style[row + 1][col];
+      // while(bottomCell.)
+      // if (style[row + 1] && style[row + 1][col]) {
+      //   const bottomCell = sheet.style[row + 1][col];
+      //   if ('border' in bottomCell && 'top' in bottomCell.border) {
+      //     const color = argbToRgb(bottomCell.border.top.color) || '000';
+      //     td.style.borderBottom = '1px solid #' + color;
+      //   }
+      // }
+      // // check if right cell has left border
+      // if (sheet.style[row] && sheet.style[row][col + 1]) {
+      //   const rightCell = sheet.style[row][col + 1];
+      //   if ('border' in rightCell && 'left' in rightCell.border) {
+      //     const color = argbToRgb(rightCell.border.left.color) || '000';
+      //     td.style.borderRight = '1px solid #' + color;
+      //   }
+      // }
+
+      if (style.border) {
+        for (let key in style.border) {
+          if ((key === 'right' || key === 'bottom') && style.border[key]) {
+            const upper = key.charAt(0).toUpperCase() + key.slice(1);
+            const border = style.border[key];
+            const color = border.color || '000';
+            td.style['border' + upper] = `${borderStyle2Width[border.style]}px solid #${color}`;
+          }
+        }
+      }
 
     }
   }

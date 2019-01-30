@@ -39,7 +39,7 @@ class Worksheet extends Component {
           items: {
             'copy' : {},
             '---------': {},
-            'borders': {}
+            'mergeCells': {}
           }
 
         },

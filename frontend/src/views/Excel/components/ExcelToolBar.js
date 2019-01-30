@@ -17,6 +17,10 @@ import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
 
+function ToolBarDivider() {
+  return <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>;
+}
+
 const styles = theme => ({
   button: {
     minWidth: 40,
@@ -74,7 +78,7 @@ class ExcelToolBar extends Component {
       for (let row = range[0]; row <= range[2]; row++) {
         for (let col = range[1]; col <= range[3]; col++) {
           const style = styles[row][col];
-          const cell = excel.workbook.sheets(0)[excel.currentSheetIdx].cell(row + 1, col + 1);
+          const cell = excel.workbook.sheet(excel.currentSheetIdx).cell(row + 1, col + 1);
           if (this.booleanAttributes.includes(name)) {
             style[name] = !style[name];
             cell.style(name, style[name]);
@@ -135,12 +139,12 @@ class ExcelToolBar extends Component {
           top: {style, color},
           bottom: {style, color},
         }, ranges);
-      customBordersPlugin.setBorders(ranges, {
-        left: {width: style2Width[style], color: `#${color}`},
-        right: {width: style2Width[style], color: `#${color}`},
-        top: {width: style2Width[style], color: `#${color}`},
-        bottom: {width: style2Width[style], color: `#${color}`},
-      });
+      // customBordersPlugin.setBorders(ranges, {
+      //   left: {width: style2Width[style], color: `#${color}`},
+      //   right: {width: style2Width[style], color: `#${color}`},
+      //   top: {width: style2Width[style], color: `#${color}`},
+      //   bottom: {width: style2Width[style], color: `#${color}`},
+      // });
     } else {
       // separate borders
       for (let i = 0; i < ranges.length; i++) {
@@ -161,9 +165,9 @@ class ExcelToolBar extends Component {
         }
       }
       this.style('border', {[borderPosition]: {style, color}}, ranges);
-      customBordersPlugin.setBorders(ranges, {
-        [borderPosition]: {width: style2Width[style], color: `#${color}`}
-      })
+      // customBordersPlugin.setBorders(ranges, {
+      //   [borderPosition]: {width: style2Width[style], color: `#${color}`}
+      // })
     }
   };
 
@@ -198,7 +202,7 @@ class ExcelToolBar extends Component {
             <Save fontSize="small"/>
           </Button>
 
-          <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>
+          <ToolBarDivider/>
 
           <SelectField
             value={selectedFontSize}
@@ -206,7 +210,7 @@ class ExcelToolBar extends Component {
             options={this.fontSizeOptions}
           />
 
-          <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>
+          <ToolBarDivider/>
 
           <Button aria-label="Bold" className={classes.button}
                   onClick={() => this.style('bold')}>
@@ -225,7 +229,7 @@ class ExcelToolBar extends Component {
             <FormatStrikethrough fontSize="small"/>
           </Button>
 
-          <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>
+          <ToolBarDivider/>
 
           <Button aria-label="Fill Color" className={classes.button}
                   onClick={this.showColorPopover('fillColorPopover')}>
@@ -236,7 +240,7 @@ class ExcelToolBar extends Component {
             <FormatColorText fontSize="small"/>
           </Button>
 
-          <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>
+          <ToolBarDivider/>
 
           <Button aria-label="Horizontal Align Left" className={classes.button}
                   onClick={() => this.style('horizontalAlignment', 'left')}>
@@ -255,7 +259,7 @@ class ExcelToolBar extends Component {
             <FormatAlignJustify fontSize="small"/>
           </Button>
 
-          <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>
+          <ToolBarDivider/>
 
           <Button aria-label="Vertical Align Top" className={classes.button}
                   onClick={() => this.style('verticalAlignment', 'top')}>
@@ -270,7 +274,7 @@ class ExcelToolBar extends Component {
             <VerticalAlignBottom fontSize="small"/>
           </Button>
 
-          <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>
+          <ToolBarDivider/>
 
           <Button aria-label="Bottom Border" className={classes.button}
                   onClick={this.setBorder('bottom')}>
@@ -293,7 +297,7 @@ class ExcelToolBar extends Component {
             <BorderAll fontSize="small"/>
           </Button>
 
-          <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>
+          <ToolBarDivider/>
 
           <Button aria-label="Download" className={classes.button}
                   onClick={() => this.downloadWorkbook()}>
