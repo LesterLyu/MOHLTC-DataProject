@@ -13,6 +13,7 @@ import {
   VerticalAlignBottom, VerticalAlignCenter, VerticalAlignTop,
   BorderTop, BorderRight, BorderBottom, BorderLeft, BorderOuter, BorderAll,
 } from "@material-ui/icons";
+import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
@@ -180,6 +181,8 @@ class ExcelToolBar extends Component {
     }
   };
 
+  mergeCells = () => this.hotInstance.getPlugin('ContextMenu').executeCommand('mergeCells');
+
   render() {
     const {fillColorPopover, textColorPopover, selectedFontSize} = this.state;
     const {classes} = this.props;
@@ -230,6 +233,10 @@ class ExcelToolBar extends Component {
           </Button>
 
           <ToolBarDivider/>
+          <Button aria-label="Merge Cells" className={classes.button}
+                  onClick={this.mergeCells}>
+            <TableMergeCells fontSize="small"/>
+          </Button>
 
           <Button aria-label="Fill Color" className={classes.button}
                   onClick={this.showColorPopover('fillColorPopover')}>
