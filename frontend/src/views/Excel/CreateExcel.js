@@ -16,18 +16,19 @@ import WorkbookManager from "../../controller/workbookManager";
 import Worksheet from './components/Worksheet'
 import ExcelToolBar from './components/ExcelToolBar';
 
-const defaultSheet = {
-  merges: [],
-  tabColor: undefined,
-  data: generateTableData(200, 26),
-  styles: generateTableStyle(200, 26),
-  name: 'Sheet1',
-  state: 'visible',
-  views: [],
-  mergeCells: [],
-  rowHeights: createArray(24, 200),
-  colWidths: createArray(80, 26),
-};
+function defaultSheet() {
+  return {
+    tabColor: undefined,
+    data: generateTableData(200, 26),
+    styles: generateTableStyle(200, 26),
+    name: 'Sheet1',
+    state: 'visible',
+    views: [],
+    mergeCells: [],
+    rowHeights: createArray(24, 200),
+    colWidths: createArray(80, 26),
+  };
+}
 
 const styles = theme => ({
   root: {
@@ -92,7 +93,7 @@ class Excel extends Component {
     this.global = {
       sheetNames: ['Sheet1'],
       sheets: [
-        defaultSheet,
+        defaultSheet(),
       ]
     };
 
@@ -132,7 +133,7 @@ class Excel extends Component {
   }
 
   get hotInstance() {
-    return this.sheetRef.current.hotInstance;
+    return this.sheetRef.current ? this.sheetRef.current.hotInstance : null;
   }
 
   getDefinedName(definedName) {
@@ -215,7 +216,7 @@ class Excel extends Component {
         outsideClickDeselects: false,
         mergeCells: sheet.mergeCells,
         afterChange: (changes, source) => {
-          console.log(changes, source);
+          // console.log(changes, source);
           if (source === 'edit') {
             if (changes) {
               for (let i = 0; i < changes.length; i++) {
@@ -251,8 +252,41 @@ class Excel extends Component {
             });
           }
         },
+        afterMergeCells: (cellRange, mergeParent, auto) => {
+          const mergeCells = this.currentSheet.mergeCells;
+          // find mergeCell, if found, do nothing
+          for (let i = 0; i < mergeCells.length; i++) {
+            const mergeCell = mergeCells[i];
+            if (mergeCell.row === cellRange.from.row && mergeCell.col === cellRange.from.col) {
+              return;
+            }
+          }
+          mergeCells.push(mergeParent);
+          setImmediate(() => {
+             this.workbook.sheet(this.currentSheetIdx).range(
+              cellRange.from.row + 1, cellRange.from.col + 1, cellRange.to.row + 1, cellRange.to.col + 1
+            ).merged(true);
+          });
+        },
+        afterUnmergeCells: (cellRange, auto) => {
+          const mergeCells = this.currentSheet.mergeCells;
+          let i, mergeCell;
+          // find mergeCell
+          for (i = 0; i < mergeCells.length; i++) {
+            mergeCell = mergeCells[i];
+            if (mergeCell.row === cellRange.from.row && mergeCell.col === cellRange.from.col) {
+              break;
+            }
+          }
+          mergeCells.splice(i, 1);
+          setImmediate(() => {
+            this.workbook.sheet(this.currentSheetIdx).range(
+              mergeCell.row + 1, mergeCell.col + 1, mergeCell.row + mergeCell.rowspan, mergeCell.col + mergeCell.colspan
+            ).merged(false);
+          });
+        },
       };
-      console.log(settings.width, settings.height)
+      console.log('container size: ', settings.width, settings.height)
       list.push(<Worksheet
         mode="admin"
         renderer={this.renderer.cellRendererForCreateExcel}
@@ -281,7 +315,7 @@ class Excel extends Component {
       }
     }
     const newSheetName = 'Sheet' + newSheetNumber;
-    const newSheet = Object.assign(defaultSheet, {name: newSheetName});
+    const newSheet = Object.assign(defaultSheet(), {name: newSheetName});
     this.global.sheets.push(newSheet);
     this.global.sheetNames.push(newSheetName);
     this.workbook.addSheet(newSheetName);
