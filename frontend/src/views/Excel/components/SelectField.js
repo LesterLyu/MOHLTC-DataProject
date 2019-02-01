@@ -80,7 +80,6 @@ const SelectFieldBase = (props) => {
         placeholder={placeholder}
         onChange={onChange}
         input={<Input id={id}/>}
-        input={<Input id={id}/>}
         {...InputProps}
       >
         {children}

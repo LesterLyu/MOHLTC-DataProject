@@ -7,7 +7,9 @@ import {
   Add as AddIcon,
 } from '@material-ui/icons';
 
-import {init, generateTableData, generateTableStyle, argbToRgb, Parser, CalculationChain, createArray} from './helpers';
+import {init, generateTableData, generateTableStyle, argbToRgb, createArray} from './helpers';
+import Parser from './calculations/formulaParser'
+import CalculationChain from './calculations/chain'
 import Renderer from './renderer';
 import Editor from './editor';
 import tinycolor from 'tinycolor2';
@@ -96,14 +98,16 @@ class Excel extends Component {
         defaultSheet(),
       ]
     };
+    // for calculation
+    this.currentSheetName = 'Sheet1';
+    this.parser = new Parser(this);
+    this.calculationChain = new CalculationChain(this);
+    // this.parser.changeCurrSheetName()
 
     this.workbookManager = new WorkbookManager(props);
 
-    this.parser = new Parser(this);
-    this.calculationChain = new CalculationChain(this);
     this.renderer = new Renderer(this);
     this.editor = new Editor(this);
-    this.currentSheetName = 'Sheet1'; // for calculation
     init(this); // init helper functions
     this.sheetContainerRef = React.createRef();
     this.sheetRef = React.createRef();
@@ -170,14 +174,19 @@ class Excel extends Component {
     return this.getSheet(this.global.sheetNames.indexOf(sheetName))
   }
 
-  switchSheet(sheetName) {
-    this.currentSheetName = sheetName;
-    this.currentSheetIdx = this.global.sheetNames.indexOf(sheetName);
+  switchSheet(sheetNameOrIndex) {
+    if (typeof sheetNameOrIndex === 'string') {
+      this.currentSheetName = sheetNameOrIndex;
+      this.currentSheetIdx = this.global.sheetNames.indexOf(sheetNameOrIndex);
+    } else if (typeof sheetNameOrIndex === 'number') {
+      this.currentSheetName = this.global.sheetNames[sheetNameOrIndex];
+      this.currentSheetIdx = sheetNameOrIndex;
+    }
+    this.parser.changeCurrSheetName(this.currentSheetName);
   }
 
   handleChange = (event, value) => {
-    this.currentSheetName = this.global.sheetNames[value];
-    this.setState({currentSheetIdx: value});
+    this.switchSheet(value);
   };
 
   workbookTabs() {
@@ -224,12 +233,28 @@ class Excel extends Component {
                 const cell = this.workbook.sheet(this.currentSheetIdx).cell(row + 1, col + 1);
                 if (newData == null || newData === '') {
                   cell.value(null);
+                  // remove chain
+                  if (oldData && oldData.formula) {
+                    this.calculationChain.removeCell(this.currentSheetIdx, row, col, oldData.formula);
+                  }
                 } else if (typeof newData === 'string' || typeof newData === 'number' || typeof newData === 'boolean') {
                   cell.value(newData);
+                  // remove chain
+                  if (oldData && oldData.formula) {
+                    this.calculationChain.removeCell(this.currentSheetIdx, row, col, oldData.formula);
+                  }
                 } else if (newData.formula) {
+                  if (!oldData || !oldData.formula) {
+                    this.calculationChain.addCell(this.currentSheetIdx, row, col, newData.formula);
+                  }
                   cell.value(newData.result);
                   cell.formula(newData.formula);
                 }
+                if (oldData !== newData) {
+                  this.calculationChain.change(this.currentSheetIdx, row, col);
+                  this.renderCurrentSheet();
+                }
+
               }
             }
           }

@@ -23,7 +23,7 @@ export default class Renderer {
 
   cellRendererForCreateExcel(instance, td, row, col, prop, value, cellProperties) {
     if (excelInstance.workbook) {
-
+      const styles = excelInstance.currentSheet.styles;
       const style = excelInstance.currentSheet.styles[row][col];
       let result = calcResult(value, style.numberFormat);
 
@@ -33,8 +33,53 @@ export default class Renderer {
       Handsontable.dom.fastInnerHTML(td, '');
       td.appendChild(span);
 
+      // text overflow if right cell is empty
+      const rightCell = instance.getDataAtCell(row, col + 1);
+      if (rightCell === '' || rightCell === null || rightCell === undefined ||
+        ((typeof rightCell === 'object' && 'formula' in rightCell) &&
+          (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))) {
+        td.style.overflow = 'visible';
+        td.style.textOverflow = 'clip';
+      }
+
+      // top and left borders first, seems border can be applied to empty cells with empty styles
+      const rowHeights = excelInstance.currentSheet.rowHeights;
+      const colWidths = excelInstance.currentSheet.colWidths;
+      let row_temp = row + 1, col_temp = col + 1;
+      while (rowHeights[row_temp] <= 0.1) {
+        row_temp++;
+      }
+      while (colWidths[col_temp] <= 0.1) {
+        col_temp++;
+      }
+      // check if bottom cell has top border
+      const bottomCellStyle = styles[row_temp] ? styles[row_temp][col] : {};
+      if ('border' in bottomCellStyle && bottomCellStyle.border.top) {
+        const color = bottomCellStyle.border.top.color || '000';
+        td.style.borderBottom = `${borderStyle2Width[bottomCellStyle.border.top.style]}px solid #${color}`;
+      }
+      // check if right cell has left border
+      const rightCellStyle = styles[row][col_temp] || {};
+      if ('border' in rightCellStyle && rightCellStyle.border.left) {
+        const color = rightCellStyle.border.left.color || '000';
+        td.style.borderRight = `${borderStyle2Width[rightCellStyle.border.left.style]}px solid #${color}`;
+      }
+
+      // if the cell has no styles, then don't do any style calculations
       if (Object.keys(style).length === 0) {
         return;
+      }
+
+      // right an bottom border s
+      if (style.border) {
+        for (let key in style.border) {
+          if ((key === 'right' || key === 'bottom') && style.border[key]) {
+            const upper = key.charAt(0).toUpperCase() + key.slice(1);
+            const border = style.border[key];
+            const color = border.color || '000';
+            td.style['border' + upper] = `${borderStyle2Width[border.style]}px solid #${color}`;
+          }
+        }
       }
 
       setFontStyle(td, {
@@ -49,14 +94,6 @@ export default class Renderer {
 
 
 
-      // text overflow if right cell is empty
-      const rightCell = instance.getDataAtCell(row, col + 1);
-      if (rightCell === '' || rightCell === null || rightCell === undefined ||
-        ((typeof rightCell === 'object' && 'formula' in rightCell) &&
-          (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))) {
-        td.style.overflow = 'visible';
-        td.style.textOverflow = 'clip';
-      }
 
       if (style.fill) {
         if (style.fill.type === 'solid') {
@@ -102,36 +139,7 @@ export default class Renderer {
         span.style.transform = 'rotate(-' + style.textRotation + 'deg)';
       }
 
-      // borders
-      // // check if bottom cell has top border
-      // const bottomCell = style[row + 1][col];
-      // while(bottomCell.)
-      // if (style[row + 1] && style[row + 1][col]) {
-      //   const bottomCell = sheet.style[row + 1][col];
-      //   if ('border' in bottomCell && 'top' in bottomCell.border) {
-      //     const color = argbToRgb(bottomCell.border.top.color) || '000';
-      //     td.style.borderBottom = '1px solid #' + color;
-      //   }
-      // }
-      // // check if right cell has left border
-      // if (sheet.style[row] && sheet.style[row][col + 1]) {
-      //   const rightCell = sheet.style[row][col + 1];
-      //   if ('border' in rightCell && 'left' in rightCell.border) {
-      //     const color = argbToRgb(rightCell.border.left.color) || '000';
-      //     td.style.borderRight = '1px solid #' + color;
-      //   }
-      // }
 
-      if (style.border) {
-        for (let key in style.border) {
-          if ((key === 'right' || key === 'bottom') && style.border[key]) {
-            const upper = key.charAt(0).toUpperCase() + key.slice(1);
-            const border = style.border[key];
-            const color = border.color || '000';
-            td.style['border' + upper] = `${borderStyle2Width[border.style]}px solid #${color}`;
-          }
-        }
-      }
 
     }
   }

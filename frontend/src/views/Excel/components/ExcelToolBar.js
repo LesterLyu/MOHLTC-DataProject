@@ -11,7 +11,7 @@ import {
   FormatItalic, FormatUnderlined, FormatStrikethrough, FormatColorText,
   FormatAlignCenter, FormatAlignLeft, FormatAlignRight, FormatAlignJustify,
   VerticalAlignBottom, VerticalAlignCenter, VerticalAlignTop,
-  BorderTop, BorderRight, BorderBottom, BorderLeft, BorderOuter, BorderAll,
+  BorderTop, BorderRight, BorderBottom, BorderLeft, BorderClear, BorderAll, BorderColor,
 } from "@material-ui/icons";
 import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";
@@ -84,8 +84,15 @@ class ExcelToolBar extends Component {
             style[name] = !style[name];
             cell.style(name, style[name]);
           } else if (this.otherAttributes.includes(name)) {
-            style[name] = value;
-            cell.style(name, value);
+            if (style[name] && typeof value === 'object') {
+              const mergedValue = Object.assign(style[name], value);
+              style[name] = mergedValue;
+              cell.style(name, mergedValue);
+            } else {
+              const valueCopy = (typeof value === 'object' && value) ? Object.assign({}, value) : value;
+              style[name] = valueCopy;
+              cell.style(name, valueCopy);
+            }
           }
         }
       }
@@ -129,7 +136,6 @@ class ExcelToolBar extends Component {
    */
   setBorder = (borderPosition, style = 'thin', color = '000000') => () => {
     let ranges = this.getSelected();
-    const customBordersPlugin = this.hotInstance.getPlugin('customBorders');
     const style2Width = {thin: 1, medium: 2, thick: 3};
 
     if (borderPosition === 'all') {
@@ -140,12 +146,14 @@ class ExcelToolBar extends Component {
           top: {style, color},
           bottom: {style, color},
         }, ranges);
-      // customBordersPlugin.setBorders(ranges, {
-      //   left: {width: style2Width[style], color: `#${color}`},
-      //   right: {width: style2Width[style], color: `#${color}`},
-      //   top: {width: style2Width[style], color: `#${color}`},
-      //   bottom: {width: style2Width[style], color: `#${color}`},
-      // });
+    } else if (borderPosition === 'clear') {
+      this.style('border',
+        {
+          left: null,
+          right: null,
+          top: null,
+          bottom: null,
+        }, ranges);
     } else {
       // separate borders
       for (let i = 0; i < ranges.length; i++) {
@@ -166,9 +174,7 @@ class ExcelToolBar extends Component {
         }
       }
       this.style('border', {[borderPosition]: {style, color}}, ranges);
-      // customBordersPlugin.setBorders(ranges, {
-      //   [borderPosition]: {width: style2Width[style], color: `#${color}`}
-      // })
+
     }
   };
 
@@ -192,18 +198,23 @@ class ExcelToolBar extends Component {
     return (
       <AppBar position="static" color="default" style={{marginBottom: 3}}>
         <Grid container className={classes.root}>
-          <Button aria-label="Zoom in" className={classes.button}
-                  onClick={() => console.log('1')}>
-            <ZoomIn fontSize="small"/>
+          <ToolBarDivider/>
+          <Button aria-label="Download" className={classes.button}
+                  onClick={() => this.downloadWorkbook()}>
+            <SaveAlt fontSize="small"/>
           </Button>
-          <Button aria-label="Zoom out" className={classes.button}
-                  onClick={() => console.log('1')}>
-            <ZoomOut fontSize="small"/>
-          </Button>
-          <Button aria-label="Save" className={classes.button}
-                  onClick={() => console.log('1')}>
-            <Save fontSize="small"/>
-          </Button>
+          {/*<Button aria-label="Zoom in" className={classes.button}*/}
+          {/*onClick={() => console.log('1')}>*/}
+          {/*<ZoomIn fontSize="small"/>*/}
+          {/*</Button>*/}
+          {/*<Button aria-label="Zoom out" className={classes.button}*/}
+          {/*onClick={() => console.log('1')}>*/}
+          {/*<ZoomOut fontSize="small"/>*/}
+          {/*</Button>*/}
+          {/*<Button aria-label="Save" className={classes.button}*/}
+          {/*onClick={() => console.log('1')}>*/}
+          {/*<Save fontSize="small"/>*/}
+          {/*</Button>*/}
 
           <ToolBarDivider/>
 
@@ -303,13 +314,14 @@ class ExcelToolBar extends Component {
                   onClick={this.setBorder('all')}>
             <BorderAll fontSize="small"/>
           </Button>
+          <Button aria-label="Clear Border" className={classes.button}
+                  onClick={this.setBorder('clear')}>
+            <BorderClear fontSize="small"/>
+          </Button>
 
           <ToolBarDivider/>
 
-          <Button aria-label="Download" className={classes.button}
-                  onClick={() => this.downloadWorkbook()}>
-            <SaveAlt fontSize="small"/>
-          </Button>
+
         </Grid>
         <Popover
           id="fillColorPopover"

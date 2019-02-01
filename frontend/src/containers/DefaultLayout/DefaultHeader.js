@@ -2,8 +2,10 @@ import React, {Component} from 'react';
 import {DropdownItem, DropdownMenu, DropdownToggle, Nav} from 'reactstrap';
 import PropTypes from 'prop-types';
 
-import {AppHeaderDropdown, AppSidebarToggler} from '@coreui/react';
+import {AppHeaderDropdown, AppSidebarToggler, AppNavbarBrand} from '@coreui/react';
 import Typography from '@material-ui/core/Typography';
+import logo from '../../assets/img/brand/Ontario_Wordmark_2007.svg'
+import sygnet from '../../assets/img/brand/icon.png'
 
 const propTypes = {
   children: PropTypes.node,
@@ -16,11 +18,10 @@ class DefaultHeader extends Component {
     return (
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile/>
-        <Typography variant="h6" color="inherit" style={{
-          paddingLeft: 10, color: 'rgb(0, 0, 0)', fontFamily: 'Roboto, Helvetica, Arial, sans-serif', fontSize: 20, fontWeight: 'bold',
-        }}>
-          GDCT
-        </Typography>
+        <AppNavbarBrand
+          full={{ src: logo, height: 40, alt: 'MOH Logo' }}
+          minimized={{ src: sygnet, height: 40, alt: 'MOH Logo' }}
+        />
         <AppSidebarToggler className="d-md-down-none" display="lg"/>
 
         <Nav className="ml-auto" navbar>
