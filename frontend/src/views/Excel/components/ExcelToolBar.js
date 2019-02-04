@@ -136,6 +136,9 @@ class ExcelToolBar extends Component {
    */
   setBorder = (borderPosition, style = 'thin', color = '000000') => () => {
     let ranges = this.getSelected();
+    if (!ranges) {
+      return;
+    }
     const style2Width = {thin: 1, medium: 2, thick: 3};
 
     if (borderPosition === 'all') {

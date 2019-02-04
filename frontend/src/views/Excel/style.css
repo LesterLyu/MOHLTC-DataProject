@@ -5,3 +5,11 @@
 .handsontable th {
   font-size: 14px;
 }
+
+.handsontable td.area.highlight:before {
+  background: #005effad;
+}
+
+.handsontable td.current.area.highlight:before {
+  background: rgba(0,0,0,0);
+}
