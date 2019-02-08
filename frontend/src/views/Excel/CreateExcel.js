@@ -18,6 +18,7 @@ import Worksheets from './components/Worksheets'
 import ExcelToolBar from './components/ExcelToolBar';
 import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
+const excelWorker = new Worker('../../controller/excel.worker', { type: 'module' });
 
 function defaultSheet() {
   return {
@@ -180,6 +181,9 @@ class Excel extends Component {
       sheetWidth: this.sheetContainerRef.current.offsetWidth,
       sheetHeight: this.sheetContainerRef.current.offsetHeight
     });
+
+    excelWorker.postMessage(1);
+    excelWorker.onmessage = function (event) {console.log(event.data)};
   }
 
   renderCurrentSheet() {
