@@ -7,9 +7,20 @@
 }
 
 .handsontable td.area.highlight:before {
-  background: #005effad;
+  background: rgba(0, 94, 255, 0.8);
 }
 
 .handsontable td.current.area.highlight:before {
   background: rgba(0,0,0,0);
+}
+
+:focus {
+  outline: none;
+}
+
+#fx {
+  font-size: 18px;
+  font-family: "Times New Roman", serif;
+  font-style: italic;
+  margin: 0 10px;
 }

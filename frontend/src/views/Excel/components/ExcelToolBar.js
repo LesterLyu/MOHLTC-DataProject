@@ -5,9 +5,10 @@ import {
   Grid,
   withStyles,
   Popover,
+  InputBase
 } from "@material-ui/core";
 import {
-  FormatBold, FormatColorFill, Save, SaveAlt, ZoomIn, ZoomOut,
+  FormatBold, FormatColorFill, Save, SaveAlt, ZoomIn, ZoomOut, WrapText,
   FormatItalic, FormatUnderlined, FormatStrikethrough, FormatColorText,
   FormatAlignCenter, FormatAlignLeft, FormatAlignRight, FormatAlignJustify,
   VerticalAlignBottom, VerticalAlignCenter, VerticalAlignTop,
@@ -18,7 +19,7 @@ import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
 
-function ToolBarDivider() {
+export function ToolBarDivider() {
   return <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>;
 }
 
@@ -37,6 +38,9 @@ class ExcelToolBar extends Component {
       fillColorPopover: null, selectedFillColor: '#fff', textColorPopover: null,
       selectedTextColor: '#000', selectedFontSize: 14, selectedFontFamily: 'Calibri',
     };
+    this.history = {
+      current: {},
+    };
     // see https://github.com/LesterLyu/xlsx-populate#styles-1
     this.booleanAttributes = ['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
       'justifyLastLine', 'wrapText', 'shrinkToFit', 'angleTextCounterclockwise', 'angleTextClockwise',
@@ -49,6 +53,15 @@ class ExcelToolBar extends Component {
     for (let i = 0; i < fontSizeOptions.length; i++) {
       this.fontSizeOptions.push({value: fontSizeOptions[i], label: fontSizeOptions[i] + ''});
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState, nextContext) {
+    return this.history.current !== nextProps.context.global.current
+      || this.state !== nextState;
+  }
+
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.history.current = this.props.context.global.current;
   }
 
   get hotInstance() {
@@ -199,172 +212,179 @@ class ExcelToolBar extends Component {
     const openTextColor = Boolean(textColorPopover);
 
     return (
-      <AppBar position="static" color="default" style={{marginBottom: 3}}>
-        <Grid container className={classes.root}>
-          <ToolBarDivider/>
-          <Button aria-label="Download" className={classes.button}
-                  onClick={() => this.downloadWorkbook()}>
-            <SaveAlt fontSize="small"/>
-          </Button>
-          {/*<Button aria-label="Zoom in" className={classes.button}*/}
-          {/*onClick={() => console.log('1')}>*/}
-          {/*<ZoomIn fontSize="small"/>*/}
-          {/*</Button>*/}
-          {/*<Button aria-label="Zoom out" className={classes.button}*/}
-          {/*onClick={() => console.log('1')}>*/}
-          {/*<ZoomOut fontSize="small"/>*/}
-          {/*</Button>*/}
-          {/*<Button aria-label="Save" className={classes.button}*/}
-          {/*onClick={() => console.log('1')}>*/}
-          {/*<Save fontSize="small"/>*/}
-          {/*</Button>*/}
+      <>
+        <AppBar position="static" color="default" style={{}}>
+          <Grid container className={classes.root}>
+            <ToolBarDivider/>
+            <Button aria-label="Download" className={classes.button}
+                    onClick={() => this.downloadWorkbook()}>
+              <SaveAlt fontSize="small"/>
+            </Button>
+            {/*<Button aria-label="Zoom in" className={classes.button}*/}
+            {/*onClick={() => console.log('1')}>*/}
+            {/*<ZoomIn fontSize="small"/>*/}
+            {/*</Button>*/}
+            {/*<Button aria-label="Zoom out" className={classes.button}*/}
+            {/*onClick={() => console.log('1')}>*/}
+            {/*<ZoomOut fontSize="small"/>*/}
+            {/*</Button>*/}
+            {/*<Button aria-label="Save" className={classes.button}*/}
+            {/*onClick={() => console.log('1')}>*/}
+            {/*<Save fontSize="small"/>*/}
+            {/*</Button>*/}
 
-          <ToolBarDivider/>
+            <ToolBarDivider/>
 
-          <SelectField
-            value={selectedFontSize}
-            onChange={this.handleSelectChange('selectedFontSize')}
-            options={this.fontSizeOptions}
-          />
+            <SelectField
+              value={selectedFontSize}
+              onChange={this.handleSelectChange('selectedFontSize')}
+              options={this.fontSizeOptions}
+            />
 
-          <ToolBarDivider/>
+            <ToolBarDivider/>
 
-          <Button aria-label="Bold" className={classes.button}
-                  onClick={() => this.style('bold')}>
-            <FormatBold fontSize="small"/>
-          </Button>
-          <Button aria-label="Italic" className={classes.button}
-                  onClick={() => this.style('italic')}>
-            <FormatItalic fontSize="small"/>
-          </Button>
-          <Button aria-label="Underline" className={classes.button}
-                  onClick={() => this.style('underline')}>
-            <FormatUnderlined fontSize="small"/>
-          </Button>
-          <Button aria-label="Strikethrough" className={classes.button}
-                  onClick={() => this.style('strikethrough')}>
-            <FormatStrikethrough fontSize="small"/>
-          </Button>
+            <Button aria-label="Bold" className={classes.button}
+                    onClick={() => this.style('bold')}>
+              <FormatBold fontSize="small"/>
+            </Button>
+            <Button aria-label="Italic" className={classes.button}
+                    onClick={() => this.style('italic')}>
+              <FormatItalic fontSize="small"/>
+            </Button>
+            <Button aria-label="Underline" className={classes.button}
+                    onClick={() => this.style('underline')}>
+              <FormatUnderlined fontSize="small"/>
+            </Button>
+            <Button aria-label="Strikethrough" className={classes.button}
+                    onClick={() => this.style('strikethrough')}>
+              <FormatStrikethrough fontSize="small"/>
+            </Button>
 
-          <ToolBarDivider/>
-          <Button aria-label="Merge Cells" className={classes.button}
-                  onClick={this.mergeCells}>
-            <TableMergeCells fontSize="small"/>
-          </Button>
+            <ToolBarDivider/>
+            <Button aria-label="Merge Cells" className={classes.button}
+                    onClick={this.mergeCells}>
+              <TableMergeCells fontSize="small"/>
+            </Button>
 
-          <Button aria-label="Fill Color" className={classes.button}
-                  onClick={this.showColorPopover('fillColorPopover')}>
-            <FormatColorFill fontSize="small"/>
-          </Button>
-          <Button aria-label="Text Color" className={classes.button}
-                  onClick={this.showColorPopover('textColorPopover')}>
-            <FormatColorText fontSize="small"/>
-          </Button>
+            <Button aria-label="Wrap Text" className={classes.button}
+                    onClick={() => this.style('wrapText')}>
+              <WrapText fontSize="small"/>
+            </Button>
 
-          <ToolBarDivider/>
+            <Button aria-label="Fill Color" className={classes.button}
+                    onClick={this.showColorPopover('fillColorPopover')}>
+              <FormatColorFill fontSize="small"/>
+            </Button>
+            <Button aria-label="Text Color" className={classes.button}
+                    onClick={this.showColorPopover('textColorPopover')}>
+              <FormatColorText fontSize="small"/>
+            </Button>
 
-          <Button aria-label="Horizontal Align Left" className={classes.button}
-                  onClick={() => this.style('horizontalAlignment', 'left')}>
-            <FormatAlignLeft fontSize="small"/>
-          </Button>
-          <Button aria-label="Horizontal Align Center" className={classes.button}
-                  onClick={() => this.style('horizontalAlignment', 'center')}>
-            <FormatAlignCenter fontSize="small"/>
-          </Button>
-          <Button aria-label="Horizontal Align Right" className={classes.button}
-                  onClick={() => this.style('horizontalAlignment', 'right')}>
-            <FormatAlignRight fontSize="small"/>
-          </Button>
-          <Button aria-label="Horizontal Align justify" className={classes.button}
-                  onClick={() => this.style('horizontalAlignment', 'justify')}>
-            <FormatAlignJustify fontSize="small"/>
-          </Button>
+            <ToolBarDivider/>
 
-          <ToolBarDivider/>
+            <Button aria-label="Horizontal Align Left" className={classes.button}
+                    onClick={() => this.style('horizontalAlignment', 'left')}>
+              <FormatAlignLeft fontSize="small"/>
+            </Button>
+            <Button aria-label="Horizontal Align Center" className={classes.button}
+                    onClick={() => this.style('horizontalAlignment', 'center')}>
+              <FormatAlignCenter fontSize="small"/>
+            </Button>
+            <Button aria-label="Horizontal Align Right" className={classes.button}
+                    onClick={() => this.style('horizontalAlignment', 'right')}>
+              <FormatAlignRight fontSize="small"/>
+            </Button>
+            <Button aria-label="Horizontal Align justify" className={classes.button}
+                    onClick={() => this.style('horizontalAlignment', 'justify')}>
+              <FormatAlignJustify fontSize="small"/>
+            </Button>
 
-          <Button aria-label="Vertical Align Top" className={classes.button}
-                  onClick={() => this.style('verticalAlignment', 'top')}>
-            <VerticalAlignTop fontSize="small"/>
-          </Button>
-          <Button aria-label="Vertical Align Center" className={classes.button}
-                  onClick={() => this.style('verticalAlignment', 'center')}>
-            <VerticalAlignCenter fontSize="small"/>
-          </Button>
-          <Button aria-label="Vertical Align Bottom" className={classes.button}
-                  onClick={() => this.style('verticalAlignment', 'bottom')}>
-            <VerticalAlignBottom fontSize="small"/>
-          </Button>
+            <ToolBarDivider/>
 
-          <ToolBarDivider/>
+            <Button aria-label="Vertical Align Top" className={classes.button}
+                    onClick={() => this.style('verticalAlignment', 'top')}>
+              <VerticalAlignTop fontSize="small"/>
+            </Button>
+            <Button aria-label="Vertical Align Center" className={classes.button}
+                    onClick={() => this.style('verticalAlignment', 'center')}>
+              <VerticalAlignCenter fontSize="small"/>
+            </Button>
+            <Button aria-label="Vertical Align Bottom" className={classes.button}
+                    onClick={() => this.style('verticalAlignment', 'bottom')}>
+              <VerticalAlignBottom fontSize="small"/>
+            </Button>
 
-          <Button aria-label="Bottom Border" className={classes.button}
-                  onClick={this.setBorder('bottom')}>
-            <BorderBottom fontSize="small"/>
-          </Button>
-          <Button aria-label="Top Border" className={classes.button}
-                  onClick={this.setBorder('top')}>
-            <BorderTop fontSize="small"/>
-          </Button>
-          <Button aria-label="Left Border" className={classes.button}
-                  onClick={this.setBorder('left')}>
-            <BorderLeft fontSize="small"/>
-          </Button>
-          <Button aria-label="Right Border" className={classes.button}
-                  onClick={this.setBorder('right')}>
-            <BorderRight fontSize="small"/>
-          </Button>
-          <Button aria-label="All Border" className={classes.button}
-                  onClick={this.setBorder('all')}>
-            <BorderAll fontSize="small"/>
-          </Button>
-          <Button aria-label="Clear Border" className={classes.button}
-                  onClick={this.setBorder('clear')}>
-            <BorderClear fontSize="small"/>
-          </Button>
+            <ToolBarDivider/>
 
-          <ToolBarDivider/>
+            <Button aria-label="Bottom Border" className={classes.button}
+                    onClick={this.setBorder('bottom')}>
+              <BorderBottom fontSize="small"/>
+            </Button>
+            <Button aria-label="Top Border" className={classes.button}
+                    onClick={this.setBorder('top')}>
+              <BorderTop fontSize="small"/>
+            </Button>
+            <Button aria-label="Left Border" className={classes.button}
+                    onClick={this.setBorder('left')}>
+              <BorderLeft fontSize="small"/>
+            </Button>
+            <Button aria-label="Right Border" className={classes.button}
+                    onClick={this.setBorder('right')}>
+              <BorderRight fontSize="small"/>
+            </Button>
+            <Button aria-label="All Border" className={classes.button}
+                    onClick={this.setBorder('all')}>
+              <BorderAll fontSize="small"/>
+            </Button>
+            <Button aria-label="Clear Border" className={classes.button}
+                    onClick={this.setBorder('clear')}>
+              <BorderClear fontSize="small"/>
+            </Button>
+
+            <ToolBarDivider/>
 
 
-        </Grid>
-        <Popover
-          id="fillColorPopover"
-          open={openFillColor}
-          anchorEl={fillColorPopover}
-          onClose={this.hideColorPopever('fillColorPopover')}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-        >
-          <SketchPicker
-            disableAlpha
-            color={this.state.selectedFillColor}
-            onChangeComplete={this.onColorChange('selectedFillColor', 'fill')}/>
-        </Popover>
-        <Popover
-          id="textColorPopover"
-          open={openTextColor}
-          anchorEl={textColorPopover}
-          onClose={this.hideColorPopever('textColorPopover')}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-        >
-          <SketchPicker
-            disableAlpha
-            color={this.state.selectedTextColor}
-            onChangeComplete={this.onColorChange('selectedTextColor', 'fontColor')}/>
-        </Popover>
-      </AppBar>
+          </Grid>
+          <Popover
+            id="fillColorPopover"
+            open={openFillColor}
+            anchorEl={fillColorPopover}
+            onClose={this.hideColorPopever('fillColorPopover')}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+          >
+            <SketchPicker
+              disableAlpha
+              color={this.state.selectedFillColor}
+              onChangeComplete={this.onColorChange('selectedFillColor', 'fill')}/>
+          </Popover>
+          <Popover
+            id="textColorPopover"
+            open={openTextColor}
+            anchorEl={textColorPopover}
+            onClose={this.hideColorPopever('textColorPopover')}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+          >
+            <SketchPicker
+              disableAlpha
+              color={this.state.selectedTextColor}
+              onChangeComplete={this.onColorChange('selectedTextColor', 'fontColor')}/>
+          </Popover>
+        </AppBar>
+      </>
     )
   }
 }

@@ -67,6 +67,9 @@ export default class Renderer {
 
       // if the cell has no styles, then don't do any style calculations
       if (Object.keys(style).length === 0) {
+        // apply default styles
+        td.classList.add('htBottom');
+        td.style.textAlign = 'left';
         return;
       }
 
@@ -129,7 +132,7 @@ export default class Renderer {
 
       // font text wrap
       if (style.wrapText) {
-        td.style.wrapText = 'break-word';
+        td.style.wordWrap = 'break-word';
         td.style.whiteSpace = 'pre-wrap';
       }
 
