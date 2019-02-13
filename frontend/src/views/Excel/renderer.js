@@ -25,6 +25,27 @@ export default class Renderer {
     if (excelInstance.workbook) {
       const styles = excelInstance.currentSheet.styles;
       const style = excelInstance.currentSheet.styles[row][col];
+      const rowHeights = excelInstance.currentSheet.rowHeights;
+      const colWidths = excelInstance.currentSheet.colWidths;
+
+      // check if row heights < 23
+      const rowHeight = rowHeights[row];
+      if (rowHeight < 23) {
+        if (td.parentNode) {
+          td.parentNode.firstChild.style.height = rowHeight - 1 + 'px';
+          td.parentNode.firstChild.style.lineHeight = rowHeight - 1 + 'px';
+        }
+        td.style.height = rowHeight - 1 + 'px';
+        td.style.lineHeight = rowHeight - 1 + 'px';
+        const rowHeader = excelInstance.hotInstance.rootElement.querySelector('.ht_clone_left .htCore tbody')
+          .children[row].firstChild.firstChild;
+        rowHeader.style.lineHeight = rowHeight - 1 + 'px';
+      }
+      const colWidth = colWidths[col];
+      if (colWidth < 23) {
+
+      }
+
       let result = calcResult(value, style.numberFormat);
 
       // wrap the value, this fix the clicking issue for overflowed text
@@ -43,8 +64,7 @@ export default class Renderer {
       }
 
       // top and left borders first, seems border can be applied to empty cells with empty styles
-      const rowHeights = excelInstance.currentSheet.rowHeights;
-      const colWidths = excelInstance.currentSheet.colWidths;
+
       let row_temp = row + 1, col_temp = col + 1;
       while (rowHeights[row_temp] <= 0.1) {
         row_temp++;
@@ -93,6 +113,7 @@ export default class Renderer {
         name: style.fontFamily,
         color: style.fontColor,
         strikethrough: style.strikethrough,
+        rowHeight,
       });
 
 
@@ -350,7 +371,14 @@ function setFontStyle(element, font) {
   }
   if ('size' in font) {
     element.style.fontSize = font.size + 'pt';
-    element.style.lineHeight = 'normal';
+    if (font.rowHeight !== undefined) {
+      if (font.rowHeight < font.size * 0.75) {
+        element.style.overflow = 'hidden';
+      } else {
+        element.style.lineHeight = 'normal';
+      }
+    }
+
   }
   if (font.name) {
     element.style.fontFamily = font.name;

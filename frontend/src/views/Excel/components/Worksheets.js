@@ -94,23 +94,30 @@ class Worksheets extends Component {
             }
           }
         },
-        modifyRowHeight: (height, row) => {
+        afterRowResize: (row, height, isDoubleClick) => {
+          console.log('save row height:', row, height);
           const rowHeights = excel.currentSheet.rowHeights;
-          if (rowHeights[row] !== height) {
-            rowHeights[row] = height;
-            setImmediate(() => {
-              excel.workbook.sheet(currentSheetIdx).row(row + 1).height(height * 0.6)
-            });
-          }
+          rowHeights[row] = height;
+          // fix bug where row height is not properly updated on the table
+          excel.renderCurrentSheet();
+          setTimeout(() => {
+            // excel.hotInstance.getPlugin('ManualRowResize').setManualSize(row, height);
+            excel.workbook.sheet(currentSheetIdx).row(row + 1).height(height * 0.6)
+          });
+          return height;
         },
-        modifyColWidth: (width, col) => {
+        beforeColumnResize: (p1, p2) => {
+          console.log(p1)
+        },
+        afterColumnResize: (col, width, isDoubleClick) => {
           const colWidths = excel.currentSheet.colWidths;
-          if (colWidths[col] !== width) {
-            colWidths[col] = width;
-            setImmediate(() => {
-              excel. workbook.sheet(currentSheetIdx).column(col + 1).width(width * 0.11)
-            });
-          }
+          colWidths[col] = width;
+          console.log('save col width:', col, width);
+
+          setTimeout(() => {
+            excel.workbook.sheet(currentSheetIdx).column(col + 1).width(width * 0.11)
+          });
+          return width;
         },
         afterMergeCells: (cellRange, mergeParent, auto) => {
           const mergeCells = excel.currentSheet.mergeCells;
