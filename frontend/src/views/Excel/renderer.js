@@ -42,8 +42,10 @@ export default class Renderer {
         rowHeader.style.lineHeight = rowHeight - 1 + 'px';
       }
       const colWidth = colWidths[col];
-      if (colWidth < 23) {
-
+      // check if column width < 23
+      if (colWidth < 20) {
+        const colHeader = excelInstance.hotInstance.rootElement.querySelector('table.htCore colgroup').children[col];
+        colHeader.style.width = colWidth + 'px';
       }
 
       let result = calcResult(value, style.numberFormat);

@@ -30,7 +30,8 @@ class FormulaBar extends Component {
       const input = formulaOrValue !== null && formulaOrValue !== undefined ?
         (formulaOrValue.formula ? '=' + formulaOrValue.formula : formulaOrValue) : '';
       if (this.state.formulaBarInput !== input) {
-        this.setState({formulaBarInput: input})
+        this.setState({formulaBarInput: input});
+        this.orginalInput = input;
       }
     });
   }
@@ -45,7 +46,21 @@ class FormulaBar extends Component {
 
   handleChange = what => (event) => {
     this.setState({[what]: event.target.value});
-    this.excel.hotInstance.setDataAtCell(this.data.row, this.data.col, event.target.value);
+    if (this.td.firstChild) {
+      this.td.firstElementChild.innerHTML = event.target.value;
+    }
+  };
+
+  focusin = () => {
+    console.log('focus in');
+    this.td = this.excel.hotInstance.rootElement.querySelector('td.current.highlight');
+  };
+
+  focusout = () => {
+    // console.log('focus out')
+    if (this.orginalInput !== this.state.formulaBarInput) {
+      this.excel.hotInstance.setDataAtCell(this.data.row, this.data.col, this.state.formulaBarInput);
+    }
   };
 
   render() {
@@ -59,7 +74,8 @@ class FormulaBar extends Component {
         <ToolBarDivider/>
         <Grid item xs>
           <InputBase fullWidth value={this.state.formulaBarInput} classes={{input: classes.input}}
-                     onChange={this.handleChange('formulaBarInput')}/>
+                     onChange={this.handleChange('formulaBarInput')}
+                     inputProps={{onBlur: this.focusout, onFocus: this.focusin}}/>
         </Grid>
       </Grid>
     </AppBar>)

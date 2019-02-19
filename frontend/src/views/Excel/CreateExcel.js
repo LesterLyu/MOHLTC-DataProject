@@ -95,6 +95,9 @@ class Excel extends Component {
     this.setState({currentSheetIdx})
   }
 
+  /**
+   * @return {Handsontable}
+   */
   get hotInstance() {
     return this.sheetRef.current ? this.sheetRef.current.hotInstance : null;
   }
