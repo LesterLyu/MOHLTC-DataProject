@@ -37,11 +37,25 @@ function defaultSheet() {
 const styles = theme => ({});
 
 /**
- * @typedef {Object}
+ * @typedef {Object} SheetStore
+ * @property {Array.<Array.<string|object>>} data
+ * @property {string} name
+ * @property {string} state
+ * @property {Array.<Array.<object|undefined|null>>} styles
+ * @property {Array.<Array.<number>>} colWidths
+ * @property {Array.<Array.<number>>} rowHeights
+ * @property {string|undefined|null} tabColor
+ * @property {Object} views
+ */
+
+/**
+ * @typedef {Object} Excel
  * @property {Object} global sheets data
  * @property {Handsontable} hotInstance
  * @property {Workbook} workbook
- *
+ * @property {string} currentSheetName
+ * @property {SheetStore} currentSheet
+ * @property {number} currentSheetIdx
  */
 class Excel extends Component {
 
@@ -85,6 +99,10 @@ class Excel extends Component {
     return this.state.loaded;
   }
 
+  /**
+   * Get current sheet data
+   * @return {SheetStore}
+   */
   get currentSheet() {
     return this.global.sheets[this.state.currentSheetIdx];
   }
