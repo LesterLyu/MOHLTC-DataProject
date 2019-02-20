@@ -29,8 +29,8 @@ function defaultSheet() {
     state: 'visible',
     views: [],
     mergeCells: [],
-    rowHeights: createArray(24, 200),
-    colWidths: createArray(80, 26),
+    rowHeights: [20,23,40,0, 5, 10, 30],// createArray(24, 200),
+    colWidths: [40,5,40,0,60,80] // createArray(80, 26),
   };
 }
 
@@ -56,13 +56,13 @@ class Excel extends Component {
       ],
       current: {}
     };
+    this.workbookManager = new WorkbookManager(props);
     // for calculation
     this.currentSheetName = 'Sheet1';
     this.parser = new Parser(this);
     this.calculationChain = new CalculationChain(this);
     // this.parser.changeCurrSheetName()
 
-    this.workbookManager = new WorkbookManager(props);
 
     this.renderer = new Renderer(this);
     this.editor = new Editor(this);
@@ -175,15 +175,19 @@ class Excel extends Component {
 
 
   componentDidMount() {
-    this.setState({loadingMessage: '', loaded: true});
+    const sheetWidth = this.sheetContainerRef.current.offsetWidth;
+    const sheetHeight = this.sheetContainerRef.current.offsetHeight;
+    // create local workbook storage
     this.workbookManager.createWorkbookLocal()
       .then(workbook => {
         this.workbook = workbook;
+        this.setState({
+          sheetWidth,
+          sheetHeight,
+          loadingMessage: '', loaded: true
+        });
       });
-    this.setState({
-      sheetWidth: this.sheetContainerRef.current.offsetWidth,
-      sheetHeight: this.sheetContainerRef.current.offsetHeight
-    });
+
 
     excelWorker.postMessage(1);
     excelWorker.onmessage = function (event) {console.log(event.data)};

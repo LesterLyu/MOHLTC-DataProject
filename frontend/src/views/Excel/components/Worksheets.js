@@ -5,6 +5,9 @@ import {withStyles} from "@material-ui/core";
 
 import Worksheet from './Worksheet'
 
+import Handsontable from 'handsontable';
+const { addClass, removeClass } = Handsontable.dom;
+
 const styles = theme => ({});
 
 class Worksheets extends Component {
@@ -95,6 +98,7 @@ class Worksheets extends Component {
           }
         },
         afterRowResize: (row, height, isDoubleClick) => {
+          height = Math.max(0, height);
           console.log('save row height:', row, height);
           const rowHeights = excel.currentSheet.rowHeights;
           rowHeights[row] = height;
@@ -106,10 +110,8 @@ class Worksheets extends Component {
           });
           return height;
         },
-        beforeColumnResize: (p1, p2) => {
-          console.log(p1)
-        },
         afterColumnResize: (col, width, isDoubleClick) => {
+          width =  Math.max(0, width);
           const colWidths = excel.currentSheet.colWidths;
           colWidths[col] = width;
           console.log('save col width:', col, width);
@@ -151,6 +153,37 @@ class Worksheets extends Component {
               mergeCell.row + 1, mergeCell.col + 1, mergeCell.row + mergeCell.rowspan, mergeCell.col + mergeCell.colspan
             ).merged(false);
           });
+        },
+        afterGetRowHeader: (row, th) => {
+          // check if row height is 0 (hidden)
+          const rowHeight = this.excel.currentSheet.rowHeights[row];
+          const tr = th.parentNode;
+
+          if (tr) {
+            if (rowHeight === 0) {
+              addClass(tr, 'hide');
+            } else {
+              removeClass(tr, 'hide');
+              // hard fix to display height smaller than 23px
+              if (rowHeight < 23) {
+                tr.style.height = rowHeight - 1 + 'px';
+                tr.style.lineHeight = rowHeight - 1 + 'px';
+              } else {
+
+              }
+            }
+          }
+        },
+        afterGetColHeader: (col, th) => {
+          // check if column width is 0 (hidden)
+          const colWidth = this.excel.currentSheet.colWidths[col];
+
+          if (colWidth === 0) {
+            addClass(th, 'hide');
+          } else {
+            removeClass(th, 'hide');
+          }
+
         },
         // afterSelection: (row, col, row2, col2) => {
         //   excel.global.current = Object.assign({}, excel.global.current, {

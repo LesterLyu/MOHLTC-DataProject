@@ -1,5 +1,16 @@
 .handsontable td, .handsontable th {
   white-space: pre;
+  height: inherit;
+  line-height: inherit;
+}
+
+.handsontable.lOverflow td {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.handsontable.lAlignLeft td {
+  text-align: left;
 }
 
 .handsontable th {

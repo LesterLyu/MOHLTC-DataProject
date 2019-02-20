@@ -82,14 +82,8 @@ class FormulaBar extends Component {
   }
 }
 
-FormulaBar
-  .propTypes = {
+FormulaBar.propTypes = {
   classes: PropTypes.object.isRequired,
 };
 
-export default withStyles(styles)
-
-(
-  FormulaBar
-)
-;
+export default withStyles(styles)(FormulaBar);

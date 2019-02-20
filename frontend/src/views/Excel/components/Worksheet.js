@@ -4,9 +4,19 @@ import Handsontable from "handsontable";
 import {HotTable} from "@handsontable/react";
 import React from "react";
 
+import {ManualColumnResize2} from '../plugins/manualColumnResize'
+
+let isPluginRegistered = false;
+
 class Worksheet extends Component {
   constructor(props) {
     super(props);
+    // override plugins
+    if (!isPluginRegistered) {
+      console.log('ManualColumnResize2');
+      Handsontable.plugins.registerPlugin('ManualColumnResize2', ManualColumnResize2);
+      isPluginRegistered = true;
+    }
   }
 
   // shouldComponentUpdate(nextProps, nextState, nextContext) {
@@ -26,7 +36,8 @@ class Worksheet extends Component {
         rowHeaders: true,
         colHeaders: true,
         trimWhitespace: false,
-        manualColumnResize: true,
+        manualColumnResize: false,
+        manualColumnResize2: true,
         manualRowResize: true,
         manualColumnMove: false,
         manualRowMove: false,

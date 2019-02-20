@@ -28,25 +28,26 @@ export default class Renderer {
       const rowHeights = excelInstance.currentSheet.rowHeights;
       const colWidths = excelInstance.currentSheet.colWidths;
 
-      // check if row heights < 23
       const rowHeight = rowHeights[row];
-      if (rowHeight < 23) {
-        if (td.parentNode) {
-          td.parentNode.firstChild.style.height = rowHeight - 1 + 'px';
-          td.parentNode.firstChild.style.lineHeight = rowHeight - 1 + 'px';
-        }
-        td.style.height = rowHeight - 1 + 'px';
-        td.style.lineHeight = rowHeight - 1 + 'px';
-        const rowHeader = excelInstance.hotInstance.rootElement.querySelector('.ht_clone_left .htCore tbody')
-          .children[row].firstChild.firstChild;
-        rowHeader.style.lineHeight = rowHeight - 1 + 'px';
-      }
       const colWidth = colWidths[col];
-      // check if column width < 23
-      if (colWidth < 20) {
-        const colHeader = excelInstance.hotInstance.rootElement.querySelector('table.htCore colgroup').children[col];
-        colHeader.style.width = colWidth + 'px';
+
+      if (colWidth === 0) {
+        td.classList.add('hide');
+        return;
       }
+
+      // // check if row height < 23 (force to display)
+      // if (0 < rowHeight < 23) {
+      //   td.style.height = rowHeight - 1 + 'px';
+      //   td.style.lineHeight = rowHeight - 1 + 'px';
+      // }
+      // // height >= 23
+      // else if (rowHeight > 23) {
+      //   // display the row header
+      //   if (td.parentNode) {
+      //     td.parentNode.style.display = '';
+      //   }
+      // }
 
       let result = calcResult(value, style.numberFormat);
 
@@ -61,8 +62,7 @@ export default class Renderer {
       if (rightCell === '' || rightCell === null || rightCell === undefined ||
         ((typeof rightCell === 'object' && 'formula' in rightCell) &&
           (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))) {
-        td.style.overflow = 'visible';
-        td.style.textOverflow = 'clip';
+        td.classList.add('lOverflow');
       }
 
       // top and left borders first, seems border can be applied to empty cells with empty styles
@@ -91,7 +91,7 @@ export default class Renderer {
       if (Object.keys(style).length === 0) {
         // apply default styles
         td.classList.add('htBottom');
-        td.style.textAlign = 'left';
+        td.classList.add('lAlignLeft');
         return;
       }
 
@@ -117,8 +117,6 @@ export default class Renderer {
         strikethrough: style.strikethrough,
         rowHeight,
       });
-
-
 
 
       if (style.fill) {
@@ -164,7 +162,6 @@ export default class Renderer {
         span.style.display = 'block';
         span.style.transform = 'rotate(-' + style.textRotation + 'deg)';
       }
-
 
 
     }
