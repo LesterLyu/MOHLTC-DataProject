@@ -11,6 +11,11 @@ const {addClass, removeClass} = Handsontable.dom;
 
 const styles = theme => ({});
 
+/**
+ * @typedef {Object}
+ * @property {Excel} excel
+ *
+ */
 class Worksheets extends Component {
 
   constructor(props) {
@@ -64,6 +69,56 @@ class Worksheets extends Component {
         data: sheet.data,
         outsideClickDeselects: false,
         mergeCells: sheet.mergeCells,
+        contextMenu: {
+          items: {
+            copy : {},
+            '---------': {},
+            hideRow: {
+              name: 'Hide Row',
+              hidden() {
+                return !this.selection.isSelectedByRowHeader();
+              },
+              callback: () => {
+                const { from, to } = excel.hotInstance.getSelectedRangeLast();
+                const start = Math.min(from.row, to.row);
+                const end = Math.max(from.row, to.row);
+                const rowHeights = excel.currentSheet.rowHeights;
+               for (let i = start; i <= end; i++) {
+                 rowHeights[i] = 0;
+                }
+                excel.hotInstance.render();
+                setTimeout(() => {
+                  for (let i = start; i <= end; i++) {
+                    excel.workbook.sheet(excel.currentSheetIdx).row(i + 1).height(0);
+                  }
+                })
+              }
+            },
+            hideColumn: {
+              name: 'Hide Column',
+              hidden() {
+                return !this.selection.isSelectedByColumnHeader();
+              },
+              callback: () => {
+                const { from, to } = excel.hotInstance.getSelectedRangeLast();
+                const start = Math.min(from.col, to.col);
+                const end = Math.max(from.col, to.col);
+                const colWidths = excel.currentSheet.colWidths;
+                for (let i = start; i <= end; i++) {
+                  colWidths[i] = 0;
+                }
+                excel.hotInstance.render();
+                setTimeout(() => {
+                  for (let i = start; i <= end; i++) {
+                    excel.workbook.sheet(excel.currentSheetIdx).column(i + 1).width(0);
+                  }
+                })
+              }
+            },
+
+          }
+
+        },
         afterChange: (changes, source) => {
           // console.log(changes, source);
           if (source === 'edit') {

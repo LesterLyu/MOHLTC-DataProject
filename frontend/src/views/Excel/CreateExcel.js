@@ -29,14 +29,20 @@ function defaultSheet() {
     state: 'visible',
     views: [],
     mergeCells: [],
-    rowHeights: [20,23,40,0, 5, 10, 30],// createArray(24, 200),
-    colWidths: [40,5,40,0,60,80] // createArray(80, 26),
+    rowHeights: createArray(24, 200),
+    colWidths: createArray(80, 26),
   };
 }
 
 const styles = theme => ({});
 
-
+/**
+ * @typedef {Object}
+ * @property {Object} global sheets data
+ * @property {Handsontable} hotInstance
+ * @property {Workbook} workbook
+ *
+ */
 class Excel extends Component {
 
   constructor(props) {
