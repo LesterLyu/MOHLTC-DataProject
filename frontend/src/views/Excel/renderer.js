@@ -31,19 +31,6 @@ export default class Renderer {
       const rowHeight = rowHeights[row];
       const colWidth = colWidths[col];
 
-      // // check if row height < 23 (force to display)
-      // if (0 < rowHeight < 23) {
-      //   td.style.height = rowHeight - 1 + 'px';
-      //   td.style.lineHeight = rowHeight - 1 + 'px';
-      // }
-      // // height >= 23
-      // else if (rowHeight > 23) {
-      //   // display the row header
-      //   if (td.parentNode) {
-      //     td.parentNode.style.display = '';
-      //   }
-      // }
-
       let result = calcResult(value, style.numberFormat);
 
       // wrap the value, this fix the clicking issue for overflowed text

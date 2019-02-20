@@ -37,6 +37,10 @@ function defaultSheet() {
 const styles = theme => ({});
 
 /**
+ * @typedef {Array.<SheetStore>} WorkbookStore
+ */
+
+/**
  * @typedef {Object} SheetStore
  * @property {Array.<Array.<string|object>>} data
  * @property {string} name

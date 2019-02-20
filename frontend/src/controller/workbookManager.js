@@ -1,6 +1,7 @@
 import axios from "axios";
 import config from "./../config/config";
 import XlsxPopulate from "xlsx-populate";
+import {createArray, generateTableData, generateTableStyle, readSheet} from "../views/Excel/helpers";
 
 const axiosConfig = {withCredentials: true};
 
@@ -147,6 +148,37 @@ class WorkbookManager {
   // methods for modifying workbook
   createWorkbookLocal() {
     return XlsxPopulate.fromBlankAsync()
+  }
+
+  readWorkbookLocal(cb) {
+    const input = document.createElement('input');
+    input.type = 'file';
+
+    input.onchange = e => {
+      const file = e.target.files[0];
+      XlsxPopulate.fromDataAsync(file)
+        .then(workbook => {
+          // load into {WorkbookStore}
+          const sheets = [], sheetNames = [];
+          workbook.sheets().forEach(sheet => {
+            sheetNames.push(sheet.name());
+            sheets.push({
+              tabColor: sheet.tabColor(),
+              data: readSheet(sheet),
+              styles: generateTableStyle(200, 26),
+              name: 'Sheet1',
+              state: 'visible',
+              views: [],
+              mergeCells: [],
+              rowHeights: createArray(24, 200),
+              colWidths: createArray(80, 26),
+            })
+          });
+          cb(sheets, sheetNames, workbook)
+        });
+    };
+
+    input.click();
   }
 
   downloadWorkbook(workbook) {

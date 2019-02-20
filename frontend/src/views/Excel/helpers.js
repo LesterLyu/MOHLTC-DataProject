@@ -15,6 +15,13 @@ export function unzip(binary) {
   return JSON.parse(pako.inflate(binary, {to: 'string'}));
 }
 
+/**
+ * @return {WorkbookStore}
+ */
+export function prePorcess2() {
+
+}
+
 export function preProcess(workbookRawData, workbookRawExtra) {
   const global = {
     workbookData: {
@@ -283,4 +290,16 @@ export function createArray(value, length) {
     res.push(value);
   }
   return res;
+}
+
+/**
+ * @param {Sheet} sheet
+ * @return {Object}
+ */
+export function readSheet(sheet) {
+  const sheetData = [];
+  sheet._rows.forEach((row, index) => {
+
+  });
+  return {};
 }

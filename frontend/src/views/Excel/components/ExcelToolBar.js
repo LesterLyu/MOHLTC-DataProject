@@ -8,7 +8,7 @@ import {
   InputBase
 } from "@material-ui/core";
 import {
-  FormatBold, FormatColorFill, Save, SaveAlt, ZoomIn, ZoomOut, WrapText,
+  FormatBold, FormatColorFill, Save, SaveAlt, CloudUploadOutlined, ZoomIn, ZoomOut, WrapText,
   FormatItalic, FormatUnderlined, FormatStrikethrough, FormatColorText,
   FormatAlignCenter, FormatAlignLeft, FormatAlignRight, FormatAlignJustify,
   VerticalAlignBottom, VerticalAlignCenter, VerticalAlignTop,
@@ -77,6 +77,13 @@ class ExcelToolBar extends Component {
       .then(() => {
         console.log('downloaded')
       })
+  };
+
+  uploadWorkbook = () => {
+    this.excel.workbookManager.readWorkbookLocal((sheets, sheetNames, workbook) => {
+
+      console.log(sheets, sheetNames, workbook)
+    })
   };
 
   style = (name, value, ranges = this.getSelected()) => {
@@ -216,6 +223,10 @@ class ExcelToolBar extends Component {
         <AppBar position="static" color="default" style={{}}>
           <Grid container className={classes.root}>
             <ToolBarDivider/>
+            <Button aria-label="Download" className={classes.button}
+                    onClick={() => this.uploadWorkbook()}>
+              <CloudUploadOutlined fontSize="small"/>
+            </Button>
             <Button aria-label="Download" className={classes.button}
                     onClick={() => this.downloadWorkbook()}>
               <SaveAlt fontSize="small"/>
