@@ -31,11 +31,6 @@ export default class Renderer {
       const rowHeight = rowHeights[row];
       const colWidth = colWidths[col];
 
-      if (colWidth === 0) {
-        td.classList.add('hide');
-        return;
-      }
-
       // // check if row height < 23 (force to display)
       // if (0 < rowHeight < 23) {
       //   td.style.height = rowHeight - 1 + 'px';

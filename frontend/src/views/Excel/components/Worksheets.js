@@ -6,7 +6,8 @@ import {withStyles} from "@material-ui/core";
 import Worksheet from './Worksheet'
 
 import Handsontable from 'handsontable';
-const { addClass, removeClass } = Handsontable.dom;
+
+const {addClass, removeClass} = Handsontable.dom;
 
 const styles = theme => ({});
 
@@ -111,10 +112,13 @@ class Worksheets extends Component {
           return height;
         },
         afterColumnResize: (col, width, isDoubleClick) => {
-          width =  Math.max(0, width);
+          width = Math.max(0, width);
           const colWidths = excel.currentSheet.colWidths;
           colWidths[col] = width;
           console.log('save col width:', col, width);
+          if (width === 0) {
+            excel.renderCurrentSheet();
+          }
 
           setTimeout(() => {
             excel.workbook.sheet(currentSheetIdx).column(col + 1).width(width * 0.11)
@@ -154,6 +158,7 @@ class Worksheets extends Component {
             ).merged(false);
           });
         },
+        // support hidden row and smaller row height
         afterGetRowHeader: (row, th) => {
           // check if row height is 0 (hidden)
           const rowHeight = this.excel.currentSheet.rowHeights[row];
@@ -174,17 +179,14 @@ class Worksheets extends Component {
             }
           }
         },
-        afterGetColHeader: (col, th) => {
-          // check if column width is 0 (hidden)
+        // support hidden column
+        modifyColWidth: (width, col) => {
           const colWidth = this.excel.currentSheet.colWidths[col];
-
           if (colWidth === 0) {
-            addClass(th, 'hide');
-          } else {
-            removeClass(th, 'hide');
+            return 0.1;
           }
-
-        },
+          return width;
+        }
         // afterSelection: (row, col, row2, col2) => {
         //   excel.global.current = Object.assign({}, excel.global.current, {
         //     sheetName: excel.currentSheetName,
