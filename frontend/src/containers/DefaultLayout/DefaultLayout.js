@@ -26,13 +26,14 @@ class DefaultLayout extends Component {
 
   constructor(props) {
     super(props);
-    this.user = new UserManager(props);
+    this.user = new UserManager(props, this.showMessage);
     this.user.isLoggedIn()
       .then(IsSignedIn => {
         if (!IsSignedIn) {
           props.history.push('/login');
         }
-      });
+      })
+      .catch(err => this.showMessage(err.message + ': Cannot reach backend server', 'error'));
     // for snackbar
     this.queue = [];
     this.state = {
@@ -47,7 +48,11 @@ class DefaultLayout extends Component {
     this.user.logout();
   }
 
-  // Snackbar methods
+  /**
+   * Snackbar methods
+   * @param message
+   * @param {'success'|'error'|'info'|'warning'} variant
+   */
   showMessage = (message, variant) => {
     this.queue.push({
       message,

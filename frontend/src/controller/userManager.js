@@ -8,10 +8,11 @@ let instance = null;
 
 class UserManager {
 
-  constructor(props) {
+  constructor(props, showMessage) {
     if (!instance) {
       instance = this;
       this.props = props;
+      this.showMessage = showMessage;
       // init
 
     }
@@ -26,7 +27,8 @@ class UserManager {
     return axios.get(config.server + '/api/isloggedin', {withCredentials: true})
       .then((response => {
         return response.data.isLoggedIn;
-      }));
+      }))
+
   }
 
   logout() {
