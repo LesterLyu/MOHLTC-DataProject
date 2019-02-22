@@ -2,7 +2,6 @@ import pako from 'pako';
 import colCache from './col-cache';
 import Parser from './formulaParser';
 import CalculationChain from './calculation-chain';
-
 export {Parser, CalculationChain, colCache};
 
 let excelInstance;
@@ -252,6 +251,10 @@ export function argbToRgb(color) {
   if (typeof color === 'string') {
     return color;
   }
+  if (color && color.rgb) {
+    return color.rgb.length === 6 ? color.rgb : color.rgb.substring(2);
+  }
+
   if (color === undefined || color.argb === undefined)
     return undefined;
   return color.argb.substring(2);
@@ -292,14 +295,87 @@ export function createArray(value, length) {
   return res;
 }
 
+export function colorToRgb(color) {
+  if (!color)
+    return undefined;
+  if (color.rgb) {
+    if (color.rgb === 'System Foreground') {
+      // TO-DO
+      return '#fff';
+    } else if (color.rgb === 'System Background') {
+      return '#000'
+    }
+    return color.rgb.length === 6 ? color.rgb : color.rgb.substring(2);
+  }
+  if (color.theme) {
+    console.warn('theme color not supported yet.');
+    return undefined;
+  }
+}
+
 /**
+ * Read sheet
  * @param {Sheet} sheet
  * @return {Object}
  */
 export function readSheet(sheet) {
-  const sheetData = [];
-  sheet._rows.forEach((row, index) => {
+  const data = [], styles = {};
+  const rowHeights = [];
+  const colWidths = [];
+  const mergeCells = [];
 
+  // data and style
+  sheet._rows.forEach((row, rowNumber) => {
+
+    const rowData = data[rowNumber - 1] = [];
+    const rowStyle = styles[rowNumber - 1] = {};
+
+    row._cells.forEach((cell, colNumber) => {
+
+      // process cell data
+      if (cell.formula()) {
+        rowData[colNumber - 1] = {formula: cell.formula(), result: cell._value};
+      } else {
+        rowData[colNumber - 1] = cell._value;
+      }
+      //
+      //
+      // // process cell style
+      // rowStyle[colNumber - 1] = cell.style(['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
+      //   'justifyLastLine', 'wrapText', 'shrinkToFit', 'angleTextCounterclockwise', 'angleTextClockwise',
+      //   'rotateTextUp', 'rotateTextDown', 'verticalText', 'fontSize', 'fontFamily', 'fontColor', 'horizontalAlignment',
+      //   'indent', 'verticalAlignment', 'textDirection', 'textRotation', 'fill', 'border', 'borderColor',
+      //   'borderStyle'])
+
+    });
   });
-  return {};
+
+  const usedRange = sheet.usedRange();
+  const numRows = usedRange.endCell().rowNumber() - usedRange.startCell().rowNumber() + 1 + 5;
+  const numCols = usedRange.endCell().columnNumber() - usedRange.startCell().columnNumber() + 1 + 5;
+
+  // rowHeights and colWidths
+  for (let row = 1; row <= numRows; row++) {
+    const height = sheet.row(row).height();
+    rowHeights.push(height === undefined ? 24 : height / 0.6);
+  }
+  for (let col = 1; col <= numCols; col++) {
+    const width = sheet.column(col).width();
+    colWidths.push(width === undefined ? 80 : width / 0.11);
+  }
+
+  // mergeCells
+  const mergeCellNames = Object.keys(sheet._mergeCells);
+  mergeCellNames.forEach(range => {
+    const decode = colCache.decode(range);
+    mergeCells.push({
+      row: decode.top - 1,
+      col: decode.left - 1,
+      rowspan: decode.bottom - decode.top + 1,
+      colspan: decode.right - decode.left + 1
+    })
+  });
+
+
+  return {data, styles, rowHeights, colWidths, mergeCells};
 }

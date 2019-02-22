@@ -43,7 +43,8 @@ const styles = theme => ({
     boxSizing: 'border-box'
   },
   tabsRoot: {
-    minHeight: '30px'
+    minHeight: '30px',
+    width: 'calc(100% - 34px)'
     // borderBottom: '1px solid #e8e8e8',
   },
   indicator: {
@@ -100,13 +101,13 @@ class ExcelBottomBar extends Component {
     if (what === 'sheetToggleMenu') {
       // i don't want to trigger the parent's onCLick event
       event.stopPropagation();
-      this.setState({ sheetToggleMenu: event.currentTarget });
+      this.setState({sheetToggleMenu: event.currentTarget});
     }
   };
 
   handleClose = what => () => {
     if (what === 'sheetToggleMenu') {
-      this.setState({ sheetToggleMenu: null });
+      this.setState({sheetToggleMenu: null});
     }
   };
 
@@ -116,7 +117,6 @@ class ExcelBottomBar extends Component {
     const {sheetNames} = excel.global;
     const tabs = [];
     for (let i = 0; i < sheetNames.length; i++) {
-
       const rgb = tinycolor(argbToRgb(excel.getSheet(i).tabColor) || 'f5f5f5');
 
       tabs.push(
@@ -155,22 +155,20 @@ class ExcelBottomBar extends Component {
                 <AddIcon fontSize="small"/>
               </IconButton>
             </Grid>
-            <Grid item xs={"auto"}>
-              <Tabs
-                classes={{
-                  root: classes.tabsRoot,
-                  indicator: classes.indicator,
-                  scrollButtons: classes.scrollButtons
-                }}
-                value={currentSheetIdx}
-                onChange={this.handleChange}
-                variant="scrollable"
-                scrollButtons="auto">
+            <Tabs
+              classes={{
+                root: classes.tabsRoot,
+                indicator: classes.indicator,
+                scrollButtons: classes.scrollButtons
+              }}
+              value={currentSheetIdx}
+              onChange={this.handleChange}
+              variant="scrollable"
+              scrollButtons="auto">
 
-                {this.workbookTabs()}
-              </Tabs>
+              {this.workbookTabs()}
+            </Tabs>
 
-            </Grid>
           </Grid>
         </AppBar>
         <Menu

@@ -72,6 +72,7 @@ class Worksheets extends Component {
         contextMenu: {
           items: {
             copy : {},
+            mergeCells: {},
             '---------': {},
             hideRow: {
               name: 'Hide Row',
@@ -254,7 +255,7 @@ class Worksheets extends Component {
       console.log('container size: ', settings.width, settings.height)
       list.push(<Worksheet
         mode="admin"
-        renderer={excel.renderer.cellRendererForCreateExcel}
+        renderer={excel.renderer.cellRendererNG}
         editor={excel.editor.FormulaEditor}
         key={idx} id={'worksheet-' + idx}
         hide={currentSheetIdx !== idx}

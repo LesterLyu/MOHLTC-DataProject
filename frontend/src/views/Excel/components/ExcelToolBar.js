@@ -81,14 +81,18 @@ class ExcelToolBar extends Component {
 
   uploadWorkbook = () => {
     this.excel.workbookManager.readWorkbookLocal((sheets, sheetNames, workbook) => {
-
-      console.log(sheets, sheetNames, workbook)
+      console.log(sheets, sheetNames, workbook);
+      this.excel.global.sheetNames = sheetNames;
+      this.excel.global.sheets = sheets;
+      this.excel.workbook = workbook;
+      this.excel.currentSheetIdx = 1;
+      this.excel.currentSheetIdx = 0;
     })
   };
 
   style = (name, value, ranges = this.getSelected()) => {
     const {excel} = this;
-    const styles = excel.currentSheet.styles;
+    // const styles = excel.currentSheet.styles;
     // const ranges = ranges || this.getSelected();
     if (!ranges) {
       return;
@@ -98,19 +102,19 @@ class ExcelToolBar extends Component {
       const range = ranges[i];
       for (let row = range[0]; row <= range[2]; row++) {
         for (let col = range[1]; col <= range[3]; col++) {
-          const style = styles[row][col];
+          // const style = styles[row][col];
           const cell = excel.workbook.sheet(excel.currentSheetIdx).cell(row + 1, col + 1);
           if (this.booleanAttributes.includes(name)) {
-            style[name] = !style[name];
-            cell.style(name, style[name]);
+            // style[name] = !style[name];
+            cell.style(name, !cell.style(name));
           } else if (this.otherAttributes.includes(name)) {
-            if (style[name] && typeof value === 'object') {
-              const mergedValue = Object.assign(style[name], value);
-              style[name] = mergedValue;
+            if (typeof value === 'object') {
+              const mergedValue = Object.assign(cell.style(name) || {}, value);
+              // style[name] = mergedValue;
               cell.style(name, mergedValue);
             } else {
               const valueCopy = (typeof value === 'object' && value) ? Object.assign({}, value) : value;
-              style[name] = valueCopy;
+              // style[name] = valueCopy;
               cell.style(name, valueCopy);
             }
           }

@@ -4,12 +4,12 @@
   line-height: inherit;
 }
 
-.handsontable.lOverflow td {
+.handsontable td.lOverflow {
   overflow: visible;
   text-overflow: clip;
 }
 
-.handsontable.lAlignLeft td {
+.handsontable td.lAlignLeft {
   text-align: left;
 }
 

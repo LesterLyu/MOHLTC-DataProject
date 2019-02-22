@@ -1,7 +1,8 @@
 import Handsontable from 'handsontable';
-import {argbToRgb} from './helpers';
+import {argbToRgb, colorToRgb} from './helpers';
 import colCache from './col-cache';
 import SSF from 'ssf'
+import RichTexts from 'xlsx-populate/lib/RichTexts';
 
 
 const SPAN_TEMPLATE = document.createElement('span');
@@ -21,10 +22,176 @@ export default class Renderer {
     global = instance.state.global;
   }
 
+  cellRendererNG(instance, td, row, col, prop, value, cellProperties) {
+    if (!excelInstance.workbook) {
+      console.warn('Renderer.cellRendererNG' + 'workbook is not yet initialized.');
+      return;
+    }
+    const {workbook} = excelInstance;
+    const worksheet = workbook.sheet(excelInstance.currentSheetIdx);
+    const cell = worksheet.cell(row + 1, col + 1);
+
+    let rowHeight = worksheet.row(row + 1).height();
+    rowHeight = rowHeight === undefined ? 24 : rowHeight / 0.6;
+
+    let colWidth = worksheet.column(col + 1).width();
+    // noinspection JSValidateTypes
+    colWidth = colWidth === undefined ? 80 : colWidth / 0.11;
+
+    // grid lines
+    if (!worksheet.gridLinesVisible()) {
+      if (td.style.borderRight === '')
+        td.style.borderRight = '1px solid #0000';
+      if (td.style.borderBottom === '')
+        td.style.borderBottom = '1px solid #0000';
+    }
+
+    let result = calcResult(value, typeof value === 'object' ? undefined : cell.style('numberFormat'));
+
+    // rich text
+    if (value instanceof RichTexts) {
+      const mainSpan = document.createElement('span');
+      for (let i = 0; i < value.length(); i++) {
+        const rt = value.get(i);
+        const span = document.createElement('span');
+        Handsontable.dom.fastInnerText(span, rt.value());
+
+        setFontStyle(span, {
+          bold: rt.style('bold'),
+          italic: rt.style('italic'),
+          underline: rt.style('underline'),
+          size: rt.style('fontSize'),
+          name: rt.style('fontFamily'),
+          color: colorToRgb(rt.style('fontColor')),
+          strikethrough: rt.style('strikethrough'),
+        });
+        mainSpan.appendChild(span);
+      }
+      // removeFontStyle(td);
+      result = mainSpan.innerHTML;
+    }
+
+    // wrap the value, this fix the clicking issue for overflowed text
+    const span = SPAN_TEMPLATE.cloneNode(false);
+    Handsontable.dom.fastInnerHTML(span, result);
+    Handsontable.dom.fastInnerHTML(td, '');
+    td.appendChild(span);
+
+    // text overflow if right cell is empty
+    const rightCell = instance.getDataAtCell(row, col + 1);
+    if (rightCell === '' || rightCell === null || rightCell === undefined ||
+      ((typeof rightCell === 'object' && 'formula' in rightCell) &&
+        (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))) {
+      td.classList.add('lOverflow');
+    }
+
+    // top and left borders first, since border can be applied to empty cells with empty styles
+    let row_temp = row + 1, col_temp = col + 1;
+
+    // check if bottom cell has top border
+    const bottomCell = worksheet.cell(row_temp + 1, col + 1);
+    const topBorder = bottomCell.style('topBorder');
+    if (topBorder) {
+      const color = colorToRgb(topBorder.color) || '000';
+      td.style.borderBottom = `${borderStyle2Width[topBorder.style]}px solid #${color}`;
+    }
+    // check if right cell has left border
+    const leftBorder = worksheet.cell(row + 1, col_temp + 1).style('leftBorder');
+    if (leftBorder) {
+      const color = colorToRgb(leftBorder.color) || '000';
+      td.style.borderRight = `${borderStyle2Width[leftBorder.style]}px solid #${color}`;
+    }
+
+    // TO-DO: if the cell has no styles, then don't do any style calculations
+    // if (Object.keys(style).length === 0) {
+    //   // apply default styles
+    //   td.classList.add('htBottom');
+    //   td.classList.add('lAlignLeft');
+    //   return;
+    // }
+    td.classList.add('htBottom');
+    td.classList.add('lAlignLeft');
+
+    // right and bottom borders
+    const borders = cell.style('border');
+    if (Object.keys(borders).length !== 0) {
+      for (let key in borders) {
+        if ((key === 'right' || key === 'bottom') && borders[key]) {
+          const upper = key.charAt(0).toUpperCase() + key.slice(1);
+          const border = borders[key];
+          const color = colorToRgb(border.color) || '000';
+          td.style['border' + upper] = `${borderStyle2Width[border.style]}px solid #${color}`;
+        }
+      }
+    }
+
+    setFontStyle(td, {
+      bold: cell.style('bold'),
+      italic: cell.style('italic'),
+      underline: cell.style('underline'),
+      size: cell.style('fontSize'),
+      name: cell.style('fontFamily'),
+      color: colorToRgb(cell.style('fontColor')),
+      strikethrough: cell.style('strikethrough'),
+      rowHeight,
+    });
+
+    const fill = cell.style('fill');
+    if (fill) {
+      if (fill.type === 'solid') {
+        td.style.background = '#' + colorToRgb(fill.color);
+      }
+    }
+
+    // horizontalAlignment
+    const horizontalAlignment = cell.style('horizontalAlignment');
+    if (horizontalAlignment && supported.horizontalAlignment.includes(horizontalAlignment)) {
+      td.style.textAlign = horizontalAlignment;
+    } else {
+      // default
+      td.style.textAlign = 'left';
+    }
+
+    // verticalAlignment
+    const verticalAlignment = cell.style('verticalAlignment');
+    if (verticalAlignment && supported.verticalAlignment.includes(verticalAlignment)) {
+      switch (verticalAlignment) {
+        case 'top':
+          td.classList.add('htTop');
+          break;
+        case 'center':
+          td.classList.add('htMiddle');
+          break;
+        case 'bottom':
+          td.classList.add('htBottom');
+          break;
+      }
+    } else {
+      //default
+      td.classList.add('htBottom');
+    }
+
+    // font text wrap
+    const wrapText = cell.style('wrapText');
+    if (wrapText) {
+      td.style.wordWrap = 'break-word';
+      td.style.whiteSpace = 'pre-wrap';
+    }
+
+    // textRotation
+    const textRotation = cell.style('textRotation');
+    if (typeof textRotation === 'number') {
+      span.style.display = 'block';
+      span.style.transform = 'rotate(-' + textRotation + 'deg)';
+    }
+
+  }
+
   cellRendererForCreateExcel(instance, td, row, col, prop, value, cellProperties) {
     if (excelInstance.workbook) {
       const styles = excelInstance.currentSheet.styles;
-      const style = excelInstance.currentSheet.styles[row][col];
+      const rowStyle = styles[row];
+      const style = rowStyle ? (rowStyle[col] ? rowStyle[col] : {}) : {};
       const rowHeights = excelInstance.currentSheet.rowHeights;
       const colWidths = excelInstance.currentSheet.colWidths;
 
@@ -47,7 +214,7 @@ export default class Renderer {
         td.classList.add('lOverflow');
       }
 
-      // top and left borders first, seems border can be applied to empty cells with empty styles
+      // top and left borders first, since border can be applied to empty cells with empty styles
 
       let row_temp = row + 1, col_temp = col + 1;
       while (rowHeights[row_temp] <= 0.1) {
@@ -57,13 +224,13 @@ export default class Renderer {
         col_temp++;
       }
       // check if bottom cell has top border
-      const bottomCellStyle = styles[row_temp] ? styles[row_temp][col] : {};
+      const bottomCellStyle = styles[row_temp] ? (typeof styles[row_temp][col] === 'object' ? styles[row_temp][col] : {}) : {};
       if ('border' in bottomCellStyle && bottomCellStyle.border.top) {
         const color = bottomCellStyle.border.top.color || '000';
         td.style.borderBottom = `${borderStyle2Width[bottomCellStyle.border.top.style]}px solid #${color}`;
       }
       // check if right cell has left border
-      const rightCellStyle = styles[row][col_temp] || {};
+      const rightCellStyle = styles[row] ? (typeof styles[row][col_temp] === 'object' ? styles[row][col_temp] : {}) : {};
       if ('border' in rightCellStyle && rightCellStyle.border.left) {
         const color = rightCellStyle.border.left.color || '000';
         td.style.borderRight = `${borderStyle2Width[rightCellStyle.border.left.style]}px solid #${color}`;
@@ -77,7 +244,7 @@ export default class Renderer {
         return;
       }
 
-      // right an bottom border s
+      // right and bottom borders
       if (style.border) {
         for (let key in style.border) {
           if ((key === 'right' || key === 'bottom') && style.border[key]) {

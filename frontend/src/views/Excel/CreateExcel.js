@@ -7,7 +7,7 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 
-import {init, generateTableData, generateTableStyle, createArray} from './helpers';
+import {init, generateTableData, generateTableStyle, createArray, colCache} from './helpers';
 import Parser from './calculations/formulaParser'
 import CalculationChain from './calculations/chain'
 import Renderer from './renderer';
@@ -19,6 +19,7 @@ import ExcelToolBar from './components/ExcelToolBar';
 import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
 const excelWorker = new Worker('../../controller/excel.worker', { type: 'module' });
+window.colCache = colCache;
 
 function defaultSheet() {
   return {

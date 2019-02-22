@@ -161,17 +161,19 @@ class WorkbookManager {
           // load into {WorkbookStore}
           const sheets = [], sheetNames = [];
           workbook.sheets().forEach(sheet => {
+            const {data, styles, rowHeights, colWidths, mergeCells} = readSheet(sheet);
+
             sheetNames.push(sheet.name());
             sheets.push({
               tabColor: sheet.tabColor(),
-              data: readSheet(sheet),
-              styles: generateTableStyle(200, 26),
+              data,
+              styles,
               name: 'Sheet1',
               state: 'visible',
               views: [],
-              mergeCells: [],
-              rowHeights: createArray(24, 200),
-              colWidths: createArray(80, 26),
+              mergeCells,
+              rowHeights,
+              colWidths,
             })
           });
           cb(sheets, sheetNames, workbook)
