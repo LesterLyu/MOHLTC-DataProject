@@ -76,7 +76,6 @@
     "start": "node app.js",
     "prestart": "./node_modules/.bin/grunt",
     "test": "./node_modules/.bin/mocha test/main.js test/ --recursive --exit --check-leaks -R mochawesome",
-    "posttest": "start ./mochawesome-report/mochawesome.html",
     "build": "./node_modules/.bin/grunt",
     "build:frontend": "cd ./frontend/ && npm run build:aws",
     "watch": "./node_modules/.bin/grunt watch",
