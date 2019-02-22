@@ -12,12 +12,12 @@ class User extends Component {
       msg: (<span> <i className="text-muted fa fa-spin fa-spinner"/> loading... </span>)
     };
     const self = this;
-    new UserManager(props).getAllUsersWithCache()
-      .then(userList => {
-        self.setState({msg:  (<span> <i className="text-muted fa fa-spin fa-spinner"/> Not Found </span>)});
-        self.userList = userList;
-        self.forceUpdate();
-      })
+    // new UserManager(props).getAllUsersWithCache()
+    //   .then(userList => {
+    //     self.setState({msg:  (<span> <i className="text-muted fa fa-spin fa-spinner"/> Not Found </span>)});
+    //     self.userList = userList;
+    //     self.forceUpdate();
+    //   })
   }
 
   render() {
