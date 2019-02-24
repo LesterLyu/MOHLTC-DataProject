@@ -301,9 +301,9 @@ export function colorToRgb(color) {
   if (color.rgb) {
     if (color.rgb === 'System Foreground') {
       // TO-DO
-      return '#fff';
+      return 'ffffff';
     } else if (color.rgb === 'System Background') {
-      return '#000'
+      return '000000'
     }
     return color.rgb.length === 6 ? color.rgb : color.rgb.substring(2);
   }
@@ -324,35 +324,37 @@ export function readSheet(sheet) {
   const colWidths = [];
   const mergeCells = [];
 
+  const usedRange = sheet.usedRange();
+  // default number of empty sheet
+  let numRows = 50, numCols = 13;
+  if (usedRange) {
+    numRows = usedRange.endCell().rowNumber() - usedRange.startCell().rowNumber() + 1 + 5;
+    numCols = usedRange.endCell().columnNumber() - usedRange.startCell().columnNumber() + 1 + 5;
+  }
+
   // data and style
   sheet._rows.forEach((row, rowNumber) => {
-
     const rowData = data[rowNumber - 1] = [];
     const rowStyle = styles[rowNumber - 1] = {};
-
     row._cells.forEach((cell, colNumber) => {
-
       // process cell data
-      if (cell.formula()) {
-        rowData[colNumber - 1] = {formula: cell.formula(), result: cell._value};
-      } else {
-        rowData[colNumber - 1] = cell._value;
-      }
-      //
-      //
-      // // process cell style
-      // rowStyle[colNumber - 1] = cell.style(['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript',
-      //   'justifyLastLine', 'wrapText', 'shrinkToFit', 'angleTextCounterclockwise', 'angleTextClockwise',
-      //   'rotateTextUp', 'rotateTextDown', 'verticalText', 'fontSize', 'fontFamily', 'fontColor', 'horizontalAlignment',
-      //   'indent', 'verticalAlignment', 'textDirection', 'textRotation', 'fill', 'border', 'borderColor',
-      //   'borderStyle'])
-
+      // if (cell.formula()) {
+      //   rowData[colNumber - 1] = {formula: cell.formula(), result: cell._value};
+      // } else {
+      //   rowData[colNumber - 1] = cell._value;
+      // }
+      rowData[colNumber - 1] = undefined;
     });
   });
 
-  const usedRange = sheet.usedRange();
-  const numRows = usedRange.endCell().rowNumber() - usedRange.startCell().rowNumber() + 1 + 5;
-  const numCols = usedRange.endCell().columnNumber() - usedRange.startCell().columnNumber() + 1 + 5;
+  // add extra rows and columns
+  data[numRows - 1] = [];
+  if (!data[0]) {
+    data[0] = [];
+  }
+  if (data[0].length < numCols) {
+    data[0][numCols - 1] = undefined;
+  }
 
   // rowHeights and colWidths
   for (let row = 1; row <= numRows; row++) {
@@ -375,6 +377,8 @@ export function readSheet(sheet) {
       colspan: decode.right - decode.left + 1
     })
   });
+
+
 
 
   return {data, styles, rowHeights, colWidths, mergeCells};

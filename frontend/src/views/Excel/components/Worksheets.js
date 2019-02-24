@@ -67,6 +67,7 @@ class Worksheets extends Component {
         rowHeights: sheet.rowHeights,
         colWidths: sheet.colWidths,
         data: sheet.data,
+        dataSchema: {},
         outsideClickDeselects: false,
         mergeCells: sheet.mergeCells,
         contextMenu: {
