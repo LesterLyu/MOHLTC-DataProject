@@ -335,7 +335,7 @@ export function readSheet(sheet) {
   // data and style
   sheet._rows.forEach((row, rowNumber) => {
     const rowData = data[rowNumber - 1] = [];
-    const rowStyle = styles[rowNumber - 1] = {};
+    // const rowStyle = styles[rowNumber - 1] = {};
     row._cells.forEach((cell, colNumber) => {
       // process cell data
       // if (cell.formula()) {

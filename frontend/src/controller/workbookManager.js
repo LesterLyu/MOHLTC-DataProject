@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "./../config/config";
 import XlsxPopulate from "xlsx-populate";
-import {createArray, generateTableData, generateTableStyle, readSheet} from "../views/Excel/helpers";
+import {readSheet} from "../views/Excel/helpers";
 
 const axiosConfig = {withCredentials: true};
 

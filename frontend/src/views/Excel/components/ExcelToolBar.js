@@ -5,14 +5,13 @@ import {
   Grid,
   withStyles,
   Popover,
-  InputBase
 } from "@material-ui/core";
 import {
-  FormatBold, FormatColorFill, Save, SaveAlt, CloudUploadOutlined, ZoomIn, ZoomOut, WrapText,
+  FormatBold, FormatColorFill, SaveAlt, CloudUploadOutlined, WrapText,
   FormatItalic, FormatUnderlined, FormatStrikethrough, FormatColorText,
   FormatAlignCenter, FormatAlignLeft, FormatAlignRight, FormatAlignJustify,
   VerticalAlignBottom, VerticalAlignCenter, VerticalAlignTop,
-  BorderTop, BorderRight, BorderBottom, BorderLeft, BorderClear, BorderAll, BorderColor,
+  BorderTop, BorderRight, BorderBottom, BorderLeft, BorderClear, BorderAll, //BorderColor,ZoomIn, ZoomOut,
 } from "@material-ui/icons";
 import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";

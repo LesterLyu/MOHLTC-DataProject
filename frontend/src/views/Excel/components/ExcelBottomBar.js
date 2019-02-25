@@ -1,10 +1,9 @@
 import React, {Component} from "react";
 import {
   AppBar,
-  Button,
   Grid,
   withStyles,
-  Popover, Tab, IconButton, Tabs, Card, MenuItem, Divider, Menu,
+  Tab, IconButton, Tabs, MenuItem, Divider, Menu,
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 import {argbToRgb} from "../helpers";
@@ -127,10 +126,10 @@ class ExcelBottomBar extends Component {
           key={sheetNames[i]}
           label={
             [sheetNames[i],
-              <a key={'sheet button'} className={classes.sheetToggle}
+              <span key={'sheet button'} className={classes.sheetToggle}
                  onClick={this.handleClick('sheetToggleMenu')}>
                 <ArrowDropDown fontSize="small"/>
-              </a>
+              </span>
             ]
           }
         />

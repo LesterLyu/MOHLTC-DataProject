@@ -1,3 +1,5 @@
+import React, {Component} from 'react';
+import ReactDOM from 'react-dom';
 import Handsontable from 'handsontable';
 import {argbToRgb, colorToRgb} from './helpers';
 import colCache from './col-cache';
@@ -16,17 +18,46 @@ const supported = {
 
 const borderStyle2Width = {thin: 1, medium: 2, thick: 3};
 
+class CellCache {
+  constructor() {
+    this.storage = {};
+  }
+
+  set(td, row, col) {
+    if (!this.storage[row]) {
+      this.storage[row] = {};
+    }
+    this.storage[row][col] = td;
+  }
+
+  get(row, col) {
+    if (!this.storage[row] || !this.storage[row][col]) {
+      return null;
+    }
+    return this.storage[row][col];
+  }
+}
+
 export default class Renderer {
   constructor(instance) {
     excelInstance = instance;
     global = instance.state.global;
+    this.cellCache = new CellCache();
   }
 
-  cellRendererNG(instance, td, row, col, prop, value, cellProperties) {
+  shouldCellUpdate() {
+
+  }
+
+  cellRendererNG = (instance, td, row, col, prop, value, cellProperties) => {
     if (!excelInstance.workbook) {
-      console.warn('Renderer.cellRendererNG' + 'workbook is not yet initialized.');
+      console.warn('Renderer.cellRendererNG workbook is not yet initialized.');
       return;
     }
+    // const old_td = this.cellCache.get(row, col);
+    // if (old_td) {
+    //   return old_td;
+    // }
     const {workbook} = excelInstance;
     const worksheet = workbook.sheet(excelInstance.currentSheetIdx);
     const cell = worksheet.cell(row + 1, col + 1);
@@ -43,6 +74,12 @@ export default class Renderer {
     let colWidth = worksheet.column(col + 1).width();
     // noinspection JSValidateTypes
     colWidth = colWidth === undefined ? 80 : colWidth / 0.11;
+
+    const style = {
+      gridLines: worksheet.gridLinesVisible(),
+      numberFmt: cell.style('numberFormat'),
+
+    };
 
     // grid lines
     if (!worksheet.gridLinesVisible()) {
@@ -171,6 +208,9 @@ export default class Renderer {
         case 'bottom':
           td.classList.add('htBottom');
           break;
+        default:
+          td.classList.add('htBottom');
+          break;
       }
     } else {
       //default
@@ -190,8 +230,8 @@ export default class Renderer {
       span.style.display = 'block';
       span.style.transform = 'rotate(-' + textRotation + 'deg)';
     }
-
-  }
+    // this.cellCache.set(td, row, col);
+  };
 
   cellRendererForCreateExcel(instance, td, row, col, prop, value, cellProperties) {
     if (excelInstance.workbook) {

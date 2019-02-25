@@ -88,7 +88,6 @@ class Excel extends Component {
     this.calculationChain = new CalculationChain(this);
     // this.parser.changeCurrSheetName()
 
-
     this.renderer = new Renderer(this);
     this.editor = new Editor(this);
     init(this); // init helper functions

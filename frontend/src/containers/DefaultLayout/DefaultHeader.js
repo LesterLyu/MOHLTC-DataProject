@@ -3,7 +3,6 @@ import {DropdownItem, DropdownMenu, DropdownToggle, Nav} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import {AppHeaderDropdown, AppSidebarToggler, AppNavbarBrand} from '@coreui/react';
-import Typography from '@material-ui/core/Typography';
 import logo from '../../assets/img/brand/Ontario_Wordmark_2007.svg'
 import sygnet from '../../assets/img/brand/icon.png'
 

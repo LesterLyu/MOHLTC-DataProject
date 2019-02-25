@@ -112,7 +112,7 @@ export default class CalculationChain {
 
   initParser() {
     const {excelInstance} = this;
-    const {sheetNames, getDefinedName} = excelInstance.global;
+    const {sheetNames} = excelInstance.global;
 
     this.parser.on('callCellValue', (cellCoord, done) => {
       let sheetNo;
