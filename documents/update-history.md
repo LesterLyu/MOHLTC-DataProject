@@ -1,11 +1,20 @@
-### To-DO
+### TO-DO
+  - [ ] Create Excel: Assign attribute and category to rows and columns
+  - [ ] Registration page
+  - [ ] User profile page
+  - [ ] User management page
+  - [ ] Front-end permissions
+  - [ ] Rewrite backend to store workbook for admin
+  - [ ] Rewrite backend to store workbook for user/client
+  - [ ] Create Excel: fix formula
+  - [ ] Create Excel: fix border
+  - [ ] Create Excel: support hyperlink
+  - [ ] Create Excel: support data validation
+  - [ ] Create Excel: support data validation
+  - [ ] Edit Excel page for user/client
 
-- [ ] Add more border option
-- [ ] Auto re-evaluate formulas
-- [ ] Border with merge cell issue
-- [ ] Border with empty row/col issue
-- [ ] RichText row alignment issue
-
+---
+The following are old update history (not using react.js)
 ### Dev 0.3.6
  - Breakthrough supports:
     - Rich text (readonly, not editable).
