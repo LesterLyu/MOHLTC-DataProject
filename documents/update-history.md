@@ -1,5 +1,5 @@
 ### TO-DO
-  - [ ] Assign attribute and category to rows and columns
+  - [ ] Create Excel: Assign attribute and category to rows and columns
   - [ ] Registration page
   - [ ] User profile page
   - [ ] User management page
