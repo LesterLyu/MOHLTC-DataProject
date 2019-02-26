@@ -221,7 +221,8 @@ class Worksheets extends Component {
         // support hidden row and smaller row height
         afterGetRowHeader: (row, th) => {
           // check if row height is 0 (hidden)
-          const rowHeight = this.excel.currentSheet.rowHeights[row];
+          const sheetRow = this.excel.sheet.row(row + 1);
+          const rowHeight = sheetRow.hidden() ? 0 : (sheetRow.height() === undefined ? 24 : sheetRow.height() / 0.6);
           const tr = th.parentNode;
 
           if (tr) {
@@ -241,7 +242,9 @@ class Worksheets extends Component {
         },
         // support hidden column
         modifyColWidth: (width, col) => {
-          const colWidth = this.excel.currentSheet.colWidths[col];
+          const sheetCol= this.excel.sheet.column(col + 1);
+          const colWidth = sheetCol.hidden() ? 0 : (sheetCol.width() === undefined ? 80 : sheetCol.width() / 0.11);
+
           if (colWidth === 0) {
             return 0.1;
           }

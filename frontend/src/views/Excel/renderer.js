@@ -117,6 +117,10 @@ export default class Renderer {
     // noinspection JSValidateTypes
     colWidth = colWidth === undefined ? 80 : colWidth / 0.11;
 
+    if (rowHeight === 0 || colWidth === 0 || cell.row().hidden() || cell.column().hidden()) {
+      return;
+    }
+
     const fontStyle = {
       bold: cell.style('bold'),
       italic: cell.style('italic'),

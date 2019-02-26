@@ -2,7 +2,8 @@ import pako from 'pako';
 import colCache from './col-cache';
 import Parser from './formulaParser';
 import CalculationChain from './calculation-chain';
-import themeColor from './calculations/themeColor';
+import tinycolor from 'tinycolor2';
+import RichTexts from "xlsx-populate/lib/RichTexts";
 
 export {Parser, CalculationChain, colCache};
 
@@ -309,12 +310,57 @@ export function colorToRgb(color) {
     }
     return color.rgb.length === 6 ? color.rgb : color.rgb.substring(2);
   }
-  if (color.theme) {
 
-    console.warn('theme color ' + themeColor[color.theme - 1].substring(2));
-    return themeColor[color.theme - 1].substring(2);
+  if (color.theme) {
+    return excelInstance.workbook.theme().themeColor(color.theme, color.tint)
   }
 }
+
+/**
+ * Get cell current data type
+ * @param cell
+ * @return {'formula', 'richtext', 'date', 'text', 'number'}
+ */
+export function getCellType(cell) {
+  if (typeof cell.formula() === 'string') {
+    return 'formula';
+  } else if (cell.value() instanceof RichTexts) {
+    return 'richtext';
+  } else if (cell.value() instanceof Date) {
+    return 'date';
+  } else if (cell.value() === undefined || cell.value() === null || typeof cell.value() === 'string') {
+    return 'text';
+  } else {
+    return typeof cell.value(); // number, date ...
+  }
+}
+
+/**
+ * Update a cell with value
+ * @param {Cell} cell
+ * @param {*} rawValue
+ * @param {Excel} [excel]
+ */
+export function updateCell(cell, rawValue, excel) {
+  if (!excel) excel = excelInstance;
+  // I don't want you update rich text
+  if (getCellType(cell) === 'richtext') {
+    return;
+  }
+  // check if it is formula now
+  if (rawValue !== undefined && rawValue.length > 0 && rawValue.charAt(0) === '=') {
+    console.log('formula');
+    const res = excel.parser.parseNewFormula(rawValue, true);
+    console.log(res);
+    cell.formula(res.formula)
+      ._value = res.result;
+  } else {
+    cell.value(rawValue);
+  }
+  excel.renderer.cellNeedUpdate(excel.currentSheetIdx, cell.rowNumber() - 1 , cell.columnNumber() - 1);
+  excel.renderCurrentSheet();
+}
+
 
 /**
  * Read sheet
@@ -380,8 +426,6 @@ export function readSheet(sheet) {
       colspan: decode.right - decode.left + 1
     })
   });
-
-
 
 
   return {data, styles, rowHeights, colWidths, mergeCells};

@@ -3,6 +3,7 @@ import {AppBar, Grid, InputBase, withStyles} from "@material-ui/core";
 import React from "react";
 import {ToolBarDivider} from './ExcelToolBar';
 import PropTypes from "prop-types";
+import {updateCell} from "../helpers";
 
 const styles = theme => ({
   input: {
@@ -27,7 +28,7 @@ class FormulaBar extends Component {
       this.data.col = col;
       this.data.sheetIdx = this.excel.currentSheetIdx;
       const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row + 1, col + 1);
-      let input = typeof cell.formula() === 'string' ? cell.formula() : cell.value();
+      let input = typeof cell.formula() === 'string' ? '=' + cell.formula() : cell.value();
       input = input === undefined || input === null ? '' : input + '';
       if (this.state.formulaBarInput !== input) {
         this.setState({formulaBarInput: input});
@@ -59,7 +60,8 @@ class FormulaBar extends Component {
   focusout = () => {
     // console.log('focus out')
     if (this.orginalInput !== this.state.formulaBarInput) {
-      this.excel.hotInstance.setDataAtCell(this.data.row, this.data.col, this.state.formulaBarInput);
+      const cell = this.excel.sheet.cell(this.data.row + 1, this.data.col + 1);
+      updateCell(cell, this.state.formulaBarInput);
     }
   };
 

@@ -104,6 +104,14 @@ class Excel extends Component {
   }
 
   /**
+   *
+   * @return {Sheet}
+   */
+  get sheet() {
+    return this.workbook.sheet(this.currentSheetIdx);
+  }
+
+  /**
    * Get current sheet data
    * @return {SheetStore}
    */

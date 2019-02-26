@@ -1,5 +1,6 @@
 import Handsontable from 'handsontable';
 import RichTexts from 'xlsx-populate/lib/RichTexts';
+import {updateCell, getCellType} from "./helpers";
 
 let excelInstance;
 
@@ -29,17 +30,7 @@ export class FormulaEditorNG extends TextEditor {
   };
 
   get type() {
-    if (typeof this.cell.formula() === 'string') {
-      return 'formula';
-    } else if (this.cell.value() instanceof RichTexts) {
-      return 'richtext';
-    } else if (this.cell.value() instanceof Date) {
-      return 'date';
-    } else if (this.cell.value() === undefined || this.cell.value() === null || typeof this.cell.value() === 'string') {
-      return 'text';
-    } else {
-      return typeof this.cell.value(); // number, date ...
-    }
+    return getCellType(this.cell);
   }
 
   getValue() {
@@ -64,19 +55,9 @@ export class FormulaEditorNG extends TextEditor {
     const rawValue = value[0][0];
     if (this.type === 'richtext')
       return;
-    // check if it is formula now
-    if (value[0][0] !== undefined && value[0][0].length > 0 && value[0][0].charAt(0) === '=') {
-      console.log('formula');
-      const res = excelInstance.parser.parseNewFormula(rawValue, true);
-      console.log(res);
-      this.cell.value(res.result);
-      this.cell.formula(res.formula);
-    } else {
-      this.cell.value(rawValue);
-    }
-    this.excel.renderer.cellNeedUpdate(this.excel.currentSheetIdx, this.row , this.col);
-    this.excel.renderCurrentSheet();
+    updateCell(cell, rawValue, this.excel);
   };
+
 }
 
 
