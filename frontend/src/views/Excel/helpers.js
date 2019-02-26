@@ -2,6 +2,8 @@ import pako from 'pako';
 import colCache from './col-cache';
 import Parser from './formulaParser';
 import CalculationChain from './calculation-chain';
+import themeColor from './calculations/themeColor';
+
 export {Parser, CalculationChain, colCache};
 
 let excelInstance;
@@ -308,8 +310,9 @@ export function colorToRgb(color) {
     return color.rgb.length === 6 ? color.rgb : color.rgb.substring(2);
   }
   if (color.theme) {
-    console.warn('theme color not supported yet.');
-    return undefined;
+
+    console.warn('theme color ' + themeColor[color.theme - 1].substring(2));
+    return themeColor[color.theme - 1].substring(2);
   }
 }
 

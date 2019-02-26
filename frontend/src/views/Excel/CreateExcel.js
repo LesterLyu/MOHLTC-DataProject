@@ -18,7 +18,7 @@ import Worksheets from './components/Worksheets'
 import ExcelToolBar from './components/ExcelToolBar';
 import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
-const excelWorker = new Worker('../../controller/excel.worker', { type: 'module' });
+// const excelWorker = new Worker('../../controller/excel.worker', { type: 'module' });
 window.colCache = colCache;
 
 function defaultSheet() {
@@ -216,9 +216,9 @@ class Excel extends Component {
         });
       });
 
-
-    excelWorker.postMessage(1);
-    excelWorker.onmessage = function (event) {console.log(event.data)};
+    //
+    // excelWorker.postMessage(1);
+    // excelWorker.onmessage = function (event) {console.log(event.data)};
   }
 
   renderCurrentSheet() {

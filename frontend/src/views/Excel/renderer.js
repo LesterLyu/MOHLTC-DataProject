@@ -20,21 +20,24 @@ const borderStyle2Width = {thin: 1, medium: 2, thick: 3};
 
 class CellCache {
   constructor() {
-    this.storage = {};
+    this.storage = {}; // sheetId -> row -> col -> td element
   }
 
-  set(td, row, col) {
-    if (!this.storage[row]) {
-      this.storage[row] = {};
+  set(td, sheetId, row, col) {
+    if (!this.storage[sheetId]) {
+      this.storage[sheetId] = {};
     }
-    this.storage[row][col] = td;
+    if (!this.storage[sheetId][row]) {
+      this.storage[sheetId][row] = {};
+    }
+    this.storage[sheetId][row][col] = td.cloneNode(true);
   }
 
-  get(row, col) {
-    if (!this.storage[row] || !this.storage[row][col]) {
+  get(sheetId, row, col) {
+    if (!this.storage[sheetId] || !this.storage[sheetId][row] || !this.storage[sheetId][row][col]) {
       return null;
     }
-    return this.storage[row][col];
+    return this.storage[sheetId][row][col];
   }
 }
 
@@ -43,10 +46,45 @@ export default class Renderer {
     excelInstance = instance;
     global = instance.state.global;
     this.cellCache = new CellCache();
+    this.changes = {}; // sheetId -> row -> col -> boolean
   }
 
-  shouldCellUpdate() {
+  setChanges(sheetId, row, col, update) {
+    if (!this.changes[sheetId]) {
+      this.changes[sheetId] = {};
+    }
+    if (!this.changes[sheetId][row]) {
+      this.changes[sheetId][row] = {};
+    }
+    this.changes[sheetId][row][col] = update;
+  }
 
+  /**
+   * Return true if the cell needs update, otherwise return the old td element.
+   * @param sheetId
+   * @param row
+   * @param col
+   * @return {boolean|Node}
+   */
+  shouldCellUpdate(sheetId, row, col) {
+    const td = this.cellCache.get(sheetId, row, col);
+    if (!td) {
+      return true;
+    }
+    if (!this.changes[sheetId] || !this.changes[sheetId][row] || !this.changes[sheetId][row][col]) {
+      return td;
+    } else {
+      return true;
+    }
+  }
+
+  cellNeedUpdate(sheetId, row, col) {
+    this.setChanges(sheetId, row, col, true);
+    console.log('cellNeedUpdate', sheetId, row, col)
+  }
+
+  cellUpdated(sheetId, row, col) {
+    this.setChanges(sheetId, row, col, undefined);
   }
 
   cellRendererNG = (instance, td, row, col, prop, value, cellProperties) => {
@@ -54,10 +92,14 @@ export default class Renderer {
       console.warn('Renderer.cellRendererNG workbook is not yet initialized.');
       return;
     }
-    // const old_td = this.cellCache.get(row, col);
-    // if (old_td) {
-    //   return old_td;
+    // let update = this.shouldCellUpdate(excelInstance.currentSheetIdx, row, col);
+    // if (typeof update === 'object') {
+    //   td.classList = update.classList;
+    //   td.innerHTML = update.innerHTML;
+    //   td.style = update.style;
+    //   return;
     // }
+    // console.log('rerender ', excelInstance.currentSheetIdx, row, col);
     const {workbook} = excelInstance;
     const worksheet = workbook.sheet(excelInstance.currentSheetIdx);
     const cell = worksheet.cell(row + 1, col + 1);
@@ -75,10 +117,15 @@ export default class Renderer {
     // noinspection JSValidateTypes
     colWidth = colWidth === undefined ? 80 : colWidth / 0.11;
 
-    const style = {
-      gridLines: worksheet.gridLinesVisible(),
-      numberFmt: cell.style('numberFormat'),
-
+    const fontStyle = {
+      bold: cell.style('bold'),
+      italic: cell.style('italic'),
+      underline: cell.style('underline'),
+      size: cell.style('fontSize'),
+      name: cell.style('fontFamily'),
+      color: colorToRgb(cell.style('fontColor')),
+      strikethrough: cell.style('strikethrough'),
+      rowHeight,
     };
 
     // grid lines
@@ -99,7 +146,7 @@ export default class Renderer {
         const span = document.createElement('span');
         Handsontable.dom.fastInnerText(span, rt.value());
 
-        setFontStyle(span, {
+        setFontStyle(span, Object.assign({}, fontStyle, {
           bold: rt.style('bold'),
           italic: rt.style('italic'),
           underline: rt.style('underline'),
@@ -107,7 +154,7 @@ export default class Renderer {
           name: rt.style('fontFamily'),
           color: colorToRgb(rt.style('fontColor')),
           strikethrough: rt.style('strikethrough'),
-        });
+        }));
         mainSpan.appendChild(span);
       }
       // removeFontStyle(td);
@@ -121,10 +168,8 @@ export default class Renderer {
     td.appendChild(span);
 
     // text overflow if right cell is empty
-    const rightCell = instance.getDataAtCell(row, col + 1);
-    if (rightCell === '' || rightCell === null || rightCell === undefined ||
-      ((typeof rightCell === 'object' && 'formula' in rightCell) &&
-        (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))) {
+    const rightCell = worksheet.cell(row + 1, col + 2).value();
+    if (rightCell === '' || rightCell === null || rightCell === undefined) {
       td.classList.add('lOverflow');
     }
 
@@ -167,17 +212,9 @@ export default class Renderer {
         }
       }
     }
-
-    setFontStyle(td, {
-      bold: cell.style('bold'),
-      italic: cell.style('italic'),
-      underline: cell.style('underline'),
-      size: cell.style('fontSize'),
-      name: cell.style('fontFamily'),
-      color: colorToRgb(cell.style('fontColor')),
-      strikethrough: cell.style('strikethrough'),
-      rowHeight,
-    });
+    if (!(value instanceof RichTexts)) {
+      setFontStyle(td, fontStyle);
+    }
 
     const fill = cell.style('fill');
     if (fill) {
@@ -200,21 +237,19 @@ export default class Renderer {
     if (verticalAlignment && supported.verticalAlignment.includes(verticalAlignment)) {
       switch (verticalAlignment) {
         case 'top':
+          td.classList.remove('htBottom');
           td.classList.add('htTop');
           break;
         case 'center':
+          td.classList.remove('htBottom');
           td.classList.add('htMiddle');
           break;
         case 'bottom':
           td.classList.add('htBottom');
           break;
         default:
-          td.classList.add('htBottom');
           break;
       }
-    } else {
-      //default
-      td.classList.add('htBottom');
     }
 
     // font text wrap
@@ -230,7 +265,12 @@ export default class Renderer {
       span.style.display = 'block';
       span.style.transform = 'rotate(-' + textRotation + 'deg)';
     }
-    // this.cellCache.set(td, row, col);
+
+    // set cache
+
+    // console.log('cellUpdated', excelInstance.currentSheetIdx, row, col, 'result=', result);
+    // this.cellUpdated(excelInstance.currentSheetIdx, row, col);
+    // this.cellCache.set(td, excelInstance.currentSheetIdx, row, col);
   };
 
   cellRendererForCreateExcel(instance, td, row, col, prop, value, cellProperties) {
@@ -559,9 +599,13 @@ function setFontStyle(element, font) {
   }
   if (font.bold) {
     element.style.fontWeight = 'bold';
+  } else {
+    element.style.fontWeight = '';
   }
   if (font.italic) {
     element.style.fontStyle = 'italic';
+  } else {
+    element.style.fontStyle = '';
   }
   if ('size' in font) {
     element.style.fontSize = font.size + 'pt';
@@ -579,6 +623,8 @@ function setFontStyle(element, font) {
   }
   if (font.underline) {
     element.style.textDecoration = 'underline';
+  } else {
+    element.style.textDecoration = '';
   }
   if (font.strikethrough) {
     if (element.style.textDecoration)

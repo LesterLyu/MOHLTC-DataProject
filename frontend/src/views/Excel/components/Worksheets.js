@@ -22,6 +22,7 @@ class Worksheets extends Component {
     super(props);
     this.excel = props.context;
     this.sheetContainerRef = React.createRef();
+    this.excel.sheetContainerRef = this.sheetContainerRef;
     this.state = {
       sheetWidth: this.excel.state.sheetWidth,
       sheetHeight: this.excel.state.sheetHeight,
@@ -40,6 +41,7 @@ class Worksheets extends Component {
   }
 
   componentDidMount() {
+
     this.history.current = this.props.context.global.current;
     window.addEventListener('resize', () => {
       if (this.sheetContainerRef.current) {
@@ -127,6 +129,7 @@ class Worksheets extends Component {
             if (changes) {
               for (let i = 0; i < changes.length; i++) {
                 let row = changes[0][0], col = changes[0][1], oldData = changes[0][2], newData = changes[0][3];
+                // excel.renderer.cellNeedUpdate(currentSheetIdx, row, col);
                 const cell = excel.workbook.sheet(currentSheetIdx).cell(row + 1, col + 1);
                 if (newData == null || newData === '') {
                   cell.value(null);
@@ -257,7 +260,7 @@ class Worksheets extends Component {
       list.push(<Worksheet
         mode="admin"
         renderer={excel.renderer.cellRendererNG}
-        editor={excel.editor.FormulaEditor}
+        editor={excel.editor.FormulaEditorNG}
         key={idx} id={'worksheet-' + idx}
         hide={currentSheetIdx !== idx}
         global={excel.global}
@@ -271,7 +274,7 @@ class Worksheets extends Component {
 
   render() {
     return (
-      <div style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px)'}} ref={this.sheetContainerRef}>
+      <div style={{overflow: 'hidden'}} ref={this.sheetContainerRef}>
         {this.worksheets()}
       </div>
     )

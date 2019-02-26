@@ -26,9 +26,9 @@ class FormulaBar extends Component {
       this.data.row = row;
       this.data.col = col;
       this.data.sheetIdx = this.excel.currentSheetIdx;
-      const formulaOrValue = this.excel.getDataAtSheetAndCell(row, col, this.excel.currentSheetIdx);
-      const input = formulaOrValue !== null && formulaOrValue !== undefined ?
-        (formulaOrValue.formula ? '=' + formulaOrValue.formula : formulaOrValue) : '';
+      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row + 1, col + 1);
+      let input = typeof cell.formula() === 'string' ? cell.formula() : cell.value();
+      input = input === undefined || input === null ? '' : input + '';
       if (this.state.formulaBarInput !== input) {
         this.setState({formulaBarInput: input});
         this.orginalInput = input;
