@@ -51,11 +51,7 @@ export class FormulaEditorNG extends TextEditor {
   };
 
   saveValue(value, ctrlDown) {
-    const cell = this.cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(this.row + 1, this.col + 1);
-    const rawValue = value[0][0];
-    if (this.type === 'richtext')
-      return;
-    updateCell(cell, rawValue, this.excel);
+    excelInstance.setDataAndRender(null, this.row, this.col, value[0][0], 'edit');
   };
 
 }

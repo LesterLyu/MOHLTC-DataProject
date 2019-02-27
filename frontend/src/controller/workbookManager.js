@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "./../config/config";
 import XlsxPopulate from "xlsx-populate";
-import {readSheet} from "../views/Excel/helpers";
+import {readSheet, excelInstance} from "../views/Excel/helpers";
 
 const axiosConfig = {withCredentials: true};
 
@@ -158,12 +158,18 @@ class WorkbookManager {
       const file = e.target.files[0];
       XlsxPopulate.fromDataAsync(file)
         .then(workbook => {
-          // load into {WorkbookStore}
           const sheets = [], sheetNames = [];
+
+          // read sheet names first for building calculation chain
+          workbook.sheets().forEach(sheet => {
+            sheetNames.push(sheet.name());
+          });
+          excelInstance.global.sheetNames = sheetNames;
+          excelInstance.calculationChain.initParser();
+
+          // load into {WorkbookStore}
           workbook.sheets().forEach(sheet => {
             const {data, styles, rowHeights, colWidths, mergeCells} = readSheet(sheet);
-
-            sheetNames.push(sheet.name());
             sheets.push({
               tabColor: sheet.tabColor(),
               data,

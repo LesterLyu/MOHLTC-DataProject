@@ -7,7 +7,7 @@ import RichTexts from "xlsx-populate/lib/RichTexts";
 
 export {Parser, CalculationChain, colCache};
 
-let excelInstance;
+export let excelInstance;
 
 export function init(instance) {
   excelInstance = instance;
@@ -336,7 +336,7 @@ export function getCellType(cell) {
 }
 
 /**
- * Update a cell with value
+ * Update a cell with value and render it
  * @param {Cell} cell
  * @param {*} rawValue
  * @param {Excel} [excel]
@@ -387,11 +387,9 @@ export function readSheet(sheet) {
     // const rowStyle = styles[rowNumber - 1] = {};
     row._cells.forEach((cell, colNumber) => {
       // process cell data
-      // if (cell.formula()) {
-      //   rowData[colNumber - 1] = {formula: cell.formula(), result: cell._value};
-      // } else {
-      //   rowData[colNumber - 1] = cell._value;
-      // }
+      if (typeof cell.formula() === 'string') {
+        excelInstance.calculationChain.addCell(excelInstance.currentSheetIdx, rowNumber - 1, colNumber - 1 , cell.formula());
+      }
       rowData[colNumber - 1] = undefined;
     });
   });

@@ -7,7 +7,7 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 
-import {init, generateTableData, generateTableStyle, createArray, colCache} from './helpers';
+import {init, generateTableData, generateTableStyle, createArray, colCache, getCellType} from './helpers';
 import Parser from './calculations/formulaParser'
 import CalculationChain from './calculations/chain'
 import Renderer from './renderer';
@@ -147,26 +147,82 @@ class Excel extends Component {
   }
 
   getDataAtSheetAndCell(row, col, sheetNo, sheetName) {
-    const global = this.global;
-    if (sheetNo !== null) {
-      const rowData = global.sheets[sheetNo].data[row];
-      return rowData ? rowData[col] : null;
-    } else if (sheetName !== null) {
-      const rowData = global.sheets[global.sheetNames.indexOf(sheetName)].data[row];
-      return rowData ? rowData[col] : null;
+    sheetNo = sheetNo === null ? this.global.sheetNames.indexOf(sheetName) : sheetNo;
+    if (sheetNo === undefined) console.error('At least one of sheetNo or sheetName should be provides.');
+    const cell = this.workbook.sheet(sheetNo).cell(row + 1, col + 1);
+    return cell.value();
+  }
+
+  getCell(sheetNo, row, col) {
+    if (sheetNo === undefined) console.error('getCell: sheetNo should be provides.');
+    return this.workbook.sheet(sheetNo).cell(row + 1, col + 1);
+  }
+
+  /**
+   * Update a cell's data without render it.
+   * Cell's value and formula will be overrode.
+   * @param {number | null | undefined} sheetNo - null or undefined if uses current sheet number
+   * @param {number} row
+   * @param {number} col
+   * @param {string} rawValue - can be any excel data type
+   * @param {'internal'| 'edit'} source - 'internal' means internal update, i.e. formula updates
+   *                                      'edit' means edit by the user
+   */
+  setData(sheetNo, row, col, rawValue, source) {
+    sheetNo = sheetNo === null || sheetNo === undefined ? this.currentSheetIdx : sheetNo;
+    const cell = this.workbook.sheet(sheetNo).cell(row + 1, col + 1);
+    const oldValue = cell.value(), oldFormula = cell.formula();
+
+    // I don't want you to update rich text.
+    if (getCellType(cell) === 'richtext') {
+      console.warn('setData: An update to rich text has been blocked.');
+      return;
+    }
+    // check if it is formula now
+    if (rawValue !== undefined && rawValue.length > 0 && rawValue.charAt(0) === '=') {
+      const res = this.parser.parseNewFormula(rawValue);
+      console.log(res);
+      cell.formula(res.formula)
+        ._value = res.result;
     } else {
-      console.error('At least one of sheetNo or sheetName should be provides.')
+      cell.value(rawValue);
+    }
+
+    // add to next render list
+    this.renderer.cellNeedUpdate(this.currentSheetIdx, row , col);
+
+    if (source !== 'internal') {
+      this.afterChangeByUser(cell, oldValue, oldFormula);
     }
   }
 
-  setDataAtSheetAndCell(row, col, val, sheetNo, sheetName) {
-    const global = this.global;
-    if (sheetNo !== null) {
-      global.sheets[sheetNo].data[row][col] = val;
-    } else if (sheetName !== null) {
-      global.sheets[this.sheetNames.indexOf(sheetName)].data[row][col] = val;
-    } else {
-      console.error('At least one of sheetNo or sheetName should be provides.');
+  setDataAndRender(...params) {
+    this.setData(...params);
+    this.renderCurrentSheet();
+  }
+
+  /**
+   * Should be called after every change to a cell by the user
+   * @param cell
+   * @param oldValue
+   * @param oldFormula
+   */
+  afterChangeByUser(cell, oldValue, oldFormula) {
+    const row = cell.rowNumber() - 1, col = cell.columnNumber() - 1;
+
+    // if the old cell contains formula, we remove the formula dependencies in our calculation chain.
+    if (typeof oldFormula === 'string') {
+      this.calculationChain.removeCell(this.currentSheetIdx, row, col, oldFormula);
+    }
+
+    // if the new cell contains formula, we update the formula dependency in our calculation chain.
+    if (typeof cell.formula() === 'string') {
+      this.calculationChain.addCell(this.currentSheetIdx, row, col, cell.formula());
+    }
+
+    // request recalculation for formulas if cell value changes
+    if (cell.value() !== oldValue) {
+      this.calculationChain.change(this.currentSheetIdx, row, col);
     }
   }
 

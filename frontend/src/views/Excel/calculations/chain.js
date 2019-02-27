@@ -108,6 +108,7 @@ export default class CalculationChain {
     }
     // revert currSheet
     excelInstance.parser.changeCurrSheetName(currSheetBackup);
+    excelInstance.renderCurrentSheet()
   }
 
   initParser() {
@@ -215,16 +216,13 @@ export default class CalculationChain {
   };
 
   // re-evaluate formula
-  evaluateFormula = (orderNo, row, col) => {
-    const data = this.excelInstance.getDataAtSheetAndCell(row, col, orderNo);
-    if (!data.hasOwnProperty('formula')) {
-      console.log('Skipped: evaluateFormula(): cell provided is not a formula');
-      return
+  evaluateFormula = (sheetNo, row, col) => {
+    const cell = this.excelInstance.getCell(sheetNo, row, col);
+    if (typeof cell.formula() !== 'string') {
+      console.log('Skipped: evaluateFormula(): cell provided does not contain formula.');
+      return;
     }
-
-    const calculated = this.excelInstance.parser.parseNewFormula(data.formula, false);
-    this.excelInstance.setDataAtSheetAndCell(row, col, calculated, orderNo);
-    return data;
+    this.excelInstance.setData(sheetNo, row, col, '=' + cell.formula(), 'internal');
   };
 
   parseDependency = (currSheetNo, formula) => {

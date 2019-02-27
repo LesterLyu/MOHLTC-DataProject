@@ -17,9 +17,9 @@ class Parser {
     return this.parser.parse(formula);
   }
 
-  parseNewFormula(newValue, hasEqualPrefix) {
+  parseNewFormula(newValue) {
     const value = {
-      formula: newValue.slice(hasEqualPrefix ? 1 : 0),
+      formula: newValue.charAt(0) === '=' ? newValue.slice(1) : newValue,
       result: ''
     };
     // fix '=+' bug
@@ -58,7 +58,7 @@ class Parser {
       else {
         sheet = this.currSheetName;
       }
-      var data = excelInstance.getDataAtSheetAndCell(cellCoord.row.index, cellCoord.column.index, null, sheet);
+      const data = excelInstance.getDataAtSheetAndCell(cellCoord.row.index, cellCoord.column.index, null, sheet);
       if (data === null || data === undefined || data === '') {
         done(0)
       }
