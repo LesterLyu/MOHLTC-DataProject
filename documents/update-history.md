@@ -1,4 +1,5 @@
 ### TO-DO
+  - [ ] Fix calculation chain
   - [ ] Create Excel: Assign attribute and category to rows and columns
   - [ ] Registration page
   - [ ] User profile page
