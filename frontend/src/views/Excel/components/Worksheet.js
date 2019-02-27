@@ -79,7 +79,7 @@ class Worksheet extends Component {
         autoColumnSize: false,
         contextMenu: ['copy'],
         renderAllRows: false,
-        viewportRowRenderingOffset: 20,
+        viewportRowRenderingOffset: 40,
         viewportColumnRenderingOffset: 10,
         cells: (row, col) => {
           let cellProperties = {};

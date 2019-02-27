@@ -229,8 +229,36 @@ class Excel extends Component {
     // excelWorker.onmessage = function (event) {console.log(event.data)};
   }
 
+  renderCell(row, col) {
+    const renderer = this.renderer.cellRendererNG;
+    const cellProperties = this.hotInstance.getCellMeta(row, col);
+    const cellElement = this.hotInstance.getCell(row, col);
+    // this cell is not rendered into the dom.
+    if (!cellElement) return;
+
+    renderer(this.hotInstance, cellElement, row, col, null, null, cellProperties);
+  }
+
   renderCurrentSheet() {
-    this.sheetRef.current.hotInstance.render();
+    const changes = this.renderer.changes;
+    for (let sheetId in changes) {
+      if (!changes.hasOwnProperty(sheetId)) continue;
+      const rows = changes[sheetId];
+      // go through rows
+      for (let rowNumber in rows) {
+        if (!rows.hasOwnProperty(rowNumber)) continue;
+        const row = rows[rowNumber];
+        // go through cell
+        for (let colNumber in row) {
+          if (!row.hasOwnProperty(colNumber)) continue;
+          if (row[colNumber]) {
+            this.renderCell(parseInt(rowNumber), parseInt(colNumber));
+            this.renderer.cellUpdated(sheetId, rowNumber, colNumber);
+          }
+        }
+      }
+    }
+    // this.sheetRef.current.hotInstance.render();
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
