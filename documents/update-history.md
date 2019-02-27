@@ -1,18 +1,31 @@
-### TO-DO
-  - [ ] Fix calculation chain
-  - [ ] Create Excel: Assign attribute and category to rows and columns
-  - [ ] Registration page
-  - [ ] User profile page
-  - [ ] User management page
-  - [ ] Front-end permissions
-  - [ ] Rewrite backend to store workbook for admin
-  - [ ] Rewrite backend to store workbook for user/client
-  - [ ] Create Excel: fix formula
-  - [ ] Create Excel: fix border
-  - [ ] Create Excel: support hyperlink
-  - [ ] Create Excel: support data validation
-  - [ ] Create Excel: support data validation
-  - [ ] Edit Excel page for user/client
+### Backlog
+  - Front-end Pages and Logics (Using React.js)
+    - [ ] Registration page
+    - [ ] User profile page
+    - [ ] User management page
+    - [ ] Front-end permissions
+    
+  - Front-end Excel Related (Patially Using React.js)
+    - [ ] Create Excel: fix formula
+    - [ ] Create Excel: fix border
+    - [ ] Create Excel: support hyperlink
+    - [ ] Create Excel: support data validation
+    - [ ] Create Excel: Assign attribute and category to rows and columns
+    - [ ] Edit Excel page for user/client
+    - [ ] Create Excel: Fix calculation chain
+    
+  - Back-end (Our server, totally no React.js)
+    - [ ] Rewrite backend to store workbook for admin
+    - [ ] Rewrite backend to store workbook for user/client
+    - [ ] ...Many other changes here while implementing the front-end pages
+    
+  - xlsx-populate (Excel library used in this project)
+    > priority in this order
+    - [ ] Add shared formula support
+    - [ ] Support conditional formatting
+    - [ ] Support comments
+    - [ ] Support images
+
 
 ---
 The following are old update history (not using react.js)
