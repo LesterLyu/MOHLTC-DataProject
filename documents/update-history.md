@@ -5,7 +5,7 @@
     - [ ] User management page
     - [ ] Front-end permissions
     
-  - Front-end Excel Related (Patially Using React.js)
+  - Front-end Excel Related (Patially Using React.js; uses HandsonTable)
     - [ ] Create Excel: fix formula
     - [ ] Create Excel: fix border
     - [ ] Create Excel: support hyperlink
@@ -19,14 +19,15 @@
     - [ ] Rewrite backend to store workbook for user/client
     - [ ] ...Many other changes here while implementing the front-end pages
     
-  - xlsx-populate (Excel library used in this project)
+  - [xlsx-populate](https://github.com/LesterLyu/xlsx-populate) (Excel library used in this project)
     > priority in this order
     - [ ] Add shared formula support
     - [ ] Support conditional formatting
     - [ ] Support comments
     - [ ] Support images
-
-
+  
+  - [formula-parser](https://github.com/LesterLyu/formula-parser) and [formula.js](https://github.com/LesterLyu/formula.js) (Excel formula library used in this project)
+    - [ ] **Excel Formula EXPERT needed to test through these library**
 ---
 The following are old update history (not using react.js)
 ### Dev 0.3.6
