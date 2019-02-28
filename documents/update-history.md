@@ -12,7 +12,7 @@
     - [ ] Create Excel: support data validation
     - [ ] Create Excel: Assign attribute and category to rows and columns
     - [ ] Edit Excel page for user/client
-    - [ ] Create Excel: Fix calculation chain
+    - [x] Create Excel: Fix calculation chain
     
   - Back-end (Our server, totally no React.js)
     - [ ] Rewrite backend to store workbook for admin
