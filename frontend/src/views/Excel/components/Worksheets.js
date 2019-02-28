@@ -74,7 +74,7 @@ class Worksheets extends Component {
         mergeCells: sheet.mergeCells,
         contextMenu: {
           items: {
-            copy : {},
+            copy: {},
             mergeCells: {},
             '---------': {},
             hideRow: {
@@ -83,12 +83,12 @@ class Worksheets extends Component {
                 return !this.selection.isSelectedByRowHeader();
               },
               callback: () => {
-                const { from, to } = excel.hotInstance.getSelectedRangeLast();
+                const {from, to} = excel.hotInstance.getSelectedRangeLast();
                 const start = Math.min(from.row, to.row);
                 const end = Math.max(from.row, to.row);
                 const rowHeights = excel.currentSheet.rowHeights;
-               for (let i = start; i <= end; i++) {
-                 rowHeights[i] = 0;
+                for (let i = start; i <= end; i++) {
+                  rowHeights[i] = 0;
                 }
                 excel.hotInstance.render();
                 setTimeout(() => {
@@ -104,7 +104,7 @@ class Worksheets extends Component {
                 return !this.selection.isSelectedByColumnHeader();
               },
               callback: () => {
-                const { from, to } = excel.hotInstance.getSelectedRangeLast();
+                const {from, to} = excel.hotInstance.getSelectedRangeLast();
                 const start = Math.min(from.col, to.col);
                 const end = Math.max(from.col, to.col);
                 const colWidths = excel.currentSheet.colWidths;
@@ -122,6 +122,26 @@ class Worksheets extends Component {
 
           }
 
+        },
+        beforeKeyDown: (event) => {
+          if (event.code === 'Delete' || event.code === 'Backspace') {
+            const selectedRange = this.excel.hotInstance.getSelectedRange();
+            if (!selectedRange) return;
+            for (let i = 0; i < selectedRange.length; i++) {
+              const selected = selectedRange[i];
+              const minRow = Math.min(selected.from.row, selected.to.row),
+                maxRow = Math.max(selected.from.row, selected.to.row),
+                minCol = Math.min(selected.from.col, selected.to.col),
+                maxCol = Math.max(selected.from.col, selected.to.col);
+              for (let row = minRow; row <= maxRow; row++) {
+                for (let col = minCol; col <= maxCol; col++) {
+                  this.excel.setData(this.excel.currentSheetIdx, row, col, '', 'edit')
+                }
+              }
+            }
+            this.excel.renderCurrentSheet();
+            event.stopImmediatePropagation();
+          }
         },
         afterChange: (changes, source) => {
           // console.log(changes, source);
@@ -218,7 +238,7 @@ class Worksheets extends Component {
         },
         // support hidden column
         modifyColWidth: (width, col) => {
-          const sheetCol= this.excel.sheet.column(col + 1);
+          const sheetCol = this.excel.sheet.column(col + 1);
           const colWidth = sheetCol.hidden() ? 0 : (sheetCol.width() === undefined ? 80 : sheetCol.width() / 0.11);
 
           if (colWidth === 0) {

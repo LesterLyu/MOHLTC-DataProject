@@ -189,13 +189,23 @@ class Excel extends Component {
     }
 
     // add to next render list
-    this.renderer.cellNeedUpdate(this.currentSheetIdx, row , col);
+    this.renderer.cellNeedUpdate(this.currentSheetIdx, row, col);
 
     if (source !== 'internal') {
       this.afterChangeByUser(cell, oldValue, oldFormula);
     }
   }
 
+  /**
+   * Update a cell's data and render it.
+   * Cell's value and formula will be overrode.
+   * @param {number | null | undefined} sheetNo - null or undefined if uses current sheet number
+   * @param {number} row
+   * @param {number} col
+   * @param {string} rawValue - can be any excel data type
+   * @param {'internal'| 'edit'} source - 'internal' means internal update, i.e. formula updates
+   *                                      'edit' means edit by the user
+   */
   setDataAndRender(...params) {
     this.setData(...params);
     this.renderCurrentSheet();
