@@ -18,34 +18,10 @@ const supported = {
 
 const borderStyle2Width = {thin: 1, medium: 2, thick: 3};
 
-class CellCache {
-  constructor() {
-    this.storage = {}; // sheetId -> row -> col -> td element
-  }
-
-  set(td, sheetId, row, col) {
-    if (!this.storage[sheetId]) {
-      this.storage[sheetId] = {};
-    }
-    if (!this.storage[sheetId][row]) {
-      this.storage[sheetId][row] = {};
-    }
-    this.storage[sheetId][row][col] = td.cloneNode(true);
-  }
-
-  get(sheetId, row, col) {
-    if (!this.storage[sheetId] || !this.storage[sheetId][row] || !this.storage[sheetId][row][col]) {
-      return null;
-    }
-    return this.storage[sheetId][row][col];
-  }
-}
-
 export default class Renderer {
   constructor(instance) {
     excelInstance = instance;
     global = instance.state.global;
-    this.cellCache = new CellCache();
     this.changes = {}; // sheetId -> row -> col -> boolean
   }
 
@@ -60,22 +36,27 @@ export default class Renderer {
   }
 
   /**
-   * Return true if the cell needs update, otherwise return the old td element.
+   * Return true if the cell does not need render. i.e. inner merge cells
    * @param sheetId
    * @param row
    * @param col
-   * @return {boolean|Node}
+   * @return {boolean}
    */
-  shouldCellUpdate(sheetId, row, col) {
-    const td = this.cellCache.get(sheetId, row, col);
-    if (!td) {
-      return true;
+  shouldCellSkipRender(sheetId, row, col) {
+    const merges = excelInstance.global.sheets[sheetId].mergeCells;
+    for (let i = 0; i < merges.length; i++) {
+      // {row: 0, col: 1, rowspan: 4, colspan: 2}
+      const merge = merges[i];
+      // the top-left cell should be rendered
+      if (row === merge.row && col === merge.col) {
+        return false;
+      }
+      // cells other than the top-left cell should be skipped
+      if (merge.row <= row && row < merge.row + merge.rowspan && merge.col <= col && col < merge.col + merge.colspan) {
+        return true;
+      }
     }
-    if (!this.changes[sheetId] || !this.changes[sheetId][row] || !this.changes[sheetId][row][col]) {
-      return td;
-    } else {
-      return true;
-    }
+    return false;
   }
 
   cellNeedUpdate(sheetId, row, col) {
@@ -85,11 +66,16 @@ export default class Renderer {
 
   cellUpdated(sheetId, row, col) {
     this.setChanges(sheetId, row, col, undefined);
+    console.log('cellUpdated', sheetId, row, col)
   }
 
   cellRendererNG = (instance, td, row, col, prop, value, cellProperties) => {
     if (!excelInstance.workbook) {
       console.warn('Renderer.cellRendererNG workbook is not yet initialized.');
+      return;
+    }
+    if (this.shouldCellSkipRender(excelInstance.currentSheetIdx, row, col)) {
+      // console.log('in merge cells, skipped render.');
       return;
     }
     // let update = this.shouldCellUpdate(excelInstance.currentSheetIdx, row, col);

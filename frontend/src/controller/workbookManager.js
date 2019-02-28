@@ -3,6 +3,7 @@ import config from "./../config/config";
 import XlsxPopulate from "xlsx-populate";
 import {readSheet, excelInstance} from "../views/Excel/helpers";
 import CalculationChain from "../views/Excel/calculations/chain";
+import Parser from "../views/Excel/calculations/formulaParser";
 
 const axiosConfig = {withCredentials: true};
 
@@ -166,6 +167,7 @@ class WorkbookManager {
             sheetNames.push(sheet.name());
           });
           excelInstance.global.sheetNames = sheetNames;
+          excelInstance.parser = new Parser(excelInstance);
           excelInstance.calculationChain = new CalculationChain(excelInstance);
 
           // load into {WorkbookStore}

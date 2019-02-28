@@ -304,9 +304,9 @@ export function colorToRgb(color) {
   if (color.rgb) {
     if (color.rgb === 'System Foreground') {
       // TO-DO
-      return 'ffffff';
+      return '000000';
     } else if (color.rgb === 'System Background') {
-      return '000000'
+      return 'ffffff'
     }
     return color.rgb.length === 6 ? color.rgb : color.rgb.substring(2);
   }
