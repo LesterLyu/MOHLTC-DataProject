@@ -1,6 +1,6 @@
 import Handsontable from 'handsontable';
 import RichTexts from 'xlsx-populate/lib/RichTexts';
-import {updateCell, getCellType} from "./helpers";
+import {getCellType} from "./helpers";
 
 let excelInstance;
 

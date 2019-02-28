@@ -336,33 +336,6 @@ export function getCellType(cell) {
 }
 
 /**
- * Update a cell with value and render it
- * @param {Cell} cell
- * @param {*} rawValue
- * @param {Excel} [excel]
- */
-export function updateCell(cell, rawValue, excel) {
-  if (!excel) excel = excelInstance;
-  // I don't want you update rich text
-  if (getCellType(cell) === 'richtext') {
-    return;
-  }
-  // check if it is formula now
-  if (rawValue !== undefined && rawValue.length > 0 && rawValue.charAt(0) === '=') {
-    console.log('formula');
-    const res = excel.parser.parseNewFormula(rawValue, true);
-    console.log(res);
-    cell.formula(res.formula)
-      ._value = res.result;
-  } else {
-    cell.value(rawValue);
-  }
-  excel.renderer.cellNeedUpdate(excel.currentSheetIdx, cell.rowNumber() - 1 , cell.columnNumber() - 1);
-  excel.renderCurrentSheet();
-}
-
-
-/**
  * Read sheet
  * @param {Sheet} sheet
  * @return {Object}

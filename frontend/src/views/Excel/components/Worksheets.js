@@ -129,31 +129,7 @@ class Worksheets extends Component {
             if (changes) {
               for (let i = 0; i < changes.length; i++) {
                 let row = changes[0][0], col = changes[0][1], oldData = changes[0][2], newData = changes[0][3];
-                // excel.renderer.cellNeedUpdate(currentSheetIdx, row, col);
-                const cell = excel.workbook.sheet(currentSheetIdx).cell(row + 1, col + 1);
-                if (newData == null || newData === '') {
-                  cell.value(null);
-                  // remove chain
-                  if (oldData && oldData.formula) {
-                    excel.calculationChain.removeCell(currentSheetIdx, row, col, oldData.formula);
-                  }
-                } else if (typeof newData === 'string' || typeof newData === 'number' || typeof newData === 'boolean') {
-                  cell.value(newData);
-                  // remove chain
-                  if (oldData && oldData.formula) {
-                    excel.calculationChain.removeCell(currentSheetIdx, row, col, oldData.formula);
-                  }
-                } else if (newData.formula) {
-                  if (!oldData || !oldData.formula) {
-                    excel.calculationChain.addCell(currentSheetIdx, row, col, newData.formula);
-                  }
-                  cell.value(newData.result);
-                  cell.formula(newData.formula);
-                }
-                if (oldData !== newData) {
-                  excel.calculationChain.change(currentSheetIdx, row, col);
-                  excel.renderCurrentSheet();
-                }
+
               }
             }
           }
