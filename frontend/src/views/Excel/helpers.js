@@ -311,7 +311,7 @@ export function colorToRgb(color) {
     return color.rgb.length === 6 ? color.rgb : color.rgb.substring(2);
   }
 
-  if (color.theme) {
+  if (color.theme !== undefined) {
     return excelInstance.workbook.theme().themeColor(color.theme, color.tint)
   }
 }
