@@ -1,5 +1,5 @@
 # DataProject
-## Live on http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com
+## Live on http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com/react
 
 ## Documents
 - [Update history](documents/update-history.md)
