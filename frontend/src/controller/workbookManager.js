@@ -177,7 +177,7 @@ class WorkbookManager {
               tabColor: sheet.tabColor(),
               data,
               styles,
-              name: 'Sheet1',
+              name: sheet.name(),
               state: 'visible',
               views: [],
               mergeCells,

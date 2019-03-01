@@ -2,7 +2,7 @@ import pako from 'pako';
 import colCache from './col-cache';
 import Parser from './formulaParser';
 import CalculationChain from './calculation-chain';
-import tinycolor from 'tinycolor2';
+import ac from 'xlsx-populate/lib/addressConverter';
 import RichTexts from "xlsx-populate/lib/RichTexts";
 
 export {Parser, CalculationChain, colCache};
@@ -345,6 +345,7 @@ export function readSheet(sheet) {
   const rowHeights = [];
   const colWidths = [];
   const mergeCells = [];
+  const sharedFormulas = [];
 
   const usedRange = sheet.usedRange();
   // default number of empty sheet
@@ -360,12 +361,30 @@ export function readSheet(sheet) {
     // const rowStyle = styles[rowNumber - 1] = {};
     row._cells.forEach((cell, colNumber) => {
       // process cell data
-      if (typeof cell.formula() === 'string') {
+      const formula = cell.formula();
+      if (typeof formula === 'string') {
+        // this is the parent shared formula
+        if (formula !== 'SHARED' && cell._sharedFormulaId !== undefined) {
+          sharedFormulas[cell._sharedFormulaId] = cell;
+        } else if (formula === 'SHARED') {
+          // convert this cell to normal formula
+          const refCell = sharedFormulas[cell._sharedFormulaId];
+          const formula = getSharedFormula(cell, refCell);
+          const oldValue = cell.value();
+          cell.formula(formula)._value = oldValue;
+        }
         excelInstance.calculationChain.addCell(sheet.workbook().sheets().indexOf(sheet), rowNumber - 1, colNumber - 1 , cell.formula());
       }
       rowData[colNumber - 1] = undefined;
     });
   });
+
+  // set parent shared formula cell to normal formula cell, this may not be necessary
+  for (let i = 0; i < sharedFormulas.length; i++) {
+    const cell = sharedFormulas[i];
+    const oldValue = cell.value();
+    cell.formula(cell.formula())._value = oldValue;
+  }
 
   // add extra rows and columns
   data[numRows - 1] = [];
@@ -398,6 +417,36 @@ export function readSheet(sheet) {
     })
   });
 
-
   return {data, styles, rowHeights, colWidths, mergeCells};
+}
+
+export function getSharedFormula(cell, refCell) {
+
+  const refFormula = refCell.getSharedRefFormula();
+
+  const refCol = refCell.columnNumber();
+  const refRow = refCell.rowNumber();
+  const cellCol = cell.columnNumber();
+  const cellRow = cell.rowNumber();
+
+  const offsetCol = cellCol - refCol;
+  const offsetRow = cellRow - refRow;
+
+  const formula = refFormula
+    .replace(/(\$)?([A-Z]+)(\$)?([0-9]+)(\()?/g, (match, absCol, colName, absRow, row, isFunction, index) => {
+      if(!!isFunction){
+        return match;
+      }
+
+      const col = +ac.columnNameToNumber(colName);
+      row = +row;
+
+      const _col = !!absCol ? col : col + offsetCol;
+      const _row = !!absRow ? row : row + offsetRow;
+
+      const _colName = ac.columnNumberToName(_col);
+      return `${_colName}${_row}`;
+    });
+
+  return formula;
 }

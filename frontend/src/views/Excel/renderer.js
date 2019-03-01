@@ -92,11 +92,7 @@ export default class Renderer {
     const worksheet = workbook.sheet(excelInstance.currentSheetIdx);
     const cell = worksheet.cell(row + 1, col + 1);
 
-    if (cell.formula()) {
-      value = {formula: cell.formula(), result: cell._value};
-    } else {
-      value = cell.value();
-    }
+    value = cell.value();
 
     let rowHeight = worksheet.row(row + 1).height();
     rowHeight = rowHeight === undefined ? 24 : rowHeight / 0.6;
