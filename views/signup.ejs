@@ -1,100 +1,105 @@
-<!doctype html>
-<html>
-<head>
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
-    <!-- load bootstrap css -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
-    <!-- load fontawesome -->
-    <link rel="stylesheet" href="/custom.css"> <!-- custom css -->
-    <title>Signup</title>
+<%- include('./common/header', {title: 'Sign Up'}); -%>
 
-    <script>
-        function saveForm() {
 
-            if (typeof(Storage) !== "undefined") {
-                sessionStorage.UserName = document.getElementById("userName").value;
-                sessionStorage.FirstNationName = document.getElementById('fnName').value;
-                sessionStorage.ChiefName = document.getElementById('chiefName').value;
-                sessionStorage.ContactName = document.getElementById('contactName').value;
-                sessionStorage.ContactPhone = document.getElementById('contactPhone').value;
-                sessionStorage.ContactEmail = document.getElementById('contactEmail').value;
-            }
+<div class="container col-sm-8 col-md-6 col-lg-5 col-xl-4 vertical-gap">
 
-        }
-    </script>
-</head>
-<body class="signupbody">
-<div class="container">
-
-    <div class="col-sm-8 col-sm-offset-2 loginBox">
-        <h1><span class="fa fa-sign-in"></span> Sign Up </h1>
+    <div class="loginBox">
+        <h1><span class="fa fa-sign-in"></span>Sign Up </h1>
     </div>
-    <div class="col-sm-8 col-sm-offset-2 box">
+    <div class="box">
+        <form id="signupForm">
 
-        <% if (message.length > 0) { %>
-            <div class="alert alert-danger"><%= message %></div>
-        <% } %>
-        <% if (message1.length > 0) { %>
-            <div class="alert alert-danger"><%= message1 %></div>
-        <% } %>
-        <form action="/signup" method="post">
             <div class="form-group">
                 <br/>
-                <label class="signuplabel" for "userName">
-                <b>Username:</b>
-                </label>
-                <input type="text" class="form-control singupinput" id="userName" name="userName">
+                <label for="signUpMethodSelect">Sign up to:</label>
+                <select class="form-control" id="signUpMethodSelect">
+                    <option value="local" selected>Local Server</option>
+                    <option value="ldap">LDAP Server</option>
+                </select>
             </div>
-            <div class="form-group">
-                <label class="signuplabel">Password:</label>
-                <input type="password" id="password" class="form-control singupinput" name="password">
 
-            </div>
             <div class="form-group">
-                <label class="signuplabel">Re-enter password:</label>
-                <input type="password" id="confirm_password" class="form-control singupinput" name="confirm_password"
-                       required="required" oninput="check(this)">
-                <script language='javascript' type='text/javascript'>
-                    function check(input) {
-                        console.log("saysomethingplease!");
-                        if (input.value != document.getElementById('password').value) {
-                            input.setCustomValidity('Password Must Match');
-                        }
-                        else {
-                            input.setCustomValidity('');
-                        }
-                    }
-                </script>
+                <label for="usernameInput">Username:</label>
+                <input type="text" class="form-control" id="usernameInput" name="username">
             </div>
+
+            <div id='password' class="form-group">
+                <label for="passwordInput">Password: </label>
+                <input type="password" name="password" class="form-control" id="passwordInput">
+            </div>
+
             <fieldset>
-                <label class="signuplabel" for "firstName">First Name: </label>
-                <input type="text" id="firstName" name="firstName" placeholder="John" class="form-control singupinput"/>
+                <label class="signuplabel" for="firstName">First name: </label>
+                <input type="text" id="firstName" name="firstName" class="form-control singupinput"/>
                 <br/>
-                <label class="signuplabel" for "lastName">Last Name: </label>
-                <input type="text" id="lastName" name="lastName" placeholder="Smith" class="form-control singupinput"/>
+                <label class="signuplabel" for="lastName">Last name: </label>
+                <input type="text" id="lastName" name="lastName" class="form-control singupinput"/>
                 <br/>
             </fieldset>
+
+            <div id="organization" class="form-group row hide">
+                <label class="col-sm-11" for="OrganizationDropDown"> Choose your organization: </label>
+                <select class="selectpicker col-sm-12" data-live-search="true" data-style="btn-outline-primary" data-actions-box="true"
+                        data-header="Select organization" id="OrganizationDropDown" name="organization">
+                </select>
+
+            </div>
+            <div id="role" class="form-group row hide">
+                <label class="col-sm-11" for="role"> Choose your role: </label>
+
+                <Select class="selectpicker col-sm-12" data-live-search="true" data-style="btn-outline-primary" data-actions-box="true"
+                        data-header="Select role" id="RoleDropDown" name="role">
+                    <option value="user">User (have access to fill workbook)</option>
+                    <option value="workbookAdmin">Administrator (have access to manage workbook templates)</option>
+                    <option value="manager">Manager (have access to user management)</option>
+                </Select>
+
+            </div>
+
             <div class="form-group">
-                <label class="signuplabel" for "contactEmail">Email: </label>
-                <input type="email" id="contactEmail" name="contactEmail" placeholder="contact@DanielZhao.com"
-                       class="form-control singupinput"/>
+                <label class="signuplabel" for="contactEmail">Email: </label>
+                <input type="email" id="email" name="email" class="form-control singupinput"/>
                 <br/>
-                <label class="signuplabel" for "contactPhone">Phone Number: </label>
-                <input type="number" id="contactPhone" name="contactPhone" placeholder="2269799881"
+                <label class="signuplabel" for="contactPhone">Phone number: </label>
+                <br/>
+                <input type="tel" id="phone"  name="phoneNumber" placeholder="2269799881"
                        class="form-control singupinput"/>
             </div>
             <div class="form-group">
-                <label class="signuplabel" for "groupNumber">User Group Number: </label>
-                <input type="number" id="groupNumber" name="groupNumber" placeholder="1"
+                <label class="signuplabel" for="groupNumber">Organization number (Group Number): </label>
+                <input type="number" id="groupNumber" name="groupNumber" value="1"
                        class="form-control singupinput"/>
             </div>
 
-            <button type="submit" onclick="saveForm()" class="btn">Next</button>
+            <button type="submit" class="btn btn-primary">Next</button>
             <br/>
-            <br/>
+            <hr/>
             <p style="margin-left: 2%;">Already have an account? <a href="/login">Login</a></p>
             <p style="margin-left: 2%;">Or go <a href="/">home</a>.</p>
 
         </form>
-</body>
-</html>
+
+    </div>
+    <!--Message Modal-->
+    <%- include('./common/messageModal'); -%>
+</div>
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+
+<link rel="stylesheet" href="../node_modules/intl-tel-input/build/css/intlTelInput.css">
+<script src="../node_modules/intl-tel-input/build/js/intlTelInput.js"></script>
+
+<script>
+
+</script>
+
+<script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+
+<%- include('./common/dashboardFooter', {js: [
+'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
+'/dist/signup.js',
+]}); -%>

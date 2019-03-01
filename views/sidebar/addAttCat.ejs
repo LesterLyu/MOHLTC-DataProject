@@ -1,0 +1,42 @@
+<%- include('../common/dashboardHeader', {title: 'Create Attribute/Catrgories'}); -%>
+<div class="container-fluid">
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">Workbooks</a>
+        </li>
+        <li class="breadcrumb-item active">Fill Workbook</li>
+    </ol>
+
+
+        <div id="alert-error" class="alert alert-danger alert-dismissible hide" role="alert">
+            <h5 id="alert-error-text"></h5>
+            <button type="button" class="close" aria-label="Close" onclick="hideErrorAlert()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div id="alert" class="alert alert-success alert-dismissible hide" role="alert">
+            <h5 id="alert-text"></h5>
+            <button type="button" class="close" aria-label="Close" onclick="hideAlert()">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <br>
+
+        <form id="categoryForm" method="post">
+            <label for="category"> New category name: </label>
+            <input name="category" type="text">
+            <Button type="submit" class="btn btn-outline-primary"> Submit </Button>
+        </form>
+        <br>
+        <form id="attributeForm" method="post">
+            <label for="attribute"> New attribute name: </label>
+            <input name="attribute" type="text">
+            <Button type="submit" class="btn btn-outline-primary"> Submit </Button>
+        </form>
+
+</div>
+<%- include('../common/dashboardFooter', {js: [
+'/dist/addAttCat.js',
+]}); -%>

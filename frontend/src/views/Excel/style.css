@@ -1,0 +1,37 @@
+.handsontable td, .handsontable th {
+  white-space: pre;
+  height: inherit;
+  line-height: inherit;
+}
+
+.handsontable td.lOverflow {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.handsontable td.lAlignLeft {
+  text-align: left;
+}
+
+.handsontable th {
+  font-size: 14px;
+}
+
+.handsontable td.area.highlight:before {
+  background: rgba(0, 94, 255, 0.8);
+}
+
+.handsontable td.current.area.highlight:before {
+  background: rgba(0,0,0,0);
+}
+
+:focus {
+  outline: none;
+}
+
+#fx {
+  font-size: 18px;
+  font-family: "Times New Roman", serif;
+  font-style: italic;
+  margin: 0 10px;
+}

@@ -1,0 +1,18 @@
+language: node_js
+node_js:
+  - "stable"
+  - "9"
+  - "8"
+before_script:
+  - export CI=true
+services:
+  - mongodb
+install:
+  - npm install
+  - cd ./frontend && npm install
+  - cd ../
+script:
+  - npm test
+  - cd ./frontend && npm test
+  - export CI=false
+  - cd ../ && npm run prod
