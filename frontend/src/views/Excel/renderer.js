@@ -136,7 +136,7 @@ export default class Renderer {
       for (let i = 0; i < value.length(); i++) {
         const rt = value.get(i);
         const span = document.createElement('span');
-        Handsontable.dom.fastInnerText(span, rt.value());
+        Handsontable.dom.fastInnerText(span, rt.value() !== undefined ? rt.value() : '');
 
         setFontStyle(span, Object.assign({}, fontStyle, {
           bold: rt.style('bold'),

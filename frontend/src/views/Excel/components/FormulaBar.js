@@ -6,8 +6,8 @@ import PropTypes from "prop-types";
 
 const styles = theme => ({
   input: {
-    fontSize: 16,
-    font: 'initial',
+    fontSize: 14,
+    font: 'Arial',
     padding: '4px 0 2px',
     '&:focus': {
       outline: 'none',
