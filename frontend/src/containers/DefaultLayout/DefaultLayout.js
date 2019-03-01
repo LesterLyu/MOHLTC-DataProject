@@ -108,7 +108,7 @@ class DefaultLayout extends Component {
             <AppSidebarFooter/>
             <AppSidebarMinimizer/>
           </AppSidebar>
-          <main className="main">
+          <div className="main">
             <AppBreadcrumb appRoutes={routes}/>
             <Container fluid>
               <Suspense fallback={this.loading()}>
@@ -130,7 +130,7 @@ class DefaultLayout extends Component {
                 </Switch>
               </Suspense>
             </Container>
-          </main>
+          </div>
         </div>
         <Snackbar
           anchorOrigin={{

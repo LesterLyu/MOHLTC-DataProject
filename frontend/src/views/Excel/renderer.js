@@ -258,6 +258,23 @@ export default class Renderer {
       span.style.transform = 'rotate(-' + textRotation + 'deg)';
     }
 
+    const hyperlink = cell.hyperlink();
+    if (hyperlink) {
+      const a = document.createElement('a');
+      if (hyperlink.mode === 'internal') {
+        a.href = window.location.href;
+        a.onclick = (event) => {
+          excelInstance.switchSheet(hyperlink.sheetName);
+          // a trick to move mouse out of window, to fix hyperlink performance bug
+          // eventFire($('ol')[0], 'mousedown');
+          // gui.showSheet(hyperlink.sheetName);
+        };
+      } else {
+        a.target = '_black';
+        a.href = hyperlink.target;
+      }
+    }
+
     // set cache
 
     // console.log('cellUpdated', excelInstance.currentSheetIdx, row, col, 'result=', result);
