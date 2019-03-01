@@ -6,6 +6,8 @@
     - [ ] Front-end permissions
     
   - Front-end Excel Related (Patially Using React.js; uses HandsonTable)
+    - [ ] Fix Issue when hidden row/col > rendered row/col
+    - [ ] Fix Issue when merge cells with borders
     - [ ] Create Excel: fix formula
     - [ ] Create Excel: fix border
     - [ ] Create Excel: support hyperlink
