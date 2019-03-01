@@ -116,6 +116,10 @@ export default class Renderer {
       rowHeight,
     };
 
+    // clear borders in case of single cell rerender
+    td.style.borderRight = '';
+    td.style.borderBottom = '';
+
     // grid lines
     if (!worksheet.gridLinesVisible()) {
       if (td.style.borderRight === '')
