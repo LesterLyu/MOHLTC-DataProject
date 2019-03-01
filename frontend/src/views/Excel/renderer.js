@@ -74,6 +74,8 @@ export default class Renderer {
       console.warn('Renderer.cellRendererNG workbook is not yet initialized.');
       return;
     }
+    // TO-DO render borders
+
     if (this.shouldCellSkipRender(excelInstance.currentSheetIdx, row, col)) {
       // console.log('in merge cells, skipped render.');
       return;

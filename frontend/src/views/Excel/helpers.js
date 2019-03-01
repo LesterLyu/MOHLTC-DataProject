@@ -361,7 +361,7 @@ export function readSheet(sheet) {
     row._cells.forEach((cell, colNumber) => {
       // process cell data
       if (typeof cell.formula() === 'string') {
-        excelInstance.calculationChain.addCell(excelInstance.currentSheetIdx, rowNumber - 1, colNumber - 1 , cell.formula());
+        excelInstance.calculationChain.addCell(sheet.workbook().sheets().indexOf(sheet), rowNumber - 1, colNumber - 1 , cell.formula());
       }
       rowData[colNumber - 1] = undefined;
     });
