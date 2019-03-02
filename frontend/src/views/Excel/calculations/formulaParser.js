@@ -62,9 +62,6 @@ class Parser {
       if (data === null || data === undefined || data === '') {
         done(0)
       }
-      else if (data.hasOwnProperty('result')) {
-        done(data.result);
-      }
       else {
         done(data);
       }
@@ -99,9 +96,6 @@ class Parser {
           // console.log(data);
           if (data === null || data === undefined || data === '') {
             colFragment.push(0)
-          }
-          else if (data.hasOwnProperty('result')) {
-            colFragment.push(data.result);
           }
           else {
             colFragment.push(data);

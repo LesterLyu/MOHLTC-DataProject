@@ -59,7 +59,15 @@ export default class CalculationChain {
     }
   }
 
+  /**
+   *
+   * @param {string} currSheet
+   * @param {number} row
+   * @param {number} col
+   */
   change(currSheet, row, col) {
+    if (typeof row === 'string') row = Number(row);
+    if (typeof col === 'string') col = Number(col);
     const {excelInstance} = this;
     const {sheetNames} = excelInstance.global;
 
@@ -182,37 +190,19 @@ export default class CalculationChain {
       });
       done(0);
     });
-
-    // this.parser.on('callVariable', function(name, done) {
-    //     // speedup lookup
-    //     if (name.toUpperCase() === 'TRUE') {
-    //         return true;
-    //     }
-    //     else if (name.toUpperCase() === 'FALSE') {
-    //         return false;
-    //     }
-    //     else if (name.toUpperCase() === 'NULL') {
-    //         return null;
-    //     }
-    //     let variable = gui.getDefinedName(name);
-    //     if (variable.length === 1){
-    //         variable = variable[0];
-    //     }
-    //     done(variable);
-    // });
-
-
   }
 
   // internals
   /**
    * Test if the val is in range
-   * @param range e.g. 1:10
-   * @param val e.g. 3
+   * @param {string} range e.g. 1:10
+   * @param {number} val e.g. 3
    */
   isInRange = (range, val) => {
-    const test = range.match(/([0-9]+):([0-9]+)/);
-    return parseInt(test[1]) <= parseInt(val) && parseInt(val) <= parseInt(test[2]);
+    const index =  range.indexOf(':');
+    const num1 = Number(range.slice(0, index));
+    const num2 = Number(range.slice(index + 1));
+    return num1 <= val && val <= num2;
   };
 
   // re-evaluate formula
