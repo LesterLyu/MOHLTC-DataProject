@@ -4,8 +4,9 @@ import Parser from './formulaParser';
 import CalculationChain from './calculation-chain';
 import ac from 'xlsx-populate/lib/addressConverter';
 import RichTexts from "xlsx-populate/lib/RichTexts";
-
-export {Parser, CalculationChain, colCache};
+import {Parser as FormulaParser} from 'hot-formula-parser/dist/formula-parser';
+// import {Parser as FormulaParser} from 'hot-formula-parser/src';
+export {Parser, CalculationChain, colCache, FormulaParser};
 
 export let excelInstance;
 

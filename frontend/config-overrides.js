@@ -1,8 +1,15 @@
 const WorkerPlugin = require('worker-plugin');
 
-module.exports = function override(config, env) {
-  config.plugins.push(
-    new WorkerPlugin()
-  );
-  return config;
-}
+module.exports = {
+  webpack: function (config, env) {
+    config.plugins.push(
+      new WorkerPlugin()
+    );
+    return config;
+  },
+  jest: function (config) {
+    config.verbose = true;
+    return config;
+  },
+};
+

@@ -9,7 +9,7 @@ import RichTexts from 'xlsx-populate/lib/RichTexts';
 
 const SPAN_TEMPLATE = document.createElement('span');
 SPAN_TEMPLATE.style.pointerEvents = 'none';
-let excelInstance, global;
+let excelInstance;
 
 const supported = {
   horizontalAlignment: ['left', 'right', 'center', 'justify'],
@@ -21,7 +21,7 @@ const borderStyle2Width = {thin: 1, medium: 2, thick: 3};
 export default class Renderer {
   constructor(instance) {
     excelInstance = instance;
-    global = instance.state.global;
+    this.global = instance.state.global;
     this.changes = {}; // sheetId -> row -> col -> boolean
   }
 
@@ -422,6 +422,7 @@ export default class Renderer {
    * @param cellProperties
    */
   cellRenderer(instance, td, row, col, prop, value, cellProperties) {
+    const global = excelInstance.global;
     // Handsontable.renderers.TextRenderer.apply(this, arguments);
     const sheet = global.workbookData.sheets[global.currentSheetIdx];
     if (sheet && sheet.views) {

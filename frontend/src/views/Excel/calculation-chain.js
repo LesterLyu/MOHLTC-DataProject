@@ -1,4 +1,4 @@
-import {Parser as FormulaParser} from 'hot-formula-parser/src';
+import {FormulaParser} from './helpers';
 import {colCache} from './helpers'
 
 let excelInstance;
