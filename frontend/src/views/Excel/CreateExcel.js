@@ -298,7 +298,11 @@ class Excel extends Component {
   renderCell(row, col) {
     const renderer = this.renderer.cellRendererNG;
     const cellProperties = this.hotInstance.getCellMeta(row, col);
-    const cellElement = this.hotInstance.getCell(row, col);
+    let cellElement;
+    // in test mode, handsontable is unable to get views.
+    try {
+      cellElement = this.hotInstance.getCell(row, col);
+    } catch (e) {}
     // this cell is not rendered into the dom.
     if (!cellElement) return;
 

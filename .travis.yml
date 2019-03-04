@@ -15,4 +15,4 @@ script:
   - npm test
   - cd ./frontend && npm test
   - export CI=false
-  - cd ../ && npm run prod
+#  - cd ../ && npm run prod

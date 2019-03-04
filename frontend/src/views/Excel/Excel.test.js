@@ -1,6 +1,6 @@
 import React from 'react';
 import Excel from './CreateExcel';
-import {mount, shallow} from "enzyme/build";
+import {mount, shallow, render} from "enzyme/build";
 import sinon from 'sinon';
 import {
   FormatBold, FormatColorFill, SaveAlt, CloudUploadOutlined, WrapText,
@@ -22,9 +22,11 @@ describe('<Excel />', () => {
   let wrapper, excel, toolbar;
 
   beforeAll(async () => {
-    wrapper = mount(shallow(<Excel/>).get(0));
+    wrapper = mount(<Excel/>).childAt(0);
+    console.log(wrapper.name());
 
     excel = wrapper.instance();
+    console.log(excel)
     // wait for async functions
     await excel.workbookManager.createWorkbookLocal();
     console.log(wrapper.children())
@@ -34,12 +36,10 @@ describe('<Excel />', () => {
     expect(excel.workbook).not.toBe(undefined);
   });
 
-  it('set cell A1 bold', () => {
-    excel.hotInstance.selectCell(0, 0);
-
-    // console.log(wrapper.children())
-    // boldButton.simulate('click');
-
+  it('basic formula cell reference', () => {
+    excel.setData(0, 0, 0, '=123', 'edit');
+    excel.setData(0, 0, 1, '=A1', 'edit');
+    expect(excel.sheet.cell('B1').value()).toBe(123);
   });
 
 
