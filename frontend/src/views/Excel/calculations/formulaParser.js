@@ -40,7 +40,8 @@ class Parser {
   // internals
   _init = () => {
     const {excelInstance} = this;
-    const {sheetNames, getDefinedName} = excelInstance.global;
+    const {sheetNames} = excelInstance.global;
+    const {getDefinedName} = excelInstance;
 
     this.parser.on('callCellValue', (cellCoord, done) => {
       // console.log('get ' + cellCoord.label);
@@ -123,10 +124,10 @@ class Parser {
       if (variable === undefined) {
         done();
       }
-      if (variable.length === 1) {
+      else if (variable.length === 1) {
         variable = variable[0];
       }
-      done(variable);
+      done();
     });
 
     this.parser.setFunction('COLUMN', (params) => {

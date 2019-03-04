@@ -60,6 +60,26 @@ describe('<Excel />', () => {
     expect(excel.sheet.cell('B1').value()).toBe(321);
   });
 
+  describe('formula error', () => {
+    it('divide by 0', () => {
+      excel.setData(0, 0, 0, '=1/0', 'edit');
+      expect(excel.sheet.cell('A1').value() instanceof XlsxPopulate.FormulaError).toBe(true);
+      expect(excel.sheet.cell('A1').value().error()).toBe(XlsxPopulate.FormulaError.DIV0.error());
+    });
+
+    it('unknown variable', () => {
+      excel.setData(0, 0, 0, '=ABCD', 'edit');
+      expect(excel.sheet.cell('A1').value() instanceof XlsxPopulate.FormulaError).toBe(true);
+      expect(excel.sheet.cell('A1').value().error()).toBe(XlsxPopulate.FormulaError.NAME.error());
+    });
+
+    it('unknown function', () => {
+      excel.setData(0, 0, 0, '=ABCD()', 'edit');
+      expect(excel.sheet.cell('A1').value() instanceof XlsxPopulate.FormulaError).toBe(true);
+      expect(excel.sheet.cell('A1').value().error()).toBe(XlsxPopulate.FormulaError.NAME.error());
+    });
+  });
+
   describe('open workbook', () => {
     let workbook;
     beforeAll((done) => {
