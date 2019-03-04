@@ -14,7 +14,6 @@ let instance = null;
 
 class WorkbookManager {
 
-
   constructor(props) {
     if (!instance) {
       instance = this;
@@ -139,7 +138,10 @@ class WorkbookManager {
   }
 
   delete(what, ids) {
-    return axios.delete(config.server + '/api/' + what + 's/delete', {data: {ids: ids}, withCredentials: axiosConfig.withCredentials})
+    return axios.delete(config.server + '/api/' + what + 's/delete', {
+      data: {ids: ids},
+      withCredentials: axiosConfig.withCredentials
+    })
       .then(response => {
         if (this.check(response)) {
           return response.data;
@@ -159,38 +161,40 @@ class WorkbookManager {
     input.onchange = e => {
       const file = e.target.files[0];
       XlsxPopulate.fromDataAsync(file)
-        .then(workbook => {
-          const sheets = [], sheetNames = [];
-
-          // read sheet names first for building calculation chain
-          workbook.sheets().forEach(sheet => {
-            sheetNames.push(sheet.name());
-          });
-          excelInstance.global.sheetNames = sheetNames;
-          excelInstance.currentSheetName = sheetNames[0];
-          excelInstance.parser = new Parser(excelInstance);
-          excelInstance.calculationChain = new CalculationChain(excelInstance);
-
-          // load into {WorkbookStore}
-          workbook.sheets().forEach(sheet => {
-            const {data, styles, rowHeights, colWidths, mergeCells} = readSheet(sheet);
-            sheets.push({
-              tabColor: sheet.tabColor(),
-              data,
-              styles,
-              name: sheet.name(),
-              state: 'visible',
-              views: [],
-              mergeCells,
-              rowHeights,
-              colWidths,
-            })
-          });
-          cb(sheets, sheetNames, workbook)
-        });
+        .then(workbook => this._readWorkbook(workbook, cb));
     };
 
     input.click();
+  }
+
+  _readWorkbook(workbook, cb) {
+    const sheets = [], sheetNames = [];
+
+    // read sheet names first for building calculation chain
+    workbook.sheets().forEach(sheet => {
+      sheetNames.push(sheet.name());
+    });
+    excelInstance.global.sheetNames = sheetNames;
+    excelInstance.currentSheetName = sheetNames[0];
+    excelInstance.parser = new Parser(excelInstance);
+    excelInstance.calculationChain = new CalculationChain(excelInstance);
+
+    // load into {WorkbookStore}
+    workbook.sheets().forEach(sheet => {
+      const {data, styles, rowHeights, colWidths, mergeCells} = readSheet(sheet);
+      sheets.push({
+        tabColor: sheet.tabColor(),
+        data,
+        styles,
+        name: sheet.name(),
+        state: 'visible',
+        views: [],
+        mergeCells,
+        rowHeights,
+        colWidths,
+      })
+    });
+    cb(sheets, sheetNames, workbook)
   }
 
   downloadWorkbook(workbook) {

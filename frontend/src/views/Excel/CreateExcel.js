@@ -164,7 +164,7 @@ class Excel extends Component {
    * @param {number | null | undefined} sheetNo - null or undefined if uses current sheet number
    * @param {number} row
    * @param {number} col
-   * @param {string} rawValue - can be any excel data type
+   * @param {string|number} rawValue - can be any excel data type
    * @param {'internal'| 'edit'} source - 'internal' means internal update, i.e. formula updates
    *                                      'edit' means edit by the user
    */
@@ -179,7 +179,7 @@ class Excel extends Component {
       return;
     }
     // check if it is formula now
-    if (rawValue !== undefined && rawValue.length > 0 && rawValue.charAt(0) === '=') {
+    if (typeof rawValue === 'string' && rawValue.charAt(0) === '=') {
       const res = this.parser.parseNewFormula(rawValue);
       console.log(res);
       cell.formula(res.formula)
