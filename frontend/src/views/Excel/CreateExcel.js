@@ -7,7 +7,8 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 
-import {init, generateTableData, generateTableStyle, createArray, colCache, getCellType} from './helpers';
+import {init, generateTableData, generateTableStyle, createArray, colCache, getCellType,
+  saveFormulaResultToCell} from './helpers';
 import Parser from './calculations/formulaParser'
 import CalculationChain from './calculations/chain'
 import Renderer from './renderer';
@@ -182,8 +183,7 @@ class Excel extends Component {
     if (typeof rawValue === 'string' && rawValue.charAt(0) === '=') {
       const res = this.parser.parseNewFormula(rawValue);
       console.log(res);
-      cell.formula(res.formula)
-        ._value = res.result;
+      saveFormulaResultToCell(cell, res);
     } else {
       cell.value(rawValue);
     }

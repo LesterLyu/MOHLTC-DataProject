@@ -5,8 +5,11 @@ import CalculationChain from './calculation-chain';
 import ac from 'xlsx-populate/lib/addressConverter';
 import RichTexts from "xlsx-populate/lib/RichTexts";
 import {Parser as FormulaParser} from 'hot-formula-parser/dist/formula-parser';
+import XlsxPopulate from "xlsx-populate";
+
+const FormulaError = XlsxPopulate.FormulaError;
 // import {Parser as FormulaParser} from 'hot-formula-parser/src';
-export {Parser, CalculationChain, colCache, FormulaParser};
+export {Parser, CalculationChain, colCache, FormulaParser, FormulaError, XlsxPopulate};
 
 export let excelInstance;
 
@@ -450,4 +453,13 @@ export function getSharedFormula(cell, refCell) {
     });
 
   return formula;
+}
+
+export function saveFormulaResultToCell(cell, fomulaResult) {
+  if (fomulaResult.result.error) {
+    cell.formula(fomulaResult.formula)._value = new FormulaError(fomulaResult.result.error);
+  }
+  else {
+    cell.formula(fomulaResult.formula)._value = fomulaResult.result;
+  }
 }

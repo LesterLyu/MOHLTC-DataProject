@@ -46,7 +46,7 @@ class FormulaBar extends Component {
 
   handleChange = what => (event) => {
     this.setState({[what]: event.target.value});
-    if (this.td.firstChild) {
+    if (this.td.firstElementChild) {
       this.td.firstElementChild.innerHTML = event.target.value;
     }
   };

@@ -1,11 +1,10 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import Handsontable from 'handsontable';
-import {argbToRgb, colorToRgb} from './helpers';
+import {argbToRgb, colorToRgb, FormulaError} from './helpers';
 import colCache from './col-cache';
 import SSF from 'ssf'
 import RichTexts from 'xlsx-populate/lib/RichTexts';
-
 
 const SPAN_TEMPLATE = document.createElement('span');
 SPAN_TEMPLATE.style.pointerEvents = 'none';
@@ -102,6 +101,13 @@ export default class Renderer {
     colWidth = colWidth === undefined ? 80 : colWidth / 0.11;
 
     if (rowHeight === 0 || colWidth === 0 || cell.row().hidden() || cell.column().hidden()) {
+      return;
+    }
+
+    // if the cell contains formula errors
+    if (value instanceof FormulaError) {
+      const span = SPAN_TEMPLATE.cloneNode(false);
+      Handsontable.dom.fastInnerHTML(td, value.error());
       return;
     }
 
