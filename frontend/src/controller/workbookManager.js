@@ -167,6 +167,7 @@ class WorkbookManager {
             sheetNames.push(sheet.name());
           });
           excelInstance.global.sheetNames = sheetNames;
+          excelInstance.currentSheetName = sheetNames[0];
           excelInstance.parser = new Parser(excelInstance);
           excelInstance.calculationChain = new CalculationChain(excelInstance);
 
