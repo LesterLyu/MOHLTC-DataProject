@@ -1,0 +1,99 @@
+<%- include('../common/dashboardHeader', {title: 'System Info'}); -%>
+<div class="container-fluid">
+
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="#">System</a>
+        </li>
+        <li class="breadcrumb-item active">Overview</li>
+    </ol>
+
+
+    <div class="row align-items-center">
+        <div class="col-sm-12 col-md-12 col-lg-6 col-lg-4" >
+            <div class="card">
+                <div class="card-body">
+                    <h4>Time</h4>
+                    <div id="time">
+                        <h5> <i class="fas fa-spinner fa-spin"></i> Loading...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Computer</h4>
+                    <div id="computer-info">
+                        <h5> <i class="fas fa-spinner fa-spin"></i> Loading...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4>OS</h4>
+                    <div id="os-info">
+                        <h5> <i class="fas fa-spinner fa-spin"></i> Loading...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4>CPU</h4>
+                    <div id="cpu-info">
+                        <h5> <i class="fas fa-spinner fa-spin"></i> Loading...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4>GPU</h4>
+                    <div id="gpu-info">
+                        <h5> <i class="fas fa-spinner fa-spin"></i> Loading...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Memory</h4>
+                    <div id="mem">
+                        <h5> <i class="fas fa-spinner fa-spin"></i> Loading...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4>File Systems</h4>
+                    <div id="fsSize">
+                        <h5> <i class="fas fa-spinner fa-spin"></i> Loading...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6 col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h4>Current Loads</h4>
+                    <div id="currentLoad">
+                        <h5> <i class="fas fa-spinner fa-spin"></i> Loading...</h5>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<%- include('../common/dashboardFooter', {js: ['/dist/systemInfo.js']}); -%>

@@ -1,0 +1,98 @@
+<%- include('../common/dashboardHeader'); -%>
+
+<div class="container-fluid">
+
+    <input class="hide" id="mode" value="<%=mode%>">
+    <input class="hide" id="workbookOldName" value="<%=workbook%>">
+
+    <!-- Breadcrumbs-->
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/manage-workbook-templates">Create/Edit Workbooks</a>
+        </li>
+        <li class="breadcrumb-item active"><%=workbook%></li>
+    </ol>
+
+    <!--<form id="create-workbook-form">-->
+        <!--<div class="form-group col-sm-10 col-md-6 col-lg-4 px-0">-->
+            <!--<label for="workbookNameInput">Workbook Name:</label>-->
+            <!--<input type="text" class="form-control" id="workbookNameInput" name="workbookName" placeholder="" value="<%=workbook%>">-->
+            <!--<small class="form-text text-muted">A workbook may contain multiple sheets.</small>-->
+        <!--</div>-->
+
+    <!--</form>-->
+
+    <%- include('../excel-web/excel-web'); -%>
+
+
+    <!--<hr>-->
+    <!--<div class="container-fluid d-none d-md-block">-->
+        <!--<h5>Instruction: </h5>-->
+        <!--<p> Right click to view the menu. Select row/column and drag to move row/column.</p>-->
+    <!--</div>-->
+</div>
+
+<!--For add/edit sheet-->
+<div id="add-modal" tabindex="-1" class="modal fade" role="dialog" aria-labelledby="msg-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="add-modal-title" class="modal-title">Add Sheet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-form-label col-sm-3" for="sheetNameInput">Sheet Name:</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="sheetNameInput" name="sheetName"
+                               placeholder="">
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-3" for="select-categories">Attributes:</label>
+                    <select class="selectpicker col-sm-9" multiple data-live-search="true"
+                            data-style="btn-outline-primary" data-actions-box="true"
+                            data-header="Select attributes" id="select-attributes">
+                    </select>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-3" for="select-categories">Categories:</label>
+                    <select class="selectpicker col-sm-9" multiple data-live-search="true"
+                            data-style="btn-outline-primary" data-actions-box="true"
+                            data-header="Select categories" id="select-categories">
+                    </select>
+                </div>
+                <button type="button" id="preview-btn" class="btn-save btn btn-primary">Preview Sheet</button>
+                <hr>
+                <div id="preview-grid"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn default" data-dismiss="modal">Close</button>
+                <button type="button" id="add-confirm-btn" class="btn-save btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--Message Modal-->
+<%- include('../common/messageModal'); -%>
+
+<link href="/node_modules/handsontable/dist/handsontable.full.min.css" rel="stylesheet" media="screen">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+<link rel="stylesheet"
+      href="/moh.css/custom2.css">
+
+<%- include('../common/dashboardFooter', {js: [
+    '/node_modules/handsontable/dist/handsontable.full.js',
+    '/node_modules/ssf/ssf.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js',
+    '/node_modules/hot-formula-parser/dist/formula-parser.js',
+    '/dist/excel-web.js',
+    '/node_modules/pako/dist/pako.min.js',
+    '/dist/createWorkbook.js',
+]}); -%>
