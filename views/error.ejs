@@ -1,15 +1,3 @@
-<%- include('./common/header', {title: 'Error'}); -%>
-<br>
-<div class="container">
-    <h1><%= message %></h1>
-    <h2><%= error.status %></h2>
-    <pre><%= error.stack %></pre>
-    <button class="btn btn-default" onclick="goBack()">Go Back</button>
-
-</div>
-<script>
-    function goBack() {
-        window.history.back();
-    }
-</script>
-<%- include('./common/footer'); -%>
+<h1><%= message %></h1>
+<h2><%= error.status %></h2>
+<pre><%= error.stack %></pre>

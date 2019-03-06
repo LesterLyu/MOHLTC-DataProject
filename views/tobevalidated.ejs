@@ -1,26 +1,40 @@
-<%- include('./common/header', {title: 'Log In'}); -%>
+<!doctype html>
+<html>
+<head>
+    <title>Waiting for Validation...</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css">
+    <!-- load bootstrap css -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <!-- load fontawesome -->
+    <style>
+        body {
+            padding-top: 80px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
 
+    <div class="jumbotron text-center">
+        <h1><span class="fa fa-cloud"></span> Validate your account!</h1>
+        <h2> Validate your account! </h2>
 
-<div class="container-fluid jumbotron text-center">
-    <h1><span class="fa fa-cloud"></span> Validate your account!</h1>
+        <p>We have sent a link to your contact email with your validation token. Please click (or have your contact
+            click) the link within the next ten minutes. </p>
 
-    <p>We have sent a link to your contact email with your validation token. Please click (or have your contact
-        click) the link within the next ten minutes. </p>
+        <!-- OLD VALIDATION
+        <form action="/validate" method="post">
+            <div class="form-group">
+                <input type="text" class="form-control" name="userToken">
+            </div>
 
-    <div class="container align-items-center text-center" id="save-row">
-        <div class="col-auto p-1">
-            <button id="resend" class="btn btn-primary"> Resend Email </button>
-        </div>
-        <div class="col-auto">
-            <div id="status"></div>
-        </div>
+            <button type="submit" class="btn btn-warning btn-lg">Validate</button>
+        </form>
+
+        <a href="/validate" class="btn btn-default"><span class="fa fa-user"></span> Send email again (this button doesn't work)</a>
+        -->
     </div>
 
 </div>
-
-<script
-        src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-<script src="/dist/toBeValidated.js"></script>
-<%- include('./common/footer'); -%>
+</body>
+</html>

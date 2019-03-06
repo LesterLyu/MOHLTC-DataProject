@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>HTML5 Editable Table</title>
+    <link rel='stylesheet prefetch'
+          href='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css'>
+    <link rel='stylesheet prefetch' href='https://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css'>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <!-- load fontawesome -->
+    <style>
+        body {
+            background-color: #DCDCDC
+        }
+
+        .container {
+            text-align: center;
+            background-color: #FFFFF0;
+            padding-bottom: 2.5%;
+        }
+
+        h1 {
+            margin-bottom: 2.5%;
+        }
+
+        input {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+<a href="/profile" class="btn btn-default"
+   style="font-size: calc(9px + (16-9) * (100vw - 400px)/ (1600-450)); margin-left:19.5%; margin-top: 2%; margin-bottom:1%;"><span
+            class="fa fa-reply "></span> &nbsp; Profile </a>
+<div class="container" style="margin-top: 0.25%;">
+    <h1> Create new Categories/Attributes </h1>
+    <br>
+    <% if (attriMessage != "") { %>
+        <div class="alert alert-danger"><%= attriMessage %></div>
+    <% } %>
+    <% if (catMessage != "") { %>
+        <div class="alert alert-danger"><%= catMessage %></div>
+    <% } %>
+    <% if (successMessage != "") { %>
+        <div class="alert alert-danger"><%= successMessage %></div>
+    <% } %>
+    <form method="post" action="/submitCategory">
+        <label for "newCategory"> New category name here: </label>
+        <input name="newCategory" type="text">
+        <input type="submit" class="btn btn-warning">
+    </form>
+    <br>
+    <form method="post" action="/submitAttribute">
+        <label for "newAttribute"> New attribute name here: </label>
+        <input name="newAttribute" type="text">
+        <input type="submit" class="btn btn-warning">
+    </form>
+</div>
+</body>
