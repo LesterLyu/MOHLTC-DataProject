@@ -23,7 +23,7 @@
     
   - [xlsx-populate](https://github.com/LesterLyu/xlsx-populate) (Excel library used in this project)
     > priority in this order
-    - [ ] Fix bug: when sheetName is a number, sheet.name() will return a number instead of string, this will break getting definedName
+    - [ ] Fix bug: when sheetName is a number, sheet.name() will return a number instead of string, this will break workbook.sheet('string') and getting definedName
     - [ ] Fix bug: hyperlink
     - [ ] Fix bug: issue-157 and add test case
     - [ ] Add worksheet protection support
