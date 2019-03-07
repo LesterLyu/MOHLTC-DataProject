@@ -53,9 +53,5 @@ let categorySchema = new mongoose.Schema({
 });
 ```
 - workbook: Represents a form with a title and a group number that tells us what group of users can fill the form
-```javascript
 
-```
 - filledWorkbook
-```javascript
-
