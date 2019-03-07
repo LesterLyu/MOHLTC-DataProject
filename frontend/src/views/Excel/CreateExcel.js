@@ -145,9 +145,10 @@ class Excel extends Component {
     this.hooks.push({name, f});
   };
 
-  getDefinedName(definedName) {
-
-  }
+  getDefinedName = (definedName) => {
+    const ref = this.workbook.definedName(definedName);
+    return ref.value();
+  };
 
   getDataAtSheetAndCell(row, col, sheetNo, sheetName) {
     sheetNo = sheetNo === null ? this.global.sheetNames.indexOf(sheetName) : sheetNo;
