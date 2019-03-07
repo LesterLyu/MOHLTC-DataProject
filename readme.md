@@ -18,7 +18,7 @@ The logic of this application is mainly done in Javascript. Tools used:
   - User authentication: Passport
   - Database Driver: Mongoose
   - Templating engine: EJS
-- Front-end Styling: *Bootstrap 4*
+- Front-end Styling: *~Bootstrap 4~* *React.js*
 - Database: MongoDB
 
 ## Overview of tables
@@ -53,43 +53,5 @@ let categorySchema = new mongoose.Schema({
 });
 ```
 - workbook: Represents a form with a title and a group number that tells us what group of users can fill the form
-```javascript
-let workbookSchema = new mongoose.Schema({
-    name: {type: String, required: true},
-    groupNumber: {type: Number, required: true}, // group number represents different organizations, each organization does not share any data with others
-    /**
-     * { sheet1: [[.., .., ..],  // row 1
-     *            [.., .., ..],  // row 2
-     *            ...
-     *            [.., .., ..]]   // row n
-     * ], sheet2: [[]]}
-     */
-    data: {}, // empty workbook can have data populated
-});
-```
+
 - filledWorkbook
-```javascript
-let fillerWorkbookSchema = new mongoose.Schema({
-    name: String,
-    username: String,  // who filled this workbook
-    date: {type: Date, default: Date.now}, // filled date
-    groupNumber: {type: Number, required: true}, // group number represents different organizations, each organization does not share any data with others
-     /** same structure as **Workbook**
-     * { sheet1: [[.., .., ..],  // row 1
-     *            [.., .., ..],  // row 2
-     *            ...
-     *            [.., .., ..]]   // row n
-     * ], sheet2: [[]]}
-     */
-    data: {},
-});
-```
-
-# Current stage of development
-### Completed features:
-- Signup with email verification
-- Signin
-- Create workbook with many sheets
-- Export workbook to excel
-- Import excel files to workbook
-
