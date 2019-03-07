@@ -84,8 +84,7 @@ class ExcelToolBar extends Component {
       this.excel.global.sheetNames = sheetNames;
       this.excel.global.sheets = sheets;
       this.excel.workbook = workbook;
-      this.excel.currentSheetIdx = 1;
-      this.excel.currentSheetIdx = 0;
+      this.excel.forceUpdate();
     })
   };
 

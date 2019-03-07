@@ -7,8 +7,10 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 
-import {init, generateTableData, generateTableStyle, createArray, colCache, getCellType,
-  saveFormulaResultToCell} from './helpers';
+import {
+  init, generateTableData, generateTableStyle, createArray, colCache, getCellType,
+  saveFormulaResultToCell
+} from './helpers';
 import Parser from './calculations/formulaParser'
 import CalculationChain from './calculations/chain'
 import Renderer from './renderer';
@@ -302,7 +304,8 @@ class Excel extends Component {
     // in test mode, handsontable is unable to get views.
     try {
       cellElement = this.hotInstance.getCell(row, col);
-    } catch (e) {}
+    } catch (e) {
+    }
     // this cell is not rendered into the dom.
     if (!cellElement) return;
 
@@ -338,6 +341,14 @@ class Excel extends Component {
           this.hotInstance.addHook(hook.name, hook.f);
       });
     }
+  }
+
+  shouldComponentUpdate(nextProps, nextState, nextContext) {
+    return this.state.sheetWidth !== nextState.sheetWidth
+      || this.state.sheetHeight !== nextState.sheetHeight
+      || this.state.loadingMessage !== nextState.loadingMessage
+      || this.state.loaded !== nextState.loaded
+      || this.state.currentSheetIdx !== nextState.currentSheetIdx
   }
 
   render() {
