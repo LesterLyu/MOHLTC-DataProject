@@ -139,12 +139,12 @@ export default class Renderer {
     // rich text
     if (value instanceof RichTexts) {
       const mainSpan = document.createElement('span');
-      for (let i = 0; i < value.length(); i++) {
+      for (let i = 0; i < value.length; i++) {
         const rt = value.get(i);
         const span = document.createElement('span');
         Handsontable.dom.fastInnerText(span, rt.value() !== undefined ? rt.value() : '');
 
-        setFontStyle(span, Object.assign({}, fontStyle, {
+        const rtStyle = {
           bold: rt.style('bold'),
           italic: rt.style('italic'),
           underline: rt.style('underline'),
@@ -152,8 +152,13 @@ export default class Renderer {
           name: rt.style('fontFamily'),
           color: colorToRgb(rt.style('fontColor')),
           strikethrough: rt.style('strikethrough'),
-        }));
+        };
+        // remove undefined field
+        Object.keys(rtStyle).forEach(key => rtStyle[key] === undefined && delete rtStyle[key]);
+
+        setFontStyle(span, Object.assign({}, fontStyle, rtStyle));
         mainSpan.appendChild(span);
+        td.style.lineHeight = rowHeight + 'px';
       }
       // removeFontStyle(td);
       result = mainSpan.innerHTML;
