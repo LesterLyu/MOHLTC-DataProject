@@ -76,13 +76,17 @@ class ExcelBottomBar extends Component {
     console.log('..')
     this.state = {sheetToggleMenu: null};
     this.history = {
+      sheetNames: props.context.global.sheetNames,
       currentSheetIdx: props.context.currentSheetIdx,
     }
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
+    const {currentSheetIdx, sheetNames} = this.history;
     return this.state !== nextState
-      || this.history.currentSheetIdx !== nextProps.context.currentSheetIdx;
+      || currentSheetIdx !== nextProps.context.currentSheetIdx
+      || sheetNames.length !== nextProps.context.global.sheetNames.length
+      || sheetNames[currentSheetIdx] !== nextProps.context.global.sheetNames[currentSheetIdx];
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
