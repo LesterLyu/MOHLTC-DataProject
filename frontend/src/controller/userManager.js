@@ -84,9 +84,18 @@ class UserManager {
 
   }
 
+  getAllPermissions() {
+    return axios.get(config.server + '/api/permissions', {withCredentials: true})
+      .then((response => {
+        return response.data.permissions;
+      }))
+  }
+
   getAllUsers() {
-
-
+    return axios.get(config.server + '/api/user/details', {withCredentials: true})
+      .then((response => {
+        return response.data.users;
+      }))
   }
 
   getAllUsersWithCache() {
