@@ -35,9 +35,13 @@ const Colors = React.lazy(() => import('./views/Theme/Colors'));
 const Typography = React.lazy(() => import('./views/Theme/Typography'));
 const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 
+const userRequest = React.lazy(() => import("./views/Users/RegistrationRequests"));
+const addOrganization = React.lazy(() => import("./views/Users/AddOrganization"));
+
 const Users = React.lazy(() => import('./views/Users/Users'));
 const User = React.lazy(() => import('./views/Users/User'));
 const Workbooks = React.lazy(() => import('./views/Workbooks/Workbooks'));
+
 
 const AttCat = React.lazy(() => import('./views/AttCat/AttCat'));
 
@@ -86,6 +90,9 @@ const routes = [
   {path: '/widgets', name: 'Widgets', component: Widgets},
   {path: '/charts', name: 'Charts', component: Charts},
 
+
+  {path: "/registrationRequest", exact:true, name:"Registration Request", component:userRequest},
+  {path: "/addOrganization", exact:true, name:"Add Organization", component:addOrganization},
 
   {path: '/users', exact: true, name: 'Users', component: Users},
   {path: '/users/:id', exact: true, name: 'User Details', component: User},

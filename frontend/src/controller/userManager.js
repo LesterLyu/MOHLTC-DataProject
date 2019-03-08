@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
+const log = console.log;
 
 /**
  * Singleton Pattern
@@ -79,13 +80,21 @@ class UserManager {
    * @param permissions {Array} permissions to be assigned
    * @return {Promise}
    */
+
+  getAllPermission(){
+
+  }
+
   updatePermission(uid, permissions) {
 
 
   }
 
   getAllUsers() {
-
+    return axios.get(config.server + '/api/user/details', {withCredentials: true})
+      .then((res) => {
+        return res.data.users;
+      })
 
   }
 

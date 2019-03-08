@@ -81,12 +81,12 @@ export default {
         },
         {
           name: 'Registration Requests',
-          url: '/3ghfgh',
+          url: '/registrationRequest',
           icon: 'icon-puzzle',
         },
         {
           name: 'Add Organization',
-          url: '/ghfgh4',
+          url: '/addOrganization',
           icon: 'icon-puzzle',
         },
       ]
