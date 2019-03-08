@@ -17,6 +17,7 @@ import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
+import RichTexts from "xlsx-populate/lib/RichTexts";
 
 export function ToolBarDivider() {
   return <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>;
@@ -52,6 +53,22 @@ class ExcelToolBar extends Component {
     for (let i = 0; i < fontSizeOptions.length; i++) {
       this.fontSizeOptions.push({value: fontSizeOptions[i], label: fontSizeOptions[i] + ''});
     }
+
+    this.excel.addHook('afterSelection', (row, col, row2, col2) => {
+      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row + 1, col + 1);
+      const style = {
+        fill: cell.style('fill'),
+        fontColor: cell.style('fontColor'),
+        fontSize: cell.style('fontSize'),
+        fontFamily: cell.style('fontFamily')
+      };
+      this.setState({
+        selectedFillColor: style.fill ? style.fill : '#000',
+        selectedTextColor: style.fontColor ? style.fontColor : '#fff',
+        selectedFontSize: style.fontSize ? style.fontSize : 11,
+        selectedFontFamily: style.fontFamily ? style.fontFamily: 'Calibri' ,
+      })
+    });
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
@@ -101,7 +118,7 @@ class ExcelToolBar extends Component {
       const range = ranges[i];
       // render one extra row if exists
       if (range[0] > 0) {
-        let col = range[1] > 0 ? range[1] - 1: range[1];
+        let col = range[1] > 0 ? range[1] - 1 : range[1];
         for (col; col <= range[3]; col++) {
           excel.renderer.cellNeedUpdate(excel.currentSheetIdx, range[0] - 1, col);
         }

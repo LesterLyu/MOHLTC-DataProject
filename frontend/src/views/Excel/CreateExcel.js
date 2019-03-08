@@ -340,8 +340,8 @@ class Excel extends Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.state.loaded && this.sheetRef) {
       this.hooks.forEach(hook => {
-        if (!this.hotInstance.hasHook(hook.name))
-          this.hotInstance.addHook(hook.name, hook.f);
+        // HandsonTable: adding the same hook twice is now silently ignored, no need to check if hook is added.
+        this.hotInstance.addHook(hook.name, hook.f);
       });
     }
   }
