@@ -147,7 +147,9 @@ class Excel extends Component {
 
   getDefinedName = (definedName) => {
     const ref = this.workbook.definedName(definedName);
-    return ref.value();
+    if (ref) {
+      return ref.value();
+    }
   };
 
   getDataAtSheetAndCell(row, col, sheetNo, sheetName) {
