@@ -19,12 +19,12 @@ export default {
     {
       name: 'My Profile',
       url: '/1',
-      icon: 'icon-pencil',
+      icon: 'mdi mdi-account-card-details-outline',
     },
     {
       name: 'Fill Workbook',
       url: '/workbooks/fill',
-      icon: 'icon-pencil',
+      icon: 'mdi mdi-pen',
       badge: {
         variant: 'info',
         text: '✓',
@@ -37,12 +37,12 @@ export default {
     },
     {
       name: 'Workbooks',
-      icon: 'icon-pencil',
+      icon: 'mdi mdi-checkbook',
       children: [
         {
           name: 'All Workbooks',
           url: '/workbooks/template',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-book-multiple',
           badge: {
             variant: 'info',
             text: '✓',
@@ -51,64 +51,64 @@ export default {
         {
           name: 'Create Workbook',
           url: '/workbooks/create',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-folder-plus-outline',
         },
         {
           name: 'Attributes',
           url: '/workbooks/attributes',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-checkbook',
         },
         {
           name: 'Categories',
           url: '/workbooks/categories',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-checkbook',
         },
         {
           name: 'Query',
           url: '/5fghfgh',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-jquery',
         },
       ]
     },
     {
       name: 'Users',
-      icon: 'icon-pencil',
+      icon: 'mdi mdi-account',
       children: [
         {
           name: 'All Users',
           url: '/users',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-account-multiple',
         },
         {
           name: 'Registration Requests',
           url: '/registrationRequest',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-account',
         },
         {
           name: 'Add Organization',
           url: '/addOrganization',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-playlist-check',
         },
       ]
     },
     {
       name: 'Server',
-      icon: 'icon-pencil',
+      icon: 'mdi mdi-server',
       children: [
         {
           name: 'Server Info',
           url: '/3rgerg',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-information',
         },
         {
           name: 'Configuration',
           url: '/rergr3',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-account',
         },
         {
           name: 'Last Auto-test Report',
           url: config.server + '/test/mochawesome.html',
-          icon: 'icon-puzzle',
+          icon: 'mdi mdi-alert-octagon',
           attributes: {target: '_blank'}
         },
       ]
