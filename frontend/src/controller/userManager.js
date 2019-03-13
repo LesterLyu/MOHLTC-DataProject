@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
+
 const log = console.log;
 
 /**
@@ -76,26 +77,38 @@ class UserManager {
 
   /**
    * Update permissions to other users. **Only for admin.**
-   * @param uid {String} uid for the user
-   * @param permissions {Array} permissions to be assigned
    * @return {Promise}
+   * @param username
+   * @param permissions
+   * @param active
    */
 
-  getAllPermission(){
-
+  updatePermission(username, permissions, active) {
+    console.log(username, permissions, active);
+    return axios.post(config.server + '/api/user/permission', {
+      permissions: [{
+        username,
+        permissions,
+        active
+      }]
+    }, {
+      withCredentials: true
+    })
   }
 
-  updatePermission(uid, permissions) {
-
-
+  getAllPermissions() {
+    return axios.get(config.server + '/api/permissions', {withCredentials: true})
+      .then((response => {
+        //log(response);
+        return response.data.permissions;
+      }))
   }
 
   getAllUsers() {
     return axios.get(config.server + '/api/user/details', {withCredentials: true})
-      .then((res) => {
-        return res.data.users;
-      })
-
+      .then((response => {
+        return response.data.users;
+      }))
   }
 
   getAllUsersWithCache() {

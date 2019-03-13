@@ -124,10 +124,7 @@ class Parser {
       if (variable === undefined) {
         done();
       }
-      else if (variable.length === 1) {
-        variable = variable[0];
-      }
-      done();
+      done(variable);
     });
 
     this.parser.setFunction('COLUMN', (params) => {
