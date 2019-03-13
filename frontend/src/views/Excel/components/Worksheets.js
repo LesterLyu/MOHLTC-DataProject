@@ -119,7 +119,16 @@ class Worksheets extends Component {
                 })
               }
             },
-
+            setId: {
+              name: 'Set ID',
+              hidden() {
+                return this.selection.isSelectedByColumnHeader() || this.selection.isSelectedByRowHeader()
+                  || this.selection.isMultiple();
+              },
+              callback: () => {
+                excel.setId();
+              }
+            }
           }
 
         },

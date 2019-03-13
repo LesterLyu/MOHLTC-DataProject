@@ -3,7 +3,7 @@ import {AppBar, Grid, InputBase, withStyles} from "@material-ui/core";
 import React from "react";
 import {ToolBarDivider} from './ExcelToolBar';
 import PropTypes from "prop-types";
-import RichTexts from "xlsx-populate/lib/RichTexts";
+import RichText from "xlsx-populate/lib/RichText";
 
 const styles = theme => ({
   input: {
@@ -30,8 +30,8 @@ class FormulaBar extends Component {
       const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row + 1, col + 1);
       let input = typeof cell.formula() === 'string' ? '=' + cell.formula() : cell.value();
       input = input === undefined || input === null ? '' : input;
-      if (input instanceof RichTexts) {
-        input = input.text;
+      if (input instanceof RichText) {
+        input = input.text();
       }
       if (this.state.formulaBarInput !== input) {
         this.setState({formulaBarInput: input});

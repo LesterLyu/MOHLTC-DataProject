@@ -4,7 +4,7 @@ import Handsontable from 'handsontable';
 import {argbToRgb, colorToRgb, FormulaError} from './helpers';
 import colCache from './col-cache';
 import SSF from 'ssf'
-import RichTexts from 'xlsx-populate/lib/RichTexts';
+import RichText from 'xlsx-populate/lib/RichText';
 
 const SPAN_TEMPLATE = document.createElement('span');
 SPAN_TEMPLATE.style.pointerEvents = 'none';
@@ -137,7 +137,7 @@ export default class Renderer {
     let result = calcResult(value, typeof value === 'object' ? undefined : cell.style('numberFormat'));
 
     // rich text
-    if (value instanceof RichTexts) {
+    if (value instanceof RichText) {
       const mainSpan = document.createElement('span');
       for (let i = 0; i < value.length; i++) {
         const rt = value.get(i);
@@ -215,7 +215,7 @@ export default class Renderer {
         }
       }
     }
-    if (!(value instanceof RichTexts)) {
+    if (!(value instanceof RichText)) {
       setFontStyle(td, fontStyle);
     }
 
@@ -433,7 +433,7 @@ export default class Renderer {
    * @param cellProperties
    */
   cellRenderer(instance, td, row, col, prop, value, cellProperties) {
-    const global = excelInstance.global;
+    const global = excelInstance.state.global;
     // Handsontable.renderers.TextRenderer.apply(this, arguments);
     const sheet = global.workbookData.sheets[global.currentSheetIdx];
     if (sheet && sheet.views) {

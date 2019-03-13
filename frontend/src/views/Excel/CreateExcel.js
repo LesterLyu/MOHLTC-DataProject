@@ -280,6 +280,9 @@ class Excel extends Component {
     this.switchSheet(newSheetName);
   };
 
+  setId = () => {
+
+  };
 
   componentDidMount() {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
@@ -355,7 +358,7 @@ class Excel extends Component {
   }
 
   render() {
-    console.log('render create excel')
+    console.log('render create excel');
     if (!this.isLoaded) {
       return (
         <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px)'}}

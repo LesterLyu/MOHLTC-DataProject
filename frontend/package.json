@@ -44,7 +44,7 @@
     "react-material-ui-form-validator": "^2.0.7",
     "react-router-config": "^4.4.0-beta.7",
     "react-router-dom": "^4.3.1",
-    "react-select": "^2.4.1",
+    "react-select": "^2.4.2",
     "react-test-renderer": "^16.8.4",
     "reactstrap": "^6.5.0",
     "simple-line-icons": "^2.4.1",

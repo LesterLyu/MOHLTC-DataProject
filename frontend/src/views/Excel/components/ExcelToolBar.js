@@ -17,7 +17,8 @@ import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
-import RichTexts from "xlsx-populate/lib/RichTexts";
+
+
 
 export function ToolBarDivider() {
   return <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>;
@@ -276,6 +277,7 @@ class ExcelToolBar extends Component {
             {/*<Save fontSize="small"/>*/}
             {/*</Button>*/}
 
+            <ToolBarDivider/>
             <ToolBarDivider/>
 
             <SelectField

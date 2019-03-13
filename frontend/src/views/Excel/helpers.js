@@ -3,7 +3,7 @@ import colCache from './col-cache';
 import Parser from './formulaParser';
 import CalculationChain from './calculation-chain';
 import ac from 'xlsx-populate/lib/addressConverter';
-import RichTexts from "xlsx-populate/lib/RichTexts";
+import RichTexts from "xlsx-populate/lib/RichText";
 import {Parser as FormulaParser} from 'hot-formula-parser/dist/formula-parser';
 import XlsxPopulate from "xlsx-populate";
 

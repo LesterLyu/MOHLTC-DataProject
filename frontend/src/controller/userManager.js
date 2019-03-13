@@ -75,15 +75,13 @@ class UserManager {
 
   /**
    * Update permissions to other users. **Only for admin.**
-   * @param uid {String} uid for the user
    * @param permissions {Array} permissions to be assigned
    * @return {Promise}
    */
-  updatePermission(uid, permissions) {
+  updatePermission(permissions) {
 
 
   }
-
   getAllPermissions() {
     return axios.get(config.server + '/api/permissions', {withCredentials: true})
       .then((response => {
