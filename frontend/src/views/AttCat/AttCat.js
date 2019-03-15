@@ -34,7 +34,7 @@ class AttCat extends Component {
     this.mode = this.props.params.mode; // can be att or cat
     this.workbookManager = new WorkbookManager(props);
     this.state = {
-      loading: true, openDialog: false, newValue: '',
+      loading: true, openSetId: false, newValue: '',
     };
     this.showMessage = this.props.showMessage;
     this.getData();
@@ -55,15 +55,15 @@ class AttCat extends Component {
   };
 
   handleClickOpen = () => {
-    this.setState({openDialog: true});
+    this.setState({openSetId: true});
   };
 
   handleClose = () => {
-    this.setState({openDialog: false});
+    this.setState({openSetId: false});
   };
 
   handelAdd = () => {
-    this.setState({openDialog: false});
+    this.setState({openSetId: false});
     const newValue = document.querySelector('#description').value;
     this.workbookManager.add(this.mode, newValue)
       .then(data => {
@@ -124,7 +124,7 @@ class AttCat extends Component {
    */
   shouldComponentUpdate(nextProps, nextState, nextContent) {
     return !(this.state.loading === nextState.loading
-      && this.state.openDialog === nextState.openDialog
+      && this.state.openSetId === nextState.openSetId
       && this.state.data.length === nextState.data.length);
   }
 
@@ -171,7 +171,7 @@ class AttCat extends Component {
         </Grid>
 
         <Dialog
-          open={this.state.openDialog}
+          open={this.state.openSetId}
           onClose={this.handleClose}
           aria-labelledby="form-dialog-title"
         >

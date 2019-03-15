@@ -21,6 +21,7 @@ import Worksheets from './components/Worksheets'
 import ExcelToolBar from './components/ExcelToolBar';
 import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
+import SetIdDialog from "./components/SetIdDialog";
 // const excelWorker = new Worker('../../controller/excel.worker', { type: 'module' });
 window.colCache = colCache;
 
@@ -76,6 +77,7 @@ class Excel extends Component {
       loadingMessage: 'Loading...',
       loaded: false,
       currentSheetIdx: 0,
+      openSetId: null,
     };
     this.global = {
       sheetNames: ['Sheet1'],
@@ -84,6 +86,7 @@ class Excel extends Component {
       ],
       current: {}
     };
+    this.fileName = null;
     this.workbookManager = new WorkbookManager(props);
     // for calculation
     this.currentSheetName = 'Sheet1';
@@ -281,7 +284,19 @@ class Excel extends Component {
   };
 
   setId = () => {
+    const selected = this.hotInstance.getSelected();
+    const td = this.hotInstance.getCell(selected[0][0], selected[0][1]);
+    console.log('td', td);
+    this.setState({openSetId: td});
+  };
 
+  handleSetId = (att, cat) => {
+    console.log(`Set ID`, att, cat);
+    this.setState({openSetId: null});
+  };
+
+  handleCloseSetId = () => {
+    this.setState({openSetId: null});
   };
 
   componentDidMount() {
@@ -297,6 +312,8 @@ class Excel extends Component {
           loadingMessage: '', loaded: true
         });
       });
+    this.workbookManager.get('att').then(atts => this.attOptions = atts);
+    this.workbookManager.get('cat').then(cats => this.catOptions = cats);
 
     //
     // excelWorker.postMessage(1);
@@ -355,6 +372,7 @@ class Excel extends Component {
       || this.state.loadingMessage !== nextState.loadingMessage
       || this.state.loaded !== nextState.loaded
       || this.state.currentSheetIdx !== nextState.currentSheetIdx
+      || this.state.openSetId !== nextState.openSetId
   }
 
   render() {
@@ -378,6 +396,15 @@ class Excel extends Component {
             <Worksheets context={this}/>
             <ExcelBottomBar context={this}/>
           </Card>
+          <SetIdDialog
+            anchorEl={this.state.openSetId}
+            // selectedAtt={}
+            // selectedCat={}
+            catOptions={this.catOptions}
+            attOptions={this.attOptions}
+            handleSetId={this.handleSetId}
+            handleClose={this.handleCloseSetId}
+          />
         </div>
       );
     }

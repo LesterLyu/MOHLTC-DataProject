@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import Handsontable from 'handsontable';
+import Handsontable from 'handsontable/dist/handsontable.full';
 import {argbToRgb, colorToRgb, FormulaError} from './helpers';
 import colCache from './col-cache';
 import SSF from 'ssf'
@@ -22,7 +22,9 @@ export default class Renderer {
     excelInstance = instance;
     this.global = instance.state.global;
     this.changes = {}; // sheetId -> row -> col -> boolean
+    this.log = [];
   }
+
 
   setChanges(sheetId, row, col, update) {
     if (!this.changes[sheetId]) {
@@ -69,6 +71,9 @@ export default class Renderer {
   }
 
   cellRendererNG = (instance, td, row, col, prop, value, cellProperties) => {
+    if (!this.log[row]) this.log[row] = [];
+    if (!this.log[row][col]) this.log[row][col] = 0;
+    this.log[row][col]++;
     if (!excelInstance.workbook) {
       console.warn('Renderer.cellRendererNG workbook is not yet initialized.');
       return;
@@ -144,7 +149,7 @@ export default class Renderer {
         const span = document.createElement('span');
         Handsontable.dom.fastInnerText(span, rt.value() !== undefined ? rt.value() : '');
 
-        const rtStyle = {
+        let rtStyle = {
           bold: rt.style('bold'),
           italic: rt.style('italic'),
           underline: rt.style('underline'),
@@ -155,12 +160,13 @@ export default class Renderer {
         };
         // remove undefined field
         Object.keys(rtStyle).forEach(key => rtStyle[key] === undefined && delete rtStyle[key]);
-
-        setFontStyle(span, Object.assign({}, fontStyle, rtStyle));
+        rtStyle = Object.assign({}, fontStyle, rtStyle);
+        setFontStyle(span, rtStyle);
+        span.style.lineHeight = rtStyle.size + 'pt';
         mainSpan.appendChild(span);
-        td.style.lineHeight = rowHeight + 'px';
+        // td.style. = rowHeight + 'px';
       }
-      // removeFontStyle(td);
+
       result = mainSpan.innerHTML;
     }
 
@@ -292,135 +298,6 @@ export default class Renderer {
     // this.cellUpdated(excelInstance.currentSheetIdx, row, col);
     // this.cellCache.set(td, excelInstance.currentSheetIdx, row, col);
   };
-
-  cellRendererForCreateExcel(instance, td, row, col, prop, value, cellProperties) {
-    if (excelInstance.workbook) {
-      const styles = excelInstance.currentSheet.styles;
-      const rowStyle = styles[row];
-      const style = rowStyle ? (rowStyle[col] ? rowStyle[col] : {}) : {};
-      const rowHeights = excelInstance.currentSheet.rowHeights;
-      const colWidths = excelInstance.currentSheet.colWidths;
-
-      const rowHeight = rowHeights[row];
-      const colWidth = colWidths[col];
-
-      let result = calcResult(value, style.numberFormat);
-
-      // wrap the value, this fix the clicking issue for overflowed text
-      const span = SPAN_TEMPLATE.cloneNode(false);
-      Handsontable.dom.fastInnerHTML(span, result);
-      Handsontable.dom.fastInnerHTML(td, '');
-      td.appendChild(span);
-
-      // text overflow if right cell is empty
-      const rightCell = instance.getDataAtCell(row, col + 1);
-      if (rightCell === '' || rightCell === null || rightCell === undefined ||
-        ((typeof rightCell === 'object' && 'formula' in rightCell) &&
-          (rightCell.result === '' || rightCell.result === null || rightCell.result === undefined))) {
-        td.classList.add('lOverflow');
-      }
-
-      // top and left borders first, since border can be applied to empty cells with empty styles
-
-      let row_temp = row + 1, col_temp = col + 1;
-      while (rowHeights[row_temp] <= 0.1) {
-        row_temp++;
-      }
-      while (colWidths[col_temp] <= 0.1) {
-        col_temp++;
-      }
-      // check if bottom cell has top border
-      const bottomCellStyle = styles[row_temp] ? (typeof styles[row_temp][col] === 'object' ? styles[row_temp][col] : {}) : {};
-      if ('border' in bottomCellStyle && bottomCellStyle.border.top) {
-        const color = bottomCellStyle.border.top.color || '000';
-        td.style.borderBottom = `${borderStyle2Width[bottomCellStyle.border.top.style]}px solid #${color}`;
-      }
-      // check if right cell has left border
-      const rightCellStyle = styles[row] ? (typeof styles[row][col_temp] === 'object' ? styles[row][col_temp] : {}) : {};
-      if ('border' in rightCellStyle && rightCellStyle.border.left) {
-        const color = rightCellStyle.border.left.color || '000';
-        td.style.borderRight = `${borderStyle2Width[rightCellStyle.border.left.style]}px solid #${color}`;
-      }
-
-      // if the cell has no styles, then don't do any style calculations
-      if (Object.keys(style).length === 0) {
-        // apply default styles
-        td.classList.add('htBottom');
-        td.classList.add('lAlignLeft');
-        return;
-      }
-
-      // right and bottom borders
-      if (style.border) {
-        for (let key in style.border) {
-          if ((key === 'right' || key === 'bottom') && style.border[key]) {
-            const upper = key.charAt(0).toUpperCase() + key.slice(1);
-            const border = style.border[key];
-            const color = border.color || '000';
-            td.style['border' + upper] = `${borderStyle2Width[border.style]}px solid #${color}`;
-          }
-        }
-      }
-
-      setFontStyle(td, {
-        bold: style.bold,
-        italic: style.italic,
-        underline: style.underline,
-        size: style.fontSize,
-        name: style.fontFamily,
-        color: style.fontColor,
-        strikethrough: style.strikethrough,
-        rowHeight,
-      });
-
-
-      if (style.fill) {
-        if (style.fill.type === 'solid') {
-          td.style.background = '#' + style.fill.color.rgb;
-        }
-      }
-
-      // horizontalAlignment
-      if (style.horizontalAlignment && supported.horizontalAlignment.includes(style.horizontalAlignment)) {
-        td.style.textAlign = style.horizontalAlignment;
-      } else {
-        // default
-        td.style.textAlign = 'left';
-      }
-
-      // verticalAlignment
-      if (style.verticalAlignment && supported.verticalAlignment.includes(style.verticalAlignment)) {
-        switch (style.verticalAlignment) {
-          case 'top':
-            td.classList.add('htTop');
-            break;
-          case 'center':
-            td.classList.add('htMiddle');
-            break;
-          case 'bottom':
-            td.classList.add('htBottom');
-            break;
-        }
-      } else {
-        //default
-        td.classList.add('htBottom');
-      }
-
-      // font text wrap
-      if (style.wrapText) {
-        td.style.wordWrap = 'break-word';
-        td.style.whiteSpace = 'pre-wrap';
-      }
-
-      // textRotation
-      if (typeof style.textRotation === 'number') {
-        span.style.display = 'block';
-        span.style.transform = 'rotate(-' + style.textRotation + 'deg)';
-      }
-
-
-    }
-  }
 
   /**
    * Text and formula renderer

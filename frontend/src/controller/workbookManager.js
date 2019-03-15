@@ -127,11 +127,16 @@ class WorkbookManager {
       })
   }
 
-  get(what, newValue) {
+  /**
+   *
+   * @param {'att'|'cat'} what
+   * @return {*}
+   */
+  get(what) {
     if (what === 'att')
-      return this.getAttributes(newValue);
+      return this.getAttributes();
     else if (what === 'cat')
-      return this.getCategories(newValue);
+      return this.getCategories();
     else {
       throw new Error('first parameter must be att or cat');
     }
@@ -160,14 +165,15 @@ class WorkbookManager {
 
     input.onchange = e => {
       const file = e.target.files[0];
+      console.log(file.name)
       XlsxPopulate.fromDataAsync(file)
-        .then(workbook => this._readWorkbook(workbook, cb));
+        .then(workbook => this._readWorkbook(workbook, cb, file.name));
     };
 
     input.click();
   }
 
-  _readWorkbook(workbook, cb) {
+  _readWorkbook(workbook, cb, fileName) {
     const sheets = [], sheetNames = [];
 
     // read sheet names first for building calculation chain
@@ -178,6 +184,7 @@ class WorkbookManager {
     excelInstance.currentSheetName = sheetNames[0];
     excelInstance.parser = new Parser(excelInstance);
     excelInstance.calculationChain = new CalculationChain(excelInstance);
+    excelInstance.fileName = fileName;
 
     // load into {WorkbookStore}
     workbook.sheets().forEach(sheet => {

@@ -1,6 +1,6 @@
 import {Component} from "react";
 import {colCache} from '../helpers';
-import Handsontable from "handsontable";
+import Handsontable from 'handsontable/dist/handsontable.full';
 import {HotTable} from "@handsontable/react";
 import React from "react";
 
@@ -122,6 +122,7 @@ class Worksheet extends Component {
     if (this.props.hide) {
       return null;
     } else {
+      console.log('render worksheet:', this.props.id);
       return (
         <HotTable ref={this.props.forwardedRef} id={this.props.id} settings={this.settings}/>
       )
