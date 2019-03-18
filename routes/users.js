@@ -105,6 +105,7 @@ router.use((req, res, next) => {
     next();
 });
 
+router.get('/api/profile', user_controller.get_profile);
 
 // profile page
 router.get('/profile', function (req, res) {

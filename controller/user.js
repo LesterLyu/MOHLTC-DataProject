@@ -41,13 +41,25 @@ function generateToken(username, expireTime) {
     });
 }
 
+const getUser = (username, cb) => {
+    User.findOne({username: username}, (err, user) => {
+        if (err) {
+            return cb(err);
+        }
+        return cb(err, user);
+    });
+};
+
 module.exports = {
-    get_user: (username, cb) => {
-        User.findOne({username: username}, (err, user) => {
+    get_user: getUser,
+
+    get_profile: (req, res, next) => {
+        const username = req.session.user.username;
+        getUser(username, (err, user) => {
             if (err) {
-                return cb(err);
+                return res.status(500).json({success: false, message: err});
             }
-            return cb(err, user);
+            return res.json({success: true, profile: user});
         });
     },
 
