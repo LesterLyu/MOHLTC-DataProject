@@ -1,6 +1,8 @@
 import axios from "axios";
 import config from "./../config/config";
 
+const log = console.log;
+
 /**
  * Singleton Pattern
  */
@@ -55,13 +57,30 @@ class UserManager {
   /**
    * This will also sign in the created user
    * @param username
+   * @param firstName
+   * @param lastName
+   * @param organization
    * @param email
    * @param password
-   * @param disabled
+   * @param phoneNumber
+   * @param groupNumber
    * @returns {Promise<firebase.User | never>}
    */
-  signUpLocal(username, email, password, disabled = true) {
-
+  signUpLocal(username, password, firstName, lastName, organization, email, phoneNumber, groupNumber) {
+    //log(username,email,password);
+    return axios.post(config.server + '/api/signup/local', {
+      username: username,
+      password: password,
+      firstName:firstName,
+      lastName:lastName,
+      organization:organization,
+      email:email,
+      phoneNumber:phoneNumber,
+      groupNumber:groupNumber
+    }, {withCredentials: true})
+      .then((response => {
+        log(response);
+      }));
   }
 
   /**
@@ -75,16 +94,28 @@ class UserManager {
 
   /**
    * Update permissions to other users. **Only for admin.**
-   * @param permissions {Array} permissions to be assigned
    * @return {Promise}
+   * @param username
+   * @param permissions
+   * @param active
    */
-  updatePermission(permissions) {
 
-
+  updatePermission(username, permissions, active) {
+    console.log(username, permissions, active);
+    return axios.post(config.server + '/api/user/permission', {
+      permissions: [{
+        username,
+        permissions,
+        active
+      }]
+    }, {
+      withCredentials: true
+    })
   }
   getAllPermissions() {
     return axios.get(config.server + '/api/permissions', {withCredentials: true})
       .then((response => {
+        //log(response);
         return response.data.permissions;
       }))
   }

@@ -1,16 +1,17 @@
 import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
 import {Badge} from 'reactstrap';
 import MaterialTable from 'material-table'
 import UserManager from "../../controller/userManager";
 import {FormControl, InputLabel, Select, Input, Checkbox, MenuItem, ListItemText} from "@material-ui/core";
+
+const log = console.log;
 
 function PermissionSelect(props) {
   const {permissions, selected, handleChange, username} = props;
 
   return (
     <FormControl>
-      <InputLabel htmlFor="select-multiple-checkbox"></InputLabel>
+      <InputLabel htmlFor="select-multiple-checkbox"> </InputLabel>
       <Select
         multiple
         value={selected}
@@ -30,7 +31,6 @@ function PermissionSelect(props) {
 }
 
 class Users extends Component {
-
   constructor(props) {
     super(props);
     this.user = new UserManager(props);
@@ -54,25 +54,38 @@ class Users extends Component {
     this.user.getAllPermissions()
       .then(permissions => {
         this.permissions = permissions;
+        //log("get all permissions")
       });
 
     this.user.getAllUsers()
       .then(users => {
         this.setState({userList: users});
         console.log(this.state.userList)
-      });
+      })
+      .catch(err => {
+        this.props.showMessage(err.response.data.message, 'error');
+      })
   }
 
-  onPermissionChange = username => (event, child) => {
+  onPermissionChange = username => (event) => {
     // this.setState({userList: })
-    console.log(username)
+    //console.log(username);
     const userList = this.state.userList;
+    let userToUpdate;
     for (let i = 0; i < userList.length; i++) {
       if (userList[i].username === username) {
         userList[i].permissions = event.target.value;
+        userToUpdate = userList[i];
       }
     }
-    this.setState({userList})
+    this.setState({userList});
+    this.user.updatePermission(username, userToUpdate.permissions, userToUpdate.active)
+      .then(response => {
+        this.props.showMessage(response.data.message, response.data.success ? 'success' : 'error');
+      })
+      .catch(err => {
+        this.props.showMessage(err.response.data.message, 'error');
+      })
   };
 
   render() {

@@ -17,6 +17,7 @@ import {
 } from 'reactstrap';
 import {Link} from "react-router-dom";
 
+const log = console.log;
 
 class Register extends Component {
 
@@ -27,14 +28,19 @@ class Register extends Component {
     this.state = {
       username: '',
       email: '',
+      firstName: "",
+      lastName: "",
       password: '',
       repeatPassword: '',
+      phoneNumber: "",
+      organization: "",
+      groupNumber: "",
       message: '',
     };
   }
 
   validateForm() {
-    return this.state.username.length > 0 && this.state.password.length > 0 && this.state.repeatPassword.length > 0;
+    return this.state.username.length > 0 && this.state.password.length > 0 //&& this.state.repeatPassword.length > 0;
   }
 
   handleChange = event => {
@@ -45,18 +51,24 @@ class Register extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    if (this.state.password !== this.state.repeatPassword) {
-      this.setState({message: 'Passwords must be same.'});
-      return;
-    }
-    this.user.signUpWithEmail(this.state.username, this.state.email, this.state.password)
-      .then(user => {
-        this.props.history.push('/');
-      })
-      .catch(err => {
-        console.log(err);
-        this.setState({message: err.message});
-      })
+    log(this.state);
+    // if (this.state.password !== this.state.repeatPassword) {
+    //   this.setState({message: 'Passwords must be same.'});
+    //   return;
+    // }
+
+    this.user.signUpLocal(this.state.username, this.state.password,
+      this.state.firstName, this.state.lastName, this.state.organization,
+      this.state.email, this.state.phoneNumber, this.state.groupNumber);
+
+    // this.user.signUpWithEmail(this.state.username, this.state.email, this.state.password)
+    //   .then(user => {
+    //     this.props.history.push('/');
+    //   })
+    //   .catch(err => {
+    //     console.log(err);
+    //     this.setState({message: err.message});
+    //   })
 
   };
 
@@ -81,6 +93,7 @@ class Register extends Component {
                       <Input type="text" id="username" placeholder="Username" autoComplete="username"
                              value={this.state.username} onChange={this.handleChange}/>
                     </InputGroup>
+
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>@</InputGroupText>
@@ -88,6 +101,58 @@ class Register extends Component {
                       <Input type="email" id="email" placeholder="Email" autoComplete="email"
                              value={this.state.email} onChange={this.handleChange}/>
                     </InputGroup>
+
+                    <InputGroup className="mb-3">
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          <i className="icon-doc"/>
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input type="firstName" id="firstName" placeholder="First Name" autoComplete="firstName"
+                             value={this.state.firstName} onChange={this.handleChange}/>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          <i className="icon-docs"/>
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input type="lastName" id="lastName" placeholder="Last Name" autoComplete="lastName"
+                             value={this.state.lastName} onChange={this.handleChange}/>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          <i className="icon-phone"/>
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input type="phoneNumber" id="phoneNumber" placeholder="Phone Number" autoComplete="phoneNumber"
+                             value={this.state.phoneNumber} onChange={this.handleChange}/>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          <i className="icon-graduation"/>
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input type="organization" id="organization" placeholder="Organization"
+                             autoComplete="organization"
+                             value={this.state.organization} onChange={this.handleChange}/>
+                    </InputGroup>
+
+                    <InputGroup className="mb-3">
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          <i className="icon-people"/>
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input type="groupNumber" id="groupNumber" placeholder="Group Number" autoComplete="groupNumber"
+                             value={this.state.groupNumber} onChange={this.handleChange}/>
+                    </InputGroup>
+
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
@@ -97,25 +162,30 @@ class Register extends Component {
                       <Input type="password" id="password" placeholder="Password" autoComplete="new-password"
                              value={this.state.password} onChange={this.handleChange}/>
                     </InputGroup>
+
                     <InputGroup className="mb-4">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
                           <i className="icon-lock"></i>
                         </InputGroupText>
                       </InputGroupAddon>
-                      <Input type="password" id="repeatPassword" placeholder="Repeat password" autoComplete="new-password"
+                      <Input type="password" id="repeatPassword" placeholder="Repeat password"
+                             autoComplete="new-password"
                              value={this.state.repeatPassword} onChange={this.handleChange}/>
                     </InputGroup>
+
                     <FormText color="muted">
                       {this.state.message}
                     </FormText>
                     <br/>
-                    <Button color="success" disabled={!this.validateForm()} block>Create Account</Button>
+                    <Button color="success" disabled={!this.validateForm()} onSubmit={this.handleSubmit} block>Create
+                      Account</Button>
                     <br/>
                     <Link to="/login">
                       <Button color="link"><span>Already have an account?</span></Button>
                     </Link>
                   </Form>
+
                 </CardBody>
                 <CardFooter className="p-4">
                   <Row>
