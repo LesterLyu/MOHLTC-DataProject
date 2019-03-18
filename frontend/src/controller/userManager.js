@@ -57,13 +57,30 @@ class UserManager {
   /**
    * This will also sign in the created user
    * @param username
+   * @param firstName
+   * @param lastName
+   * @param organization
    * @param email
    * @param password
-   * @param disabled
+   * @param phoneNumber
+   * @param groupNumber
    * @returns {Promise<firebase.User | never>}
    */
-  signUpLocal(username, email, password, disabled = true) {
-
+  signUpLocal(username, password, firstName, lastName, organization, email, phoneNumber, groupNumber) {
+    //log(username,email,password);
+    return axios.post(config.server + '/api/signup/local', {
+      username: username,
+      password: password,
+      firstName:firstName,
+      lastName:lastName,
+      organization:organization,
+      email:email,
+      phoneNumber:phoneNumber,
+      groupNumber:groupNumber
+    }, {withCredentials: true})
+      .then((response => {
+        log(response);
+      }));
   }
 
   /**
