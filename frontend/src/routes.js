@@ -35,6 +35,8 @@ const Colors = React.lazy(() => import('./views/Theme/Colors'));
 const Typography = React.lazy(() => import('./views/Theme/Typography'));
 const Widgets = React.lazy(() => import('./views/Widgets/Widgets'));
 
+const Profile = React.lazy(() => import('./views/Profile/Profile'));
+
 const userRequest = React.lazy(() => import("./views/Users/RegistrationRequests"));
 const addOrganization = React.lazy(() => import("./views/Users/AddOrganization"));
 
@@ -90,6 +92,7 @@ const routes = [
   {path: '/widgets', name: 'Widgets', component: Widgets},
   {path: '/charts', name: 'Charts', component: Charts},
 
+  {path: "/profile", exact:true, name:"My Profile", component:Profile},
 
   {path: "/registrationRequest", exact:true, name:"Registration Request", component:userRequest},
   {path: "/addOrganization", exact:true, name:"Add Organization", component:addOrganization},

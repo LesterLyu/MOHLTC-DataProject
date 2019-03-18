@@ -131,6 +131,15 @@ class UserManager {
 
   }
 
+  getProfile() {
+    return axios.get(config.server + '/api/profile', {withCredentials: true})
+      .then((response => {
+        return response.data.profile;
+      }))
+      .catch(err => {
+        this.showMessage(err, 'error');
+      })
+  }
 
 }
 

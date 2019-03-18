@@ -18,7 +18,7 @@ export default {
 
     {
       name: 'My Profile',
-      url: '/1',
+      url: '/profile',
       icon: 'mdi mdi-account-card-details-outline',
     },
     {
