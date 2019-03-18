@@ -5,7 +5,7 @@ import {withStyles} from "@material-ui/core";
 
 import Worksheet from './Worksheet'
 
-import Handsontable from 'handsontable';
+import Handsontable from 'handsontable/dist/handsontable.full';
 
 const {addClass, removeClass} = Handsontable.dom;
 
@@ -28,21 +28,25 @@ class Worksheets extends Component {
       sheetHeight: this.excel.state.sheetHeight,
     };
     this.history = {
-      current: null,
       currentSheetIdx: props.context.currentSheetIdx,
     }
 
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
-    return this.history.current !== nextProps.context.global.current
-      || this.history.currentSheetIdx !== nextProps.context.global.currentSheetIdx
+    return this.history.currentSheetIdx !== nextProps.context.currentSheetIdx
+      || this.history.fileName !== nextProps.context.fileName
       || this.state !== nextState;
   }
 
-  componentDidMount() {
+  componentDidUpdate(prevProps, prevState, snapshot) {
+    this.history.currentSheetIdx = this.props.context.currentSheetIdx;
+    this.history.fileName = this.props.context.fileName;
+  }
 
-    this.history.current = this.props.context.global.current;
+  componentDidMount() {
+    this.history.currentSheetIdx = this.props.context.currentSheetIdx;
+    this.history.fileName = this.props.context.fileName;
     window.addEventListener('resize', () => {
       if (this.sheetContainerRef.current) {
         this.setState({
@@ -119,7 +123,16 @@ class Worksheets extends Component {
                 })
               }
             },
-
+            setId: {
+              name: 'Set ID',
+              hidden() {
+                return this.selection.isSelectedByColumnHeader() || this.selection.isSelectedByRowHeader()
+                  || this.selection.isMultiple();
+              },
+              callback() {
+                excel.setId();
+              }
+            }
           }
 
         },

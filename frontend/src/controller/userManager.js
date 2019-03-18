@@ -112,7 +112,6 @@ class UserManager {
       withCredentials: true
     })
   }
-
   getAllPermissions() {
     return axios.get(config.server + '/api/permissions', {withCredentials: true})
       .then((response => {

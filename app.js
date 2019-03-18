@@ -66,6 +66,7 @@ db.once('open', function () {
 });
 
 const whitelist = [
+    'http://localhost',
     'http://localhost:3003',
     'http://localhost:3000',
     'http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com',

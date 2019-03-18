@@ -21,6 +21,7 @@ import Worksheets from './components/Worksheets'
 import ExcelToolBar from './components/ExcelToolBar';
 import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
+import SetIdDialog from "./components/SetIdDialog";
 // const excelWorker = new Worker('../../controller/excel.worker', { type: 'module' });
 window.colCache = colCache;
 
@@ -76,6 +77,7 @@ class Excel extends Component {
       loadingMessage: 'Loading...',
       loaded: false,
       currentSheetIdx: 0,
+      openSetId: null,
     };
     this.global = {
       sheetNames: ['Sheet1'],
@@ -84,6 +86,7 @@ class Excel extends Component {
       ],
       current: {}
     };
+    this.fileName = null;
     this.workbookManager = new WorkbookManager(props);
     // for calculation
     this.currentSheetName = 'Sheet1';
@@ -280,6 +283,21 @@ class Excel extends Component {
     this.switchSheet(newSheetName);
   };
 
+  setId = () => {
+    const selected = this.hotInstance.getSelected();
+    const td = this.hotInstance.getCell(selected[0][0], selected[0][1]);
+    console.log('td', td);
+    this.setState({openSetId: td});
+  };
+
+  handleSetId = (att, cat) => {
+    console.log(`Set ID`, att, cat);
+    this.setState({openSetId: null});
+  };
+
+  handleCloseSetId = () => {
+    this.setState({openSetId: null});
+  };
 
   componentDidMount() {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
@@ -294,6 +312,8 @@ class Excel extends Component {
           loadingMessage: '', loaded: true
         });
       });
+    this.workbookManager.get('att').then(atts => this.attOptions = atts);
+    this.workbookManager.get('cat').then(cats => this.catOptions = cats);
 
     //
     // excelWorker.postMessage(1);
@@ -340,8 +360,8 @@ class Excel extends Component {
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.state.loaded && this.sheetRef) {
       this.hooks.forEach(hook => {
-        if (!this.hotInstance.hasHook(hook.name))
-          this.hotInstance.addHook(hook.name, hook.f);
+        // HandsonTable: adding the same hook twice is now silently ignored, no need to check if hook is added.
+        this.hotInstance.addHook(hook.name, hook.f);
       });
     }
   }
@@ -352,10 +372,11 @@ class Excel extends Component {
       || this.state.loadingMessage !== nextState.loadingMessage
       || this.state.loaded !== nextState.loaded
       || this.state.currentSheetIdx !== nextState.currentSheetIdx
+      || this.state.openSetId !== nextState.openSetId
   }
 
   render() {
-    console.log('render create excel')
+    console.log('render create excel');
     if (!this.isLoaded) {
       return (
         <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px)'}}
@@ -375,6 +396,15 @@ class Excel extends Component {
             <Worksheets context={this}/>
             <ExcelBottomBar context={this}/>
           </Card>
+          <SetIdDialog
+            anchorEl={this.state.openSetId}
+            // selectedAtt={}
+            // selectedCat={}
+            catOptions={this.catOptions}
+            attOptions={this.attOptions}
+            handleSetId={this.handleSetId}
+            handleClose={this.handleCloseSetId}
+          />
         </div>
       );
     }

@@ -25,6 +25,8 @@ describe('<Excel />', () => {
   beforeAll(async () => {
     wrapper = mount(<Excel/>).childAt(0);
     excel = wrapper.instance();
+    excel.attOptions = ['att1', 'att2'];
+    excel.catOptions = ['cat1', 'cat2'];
     // wait for async functions
     await excel.workbookManager.createWorkbookLocal();
   });

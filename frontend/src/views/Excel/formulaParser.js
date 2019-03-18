@@ -1,4 +1,4 @@
-import FormulaParser from 'hot-formula-parser/dist/formula-parser';
+import {FormulaParser} from './helpers';
 class Parser {
 
   constructor(excelInstance) {
