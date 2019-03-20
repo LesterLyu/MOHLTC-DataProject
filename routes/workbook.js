@@ -1,5 +1,6 @@
 const express = require('express');
 const workbookController = require('../controller/workbook');
+const workbookControllerV2 = require('../controller/workbookV2');
 let router = express.Router();
 
 const error = require('../config/error');
@@ -33,6 +34,10 @@ router.put('/api/admin/workbook', workbookController.admin_edit_workbooks);
 
 // DELETE Delete workbook
 router.delete('/api/admin/workbook', workbookController.admin_delete_workbook);
+
+//V2
+// POST Create/Edit workbook
+router.post('/api/v2/admin/workbook', workbookControllerV2.admin_create_edit_workbook);
 
 // web pages
 
