@@ -17,8 +17,9 @@ function OutlinedButtons(props) {
   return (
     <div>
       <Button variant="outlined" color="primary" className={classes.button} onClick={props.onClick}>
-        Submit
+
       </Button>
+      
       <input
         accept="image/*"
         className={classes.input}

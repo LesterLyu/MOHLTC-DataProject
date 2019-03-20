@@ -112,6 +112,7 @@ class UserManager {
       withCredentials: true
     })
   }
+
   getAllPermissions() {
     return axios.get(config.server + '/api/permissions', {withCredentials: true})
       .then((response => {
@@ -125,6 +126,28 @@ class UserManager {
       .then((response => {
         return response.data.users;
       }))
+  }
+
+  getAllRegRequest(){
+    return axios.get(config.server + '/api/user/registerInfo', {withCredentials: true})
+      .then((response => {
+        log(response.data);
+        return response.data.registerrequests;
+      }))
+  }
+
+  decideRequest(username, value, role){
+    return axios.post(config.server + "/api/user/register_management", {
+      data: {
+        username: username,
+        value: value,
+        role: role
+      }
+    }, {withCredentials: true})
+      .then(response => {
+        log(response);
+      })
+
   }
 
   getAllUsersWithCache() {
