@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import UserManager from "../../controller/userManager";
-import {Fade, Chip, Typography, Card, Checkbox, MenuItem, ListItemText, Button} from "@material-ui/core";
+import {Fade, Chip, Typography, Card} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core/es";
 
@@ -36,7 +36,7 @@ class Profile extends Component {
         username: '',
         email: '',
         firstName: '',
-        lastName: '',
+        lastName: 'Loading...',
         phoneNumber: '',
         active: '',
         permissions: [],
