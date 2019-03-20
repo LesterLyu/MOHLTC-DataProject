@@ -16,7 +16,7 @@ class UserManager {
       this.props = props;
       this.showMessage = showMessage;
       // init
-
+      this.lastUrl = null;
     }
     return instance;
   }
@@ -137,7 +137,7 @@ class UserManager {
         return response.data.profile;
       }))
       .catch(err => {
-        this.showMessage(err, 'error');
+        this.showMessage(err.toString(), 'error');
       })
   }
 

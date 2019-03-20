@@ -30,6 +30,7 @@ class DefaultLayout extends Component {
     this.user.isLoggedIn()
       .then(IsSignedIn => {
         if (!IsSignedIn) {
+          this.user.lastUrl = window.location.hash.replace('#', '');
           props.history.push('/login');
         }
       })
@@ -39,6 +40,14 @@ class DefaultLayout extends Component {
     this.state = {
       openSnackbar: false, messageInfo: {}
     };
+  }
+
+  componentDidMount() {
+    // go to the page before login
+    if (this.user.lastUrl) {
+      this.props.history.push(this.user.lastUrl);
+      this.user.lastUrl = null;
+    }
   }
 
   loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
