@@ -102,9 +102,10 @@ const routes = [
   {path: '/workbooks/fill', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'user'}},
   {path: '/workbooks/fill/:name', exact: true, name: 'Fill Workbook', component: Excel, params: {mode: 'user'}},
   {path: '/workbooks/template', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'admin'}},
-  {path: '/workbooks/template/:name', exact: true, name: 'Workbooks', component: Excel, params: {mode: 'admin'}},
 
-  {path: '/workbooks/create', exact: true, name: 'Create Workbook', component: CreateExcel, params: {mode: 'admin'}},
+  {path: '/workbooks/template/:name/', exact: true, name: 'Edit Workbook', component: CreateExcel, params: {mode: 'admin edit'}},
+  {path: '/workbooks/create', exact: true, name: 'Create Workbook', component: CreateExcel, params: {mode: 'admin create'}},
+
 
   {path: '/workbooks/attributes', exact: true, name: 'Attributes', component: AttCat, params: {mode: 'att'}},
   {path: '/workbooks/categories', exact: true, name: 'Categories', component: AttCat, params: {mode: 'cat'}},

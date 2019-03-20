@@ -18,6 +18,7 @@ import Editor from './editor';
 import './style.css';
 import WorkbookManager from "../../controller/workbookManager";
 import Worksheets from './components/Worksheets'
+import ExcelAppBar from './components/ExcelAppBar';
 import ExcelToolBar from './components/ExcelToolBar';
 import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
@@ -70,6 +71,9 @@ class Excel extends Component {
 
   constructor(props) {
     super(props);
+    this.mode = props.params.mode;
+    console.log('mode:', props.params.mode);
+    window.excel = this;
     this.state = {
       completed: 5,
       sheetHeight: 0,
@@ -78,6 +82,7 @@ class Excel extends Component {
       loaded: false,
       currentSheetIdx: 0,
       openSetId: null,
+      fileName: 'Untitled workbook'
     };
     this.global = {
       sheetNames: ['Sheet1'],
@@ -86,7 +91,7 @@ class Excel extends Component {
       ],
       current: {}
     };
-    this.fileName = null;
+    this.initialFileName = null; // uploaded file name
     this.workbookManager = new WorkbookManager(props);
     // for calculation
     this.currentSheetName = 'Sheet1';
@@ -101,9 +106,12 @@ class Excel extends Component {
     this.sheetRef = React.createRef();
     this.hooks = [];
 
-    window.excel = this;
-
+    // set ID dialog
+    this.attOptions = [];
+    this.catOptions = [];
   }
+
+
 
   get isLoaded() {
     return this.state.loaded;
@@ -302,16 +310,39 @@ class Excel extends Component {
   componentDidMount() {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
     const sheetHeight = this.sheetContainerRef.current.offsetHeight;
-    // create local workbook storage
-    this.workbookManager.createWorkbookLocal()
-      .then(workbook => {
-        this.workbook = workbook;
-        this.setState({
-          sheetWidth,
-          sheetHeight,
-          loadingMessage: '', loaded: true
+
+    if (this.mode === 'admin create') {
+      // create local workbook storage
+      this.workbookManager.createWorkbookLocal()
+        .then(workbook => {
+          this.workbook = workbook;
+          this.setState({
+            sheetWidth,
+            sheetHeight,
+            loadingMessage: '', loaded: true
+          });
         });
-      });
+    } else if (this.mode === 'admin edit') {
+      const {name} = this.props.match.params;
+      this.workbookManager.readWorkbookFromDatabase(name)
+        .then(data => {
+          const {sheets, sheetNames, workbook, fileName} = data;
+          this.global.sheetNames = sheetNames;
+          this.global.sheets = sheets;
+          this.workbook = workbook;
+          this.setState({
+            fileName,
+            currentSheetIdx: 0,
+            sheetWidth,
+            sheetHeight,
+            loadingMessage: '', loaded: true
+          });
+        })
+
+    } else if (this.mode === 'user edit') {
+
+    }
+
     this.workbookManager.get('att').then(atts => this.attOptions = atts);
     this.workbookManager.get('cat').then(cats => this.catOptions = cats);
 
@@ -357,6 +388,10 @@ class Excel extends Component {
     // this.sheetRef.current.hotInstance.render();
   }
 
+  onFileNameChange = (event) => {
+    this.setState({fileName: event.target.value})
+  };
+
   componentDidUpdate(prevProps, prevState, snapshot) {
     if (this.state.loaded && this.sheetRef) {
       this.hooks.forEach(hook => {
@@ -373,17 +408,18 @@ class Excel extends Component {
       || this.state.loaded !== nextState.loaded
       || this.state.currentSheetIdx !== nextState.currentSheetIdx
       || this.state.openSetId !== nextState.openSetId
+      || this.state.fileName !== nextState.fileName
   }
 
   render() {
     console.log('render create excel');
     if (!this.isLoaded) {
       return (
-        <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px)'}}
+        <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px - 58px)'}}
              ref={this.sheetContainerRef}>
           <h3>{this.state.loadingMessage}</h3><br/>
 
-          <LinearProgress variant="determinate" value={this.state.completed}/>
+          <LinearProgress variant="indeterminate"/>
         </div>
       );
     } else {
@@ -391,6 +427,7 @@ class Excel extends Component {
         <div className="animated fadeIn">
           <Card xs={12}>
             {this.state.loadingMessage}
+            <ExcelAppBar fileName={this.state.fileName} onFileNameChange={this.onFileNameChange} context={this}/>
             <ExcelToolBar context={this}/>
             <FormulaBar context={this}/>
             <Worksheets context={this}/>

@@ -73,7 +73,6 @@ class ExcelBottomBar extends Component {
   constructor(props) {
     super(props);
     this.excel = props.context;
-    console.log('..')
     this.state = {sheetToggleMenu: null};
     this.history = {
       sheetNames: props.context.global.sheetNames,

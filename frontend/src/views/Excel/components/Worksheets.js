@@ -35,18 +35,18 @@ class Worksheets extends Component {
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     return this.history.currentSheetIdx !== nextProps.context.currentSheetIdx
-      || this.history.fileName !== nextProps.context.fileName
+      || this.history.initialFileName !== nextProps.context.initialFileName
       || this.state !== nextState;
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
     this.history.currentSheetIdx = this.props.context.currentSheetIdx;
-    this.history.fileName = this.props.context.fileName;
+    this.history.initialFileName = this.props.context.initialFileName;
   }
 
   componentDidMount() {
     this.history.currentSheetIdx = this.props.context.currentSheetIdx;
-    this.history.fileName = this.props.context.fileName;
+    this.history.initialFileName = this.props.context.initialFileName;
     window.addEventListener('resize', () => {
       if (this.sheetContainerRef.current) {
         this.setState({
@@ -59,7 +59,7 @@ class Worksheets extends Component {
 
   worksheets() {
     const {excel} = this;
-    const {current, sheets} = excel.global;
+    const {sheets} = excel.global;
     const {currentSheetIdx} = excel;
     const list = [];
 

@@ -45,7 +45,7 @@ class FormulaBar extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
-    return true;
+    return this.state !== nextState;
   }
 
   handleChange = what => (event) => {

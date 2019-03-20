@@ -7,7 +7,7 @@ import {
   Popover,
 } from "@material-ui/core";
 import {
-  FormatBold, FormatColorFill, SaveAlt, CloudUploadOutlined, WrapText,
+  FormatBold, FormatColorFill, SaveAlt, CloudUploadOutlined, WrapText, Save,
   FormatItalic, FormatUnderlined, FormatStrikethrough, FormatColorText,
   FormatAlignCenter, FormatAlignLeft, FormatAlignRight, FormatAlignJustify,
   VerticalAlignBottom, VerticalAlignCenter, VerticalAlignTop,
@@ -56,6 +56,7 @@ class ExcelToolBar extends Component {
     }
 
     this.excel.addHook('afterSelection', (row, col, row2, col2) => {
+      if (this.history.current.row === row && this.history.current.col === col) return;
       const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row + 1, col + 1);
       const style = {
         fill: cell.style('fill'),
@@ -68,18 +69,18 @@ class ExcelToolBar extends Component {
         selectedTextColor: style.fontColor ? style.fontColor : '#fff',
         selectedFontSize: style.fontSize ? style.fontSize : 11,
         selectedFontFamily: style.fontFamily ? style.fontFamily: 'Calibri' ,
-      })
+      });
+      this.history.current = {row, col}
     });
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
-    return this.history.current !== nextProps.context.global.current
-      || this.state !== nextState;
+    return this.state !== nextState;
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    this.history.current = this.props.context.global.current;
-  }
+  // componentDidUpdate(prevProps, prevState, snapshot) {
+  //   this.history.current = this.props.context.global.current;
+  // }
 
   get hotInstance() {
     return this.excel.hotInstance;
@@ -90,7 +91,7 @@ class ExcelToolBar extends Component {
   }
 
   downloadWorkbook = () => {
-    this.excel.workbookManager.downloadWorkbook(this.excel.workbook)
+    this.excel.workbookManager.downloadWorkbook(this.excel.workbook, this.excel.state.fileName)
       .then(() => {
         console.log('downloaded')
       })
@@ -105,6 +106,9 @@ class ExcelToolBar extends Component {
       this.excel.currentSheetIdx = 0;
       this.excel.forceUpdate();
     })
+  };
+  saveWorkbook = () => {
+    this.excel.workbookManager.saveWorkbookAdmin(this.excel.workbook);
   };
 
   style = (name, value, ranges = this.getSelected()) => {
@@ -255,6 +259,10 @@ class ExcelToolBar extends Component {
       <>
         <AppBar position="static" color="default" style={{}}>
           <Grid container className={classes.root}>
+            <Button aria-label="Save" className={classes.button}
+                    onClick={() => this.saveWorkbook()}>
+              <Save fontSize="small"/>
+            </Button>
             <ToolBarDivider/>
             <Button aria-label="Download" className={classes.button}
                     onClick={() => this.uploadWorkbook()}>
