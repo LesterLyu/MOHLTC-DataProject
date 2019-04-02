@@ -114,6 +114,11 @@ export default {
       ]
     },
     {
+      name: 'Formula Parser Test',
+      url: '/parser',
+      icon: 'mdi mdi-account',
+    },
+    {
       name: 'Update History',
       url: 'https://github.com/LesterLyu/MOHLTC-DataProject/blob/dev-lester/documents/update-history.md',
       icon: 'icon-cloud-download',

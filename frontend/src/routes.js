@@ -50,6 +50,8 @@ const AttCat = React.lazy(() => import('./views/AttCat/AttCat'));
 const Excel = React.lazy(() => import('./views/Excel/Excel'));
 const CreateExcel = React.lazy(() => import('./views/Excel/CreateExcel'));
 
+const Parser = React.lazy(() => import('./views/Parser/Parser'));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   {path: '/', exact: true, name: 'Home', component: DefaultLayout},
@@ -110,6 +112,7 @@ const routes = [
   {path: '/workbooks/attributes', exact: true, name: 'Attributes', component: AttCat, params: {mode: 'att'}},
   {path: '/workbooks/categories', exact: true, name: 'Categories', component: AttCat, params: {mode: 'cat'}},
 
+  {path: '/parser', exact: true, name: 'Parser', component: Parser},
 ];
 
 export default routes;

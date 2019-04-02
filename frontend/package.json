@@ -25,6 +25,7 @@
     "core-js": "^2.6.5",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
+    "fast-formula-parser": "git+https://github.com/LesterLyu/fast-formula-parser.git",
     "flag-icon-css": "^3.3.0",
     "font-awesome": "^4.7.0",
     "handsontable": "git+https://github.com/LesterLyu/handsontable-fast.git",
