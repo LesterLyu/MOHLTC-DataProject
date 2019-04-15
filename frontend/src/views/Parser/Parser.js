@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Fade, TextField, Typography, Card} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core/es";
-import FormulaParser from 'fast-formula-parser/build/parser.min';
+import FormulaParser from 'fast-formula-parser';
 
 
 const styles = theme => ({

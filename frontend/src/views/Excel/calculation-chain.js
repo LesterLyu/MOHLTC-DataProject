@@ -173,7 +173,7 @@ function evaluateFormula(orderNo, row, col) {
     return
   }
 
-  const calculated = excelInstance.parser.parseNewFormula(data.formula, false);
+  const calculated = excelInstance.parser.parseNewFormula(data.formula, {sheetNo: orderNo});
   excelInstance.setDataAtSheetAndCell(row, col, calculated, orderNo);
   return data;
 }

@@ -166,13 +166,14 @@ class Excel extends Component {
   getDataAtSheetAndCell(row, col, sheetNo, sheetName) {
     sheetNo = sheetNo === null ? this.global.sheetNames.indexOf(sheetName) : sheetNo;
     if (sheetNo === undefined) console.error('At least one of sheetNo or sheetName should be provides.');
-    const cell = this.workbook.sheet(sheetNo).cell(row + 1, col + 1);
-    return cell.value();
+
+    const cell = this.workbook.sheet(sheetNo).getCell(row + 1, col + 1);
+    return cell == null ? undefined : cell.getValue();
   }
 
   getCell(sheetNo, row, col) {
     if (sheetNo === undefined) console.error('getCell: sheetNo should be provides.');
-    return this.workbook.sheet(sheetNo).cell(row + 1, col + 1);
+    return this.workbook.sheet(sheetNo).getCell(row + 1, col + 1);
   }
 
   /**
@@ -187,8 +188,10 @@ class Excel extends Component {
    */
   setData(sheetNo, row, col, rawValue, source) {
     sheetNo = sheetNo === null || sheetNo === undefined ? this.currentSheetIdx : sheetNo;
-    const cell = this.workbook.sheet(sheetNo).cell(row + 1, col + 1);
+    const sheet = this.workbook.sheet(sheetNo);
+    const cell = sheet.getCell(row + 1, col + 1);
     const oldValue = cell.value(), oldFormula = cell.formula();
+    let updates;
 
     // I don't want you to update rich text.
     if (getCellType(cell) === 'richtext') {
@@ -196,20 +199,21 @@ class Excel extends Component {
       return;
     }
     // check if it is formula now
-    if (typeof rawValue === 'string' && rawValue.charAt(0) === '=') {
-      const res = this.parser.parseNewFormula(rawValue);
-      console.log(res);
-      saveFormulaResultToCell(cell, res);
+    if (typeof rawValue === 'string' && rawValue.charAt(0) === '=' && rawValue.length > 1) {
+      updates = cell.setFormula(rawValue.slice(1));
     } else {
-      cell.value(rawValue);
+      updates = cell.setValue(rawValue);
     }
 
     // add to next render list
-    this.renderer.cellNeedUpdate(this.currentSheetIdx, row, col);
+    updates.forEach(ref => {
+      this.renderer.cellNeedUpdate(this.global.sheetNames.indexOf(ref.sheet), ref.row, ref.col);
+    });
 
-    if (source !== 'internal') {
-      this.afterChangeByUser(cell, oldValue, oldFormula);
-    }
+
+    // if (source !== 'internal') {
+    //   this.afterChangeByUser(cell, oldValue, oldFormula);
+    // }
   }
 
   /**

@@ -111,7 +111,7 @@ export class FormulaEditor extends TextEditor {
     if (this.type === 'richtext')
       return;
     // check if it is formula now
-    if (value[0][0] !== undefined && value[0][0].length > 0 && value[0][0].charAt(0) === '=') {
+    if (value[0][0] !== undefined && value[0][0].length > 1 && value[0][0].charAt(0) === '=') {
       this.type = 'formula';
       console.log('formula')
     } else {
@@ -123,7 +123,7 @@ export class FormulaEditor extends TextEditor {
       return this.instance.setDataAtCell(this.row, this.col, value[0][0])
       // return TextEditor.prototype.saveValue.apply(this, [value, ctrlDown]);
     } else if (this.type === 'formula') {
-      const res = excelInstance.parser.parseNewFormula(value[0][0], true);
+      const res = excelInstance.parser.parseNewFormula(value[0][0], {sheetNo: excelInstance.currentSheetIdx});
       console.log(res);
       this.instance.setDataAtCell(this.row, this.col, res);
     }
