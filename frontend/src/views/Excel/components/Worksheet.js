@@ -56,7 +56,7 @@ class Worksheet extends Component {
         },
         renderAllRows: false,
         viewportRowRenderingOffset: 20,
-        viewportColumnRenderingOffset: 10,
+        viewportColumnRenderingOffset: 2,
         cells: (row, col) => {
           let cellProperties = {};
           cellProperties.renderer = props.renderer;

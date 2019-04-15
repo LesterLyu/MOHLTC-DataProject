@@ -94,9 +94,10 @@ export default class Renderer {
     // console.log('rerender ', excelInstance.currentSheetIdx, row, col);
     const {workbook} = excelInstance;
     const worksheet = workbook.sheet(excelInstance.currentSheetIdx);
-    const cell = worksheet.cell(row + 1, col + 1);
 
-    value = cell.value();
+    const cell = worksheet.getCell(row + 1, col + 1);
+
+    value = cell.getValue();
 
     let rowHeight = worksheet.row(row + 1).height();
     rowHeight = rowHeight === undefined ? 24 : rowHeight / 0.6;
@@ -116,17 +117,6 @@ export default class Renderer {
       return;
     }
 
-    const fontStyle = {
-      bold: cell.style('bold'),
-      italic: cell.style('italic'),
-      underline: cell.style('underline'),
-      size: cell.style('fontSize'),
-      name: cell.style('fontFamily'),
-      color: colorToRgb(cell.style('fontColor')),
-      strikethrough: cell.style('strikethrough'),
-      rowHeight,
-    };
-
     // clear borders in case of single cell rerender
     td.style.borderRight = '';
     td.style.borderBottom = '';
@@ -139,7 +129,22 @@ export default class Renderer {
         td.style.borderBottom = '1px solid #0000';
     }
 
-    let result = calcResult(value, typeof value === 'object' ? undefined : cell.style('numberFormat'));
+    if (!worksheet.hasCell(row + 1, col + 1)) {
+      return;
+    }
+
+    let result = calcResult(value, typeof value === 'object' ? undefined : cell.getStyle('numberFormat'));
+
+    const fontStyle = {
+      bold: cell.getStyle('bold'),
+      italic: cell.getStyle('italic'),
+      underline: cell.getStyle('underline'),
+      size: cell.getStyle('fontSize'),
+      name: cell.getStyle('fontFamily'),
+      color: colorToRgb(cell.getStyle('fontColor')),
+      strikethrough: cell.getStyle('strikethrough'),
+      rowHeight,
+    };
 
     // rich text
     if (value instanceof RichText) {
