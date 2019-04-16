@@ -91,8 +91,6 @@ class Excel extends Component {
     };
     this.initialFileName = null; // uploaded file name
     this.workbookManager = new WorkbookManager(props);
-    // for calculation
-    this.currentSheetName = 'Sheet1';
 
     this.renderer = new Renderer(this);
     this.editor = new Editor(this);
