@@ -3,8 +3,10 @@ import ReactDOM from 'react-dom';
 import Handsontable from 'handsontable/dist/handsontable.full';
 import {argbToRgb, colorToRgb, FormulaError} from './helpers';
 import colCache from './col-cache';
-import SSF from 'ssf'
+import FormulaParser from 'fast-formula-parser';
 import RichText from 'xlsx-populate/lib/RichText';
+
+const SSF = FormulaParser.SSF;
 
 const SPAN_TEMPLATE = document.createElement('span');
 SPAN_TEMPLATE.style.pointerEvents = 'none';

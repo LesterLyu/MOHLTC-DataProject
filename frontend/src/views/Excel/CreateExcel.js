@@ -9,10 +9,8 @@ import {
 
 import {
   init, generateTableData, generateTableStyle, createArray, colCache, getCellType,
-  saveFormulaResultToCell
 } from './helpers';
-import Parser from './calculations/formulaParser'
-import CalculationChain from './calculations/chain'
+
 import Renderer from './renderer';
 import Editor from './editor';
 import './style.css';
@@ -95,9 +93,6 @@ class Excel extends Component {
     this.workbookManager = new WorkbookManager(props);
     // for calculation
     this.currentSheetName = 'Sheet1';
-    this.parser = new Parser(this);
-    this.calculationChain = new CalculationChain(this);
-    // this.parser.changeCurrSheetName()
 
     this.renderer = new Renderer(this);
     this.editor = new Editor(this);
@@ -205,9 +200,11 @@ class Excel extends Component {
       updates = cell.setValue(rawValue);
     }
 
+    this.renderer.cellNeedUpdate(this.currentSheetIdx, row, col);
+
     // add to next render list
     updates.forEach(ref => {
-      this.renderer.cellNeedUpdate(this.global.sheetNames.indexOf(ref.sheet), ref.row, ref.col);
+      this.renderer.cellNeedUpdate(this.global.sheetNames.indexOf(ref.sheet), ref.row - 1, ref.col - 1);
     });
 
 
@@ -272,7 +269,6 @@ class Excel extends Component {
       this.currentSheetName = this.global.sheetNames[sheetNameOrIndex];
       this.currentSheetIdx = sheetNameOrIndex;
     }
-    this.parser.changeCurrSheetName(this.currentSheetName);
   }
 
   addSheet = () => {
