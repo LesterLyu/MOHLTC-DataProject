@@ -198,17 +198,13 @@ class Excel extends Component {
       updates = cell.setValue(rawValue);
     }
 
-    this.renderer.cellNeedUpdate(this.currentSheetIdx, row, col);
-
+    this.renderCell(row, col);
     // add to next render list
     updates.forEach(ref => {
-      this.renderer.cellNeedUpdate(this.global.sheetNames.indexOf(ref.sheet), ref.row - 1, ref.col - 1);
+      if (ref.sheet === this.currentSheetName) {
+        this.renderCell(ref.row - 1, ref.col - 1);
+      }
     });
-
-
-    // if (source !== 'internal') {
-    //   this.afterChangeByUser(cell, oldValue, oldFormula);
-    // }
   }
 
   /**
@@ -224,31 +220,6 @@ class Excel extends Component {
   setDataAndRender(...params) {
     this.setData(...params);
     this.renderCurrentSheet();
-  }
-
-  /**
-   * Should be called after every change to a cell by the user
-   * @param cell
-   * @param oldValue
-   * @param oldFormula
-   */
-  afterChangeByUser(cell, oldValue, oldFormula) {
-    const row = cell.rowNumber() - 1, col = cell.columnNumber() - 1;
-
-    // if the old cell contains formula, we remove the formula dependencies in our calculation chain.
-    if (typeof oldFormula === 'string') {
-      this.calculationChain.removeCell(this.currentSheetIdx, row, col, oldFormula);
-    }
-
-    // if the new cell contains formula, we update the formula dependency in our calculation chain.
-    if (typeof cell.formula() === 'string') {
-      this.calculationChain.addCell(this.currentSheetIdx, row, col, cell.formula());
-    }
-
-    // request recalculation for formulas if cell value changes
-    if (cell.value() !== oldValue) {
-      this.calculationChain.change(this.currentSheetIdx, row, col);
-    }
   }
 
   getSheet(idx) {
