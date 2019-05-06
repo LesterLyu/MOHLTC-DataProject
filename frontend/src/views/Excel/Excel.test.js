@@ -35,9 +35,9 @@ describe('<Excel />', () => {
     expect(excel.workbook).not.toBe(undefined);
   });
 
-  it('empty cell should equal 0', () => {
+  it('empty cell should == null', () => {
     excel.setData(0, 0, 1, '=A1', 'edit');
-    expect(excel.sheet.cell('B1').value()).toBe(0);
+    expect(excel.sheet.cell('B1').value() == null).toBe(true);
   });
 
   it('basic formula cell reference', () => {

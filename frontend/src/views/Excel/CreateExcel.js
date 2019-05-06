@@ -284,6 +284,7 @@ class Excel extends Component {
       // create local workbook storage
       this.workbookManager.createWorkbookLocal()
         .then(workbook => {
+          this.currentSheetName = 'Sheet1';
           this.workbook = workbook;
           this.setState({
             sheetWidth,
