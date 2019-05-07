@@ -1,5 +1,5 @@
 import colCache from './col-cache';
-import RichTexts from "xlsx-populate/lib/RichText";
+import RichTexts from "xlsx-populate/lib/worksheets/RichText";
 import XlsxPopulate from "xlsx-populate";
 
 const FormulaError = XlsxPopulate.FormulaError;

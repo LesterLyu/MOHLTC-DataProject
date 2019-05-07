@@ -4,7 +4,7 @@ import Handsontable from 'handsontable/dist/handsontable.full';
 import {argbToRgb, colorToRgb, FormulaError} from './helpers';
 import colCache from './col-cache';
 import FormulaParser from 'fast-formula-parser';
-import RichText from 'xlsx-populate/lib/RichText';
+import RichText from 'xlsx-populate/lib/worksheets/RichText';
 
 const SSF = FormulaParser.SSF;
 
