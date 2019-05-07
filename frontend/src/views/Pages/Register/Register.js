@@ -87,7 +87,7 @@ class Register extends Component {
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-user"/>
+                          <i className="mdi mdi-account-circle"/>
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="text" id="username" placeholder="Username" autoComplete="username"
@@ -105,7 +105,7 @@ class Register extends Component {
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-doc"/>
+                          <i className="mdi mdi-rename-box"/>
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="firstName" id="firstName" placeholder="First Name" autoComplete="firstName"
@@ -115,7 +115,7 @@ class Register extends Component {
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-docs"/>
+                          <i className="mdi mdi-rename-box"/>
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="lastName" id="lastName" placeholder="Last Name" autoComplete="lastName"
@@ -125,7 +125,7 @@ class Register extends Component {
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-phone"/>
+                          <i className="mdi mdi-cellphone"/>
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="phoneNumber" id="phoneNumber" placeholder="Phone Number" autoComplete="phoneNumber"
@@ -135,7 +135,7 @@ class Register extends Component {
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-graduation"/>
+                          <i className="mdi mdi-account-group"/>
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="organization" id="organization" placeholder="Organization"
@@ -146,7 +146,7 @@ class Register extends Component {
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-people"/>
+                          <i className="mdi mdi-numeric"/>
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="groupNumber" id="groupNumber" placeholder="Group Number" autoComplete="groupNumber"
@@ -156,7 +156,7 @@ class Register extends Component {
                     <InputGroup className="mb-3">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-lock"/>
+                          <i className="mdi mdi-lock"/>
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="password" id="password" placeholder="Password" autoComplete="new-password"
@@ -166,7 +166,7 @@ class Register extends Component {
                     <InputGroup className="mb-4">
                       <InputGroupAddon addonType="prepend">
                         <InputGroupText>
-                          <i className="icon-lock"></i>
+                          <i className="mdi mdi-lock-plus"/>
                         </InputGroupText>
                       </InputGroupAddon>
                       <Input type="password" id="repeatPassword" placeholder="Repeat password"

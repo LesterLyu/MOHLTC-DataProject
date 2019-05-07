@@ -26,7 +26,7 @@ class DefaultHeader extends Component {
         <Nav className="ml-auto" navbar>
           <AppHeaderDropdown direction="down">
             <DropdownToggle nav>
-              <i className="cui-user icons font-2xl"/>
+              <i className="mdi mdi-account mdi-36px"/>
             </DropdownToggle>
             <DropdownMenu right style={{right: 'auto'}}>
               <DropdownItem header tag="div" className="text-center"><strong>Account</strong></DropdownItem>

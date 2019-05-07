@@ -71,7 +71,7 @@ class Login extends Component {
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
-                            <i className="icon-user"></i>
+                            <i className="mdi mdi-account-circle"></i>
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input type="text" id="username" placeholder="Username" autoComplete="username"
@@ -80,7 +80,7 @@ class Login extends Component {
                       <InputGroup className="mb-4">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
-                            <i className="icon-lock"></i>
+                            <i className="mdi mdi-lock"></i>
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input type="password" id="password" placeholder="Password" autoComplete="current-password"

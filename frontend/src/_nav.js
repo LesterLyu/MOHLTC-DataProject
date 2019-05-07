@@ -5,7 +5,7 @@ export default {
     {
       name: 'Dashboard',
       url: '/dashboard',
-      icon: 'icon-speedometer',
+      icon: 'mdi mdi-view-dashboard',
       badge: {
         variant: 'info',
         // text: 'NEW',
@@ -66,7 +66,7 @@ export default {
         {
           name: 'Query',
           url: '/5fghfgh',
-          icon: 'mdi mdi-jquery',
+          icon: 'mdi mdi-magnify',
         },
       ]
     },
