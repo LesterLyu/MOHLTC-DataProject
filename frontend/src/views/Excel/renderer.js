@@ -282,21 +282,28 @@ export default class Renderer {
       span.style.transform = 'rotate(-' + textRotation + 'deg)';
     }
 
-    const hyperlink = cell.hyperlink();
+    const hyperlink = cell.sheet()._hyperlinks.get(cell.address());
     if (hyperlink) {
+      const location = hyperlink.attributes.location;
       const a = document.createElement('a');
-      if (hyperlink.mode === 'internal') {
-        a.href = window.location.href;
+      a.href = window.location.href;
+
+      if (location) {
         a.onclick = (event) => {
-          excelInstance.switchSheet(hyperlink.sheetName);
+          const sheet = cell.sheet()._hyperlinks.parse(location).sheet;
+          if (sheet)
+            excelInstance.switchSheet(sheet);
           // a trick to move mouse out of window, to fix hyperlink performance bug
           // eventFire($('ol')[0], 'mousedown');
           // gui.showSheet(hyperlink.sheetName);
         };
       } else {
         a.target = '_black';
-        a.href = hyperlink.target;
+        a.href = cell.hyperlink();
       }
+      Handsontable.dom.fastInnerHTML(a, result);
+      Handsontable.dom.fastInnerText(td, '');
+      td.appendChild(a);
     }
 
     // set cache
