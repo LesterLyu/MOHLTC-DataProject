@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosRequestConfig} from "axios";
 import config from "./../config/config";
 import XlsxPopulate from "xlsx-populate";
 import {readSheet, excelInstance} from "../views/Excel/helpers";
@@ -56,6 +56,22 @@ class WorkbookManager {
         }
 
       })
+  }
+
+  // David
+  static deleteWorkbookForAdmin(name) {
+    console.log("inside the workbook Manager: " + name);
+
+    return axios.delete(config.server + '/api/admin/workbook/',
+      {
+        data: {
+          name: decodeURIComponent(name),
+        },
+        withCredentials: axiosConfig.withCredentials
+      })
+      .then(response => {
+        console.log(response);
+      });
   }
 
   getWorkbook(name) {
