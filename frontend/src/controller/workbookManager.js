@@ -61,7 +61,7 @@ class WorkbookManager {
   getWorkbook(name) {
     return axios.get(config.server + '/api/workbook/' + name, axiosConfig)
       .then(response => {
-        console.log(response)
+        console.log(response);
         if (this.check(response)) {
           return response;
         }
@@ -165,7 +165,7 @@ class WorkbookManager {
           .then(workbook => this._readWorkbook(workbook, null, name));
       })
       .catch(err => {
-        console.log(err)
+        console.log(err);
         this.props.showMessage(err.toString(), 'error');
       })
 
@@ -219,7 +219,7 @@ class WorkbookManager {
     }
   }
 
-  downloadWorkbook(workbook, fileName='out.xlsx') {
+  downloadWorkbook(workbook, fileName = 'out.xlsx') {
     return workbook.outputAsync()
       .then(function (blob) {
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {
