@@ -21,6 +21,7 @@ import ExcelToolBar from './components/ExcelToolBar';
 import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
 import SetIdDialog from "./components/SetIdDialog";
+import Dropdown from './components/Dropdown';
 // const excelWorker = new Worker('../../controller/excel.worker', { type: 'module' });
 window.colCache = colCache;
 
@@ -80,6 +81,8 @@ class Excel extends Component {
       loaded: false,
       currentSheetIdx: 0,
       openSetId: null,
+      openDropdown: null,
+      dropdownCell: null,
       fileName: 'Untitled workbook'
     };
     this.global = {
@@ -103,7 +106,6 @@ class Excel extends Component {
     this.attOptions = [];
     this.catOptions = [];
   }
-
 
 
   get isLoaded() {
@@ -135,6 +137,10 @@ class Excel extends Component {
   }
 
   set currentSheetIdx(currentSheetIdx) {
+    if (currentSheetIdx === -1) {
+      this.props.showMessage('Reference does not exist.', 'warning');
+      return;
+    }
     this.setState({currentSheetIdx})
   }
 
@@ -276,6 +282,21 @@ class Excel extends Component {
     this.setState({openSetId: null});
   };
 
+  /**
+   * For data validation
+   * @param event
+   * @param cell
+   */
+  showDropdown = (event, cell) => {
+    const td = event.target.parentNode.parentNode;
+    this.setState({openDropdown: td, dropdownCell: cell});
+    console.log(event)
+  };
+
+  handleCloseDropdown = () => {
+    this.setState({openDropdown: null});
+  };
+
   componentDidMount() {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
     const sheetHeight = this.sheetContainerRef.current.offsetHeight;
@@ -378,6 +399,7 @@ class Excel extends Component {
       || this.state.loaded !== nextState.loaded
       || this.state.currentSheetIdx !== nextState.currentSheetIdx
       || this.state.openSetId !== nextState.openSetId
+      || this.state.openDropdown !== nextState.openDropdown
       || this.state.fileName !== nextState.fileName
   }
 
@@ -411,6 +433,11 @@ class Excel extends Component {
             attOptions={this.attOptions}
             handleSetId={this.handleSetId}
             handleClose={this.handleCloseSetId}
+          />
+          <Dropdown
+            anchorEl={this.state.openDropdown}
+            cell={this.state.dropdownCell}
+            handleClose={this.handleCloseDropdown}
           />
         </div>
       );

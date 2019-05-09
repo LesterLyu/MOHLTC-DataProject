@@ -6,3 +6,14 @@ button:focus {
 .handsontable td, .handsontable th {
   white-space: pre;
 }
+
+.dropdownArrow {
+  font-size: 10px;
+  color: #c1c1c1;
+  float: right;
+  position: relative;
+}
+
+.dropdownArrow:hover {
+  color: #4f4f4f;
+}

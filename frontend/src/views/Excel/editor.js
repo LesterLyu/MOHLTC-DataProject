@@ -38,6 +38,7 @@ export class FormulaEditorNG extends TextEditor {
   };
 
   setValue(newValue) {
+    // TODO: embed data validation
     if (this.type === 'formula') {
       this.TEXTAREA.value = '=' + newValue;
     } else {
