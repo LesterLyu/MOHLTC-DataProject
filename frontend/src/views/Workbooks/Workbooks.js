@@ -31,6 +31,7 @@ class Workbooks extends Component {
       loading: true
     };
     this.workbookManager = new WorkbookManager(props);
+    // FIXME: reload after delete one workbook
     if (this.mode === 'user') {
       this.workbookManager.getAllWorkbooksForUser()
         .then(data => {
@@ -39,8 +40,7 @@ class Workbooks extends Component {
           this.workbooks = data;
           this.setState({loading: false});
         })
-    }
-    else if (this.mode === 'admin') {
+    } else if (this.mode === 'admin') {
       this.workbookManager.getAllWorkbooksForAdmin()
         .then(data => {
           if (!data)
@@ -95,11 +95,15 @@ class Workbooks extends Component {
   }
 
   deleteWorkbookForUser(workbook) {
-      console.log('user delete workbook ', workbook)
+    console.log('user delete workbook ', workbook);
   }
 
   deleteWorkbookForAdmin(workbook) {
-    console.log('admin delete workbook ', workbook)
+    // david
+    // Firstly, delete workbook from database
+    console.log(workbook);
+    WorkbookManager.deleteWorkbookForAdmin(workbook);
+    // Then, reload all workbooks
   }
 
   render() {
@@ -112,8 +116,7 @@ class Workbooks extends Component {
           <LinearProgress variant="indeterminate"/>
         </div>
       );
-    }
-    else if (this.mode === 'user') {
+    } else if (this.mode === 'user') {
       return (
         <div className="animated fadeIn">
           <Paper className={classes.root} elevation={1}>
@@ -139,8 +142,7 @@ class Workbooks extends Component {
           </Paper>
         </div>
       )
-    }
-    else if (this.mode === 'admin') {
+    } else if (this.mode === 'admin') {
       return (
         <div className="animated fadeIn">
           <Paper className={classes.root} elevation={1}>
@@ -155,8 +157,7 @@ class Workbooks extends Component {
           </Paper>
         </div>
       )
-    }
-    else {
+    } else {
       return (
         <Typography variant="h6" gutterBottom>
           Error: Illegal params.
