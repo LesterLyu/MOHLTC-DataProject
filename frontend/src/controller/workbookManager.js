@@ -58,11 +58,11 @@ class WorkbookManager {
   }
 
   // David
-  deleteWorkbookForAdmin(name) {
+  deleteWorkbookForAdmin(fileName) {
     return axios.delete(config.server + '/api/admin/workbook/',
       {
         data: {
-          name: name,
+          name: fileName,
         },
         withCredentials: axiosConfig.withCredentials,
       })
@@ -74,7 +74,24 @@ class WorkbookManager {
       .catch(err => {
         this.props.showMessage(err.toString(), 'error');
       })
-    // this.props.showMessage(response.data.message, response.data.success ? 'success' : 'error');
+  }
+
+  deleteWorkbookForUser(fileName) {
+    return axios.delete(config.server + '/api/filled-workbook',
+      {
+        data: {
+          name: fileName,
+        },
+        withCredentials: axiosConfig.withCredentials,
+      })
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+      .catch(err => {
+        this.props.showMessage(err.toString(), 'error');
+      })
   }
 
   getWorkbook(name) {

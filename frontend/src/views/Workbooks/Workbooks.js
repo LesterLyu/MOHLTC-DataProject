@@ -22,14 +22,6 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import Slide from '@material-ui/core/Slide';
-
-function Transition(props) {
-  return <Slide direction="up" {...props} />;
-}
-
-// david's dialog
-
 
 const styles = theme => ({
   root: {
@@ -98,10 +90,14 @@ class Workbooks extends Component {
 
   // david
   handleAlertDialogCancel = () => {
-    this.setState({openAlertDialog: false});
+    this.setState({
+      openAlertDialog: false
+    });
   };
   handleAlertDialogDelete = () => {
-    this.setState({openAlertDialog: false});
+    this.setState({
+      openAlertDialog: false
+    });
     let workbook = this.state.currentWorkbook;
     if (!workbook) {
       return;
@@ -112,7 +108,6 @@ class Workbooks extends Component {
         this.props.showMessage('Something Error', 'error');
       } else {
         console.log("debugging: " + data.message);
-        // FIXME: reload workbooks
         // Finally, return message about result and reload data from database
         this.componentDidMount();
         this.props.showMessage(data.message, 'success');
@@ -120,13 +115,18 @@ class Workbooks extends Component {
     });
   };
 
-  deleteWorkbookForUser(workbook) {
+// FIXME: next task
+  deleteWorkbookForUser = (workbook) => {
     console.log('user delete workbook ', workbook);
-  }
+    this.setState({
+      currentWorkbook: workbook,
+      openAlertDialog: true,
+    });
+  };
 
   deleteWorkbookForAdmin = (workbook) => {
     // david
-    // FIXME: firstly delete item from list, refresh workbooks list and ask for confirmation to delete
+    // FIXME: firstly delete item from list, refresh workbooks list then ask for confirmation to delete
     this.setState({
       currentWorkbook: workbook,
       openAlertDialog: true,
@@ -188,6 +188,31 @@ class Workbooks extends Component {
               </Grid>
               {this.filledWorkbooks()}
             </Grid>
+            <Dialog
+              open={this.state.openAlertDialog}
+              keepMounted
+              onClose={this.handleClose}
+              aria-labelledby="alert-dialog-slide-title"
+              aria-describedby="alert-dialog-slide-description"
+            >
+              <DialogTitle id="alert-dialog-slide-title">
+                {"Confirm delete ?"}
+              </DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-slide-description">
+                  Are you sure you want to delete <strong>{this.state.currentWorkbook}</strong>? <br/>
+                  This process cannot be undone.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={this.handleAlertDialogCancel} color="primary">
+                  Cancel
+                </Button>
+                <Button onClick={this.handleAlertDialogDelete} color="primary">
+                  Delete
+                </Button>
+              </DialogActions>
+            </Dialog>
 
           </Paper>
         </div>
@@ -205,11 +230,8 @@ class Workbooks extends Component {
               {this.allWorkbooks()}
             </Grid>
           </Paper>
-
-          // david
           <Dialog
             open={this.state.openAlertDialog}
-            TransitionComponent={Transition}
             keepMounted
             onClose={this.handleClose}
             aria-labelledby="alert-dialog-slide-title"
