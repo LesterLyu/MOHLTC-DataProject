@@ -29,24 +29,7 @@ class Workbooks extends Component {
     this.state = {
       loading: true
     };
-    this.workbookManager = new WorkbookManager(props);
-    if (this.mode === 'user') {
-      this.workbookManager.getAllWorkbooksForUser()
-        .then(data => {
-          if (!data)
-            return;
-          this.workbooks = data;
-          this.setState({loading: false});
-        })
-    } else if (this.mode === 'admin') {
-      this.workbookManager.getAllWorkbooksForAdmin()
-        .then(data => {
-          if (!data)
-            return;
-          this.workbooks = data;
-          this.setState({loading: false});
-        })
-    }
+    this.workbookManager = new WorkbookManager(this.props);
   }
 
   filledWorkbooks() {
@@ -95,19 +78,41 @@ class Workbooks extends Component {
     console.log('user delete workbook ', workbook);
   }
 
-  deleteWorkbookForAdmin(workbook) {
+  deleteWorkbookForAdmin = (workbook) => {
     // david
     // FIXME: firstly delete item from list, refresh workbooks list and ask for confirmation to delete
     // Second, if confirmed, delete workbook from database
     // if not, cancel the previous action
-    WorkbookManager.deleteWorkbookForAdmin(workbook).then((data) => {
+    this.workbookManager.deleteWorkbookForAdmin(workbook).then((data) => {
       if (!data)
         return;
       console.log("debugging: " + data.message);
       // FIXME: reload workbooks
       // Finally, return message about result and reload data from database
+      this.componentDidMount();
+      this.props.showMessage(data.message, 'success')
     });
-  }
+  };
+
+  componentDidMount() {
+    if (this.mode === 'user') {
+      this.workbookManager.getAllWorkbooksForUser()
+        .then(data => {
+          if (!data)
+            return;
+          this.workbooks = data;
+          this.setState({loading: false});
+        })
+    } else if (this.mode === 'admin') {
+      this.workbookManager.getAllWorkbooksForAdmin()
+        .then(data => {
+          if (!data)
+            return;
+          this.workbooks = data;
+          this.setState({loading: false});
+        })
+    }
+  };
 
   render() {
     const {classes} = this.props;
