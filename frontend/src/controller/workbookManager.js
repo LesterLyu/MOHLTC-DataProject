@@ -54,7 +54,6 @@ class WorkbookManager {
         if (this.check(response)) {
           return response.data.workbooks;
         }
-
       })
   }
 
