@@ -99,23 +99,24 @@ class Workbooks extends Component {
   // david
   handleAlertDialogCancel = () => {
     this.setState({openAlertDialog: false});
-    return false;
   };
-
   handleAlertDialogDelete = () => {
-    if (!this.state.currentWorkbook) {
+    this.setState({openAlertDialog: false});
+    let workbook = this.state.currentWorkbook;
+    if (!workbook) {
       return;
     }
-    this.setState({openAlertDialog: false});
     // continue to delete workbook
-    this.workbookManager.deleteWorkbookForAdmin(this.state.currentWorkbook).then((data) => {
-      if (!data)
-        return;
-      console.log("debugging: " + data.message);
-      // FIXME: reload workbooks
-      // Finally, return message about result and reload data from database
-      this.componentDidMount();
-      this.props.showMessage(data.message, 'success');
+    this.workbookManager.deleteWorkbookForAdmin(workbook).then((data) => {
+      if (!data) {
+        this.props.showMessage('Something Error', 'error');
+      } else {
+        console.log("debugging: " + data.message);
+        // FIXME: reload workbooks
+        // Finally, return message about result and reload data from database
+        this.componentDidMount();
+        this.props.showMessage(data.message, 'success');
+      }
     });
   };
 
@@ -215,20 +216,20 @@ class Workbooks extends Component {
             aria-describedby="alert-dialog-slide-description"
           >
             <DialogTitle id="alert-dialog-slide-title">
-              {"Use Google's location service?"}
+              {"Confirm delete ?"}
             </DialogTitle>
             <DialogContent>
               <DialogContentText id="alert-dialog-slide-description">
-                Let Google help apps determine location. This means sending anonymous location data to
-                Google, even when no apps are running.
+                Are you sure you want to delete <strong>{this.state.currentWorkbook}</strong>? <br/>
+                This process cannot be undone.
               </DialogContentText>
             </DialogContent>
             <DialogActions>
               <Button onClick={this.handleAlertDialogCancel} color="primary">
-                Disagree
+                Cancel
               </Button>
               <Button onClick={this.handleAlertDialogDelete} color="primary">
-                Agree
+                Delete
               </Button>
             </DialogActions>
           </Dialog>
