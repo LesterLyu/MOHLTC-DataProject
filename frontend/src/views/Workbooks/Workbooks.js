@@ -23,7 +23,6 @@ const styles = theme => ({
 });
 
 class Workbooks extends Component {
-
   constructor(props) {
     super(props);
     this.mode = this.props.params.mode; // can be user or admin
@@ -31,7 +30,6 @@ class Workbooks extends Component {
       loading: true
     };
     this.workbookManager = new WorkbookManager(props);
-    // FIXME: reload after delete one workbook
     if (this.mode === 'user') {
       this.workbookManager.getAllWorkbooksForUser()
         .then(data => {
@@ -49,7 +47,6 @@ class Workbooks extends Component {
           this.setState({loading: false});
         })
     }
-
   }
 
   filledWorkbooks() {
@@ -100,10 +97,16 @@ class Workbooks extends Component {
 
   deleteWorkbookForAdmin(workbook) {
     // david
-    // Firstly, delete workbook from database
-    console.log(workbook);
-    WorkbookManager.deleteWorkbookForAdmin(workbook);
-    // Then, reload all workbooks
+    // FIXME: firstly delete item from list, refresh workbooks list and ask for confirmation to delete
+    // Second, if confirmed, delete workbook from database
+    // if not, cancel the previous action
+    WorkbookManager.deleteWorkbookForAdmin(workbook).then((data) => {
+      if (!data)
+        return;
+      console.log("debugging: " + data.message);
+      // FIXME: reload workbooks
+      // Finally, return message about result and reload data from database
+    });
   }
 
   render() {

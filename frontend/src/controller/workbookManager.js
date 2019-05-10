@@ -60,18 +60,18 @@ class WorkbookManager {
 
   // David
   static deleteWorkbookForAdmin(name) {
-    console.log("inside the workbook Manager: " + name);
-
     return axios.delete(config.server + '/api/admin/workbook/',
       {
         data: {
           name: decodeURIComponent(name),
         },
-        withCredentials: axiosConfig.withCredentials
-      })
-      .then(response => {
-        console.log(response);
-      });
+        withCredentials: axiosConfig.withCredentials,
+      }).catch(error => {
+      return error.data;
+    }).then(response => {
+      return response.data;
+    });
+    // this.props.showMessage(response.data.message, response.data.success ? 'success' : 'error');
   }
 
   getWorkbook(name) {
@@ -168,13 +168,13 @@ class WorkbookManager {
       })
   }
 
-  // methods for modifying workbook
+// methods for modifying workbook
   createWorkbookLocal() {
     return XlsxPopulate.fromBlankAsync()
   }
 
-  readWorkbookFromDatabase(fileName) {
-    return this.getWorkbook(fileName)
+  readWorkbookFromDatabase(workbook) {
+    return this.getWorkbook(workbook)
       .then(response => {
         const {data, name} = response.data.workbook;
         return XlsxPopulate.fromDataAsync(data, {base64: true})
