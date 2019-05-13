@@ -99,7 +99,7 @@ class Dropdown extends Component {
       }
     }
     options = options.map((option, index) => {
-      option = option.trim();
+      if (typeof option === "string") option = option.trim();
       if (option === value)
         idx = index;
       return {value: option, label: option}
