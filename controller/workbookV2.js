@@ -40,22 +40,27 @@ module.exports = {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
-            Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
-                if (err) {
-                    console.log(err);
-                    return res.status(500).json({success: false, message: err});
-                }
-                if (!workbook) {
-                    return res.status(400).json({success: false, message: 'Workbook does not exist.'});
-                }
-                if (!filledWorkbook) {
+            if (filledWorkbook) {
+                return res.json({
+                    success: true,
+                    workbook: {
+                        base64: filledWorkbook.base64,
+                        name: filledWorkbook.name,
+                    },
+                    date: filledWorkbook.date
+                })
+            } else {
+                Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    if (!workbook) {
+                        return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                    }
                     return res.json({success: true, workbook: workbook});
-                } else {
-                    workbook.data = filledWorkbook.data;
-                    return res.json({success: true, workbook: workbook});
-                }
-            });
-
+                });
+            }
         })
     },
 
@@ -153,7 +158,7 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-        const {name, data, attMap, catMap} = req.body;
+        const {name, base64, attMap, catMap} = req.body;
         const groupNumber = req.session.user.groupNumber;
         if (name === '' || !name) {
             return res.status(500).json({success: false, message: 'Name cannot be empty.'});
@@ -170,12 +175,12 @@ module.exports = {
                 workbook = new Workbook({
                     name,
                     groupNumber,
-                    data,
+                    base64,
                     attMap,
                     catMap
                 });
             } else {
-                workbook.data = data;
+                workbook.base64 = base64;
                 workbook.attMap = attMap;
                 workbook.catMap = catMap;
             }
@@ -186,7 +191,48 @@ module.exports = {
                 }
                 return res.json({
                     success: true,
-                    message: `Successfully ${isNew? 'created' : 'edited'} workbook ${name}.`
+                    message: `Successfully ${isNew ? 'created' : 'edited'} workbook ${name} for admin.`
+                });
+            })
+
+        });
+    },
+
+    // user
+    user_create_edit_workbook: (req, res, next) => {
+        const {name, data, base64} = req.body;
+        const groupNumber = req.session.user.groupNumber;
+        const username = req.session.user.username;
+        if (name === '' || !name) {
+            return res.status(500).json({success: false, message: 'Name cannot be empty.'});
+        }
+
+        FilledWorkbook.findOne({username, name, groupNumber}, (err, filledWorkbook) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            let isNew = false;
+            if (!filledWorkbook) {
+                isNew = true;
+                filledWorkbook = new FilledWorkbook({
+                    name,
+                    username,
+                    groupNumber,
+                    data,
+                    base64,
+                });
+            } else {
+                filledWorkbook.data = data;
+            }
+            filledWorkbook.save((err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                return res.json({
+                    success: true,
+                    message: `Successfully ${isNew ? 'created' : 'edited'} workbook ${name} for user.`
                 });
             })
 

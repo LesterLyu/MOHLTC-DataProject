@@ -7,7 +7,7 @@ let workbookSchema = new mongoose.Schema({
     groupNumber: {type: Number, required: true},
     fileName: String,
     extra: {}, //store styles and other properties, compressed
-    data: {}, // store data
+    base64: {}, // store data
     attMap: {},
     catMap: {},
 });
