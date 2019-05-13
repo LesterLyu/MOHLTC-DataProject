@@ -182,7 +182,7 @@ class Excel extends Component {
    * @param {number} row
    * @param {number} col
    * @param {string|number} rawValue - can be any excel data type
-   * @param {'internal'| 'edit'} source - 'internal' means internal update, i.e. formula updates
+   * @param {'internal'| 'edit'} [source] - 'internal' means internal update, i.e. formula updates
    *                                      'edit' means edit by the user
    */
   setData(sheetNo, row, col, rawValue, source) {
@@ -211,7 +211,7 @@ class Excel extends Component {
         this.renderCell(ref.row - 1, ref.col - 1);
       }
     });
-  }
+  };
 
   /**
    * Update a cell's data and render it.
@@ -290,7 +290,15 @@ class Excel extends Component {
   showDropdown = (event, cell) => {
     const td = event.target.parentNode.parentNode;
     this.setState({openDropdown: td, dropdownCell: cell});
-    console.log(event)
+  };
+
+  handleChangeDropdown = selected => {
+    /**
+     * @type {Cell|undefined}
+     */
+    const dropdownCell = this.state.dropdownCell;
+    this.setData(this.currentSheetIdx, dropdownCell.rowNumber() - 1, dropdownCell.columnNumber() - 1, selected.value);
+    this.setState({openDropdown: null, dropdownCell: null});
   };
 
   handleCloseDropdown = () => {
@@ -438,6 +446,7 @@ class Excel extends Component {
             anchorEl={this.state.openDropdown}
             cell={this.state.dropdownCell}
             handleClose={this.handleCloseDropdown}
+            handleChange={this.handleChangeDropdown}
           />
         </div>
       );
