@@ -332,6 +332,9 @@ class Excel extends Component {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
     const sheetHeight = this.sheetContainerRef.current.offsetHeight;
 
+    this.workbookManager.get('att').then(atts => this.attOptions = atts);
+    this.workbookManager.get('cat').then(cats => this.catOptions = cats);
+
     if (this.mode === 'admin create') {
       // create local workbook storage
       this.workbookManager.createWorkbookLocal()
@@ -377,9 +380,6 @@ class Excel extends Component {
             loadingMessage: '', loaded: true
           });
         })
-    } else {
-      this.workbookManager.get('att').then(atts => this.attOptions = atts);
-      this.workbookManager.get('cat').then(cats => this.catOptions = cats);
     }
   }
 
