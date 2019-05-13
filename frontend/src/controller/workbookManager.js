@@ -58,8 +58,9 @@ class WorkbookManager {
       })
   }
 
-  getWorkbook(name) {
-    return axios.get(config.server + '/api/workbook/' + name, axiosConfig)
+  getWorkbook(name, admin) {
+    const url = admin ? '/api/workbook/' : '/api/v2/user/filled/';
+    return axios.get(config.server + url + name, axiosConfig)
       .then(response => {
         console.log(response)
         if (this.check(response)) {
@@ -157,15 +158,15 @@ class WorkbookManager {
     return XlsxPopulate.fromBlankAsync()
   }
 
-  readWorkbookFromDatabase(fileName) {
-    return this.getWorkbook(fileName)
+  readWorkbookFromDatabase(fileName, admin = true) {
+    return this.getWorkbook(fileName, admin)
       .then(response => {
-        const {data, name} = response.data.workbook;
-        return XlsxPopulate.fromDataAsync(data, {base64: true})
+        const {base64, name} = response.data.workbook;
+        return XlsxPopulate.fromDataAsync(base64, {base64: true})
           .then(workbook => this._readWorkbook(workbook, null, name));
       })
       .catch(err => {
-        console.log(err)
+        console.log(err);
         this.props.showMessage(err.toString(), 'error');
       })
 
@@ -285,11 +286,11 @@ class WorkbookManager {
         console.log(workbookData, attMap, catMap, fileName);
         if (admin) {
           return axios.post(config.server + '/api/v2/admin/workbook', {
-            attMap, catMap, data: base64, name: fileName
+            attMap, catMap, base64, name: fileName
           }, axiosConfig);
         } else {
           return axios.post(config.server + '/api/v2/user/workbook', {
-            workbookData, name: fileName
+            workbookData, base64, name: fileName
           }, axiosConfig);
         }
       })
