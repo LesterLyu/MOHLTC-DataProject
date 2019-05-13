@@ -22,6 +22,7 @@ const borderStyle2Width = {thin: 1, medium: 2, thick: 3};
 export default class Renderer {
   constructor(instance) {
     excelInstance = instance;
+    excelInstance.SSF = SSF;
     this.global = instance.state.global;
     this.changes = {}; // sheetId -> row -> col -> boolean
     this.log = [];
@@ -360,17 +361,9 @@ function setFontStyle(element, font) {
 
 function calcResult(cellValue, numFmt) {
   let result = cellValue;
-  if (cellValue && typeof cellValue === 'object' && cellValue.hasOwnProperty('formula')) {
-    if (cellValue.result && cellValue.result.error) {
-      result = cellValue.result.error;
-    } else {
-      result = cellValue.result;
-
-    }
-  }
   result = result === null || result === undefined ? '' : result;
   if (numFmt !== null && numFmt !== undefined) {
-    result = SSF.format(numFmt, result);
+    result = SSF.format(numFmt.replace('\\', ''), result);
   }
   return result;
 }
