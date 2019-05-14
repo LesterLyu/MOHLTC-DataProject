@@ -18,6 +18,7 @@ import WorkbookManager from "../../controller/workbookManager";
 import Worksheets from './components/Worksheets'
 import ExcelAppBar from './components/ExcelAppBar';
 import ExcelToolBar from './components/ExcelToolBar';
+import ExcelToolBarUser from './components/ExcelToolBarUser';
 import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
 import SetIdDialog from "./components/SetIdDialog";
@@ -72,6 +73,7 @@ class Excel extends Component {
     super(props);
     this.mode = props.params.mode;
     console.log('mode:', props.params.mode);
+    // TODO: disable some cell editing for user (formula editing...)
     window.excel = this;
     this.state = {
       completed: 5,
@@ -83,6 +85,7 @@ class Excel extends Component {
       openSetId: null,
       openDropdown: null,
       dropdownCell: null,
+      setIdCell: null,
       fileName: 'Untitled workbook'
     };
     this.global = {
@@ -151,6 +154,17 @@ class Excel extends Component {
     return this.sheetRef.current ? this.sheetRef.current.hotInstance : null;
   }
 
+  /**
+   * @return {{cell: Cell, td: HTMLElement}}
+   */
+  get selected() {
+    const selected = this.hotInstance.getSelected();
+    return {
+      cell: this.sheet.getCell(selected[0][0] + 1, selected[0][1] + 1),
+      td: this.hotInstance.getCell(selected[0][0], selected[0][1])
+    };
+  }
+
   addHook = (name, f) => {
     this.hooks.push({name, f});
   };
@@ -182,7 +196,7 @@ class Excel extends Component {
    * @param {number} row
    * @param {number} col
    * @param {string|number} rawValue - can be any excel data type
-   * @param {'internal'| 'edit'} source - 'internal' means internal update, i.e. formula updates
+   * @param {'internal'| 'edit'} [source] - 'internal' means internal update, i.e. formula updates
    *                                      'edit' means edit by the user
    */
   setData(sheetNo, row, col, rawValue, source) {
@@ -211,7 +225,8 @@ class Excel extends Component {
         this.renderCell(ref.row - 1, ref.col - 1);
       }
     });
-  }
+    console.log(`Updated ${updates.length + 1} cells.`)
+  };
 
   /**
    * Update a cell's data and render it.
@@ -267,19 +282,27 @@ class Excel extends Component {
   };
 
   setId = () => {
-    const selected = this.hotInstance.getSelected();
-    const td = this.hotInstance.getCell(selected[0][0], selected[0][1]);
+    const {td, cell} = this.selected;
     console.log('td', td);
-    this.setState({openSetId: td});
+    this.setState({openSetId: td, setIdCell: cell});
   };
 
-  handleSetId = (att, cat) => {
+  handleSetId = (att = {}, cat = {}) => {
     console.log(`Set ID`, att, cat);
-    this.setState({openSetId: null});
+    const cell = this.state.setIdCell;
+    const attCell = this.sheet.getCell(1, cell.columnNumber());
+    const catCell = this.sheet.getCell(cell.rowNumber(), 1);
+    if (attCell.getValue() !== att.value || attCell.getFormula() != null
+      || catCell.getValue() !== cat.value || catCell.getFormula() != null) {
+      this.props.showMessage('Content is overridden.', "info");
+    }
+    this.setData(null, 0, cell.columnNumber() - 1, att.value || '');
+    this.setData(null, cell.rowNumber() - 1, 0, cat.value || '');
+    this.setState({openSetId: null, setIdCell: null});
   };
 
   handleCloseSetId = () => {
-    this.setState({openSetId: null});
+    this.setState({openSetId: null, setIdCell: null});
   };
 
   /**
@@ -290,16 +313,27 @@ class Excel extends Component {
   showDropdown = (event, cell) => {
     const td = event.target.parentNode.parentNode;
     this.setState({openDropdown: td, dropdownCell: cell});
-    console.log(event)
+  };
+
+  handleChangeDropdown = selected => {
+    /**
+     * @type {Cell|undefined}
+     */
+    const dropdownCell = this.state.dropdownCell;
+    this.setData(this.currentSheetIdx, dropdownCell.rowNumber() - 1, dropdownCell.columnNumber() - 1, selected.value);
+    this.setState({openDropdown: null, dropdownCell: null});
   };
 
   handleCloseDropdown = () => {
-    this.setState({openDropdown: null});
+    this.setState({openDropdown: null, dropdownCell: null});
   };
 
   componentDidMount() {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
     const sheetHeight = this.sheetContainerRef.current.offsetHeight;
+
+    this.workbookManager.get('att').then(atts => this.attOptions = atts);
+    this.workbookManager.get('cat').then(cats => this.catOptions = cats);
 
     if (this.mode === 'admin create') {
       // create local workbook storage
@@ -329,17 +363,24 @@ class Excel extends Component {
             loadingMessage: '', loaded: true
           });
         })
-
-    } else if (this.mode === 'user edit') {
-
     }
-
-    this.workbookManager.get('att').then(atts => this.attOptions = atts);
-    this.workbookManager.get('cat').then(cats => this.catOptions = cats);
-
-    //
-    // excelWorker.postMessage(1);
-    // excelWorker.onmessage = function (event) {console.log(event.data)};
+    if (this.mode === 'user edit') {
+      const {name} = this.props.match.params;
+      this.workbookManager.readWorkbookFromDatabase(name, false)
+        .then(data => {
+          const {sheets, sheetNames, workbook, fileName} = data;
+          this.global.sheetNames = sheetNames;
+          this.global.sheets = sheets;
+          this.workbook = workbook;
+          this.setState({
+            fileName,
+            currentSheetIdx: 0,
+            sheetWidth,
+            sheetHeight,
+            loadingMessage: '', loaded: true
+          });
+        })
+    }
   }
 
   renderCell(row, col) {
@@ -414,7 +455,7 @@ class Excel extends Component {
           <LinearProgress variant="indeterminate"/>
         </div>
       );
-    } else {
+    } else if (this.mode === 'admin create' || this.mode === 'admin edit') {
       return (
         <div className="animated fadeIn">
           <Card xs={12}>
@@ -427,8 +468,7 @@ class Excel extends Component {
           </Card>
           <SetIdDialog
             anchorEl={this.state.openSetId}
-            // selectedAtt={}
-            // selectedCat={}
+            cell={this.state.setIdCell}
             catOptions={this.catOptions}
             attOptions={this.attOptions}
             handleSetId={this.handleSetId}
@@ -438,9 +478,26 @@ class Excel extends Component {
             anchorEl={this.state.openDropdown}
             cell={this.state.dropdownCell}
             handleClose={this.handleCloseDropdown}
+            handleChange={this.handleChangeDropdown}
           />
         </div>
       );
+    } else if (this.mode === 'user edit') {
+      return (
+        <div className="animated fadeIn">
+          <Card xs={12}>
+            <ExcelAppBar fileName={this.state.fileName} onFileNameChange={this.onFileNameChange} context={this}/>
+            <ExcelToolBarUser context={this}/>
+            <Worksheets context={this}/>
+            <ExcelBottomBar context={this}/>
+          </Card>
+          <Dropdown
+            anchorEl={this.state.openDropdown}
+            cell={this.state.dropdownCell}
+            handleClose={this.handleCloseDropdown}
+            handleChange={this.handleChangeDropdown}
+          />
+        </div>)
     }
   }
 }

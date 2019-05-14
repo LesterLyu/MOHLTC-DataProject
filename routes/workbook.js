@@ -39,6 +39,12 @@ router.delete('/api/admin/workbook', workbookController.admin_delete_workbook);
 // POST Create/Edit workbook
 router.post('/api/v2/admin/workbook', workbookControllerV2.admin_create_edit_workbook);
 
+// get user filled workbook
+router.get('/api/v2/user/filled/:name', workbookControllerV2.get_filled_workbook);
+
+// POST Create/Edit filledWorkbook
+router.post('/api/v2/user/workbook', workbookControllerV2.user_create_edit_workbook);
+
 // web pages
 
 router.get('/create-workbook-template', (req, res, next) => {

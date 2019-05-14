@@ -29,7 +29,13 @@ const routes = [
   {path: '/users', exact: true, name: 'Users', component: Users},
   {path: '/users/:id', exact: true, name: 'User Details', component: User},
   {path: '/workbooks/fill', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'user'}},
-  // {path: '/workbooks/fill/:name', exact: true, name: 'Fill Workbook', component: Excel, params: {mode: 'user'}},
+  {
+    path: '/workbooks/fill/:name',
+    exact: true,
+    name: 'Fill Workbook',
+    component: CreateExcel,
+    params: {mode: 'user edit'}
+  },
   {path: '/workbooks/template', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'admin'}},
 
   {path: '/workbooks/template/:name/', exact: true, name: 'Edit Workbook', component: CreateExcel, params: {mode: 'admin edit'}},

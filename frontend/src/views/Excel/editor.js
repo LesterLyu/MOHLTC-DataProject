@@ -19,7 +19,7 @@ export class FormulaEditorNG extends TextEditor {
   excel = excelInstance;
 
   prepare(row, col, prop, td, originalValue, cellProperties) {
-    const cell = this.cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(this.row + 1, this.col + 1);
+    const cell = this.cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).getCell(row + 1, col + 1);
     const value = typeof cell.formula() === 'string' ? cell.formula() : cell.value();
     super.prepare.apply(this, [row, col, prop, td, value, cellProperties]);
   };

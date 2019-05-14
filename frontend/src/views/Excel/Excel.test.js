@@ -2,6 +2,7 @@ import React from 'react';
 import Excel from './CreateExcel';
 import {mount, shallow, render} from "enzyme/build";
 import XlsxPopulate from "xlsx-populate";
+import FormulaError from 'fast-formula-parser/formulas/error';
 import sinon from 'sinon';
 import {
   FormatBold, FormatColorFill, SaveAlt, CloudUploadOutlined, WrapText,

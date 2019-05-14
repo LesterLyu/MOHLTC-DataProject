@@ -154,7 +154,36 @@ class Workbooks extends Component {
         })
     }
   }
-  ;
+
+  dialog() {
+    return (
+      <Dialog
+        open={this.state.openAlertDialog}
+        keepMounted
+        onClose={this.handleClose}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+          {"Confirm delete ?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Are you sure you want to delete <strong>{this.state.currentWorkbook}</strong>? <br/>
+            This process cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.handleAlertDialogCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={this.handleAlertDialogDelete} color="primary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
+  }
 
   render() {
     const {classes} = this.props;
@@ -188,32 +217,7 @@ class Workbooks extends Component {
               </Grid>
               {this.filledWorkbooks()}
             </Grid>
-            <Dialog
-              open={this.state.openAlertDialog}
-              keepMounted
-              onClose={this.handleClose}
-              aria-labelledby="alert-dialog-slide-title"
-              aria-describedby="alert-dialog-slide-description"
-            >
-              <DialogTitle id="alert-dialog-slide-title">
-                {"Confirm delete ?"}
-              </DialogTitle>
-              <DialogContent>
-                <DialogContentText id="alert-dialog-slide-description">
-                  Are you sure you want to delete <strong>{this.state.currentWorkbook}</strong>? <br/>
-                  This process cannot be undone.
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={this.handleAlertDialogCancel} color="primary">
-                  Cancel
-                </Button>
-                <Button onClick={this.handleAlertDialogDelete} color="primary">
-                  Delete
-                </Button>
-              </DialogActions>
-            </Dialog>
-
+            {this.dialog()}
           </Paper>
         </div>
       )
@@ -230,31 +234,7 @@ class Workbooks extends Component {
               {this.allWorkbooks()}
             </Grid>
           </Paper>
-          <Dialog
-            open={this.state.openAlertDialog}
-            keepMounted
-            onClose={this.handleClose}
-            aria-labelledby="alert-dialog-slide-title"
-            aria-describedby="alert-dialog-slide-description"
-          >
-            <DialogTitle id="alert-dialog-slide-title">
-              {"Confirm delete ?"}
-            </DialogTitle>
-            <DialogContent>
-              <DialogContentText id="alert-dialog-slide-description">
-                Are you sure you want to delete <strong>{this.state.currentWorkbook}</strong>? <br/>
-                This process cannot be undone.
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={this.handleAlertDialogCancel} color="primary">
-                Cancel
-              </Button>
-              <Button onClick={this.handleAlertDialogDelete} color="primary">
-                Delete
-              </Button>
-            </DialogActions>
-          </Dialog>
+          {this.dialog()}
         </div>
       )
     } else {
