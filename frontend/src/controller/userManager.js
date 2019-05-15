@@ -51,6 +51,9 @@ class UserManager {
       username: username,
       password: password
     }, {withCredentials: true})
+      .then((response => {
+        return response;
+      }));
   }
 
 

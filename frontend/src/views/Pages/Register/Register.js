@@ -48,7 +48,6 @@ class Register extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-
     this.user.signUpLocal(this.state.username, this.state.password,
       this.state.firstName, this.state.lastName, null, this.state.email, this.state.phoneNumber, this.state.groupNumber)
       .then(response => {
@@ -199,6 +198,7 @@ class Register extends Component {
                       label="Username"
                       type="string"
                       required
+                      autoFocus={true}
                       value={this.state.username}
                       onChange={this.handleChange('username')}
                       onBlur={this.validateUsername}
