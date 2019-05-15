@@ -166,6 +166,15 @@ class Register extends Component {
     }
   };
 
+  validateAllInputs() {
+    return (this.state.username === '') ||
+      this.state.isUsernameError ||
+      this.state.isEmailError ||
+      this.state.isPasswordError ||
+      this.state.isRepeatPasswordError ||
+      this.state.isGroupNumberError
+  }
+
 
   handleChange = name => event => {
     this.setState({
@@ -286,15 +295,7 @@ class Register extends Component {
                     <Button
                       variant="outlined"
                       color="primary"
-                      disabled=
-                        {
-                          (this.state.username === '') ||
-                          this.state.isUsernameError ||
-                          this.state.isEmailError ||
-                          this.state.isPasswordError ||
-                          this.state.isRepeatPasswordError ||
-                          this.state.isGroupNumberError
-                        }
+                      disabled={this.validateAllInputs()}
                       onSubmit={this.handleSubmit}
                       block
                     >
