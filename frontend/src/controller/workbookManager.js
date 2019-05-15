@@ -57,6 +57,16 @@ class WorkbookManager {
       })
   }
 
+  /**
+   *
+   * @param {string} fileName
+   * @param {boolean} admin
+   * @returns {Promise<any | never>}
+   */
+  deleteWorkbook(fileName, admin) {
+    return admin ? this.deleteWorkbookForAdmin(fileName) : this.deleteWorkbookForUser(fileName);
+  }
+
   // David
   deleteWorkbookForAdmin(fileName) {
     return axios.delete(config.server + '/api/admin/workbook/',

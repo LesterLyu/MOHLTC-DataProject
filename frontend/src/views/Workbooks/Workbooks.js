@@ -88,12 +88,12 @@ class Workbooks extends Component {
     return list;
   }
 
-  // david
   handleAlertDialogCancel = () => {
     this.setState({
       openAlertDialog: false
     });
   };
+
   handleAlertDialogDelete = () => {
     this.setState({
       openAlertDialog: false
@@ -103,21 +103,21 @@ class Workbooks extends Component {
       return;
     }
     // continue to delete workbook
-    this.workbookManager.deleteWorkbookForAdmin(workbook).then((data) => {
-      if (!data) {
-        this.props.showMessage('Something Error', 'error');
-      } else {
-        console.log("debugging: " + data.message);
-        // Finally, return message about result and reload data from database
-        this.componentDidMount();
-        this.props.showMessage(data.message, 'success');
-      }
-    });
+    this.workbookManager.deleteWorkbook(workbook, this.mode === 'admin')
+      .then((data) => {
+        if (!data) {
+          this.props.showMessage('Something Error', 'error');
+        } else {
+          console.log("debugging: " + data.message);
+          // Finally, return message about result and reload data from database
+          this.componentDidMount();
+          this.props.showMessage(data.message, 'success');
+        }
+      });
   };
 
 // FIXME: next task
   deleteWorkbookForUser = (workbook) => {
-    console.log('user delete workbook ', workbook);
     this.setState({
       currentWorkbook: workbook,
       openAlertDialog: true,
@@ -125,14 +125,10 @@ class Workbooks extends Component {
   };
 
   deleteWorkbookForAdmin = (workbook) => {
-    // david
-    // FIXME: firstly delete item from list, refresh workbooks list then ask for confirmation to delete
     this.setState({
       currentWorkbook: workbook,
       openAlertDialog: true,
     });
-    // Second, if confirmed, delete workbook from database
-    // if not, cancel the previous action
   };
 
   componentDidMount() {
