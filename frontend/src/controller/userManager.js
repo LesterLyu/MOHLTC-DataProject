@@ -71,15 +71,15 @@ class UserManager {
     return axios.post(config.server + '/api/signup/local', {
       username: username,
       password: password,
-      firstName:firstName,
-      lastName:lastName,
-      organization:organization,
-      email:email,
-      phoneNumber:phoneNumber,
-      groupNumber:groupNumber
+      firstName: firstName,
+      lastName: lastName,
+      organization: organization,
+      email: email,
+      phoneNumber: phoneNumber,
+      groupNumber: groupNumber
     }, {withCredentials: true})
       .then((response => {
-        log(response);
+        return response;
       }));
   }
 
@@ -112,6 +112,7 @@ class UserManager {
       withCredentials: true
     })
   }
+
   getAllPermissions() {
     return axios.get(config.server + '/api/permissions', {withCredentials: true})
       .then((response => {
