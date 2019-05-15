@@ -336,7 +336,7 @@ class WorkbookManager {
           }, axiosConfig);
         } else {
           return axios.post(config.server + '/api/v2/user/workbook', {
-            workbookData, base64, name: fileName
+            data: workbookData, base64, name: fileName
           }, axiosConfig);
         }
       })
