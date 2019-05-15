@@ -1,3 +1,5 @@
+import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 import React, {Component} from 'react';
 import UserManager from "../../../controller/userManager";
 import {
@@ -16,8 +18,7 @@ import {
   Row
 } from 'reactstrap';
 import {Link} from "react-router-dom";
-
-const log = console.log;
+import {TextField} from '@material-ui/core';
 
 class Register extends Component {
 
@@ -27,50 +28,157 @@ class Register extends Component {
 
     this.state = {
       username: '',
-      email: '',
+      email: '@ontario.ca',
       firstName: "",
       lastName: "",
       password: '',
       repeatPassword: '',
       phoneNumber: "",
-      organization: "",
-      groupNumber: "",
-      message: '',
+      groupNumber: 1,
+
+      isServerErrormessage: false,
+      ServerErrormessage: null,
+
+      isUsernameError: false,
+      usernameErrorMessage: '',
+      isEmailError: false,
+      emailErrorMessage: '',
+      isPasswordError: false,
+      passwordErrorMessage: '',
+      isRepeatPasswordError: false,
+      repeatPasswordErrorMessage: '',
+      isGroupNumberError: false,
+      groupNumberErrorMessage: '',
     };
   }
 
-  validateForm() {
-    return this.state.username.length > 0 && this.state.password.length > 0 //&& this.state.repeatPassword.length > 0;
-  }
+  handleSubmit = event => {
+    event.preventDefault();
 
-  handleChange = event => {
+    this.user.signUpLocal(this.state.username, this.state.password,
+      this.state.firstName, this.state.lastName, null, this.state.email, this.state.phoneNumber, this.state.groupNumber)
+      .then(response => {
+        this.props.history.push(response.data.redirect);
+      })
+      .catch(err => {
+        if ((typeof err.response.data.message) === 'string') {
+          const serverErrorMessage = err.response.data.message;
+          console.log(serverErrorMessage);
+          if (serverErrorMessage.toLowerCase().includes('username')) {
+            this.setState({
+              isUsernameError: true,
+              usernameErrorMessage: serverErrorMessage,
+            });
+          }
+          if (serverErrorMessage.toLowerCase().includes('email')) {
+            this.setState({
+              isEmailError: true,
+              emailErrorMessage: serverErrorMessage,
+            });
+          }
+          if (serverErrorMessage.toLowerCase().includes('group number')) {
+            this.setState({
+              isGroupNumberError: true,
+              ServerErrormessage: serverErrorMessage,
+            });
+          }
+        } else {
+          const serverErrorMessage = err.response.data.message.message;
+          console.log(serverErrorMessage);
+          this.setState({
+            isServerErrormessage: false,
+            ServerErrormessage: serverErrorMessage,
+          })
+        }
+      })
+  };
+  validateUsername = () => {
+    if (this.state.username.length >= 1 && this.state.username.length <= 20) {
+      this.setState({
+        isUsernameError: false,
+        usernameErrorMessage: '*Required',
+      });
+      return true;
+    } else {
+      this.setState({
+        isUsernameError: true,
+        usernameErrorMessage: 'Username must be 1-20 characters long.',
+      });
+      return false;
+    }
+  };
+
+  validateEmail = () => {
+    if (this.state.email !== '@ontario.ca' && this.state.email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
+      this.setState({
+        isEmailError: false,
+        emailErrorMessage: '*Required',
+      });
+      return true;
+    } else {
+      this.setState({
+        isEmailError: true,
+        emailErrorMessage: 'Email is invalid.',
+      });
+      return false;
+    }
+  };
+
+  validatePassword = () => {
+    if (this.state.password.length >= 1) {
+      this.setState({
+        isPasswordError: false,
+        passwordErrorMessage: '*Required',
+      });
+      return false;
+    } else {
+      this.setState({
+        isPasswordError: true,
+        passwordErrorMessage: 'Passwords can not be empty.',
+      });
+      return true;
+    }
+
+  };
+  validateRepeatPassword = () => {
+    if (this.state.password === this.state.repeatPassword) {
+      this.setState({
+        isRepeatPasswordError: false,
+        repeatPasswordErrorMessage: '*Required',
+      });
+      return false;
+    } else {
+      this.setState({
+        isRepeatPasswordError: true,
+        repeatPasswordErrorMessage: 'Passwords must be identical.',
+      });
+      return true;
+    }
+  };
+
+  validateGroupNumber = () => {
+    if (this.state.groupNumber >= 1) {
+      this.setState({
+        isGroupNumberError: false,
+        groupNumberErrorMessage: '',
+      });
+      return false;
+    } else {
+      this.setState({
+        isGroupNumberError: true,
+        groupNumberErrorMessage: 'GroupNumber can not be empty or 0.',
+      });
+      return true;
+    }
+  };
+
+
+  handleChange = name => event => {
     this.setState({
-      [event.target.id]: event.target.value
+      [name]: event.target.value
     });
   };
 
-  handleSubmit = event => {
-    event.preventDefault();
-    log(this.state);
-    // if (this.state.password !== this.state.repeatPassword) {
-    //   this.setState({message: 'Passwords must be same.'});
-    //   return;
-    // }
-
-    this.user.signUpLocal(this.state.username, this.state.password,
-      this.state.firstName, this.state.lastName, this.state.organization,
-      this.state.email, this.state.phoneNumber, this.state.groupNumber);
-
-    // this.user.signUpWithEmail(this.state.username, this.state.email, this.state.password)
-    //   .then(user => {
-    //     this.props.history.push('/');
-    //   })
-    //   .catch(err => {
-    //     console.log(err);
-    //     this.setState({message: err.message});
-    //   })
-
-  };
 
   render() {
     return (
@@ -84,119 +192,133 @@ class Register extends Component {
                     <h1>Register</h1>
                     <p className="text-muted">Create your account</p>
 
-                    <InputGroup className="mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="mdi mdi-account-circle"/>
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="text" id="username" placeholder="Username" autoComplete="username"
-                             value={this.state.username} onChange={this.handleChange}/>
-                    </InputGroup>
+                    <TextField
+                      label="Username"
+                      type="string"
+                      required
+                      value={this.state.username}
+                      onChange={this.handleChange('username')}
+                      onBlur={this.validateUsername}
+                      margin="normal"
+                      fullWidth
+                      error={this.state.isUsernameError}
+                      helperText={this.state.usernameErrorMessage}
+                    />
 
-                    <InputGroup className="mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>@</InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="email" id="email" placeholder="Email" autoComplete="email"
-                             value={this.state.email} onChange={this.handleChange}/>
-                    </InputGroup>
+                    <TextField
+                      label="Email"
+                      type="email"
+                      required={true}
+                      value={this.state.email}
+                      onChange={this.handleChange('email')}
+                      onBlur={this.validateEmail}
+                      margin="normal"
+                      fullWidth
+                      error={this.state.isEmailError}
+                      helperText={this.state.emailErrorMessage}
+                    />
 
-                    <InputGroup className="mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="mdi mdi-rename-box"/>
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="firstName" id="firstName" placeholder="First Name" autoComplete="firstName"
-                             value={this.state.firstName} onChange={this.handleChange}/>
-                    </InputGroup>
+                    <TextField
+                      label="First Name"
+                      type="string"
+                      required={false}
+                      value={this.state.firstName}
+                      onChange={this.handleChange('firstName')}
+                      margin="normal"
+                      fullWidth
+                    />
 
-                    <InputGroup className="mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="mdi mdi-rename-box"/>
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="lastName" id="lastName" placeholder="Last Name" autoComplete="lastName"
-                             value={this.state.lastName} onChange={this.handleChange}/>
-                    </InputGroup>
+                    <TextField
+                      label="Last Name"
+                      type="string"
+                      required={false}
+                      value={this.state.lastName}
+                      onChange={this.handleChange('lastName')}
+                      margin="normal"
+                      fullWidth
+                    />
 
-                    <InputGroup className="mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="mdi mdi-cellphone"/>
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="phoneNumber" id="phoneNumber" placeholder="Phone Number" autoComplete="phoneNumber"
-                             value={this.state.phoneNumber} onChange={this.handleChange}/>
-                    </InputGroup>
+                    <TextField
+                      label="Phone Number"
+                      type="string"
+                      required={false}
+                      value={this.state.phoneNumber}
+                      onChange={this.handleChange('phoneNumber')}
+                      margin="normal"
+                      fullWidth
+                    />
 
-                    <InputGroup className="mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="mdi mdi-account-group"/>
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="organization" id="organization" placeholder="Organization"
-                             autoComplete="organization"
-                             value={this.state.organization} onChange={this.handleChange}/>
-                    </InputGroup>
+                    <TextField
+                      label="Password"
+                      value={this.state.password}
+                      onChange={this.handleChange('password')}
+                      onBlur={this.validatePassword}
+                      type="password"
+                      required={true}
+                      margin="normal"
+                      fullWidth
+                      error={this.state.isPasswordError}
+                      helperText={this.state.passwordErrorMessage}
+                    />
 
-                    <InputGroup className="mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="mdi mdi-numeric"/>
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="groupNumber" id="groupNumber" placeholder="Group Number" autoComplete="groupNumber"
-                             value={this.state.groupNumber} onChange={this.handleChange}/>
-                    </InputGroup>
+                    <TextField
+                      label="RepeatPassword"
+                      value={this.state.repeatPassword}
+                      onChange={this.handleChange('repeatPassword')}
+                      onBlur={this.validateRepeatPassword}
+                      type="password"
+                      required={true}
+                      margin="normal"
+                      fullWidth
+                      error={this.state.isRepeatPasswordError}
+                      helperText={this.state.repeatPasswordErrorMessage}
+                    />
 
-                    <InputGroup className="mb-3">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="mdi mdi-lock"/>
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="password" id="password" placeholder="Password" autoComplete="new-password"
-                             value={this.state.password} onChange={this.handleChange}/>
-                    </InputGroup>
+                    <TextField
+                      label="Group Number"
+                      type="number"
+                      required={true}
+                      value={this.state.groupNumber}
+                      onChange={this.handleChange('groupNumber')}
+                      onBlur={this.validateGroupNumber}
+                      margin="normal"
+                      fullWidth
+                      error={this.state.isGroupNumberError}
+                      helperText={this.state.groupNumberErrorMessage}
+                    />
 
-                    <InputGroup className="mb-4">
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="mdi mdi-lock-plus"/>
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input type="password" id="repeatPassword" placeholder="Repeat password"
-                             autoComplete="new-password"
-                             value={this.state.repeatPassword} onChange={this.handleChange}/>
-                    </InputGroup>
 
-                    <FormText color="muted">
-                      {this.state.message}
-                    </FormText>
                     <br/>
-                    <Button color="success" disabled={!this.validateForm()} onSubmit={this.handleSubmit} block>Create
-                      Account</Button>
-                    <br/>
+                    <Button
+                      variant="outlined"
+                      color="primary"
+                      disabled=
+                        {
+                          (this.state.username === '') ||
+                          this.state.isUsernameError ||
+                          this.state.isEmailError ||
+                          this.state.isPasswordError ||
+                          this.state.isRepeatPasswordError ||
+                          this.state.isGroupNumberError
+                        }
+                      onSubmit={this.handleSubmit}
+                      block
+                    >
+                      Create Account
+                    </Button>
+
+                    <Paper elevation={1}>
+                      <Typography component="p">
+                        {/* FIXME: modify the color to red */}
+                        {this.state.ServerErrormessage}
+                      </Typography>
+                    </Paper>
+
                     <Link to="/login">
                       <Button color="link"><span>Already have an account?</span></Button>
                     </Link>
                   </Form>
-
                 </CardBody>
-                <CardFooter className="p-4">
-                  <Row>
-                    <Col xs="12" sm="6">
-                      <Button className="btn-facebook mb-1 disabled" block><span>facebook</span></Button>
-                    </Col>
-                    <Col xs="12" sm="6">
-                      <Button className="btn-twitter mb-1 disabled" block><span>twitter</span></Button>
-                    </Col>
-                  </Row>
-                </CardFooter>
               </Card>
             </Col>
           </Row>
