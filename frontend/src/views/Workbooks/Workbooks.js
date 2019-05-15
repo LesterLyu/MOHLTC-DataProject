@@ -116,7 +116,6 @@ class Workbooks extends Component {
       });
   };
 
-// FIXME: next task
   deleteWorkbookForUser = (workbook) => {
     this.setState({
       currentWorkbook: workbook,
