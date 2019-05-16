@@ -122,11 +122,15 @@ class Register extends Component {
 
   validatePassword = () => {
     if (this.state.password.length >= 1) {
-      this.setState({
-        isPasswordError: false,
-        passwordErrorMessage: '*Required',
-      });
-      return false;
+      if (this.state.repeatPassword.length >= 1) { // validate the repeatPassword when it is not empty
+        this.validateRepeatPassword();
+      } else {
+        this.setState({
+          isPasswordError: false,
+          passwordErrorMessage: '',
+        });
+        return false;
+      }
     } else {
       this.setState({
         isPasswordError: true,
@@ -140,7 +144,7 @@ class Register extends Component {
     if (this.state.password === this.state.repeatPassword) {
       this.setState({
         isRepeatPasswordError: false,
-        repeatPasswordErrorMessage: '*Required',
+        repeatPasswordErrorMessage: '',
       });
       return false;
     } else {
@@ -170,6 +174,8 @@ class Register extends Component {
 
   validateAllInputs() {
     return (this.state.username === '') ||
+      this.state.password === '' ||
+      this.state.repeatPassword === '' ||
       this.state.isUsernameError ||
       this.state.isEmailError ||
       this.state.isPasswordError ||
@@ -197,11 +203,14 @@ class Register extends Component {
       this.setState({
         isPasswordError: false,
         passwordErrorMessage: '',
+        isRepeatPasswordError: false,
+        repeatPasswordErrorMessage: '',
       });
     } else if (name === 'repeatPassword') {
+      console.log('reapeat');
       this.setState({
         isRepeatPasswordError: false,
-        RepeatPasswordErrorMessage: '',
+        repeatPasswordErrorMessage: '',
       });
     } else if (name === 'groupNumber') {
       this.setState({
