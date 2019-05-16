@@ -80,6 +80,18 @@ class Login extends Component {
     this.setState({
       [name]: event.target.value
     });
+    if (name === 'username') {
+      this.setState({
+        isUsernameError: false,
+        usernameErrorMessage: '',
+      });
+    } else if (name === 'password') {
+      this.setState({
+        isPasswordError: false,
+        passwordErrorMessage: '',
+      });
+    }
+
   };
 
   handleSubmit = event => {
