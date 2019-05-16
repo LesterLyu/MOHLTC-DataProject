@@ -2,6 +2,7 @@ import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import React, {Component} from 'react';
 import UserManager from "../../../controller/userManager";
+
 import {
   Button,
   Card,
@@ -85,13 +86,15 @@ class Register extends Component {
         }
       })
   };
+
+
   validateUsername = () => {
+    // local validate
     if (this.state.username.length >= 1 && this.state.username.length <= 20) {
       this.setState({
         isUsernameError: false,
-        usernameErrorMessage: '*Required',
+        usernameErrorMessage: '',
       });
-      return true;
     } else {
       this.setState({
         isUsernameError: true,
@@ -179,6 +182,33 @@ class Register extends Component {
     this.setState({
       [name]: event.target.value
     });
+
+    if (name === 'username') {
+      this.setState({
+        isUsernameError: false,
+        usernameErrorMessage: '',
+      });
+    } else if (name === 'email') {
+      this.setState({
+        isEmailError: false,
+        emailErrorMessage: '',
+      });
+    } else if (name === 'password') {
+      this.setState({
+        isPasswordError: false,
+        passwordErrorMessage: '',
+      });
+    } else if (name === 'repeatPassword') {
+      this.setState({
+        isRepeatPasswordError: false,
+        RepeatPasswordErrorMessage: '',
+      });
+    } else if (name === 'groupNumber') {
+      this.setState({
+        isGroupNumberError: false,
+        groupNumberErrorMessage: '',
+      });
+    }
   };
 
 
