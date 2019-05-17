@@ -88,15 +88,7 @@ class Dropdown extends Component {
       value = cell.value();
       console.log('chose ' + value);
       // get options
-      const formula = cell.dataValidation().formula1;
-      options = cell.sheet().workbook()._parser._parser.parse(formula, cell.getRef(), true);
-      if (typeof options === "string") {
-        options = options.replace(/\s[,;]\s/g, ',').split(',');
-      } else if (Array.isArray(options)) {
-        options = options.flat();
-      } else {
-        options = [options];
-      }
+      options = cell.dataValidation().formula1Result;
     }
     options = options.map((option, index) => {
       if (typeof option === "string") option = option.trim();

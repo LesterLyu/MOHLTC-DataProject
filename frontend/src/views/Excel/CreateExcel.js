@@ -23,6 +23,7 @@ import ExcelBottomBar from './components/ExcelBottomBar';
 import FormulaBar from "./components/FormulaBar";
 import SetIdDialog from "./components/SetIdDialog";
 import Dropdown from './components/Dropdown';
+import DataValidationDialog from './components/DataValidationDialog';
 // const excelWorker = new Worker('../../controller/excel.worker', { type: 'module' });
 window.colCache = colCache;
 
@@ -84,6 +85,7 @@ class Excel extends Component {
       currentSheetIdx: 0,
       openSetId: null,
       openDropdown: null,
+      openDataValidationDialog: false,
       dropdownCell: null,
       setIdCell: null,
       fileName: 'Untitled workbook'
@@ -108,6 +110,9 @@ class Excel extends Component {
     // set ID dialog
     this.attOptions = [];
     this.catOptions = [];
+
+    // error dialog
+    this.errorDialog = {};
   }
 
 
@@ -203,7 +208,6 @@ class Excel extends Component {
     sheetNo = sheetNo === null || sheetNo === undefined ? this.currentSheetIdx : sheetNo;
     const sheet = this.workbook.sheet(sheetNo);
     const cell = sheet.getCell(row + 1, col + 1);
-    const oldValue = cell.value(), oldFormula = cell.formula();
     let updates;
 
     // I don't want you to update rich text.
@@ -211,9 +215,23 @@ class Excel extends Component {
       console.warn('setData: An update to rich text has been blocked.');
       return;
     }
+    const isFormula = typeof rawValue === 'string' && rawValue.charAt(0) === '=' && rawValue.length > 1;
+    let formula;
+    if (isFormula) formula = rawValue.slice(1);
+    const validation = this.sheet._dataValidations.validate(cell, isFormula ? formula : rawValue, isFormula);
+    if (!validation.result) {
+      // validation failed
+      this.errorDialog = {
+        errorMessage: validation.dataValidation.error,
+        errorTitle: validation.dataValidation.errorTitle,
+        errorStyle: validation.dataValidation.errorStyle,
+      };
+      this.setState({openDataValidationDialog: true});
+      return false;
+    }
     // check if it is formula now
-    if (typeof rawValue === 'string' && rawValue.charAt(0) === '=' && rawValue.length > 1) {
-      updates = cell.setFormula(rawValue.slice(1));
+    if (isFormula) {
+      updates = cell.setFormula(formula);
     } else {
       updates = cell.setValue(rawValue);
     }
@@ -326,6 +344,18 @@ class Excel extends Component {
 
   handleCloseDropdown = () => {
     this.setState({openDropdown: null, dropdownCell: null});
+  };
+
+  showDataValidationDialog = () => {
+    this.setState({openDataValidationDialog: true});
+  };
+
+  handleCloseDataValidationDialog = () => {
+    this.setState({openDataValidationDialog: false});
+  };
+
+  handleRetryDataValidationDialog = () => {
+    this.setState({openDataValidationDialog: false});
   };
 
   componentDidMount() {
@@ -442,6 +472,28 @@ class Excel extends Component {
       || this.state.openSetId !== nextState.openSetId
       || this.state.openDropdown !== nextState.openDropdown
       || this.state.fileName !== nextState.fileName
+      || this.state.openDataValidationDialog !== nextState.openDataValidationDialog
+  }
+
+  common() {
+    return (
+      <>
+        <Dropdown
+          anchorEl={this.state.openDropdown}
+          cell={this.state.dropdownCell}
+          handleClose={this.handleCloseDropdown}
+          handleChange={this.handleChangeDropdown}
+        />
+        <DataValidationDialog
+          open={this.state.openDataValidationDialog}
+          errorMessage={this.errorDialog.errorMessage}
+          errorTitle={this.errorDialog.errorTitle}
+          errorStyle={this.errorDialog.errorStyle}
+          handleRetry={this.handleRetryDataValidationDialog}
+          handleClose={this.handleCloseDataValidationDialog}
+        />
+      </>
+    )
   }
 
   render() {
@@ -474,12 +526,7 @@ class Excel extends Component {
             handleSetId={this.handleSetId}
             handleClose={this.handleCloseSetId}
           />
-          <Dropdown
-            anchorEl={this.state.openDropdown}
-            cell={this.state.dropdownCell}
-            handleClose={this.handleCloseDropdown}
-            handleChange={this.handleChangeDropdown}
-          />
+          {this.common()}
         </div>
       );
     } else if (this.mode === 'user edit') {
@@ -491,12 +538,7 @@ class Excel extends Component {
             <Worksheets context={this}/>
             <ExcelBottomBar context={this}/>
           </Card>
-          <Dropdown
-            anchorEl={this.state.openDropdown}
-            cell={this.state.dropdownCell}
-            handleClose={this.handleCloseDropdown}
-            handleChange={this.handleChangeDropdown}
-          />
+          {this.common()}
         </div>)
     }
   }
