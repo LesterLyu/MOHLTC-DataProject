@@ -14,6 +14,15 @@ import SheetCard from './components/SheetCard';
 // custom controller
 import WorkbookManager from '../../controller/workbookManager'
 
+// david's dialog
+// import React from 'react';
+import Button from '@material-ui/core/Button';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
@@ -23,33 +32,18 @@ const styles = theme => ({
 });
 
 class Workbooks extends Component {
-
   constructor(props) {
     super(props);
     this.mode = this.props.params.mode; // can be user or admin
     this.state = {
       loading: true
-    };
-    this.workbookManager = new WorkbookManager(props);
-    if (this.mode === 'user') {
-      this.workbookManager.getAllWorkbooksForUser()
-        .then(data => {
-          if (!data)
-            return;
-          this.workbooks = data;
-          this.setState({loading: false});
-        })
+      ,
+      // david
+      currentWorkbook: null,
+      openAlertDialog: false,
     }
-    else if (this.mode === 'admin') {
-      this.workbookManager.getAllWorkbooksForAdmin()
-        .then(data => {
-          if (!data)
-            return;
-          this.workbooks = data;
-          this.setState({loading: false});
-        })
-    }
-
+    ;
+    this.workbookManager = new WorkbookManager(this.props);
   }
 
   filledWorkbooks() {
@@ -94,12 +88,96 @@ class Workbooks extends Component {
     return list;
   }
 
-  deleteWorkbookForUser(workbook) {
-      console.log('user delete workbook ', workbook)
+  handleAlertDialogCancel = () => {
+    this.setState({
+      openAlertDialog: false
+    });
+  };
+
+  handleAlertDialogDelete = () => {
+    this.setState({
+      openAlertDialog: false
+    });
+    let workbook = this.state.currentWorkbook;
+    if (!workbook) {
+      return;
+    }
+    // continue to delete workbook
+    this.workbookManager.deleteWorkbook(workbook, this.mode === 'admin')
+      .then((data) => {
+        if (!data) {
+          this.props.showMessage('Something Error', 'error');
+        } else {
+          console.log("debugging: " + data.message);
+          // Finally, return message about result and reload data from database
+          this.componentDidMount();
+          this.props.showMessage(data.message, 'success');
+        }
+      });
+  };
+
+  deleteWorkbookForUser = (workbook) => {
+    this.setState({
+      currentWorkbook: workbook,
+      openAlertDialog: true,
+    });
+  };
+
+  deleteWorkbookForAdmin = (workbook) => {
+    this.setState({
+      currentWorkbook: workbook,
+      openAlertDialog: true,
+    });
+  };
+
+  componentDidMount() {
+    if (this.mode === 'user') {
+      this.workbookManager.getAllWorkbooksForUser()
+        .then(data => {
+          if (!data)
+            return;
+          this.workbooks = data;
+          this.setState({loading: false});
+        })
+    } else if (this.mode === 'admin') {
+      this.workbookManager.getAllWorkbooksForAdmin()
+        .then(data => {
+          if (!data)
+            return;
+          this.workbooks = data;
+          this.setState({loading: false});
+        })
+    }
   }
 
-  deleteWorkbookForAdmin(workbook) {
-    console.log('admin delete workbook ', workbook)
+  dialog() {
+    return (
+      <Dialog
+        open={this.state.openAlertDialog}
+        keepMounted
+        onClose={this.handleClose}
+        aria-labelledby="alert-dialog-slide-title"
+        aria-describedby="alert-dialog-slide-description"
+      >
+        <DialogTitle id="alert-dialog-slide-title">
+          {"Confirm delete ?"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-slide-description">
+            Are you sure you want to delete <strong>{this.state.currentWorkbook}</strong>? <br/>
+            This process cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.handleAlertDialogCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={this.handleAlertDialogDelete} color="primary">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
   }
 
   render() {
@@ -112,8 +190,7 @@ class Workbooks extends Component {
           <LinearProgress variant="indeterminate"/>
         </div>
       );
-    }
-    else if (this.mode === 'user') {
+    } else if (this.mode === 'user') {
       return (
         <div className="animated fadeIn">
           <Paper className={classes.root} elevation={1}>
@@ -135,12 +212,11 @@ class Workbooks extends Component {
               </Grid>
               {this.filledWorkbooks()}
             </Grid>
-
+            {this.dialog()}
           </Paper>
         </div>
       )
-    }
-    else if (this.mode === 'admin') {
+    } else if (this.mode === 'admin') {
       return (
         <div className="animated fadeIn">
           <Paper className={classes.root} elevation={1}>
@@ -153,10 +229,10 @@ class Workbooks extends Component {
               {this.allWorkbooks()}
             </Grid>
           </Paper>
+          {this.dialog()}
         </div>
       )
-    }
-    else {
+    } else {
       return (
         <Typography variant="h6" gutterBottom>
           Error: Illegal params.
@@ -164,6 +240,7 @@ class Workbooks extends Component {
       )
 
     }
+
   }
 
 }

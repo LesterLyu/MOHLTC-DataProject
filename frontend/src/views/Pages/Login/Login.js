@@ -10,12 +10,9 @@ import {
   Container,
   Form,
   FormText,
-  Input,
-  InputGroup,
-  InputGroupAddon,
-  InputGroupText,
   Row
 } from 'reactstrap';
+import {TextField} from "@material-ui/core";
 
 
 class Login extends Component {
@@ -27,30 +24,90 @@ class Login extends Component {
     this.state = {
       username: '',
       password: '',
-      message: '',
+
+      isServerErrormessage: false,
+      ServerErrormessage: null,
+
+      isUsernameError: false,
+      usernameErrorMessage: '',
+
+      isPasswordError: false,
+      passwordErrorMessage: '',
     };
   }
 
   validateForm() {
-    return this.state.username.length > 0 && this.state.password.length > 0;
+    return (this.state.username.length >= 1) &&
+      (this.state.password.length >= 1) &&
+      !this.state.isUsernameError &&
+      !this.state.isPasswordError;
   }
 
-  handleChange = event => {
+  validateUsername = () => {
+    if (this.state.username.length >= 1 && this.state.username.length <= 20) {
+      this.setState({
+        isUsernameError: false,
+        usernameErrorMessage: '',
+      });
+      return true;
+    } else {
+      this.setState({
+        isUsernameError: true,
+        usernameErrorMessage: 'Username must be 1-20 characters long.',
+      });
+      return false;
+    }
+  };
+
+  validatePassword = () => {
+    if (this.state.password.length >= 1) {
+      this.setState({
+        isPasswordError: false,
+        passwordErrorMessage: '',
+      });
+      return false;
+    } else {
+      this.setState({
+        isPasswordError: true,
+        passwordErrorMessage: 'Passwords can not be empty.',
+      });
+      return true;
+    }
+  };
+
+
+  handleChange = name => event => {
     this.setState({
-      [event.target.id]: event.target.value
+      [name]: event.target.value
     });
+    if (name === 'username') {
+      this.setState({
+        isUsernameError: false,
+        usernameErrorMessage: '',
+      });
+    } else if (name === 'password') {
+      this.setState({
+        isPasswordError: false,
+        passwordErrorMessage: '',
+      });
+    }
+
   };
 
   handleSubmit = event => {
     event.preventDefault();
     this.user.loginLocal(this.state.username, this.state.password)
       .then(response => {
+        console.log('login successfully');
         this.props.history.push('/');
       })
       .catch(err => {
-        console.log(err.response);
-        const message = err.response ? err.response : err.message;
-        this.setState({message});
+        console.log(err.response.data.message);
+        const errorMessage = err.response.data.message;
+        this.setState({
+          isPasswordError: true,
+          passwordErrorMessage: errorMessage,
+        });
       })
 
   };
@@ -68,31 +125,41 @@ class Login extends Component {
                     <Form onSubmit={this.handleSubmit}>
                       <h1>Login</h1>
                       <p className="text-muted">Sign In to your account</p>
-                      <InputGroup className="mb-3">
-                        <InputGroupAddon addonType="prepend">
-                          <InputGroupText>
-                            <i className="mdi mdi-account-circle"></i>
-                          </InputGroupText>
-                        </InputGroupAddon>
-                        <Input type="text" id="username" placeholder="Username" autoComplete="username"
-                               value={this.state.username} onChange={this.handleChange}/>
-                      </InputGroup>
-                      <InputGroup className="mb-4">
-                        <InputGroupAddon addonType="prepend">
-                          <InputGroupText>
-                            <i className="mdi mdi-lock"></i>
-                          </InputGroupText>
-                        </InputGroupAddon>
-                        <Input type="password" id="password" placeholder="Password" autoComplete="current-password"
-                               value={this.state.password} onChange={this.handleChange}/>
-                      </InputGroup>
+
+                      <TextField
+                        label="Username"
+                        type="string"
+                        autoFocus={true}
+                        value={this.state.username}
+                        onChange={this.handleChange('username')}
+                        onBlur={this.validateUsername}
+                        margin="normal"
+                        fullWidth
+                        error={this.state.isUsernameError}
+                        helperText={this.state.usernameErrorMessage}
+                      />
+
+                      <TextField
+                        label="Password"
+                        value={this.state.password}
+                        onChange={this.handleChange('password')}
+                        onBlur={this.validatePassword}
+                        type="password"
+                        margin="normal"
+                        fullWidth
+                        error={this.state.isPasswordError}
+                        helperText={this.state.passwordErrorMessage}
+                      />
+
                       <FormText color="muted">
                         {this.state.message}
                       </FormText>
                       <br/>
                       <Row>
                         <Col xs="6">
-                          <Button color="primary" className="px-4" disabled={!this.validateForm()}>Login</Button>
+                          <Button color="primary" className="px-4"
+                                  disabled={!this.validateForm()}
+                          >Login</Button>
                         </Col>
                         <Col xs="6" className="text-right">
                           <Link to="/forgetpassword">
@@ -125,6 +192,6 @@ class Login extends Component {
       </div>
     );
   }
-}
+};
 
 export default Login;

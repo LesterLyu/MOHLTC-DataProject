@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosRequestConfig} from "axios";
 import config from "./../config/config";
 import XlsxPopulate from "xlsx-populate";
 import {readSheet, excelInstance} from "../views/Excel/helpers";
@@ -54,7 +54,53 @@ class WorkbookManager {
         if (this.check(response)) {
           return response.data.workbooks;
         }
+      })
+  }
 
+  /**
+   *
+   * @param {string} fileName
+   * @param {boolean} admin
+   * @returns {Promise<any | never>}
+   */
+  deleteWorkbook(fileName, admin) {
+    return admin ? this.deleteWorkbookForAdmin(fileName) : this.deleteWorkbookForUser(fileName);
+  }
+
+  // David
+  deleteWorkbookForAdmin(fileName) {
+    return axios.delete(config.server + '/api/admin/workbook/',
+      {
+        data: {
+          name: fileName,
+        },
+        withCredentials: axiosConfig.withCredentials,
+      })
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+      .catch(err => {
+        this.props.showMessage(err.toString(), 'error');
+      })
+  }
+
+  deleteWorkbookForUser(fileName) {
+    return axios.delete(config.server + '/api/filled-workbook',
+      {
+        data: {
+          name: fileName,
+        },
+        withCredentials: axiosConfig.withCredentials,
+      })
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+      .catch(err => {
+        this.props.showMessage(err.toString(), 'error');
       })
   }
 
@@ -62,7 +108,7 @@ class WorkbookManager {
     const url = admin ? '/api/workbook/' : '/api/v2/user/filled/';
     return axios.get(config.server + url + name, axiosConfig)
       .then(response => {
-        console.log(response)
+        console.log(response);
         if (this.check(response)) {
           return response;
         }
@@ -153,7 +199,7 @@ class WorkbookManager {
       })
   }
 
-  // methods for modifying workbook
+// methods for modifying workbook
   createWorkbookLocal() {
     return XlsxPopulate.fromBlankAsync()
   }
@@ -220,7 +266,7 @@ class WorkbookManager {
     }
   }
 
-  downloadWorkbook(workbook, fileName='out.xlsx') {
+  downloadWorkbook(workbook, fileName = 'out.xlsx') {
     return workbook.outputAsync()
       .then(function (blob) {
         if (window.navigator && window.navigator.msSaveOrOpenBlob) {

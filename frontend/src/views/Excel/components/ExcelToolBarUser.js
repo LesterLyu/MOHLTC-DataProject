@@ -11,7 +11,6 @@ import {
 import PropTypes from "prop-types";
 
 
-
 export function ToolBarDivider() {
   return <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>;
 }
