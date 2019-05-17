@@ -3,8 +3,8 @@ import {DropdownItem, DropdownMenu, DropdownToggle, Nav} from 'reactstrap';
 import PropTypes from 'prop-types';
 
 import {AppHeaderDropdown, AppSidebarToggler, AppNavbarBrand} from '@coreui/react';
-import logo from '../../assets/img/brand/Ontario_Wordmark_2007.svg'
-import sygnet from '../../assets/img/brand/icon.png'
+import logo from '../../assets/img/brand/ON_POS_LOGO_BLUE_RGB.svg'
+import sygnet from '../../assets/img/brand/ON_POS_LOGO_RGB_BLUE_NO_FONT_SPACED.svg'
 
 const propTypes = {
   children: PropTypes.node,
@@ -18,8 +18,9 @@ class DefaultHeader extends Component {
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile/>
         <AppNavbarBrand
-          full={{ src: logo, height: 40, alt: 'MOH Logo' }}
-          minimized={{ src: sygnet, height: 40, alt: 'MOH Logo' }}
+          style={{fill: 'yellow'}}
+          full={{ src: logo, height: 48, alt: 'MOH Logo'}}
+          minimized={{ src: sygnet, height: 48, alt: 'MOH Logo' }}
         />
         <AppSidebarToggler className="d-md-down-none" display="lg"/>
 
@@ -30,7 +31,7 @@ class DefaultHeader extends Component {
             </DropdownToggle>
             <DropdownMenu right style={{right: 'auto'}}>
               <DropdownItem header tag="div" className="text-center"><strong>Account</strong></DropdownItem>
-              <DropdownItem onClick={e => this.props.onLogout(e)}><i className="fa fa-lock"></i> Logout</DropdownItem>
+              <DropdownItem onClick={e => this.props.onLogout(e)}><i className="fa fa-lock"/> Logout</DropdownItem>
             </DropdownMenu>
           </AppHeaderDropdown>
         </Nav>
