@@ -95,6 +95,7 @@ module.exports = function (grunt) {
                             'Gruntfile.js',
                             'Gruntfile.js',
                             'package.json',
+                            'package-lock.json',
                         ],
                         dest: 'build/zip/'
                     },
