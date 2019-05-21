@@ -109,7 +109,8 @@ export default class Renderer {
     // if the cell contains formula errors
     if (value instanceof FormulaError) {
       const span = SPAN_TEMPLATE.cloneNode(false);
-      Handsontable.dom.fastInnerHTML(td, value.error());
+      td.innerText = value.error();
+      // Handsontable.dom.fastInnerHTML(td, value.error());
       return;
     }
 
@@ -130,6 +131,7 @@ export default class Renderer {
     }
 
     let result = calcResult(value, typeof value === 'object' ? undefined : cell.getStyle('numberFormat'));
+    result = document.createTextNode(result);
 
     const fontStyle = {
       bold: cell.getStyle('bold'),
@@ -168,13 +170,16 @@ export default class Renderer {
         // td.style. = rowHeight + 'px';
       }
 
-      result = mainSpan.innerHTML;
+      result = mainSpan;
     }
 
     // wrap the value, this fix the clicking issue for overflowed text
     const span = SPAN_TEMPLATE.cloneNode(false);
-    Handsontable.dom.fastInnerHTML(span, result);
-    Handsontable.dom.fastInnerHTML(td, '');
+    span.appendChild(result);
+    // td.innerHTML = null;
+    // Handsontable.dom.fastInnerHTML(span, result);
+    // Handsontable.dom.fastInnerHTML(td, '');
+    removeAllChild(td);
     td.appendChild(span);
 
     // text overflow if right cell is empty
@@ -188,7 +193,7 @@ export default class Renderer {
 
     // check if bottom cell has top border
     const bottomCell = worksheet.cell(row_temp + 1, col + 1);
-    const topBorder = bottomCell.style('topBorder');
+    const topBorder = bottomCell.getStyle('topBorder');
     if (topBorder) {
       const color = colorToRgb(topBorder.color) || '000';
       td.style.borderBottom = `${borderStyle2Width[topBorder.style]}px solid #${color}`;
@@ -211,7 +216,7 @@ export default class Renderer {
     td.classList.add('lAlignLeft');
 
     // right and bottom borders
-    const borders = cell.style('border');
+    const borders = cell.getStyle('border');
     if (Object.keys(borders).length !== 0) {
       for (let key in borders) {
         if ((key === 'right' || key === 'bottom') && borders[key]) {
@@ -226,7 +231,7 @@ export default class Renderer {
       setFontStyle(td, fontStyle);
     }
 
-    const fill = cell.style('fill');
+    const fill = cell.getStyle('fill');
     if (fill) {
       if (fill.type === 'solid') {
         td.style.background = '#' + colorToRgb(fill.color);
@@ -234,7 +239,7 @@ export default class Renderer {
     }
 
     // horizontalAlignment
-    const horizontalAlignment = cell.style('horizontalAlignment');
+    const horizontalAlignment = cell.getStyle('horizontalAlignment');
     if (horizontalAlignment && supported.horizontalAlignment.includes(horizontalAlignment)) {
       td.style.textAlign = horizontalAlignment;
     } else {
@@ -243,7 +248,7 @@ export default class Renderer {
     }
 
     // verticalAlignment
-    const verticalAlignment = cell.style('verticalAlignment');
+    const verticalAlignment = cell.getStyle('verticalAlignment');
     if (verticalAlignment && supported.verticalAlignment.includes(verticalAlignment)) {
       switch (verticalAlignment) {
         case 'top':
@@ -263,14 +268,14 @@ export default class Renderer {
     }
 
     // font text wrap
-    const wrapText = cell.style('wrapText');
+    const wrapText = cell.getStyle('wrapText');
     if (wrapText) {
       td.style.wordWrap = 'break-word';
       td.style.whiteSpace = 'pre-wrap';
     }
 
     // textRotation
-    const textRotation = cell.style('textRotation');
+    const textRotation = cell.getStyle('textRotation');
     if (typeof textRotation === 'number') {
       span.style.display = 'block';
       span.style.transform = 'rotate(-' + textRotation + 'deg)';
@@ -292,8 +297,11 @@ export default class Renderer {
         a.target = '_black';
         a.href = cell.hyperlink();
       }
-      Handsontable.dom.fastInnerHTML(a, result);
-      Handsontable.dom.fastInnerText(td, '');
+      a.appendChild(result);
+      // td.innerText = null;
+      // Handsontable.dom.fastInnerHTML(a, result);
+      // Handsontable.dom.fastInnerText(td, '');
+      removeAllChild(td);
       td.appendChild(a);
     }
     const dataValidation = cell.dataValidation();
@@ -311,7 +319,7 @@ export default class Renderer {
       const container = document.createElement('div');
       td.childNodes.forEach(node => container.appendChild(node.cloneNode(true)));
       container.appendChild(arrow);
-      Handsontable.dom.fastInnerText(td, '');
+      removeAllChild(td);
       td.appendChild(container);
     }
   };
@@ -325,12 +333,12 @@ function setFontStyle(element, font) {
   if (font.bold) {
     element.style.fontWeight = 'bold';
   } else {
-    element.style.fontWeight = '';
+    element.style.fontWeight = null;
   }
   if (font.italic) {
     element.style.fontStyle = 'italic';
   } else {
-    element.style.fontStyle = '';
+    element.style.fontStyle = null;
   }
   if ('size' in font) {
     element.style.fontSize = font.size + 'pt';
@@ -349,7 +357,7 @@ function setFontStyle(element, font) {
   if (font.underline) {
     element.style.textDecoration = 'underline';
   } else {
-    element.style.textDecoration = '';
+    element.style.textDecoration = null;
   }
   if (font.strikethrough) {
     if (element.style.textDecoration)
@@ -366,4 +374,10 @@ function calcResult(cellValue, numFmt) {
     result = SSF.format(numFmt.replace('\\', ''), result);
   }
   return result;
+}
+
+function removeAllChild(element) {
+  while (element.firstChild) {
+    element.firstChild.remove();
+  }
 }
