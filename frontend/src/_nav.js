@@ -114,8 +114,8 @@ export default {
       ]
     },
     {
-      name: 'Formula Parser Test',
-      url: '/parser',
+      name: 'Test',
+      url: '/workbooks/template2/2018-19%20CAPS%20LHIN%20Managed%20BLANK%20V1.xlsm',
       icon: 'mdi mdi-account',
     },
     {

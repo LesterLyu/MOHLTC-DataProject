@@ -15,6 +15,7 @@ const Workbooks = React.lazy(() => import('./views/Workbooks/Workbooks'));
 
 const AttCat = React.lazy(() => import('./views/AttCat/AttCat'));
 const CreateExcel = React.lazy(() => import('./views/Excel/CreateExcel'));
+const Excel = React.lazy(() => import('./views/Excel/Excel'));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -41,6 +42,7 @@ const routes = [
   {path: '/workbooks/template/:name/', exact: true, name: 'Edit Workbook', component: CreateExcel, params: {mode: 'admin edit'}},
   {path: '/workbooks/create', exact: true, name: 'Create Workbook', component: CreateExcel, params: {mode: 'admin create'}},
 
+  {path: '/workbooks/template2/:name/', exact: true, name: 'Edit Workbook', component: Excel, params: {mode: 'admin edit'}},
 
   {path: '/workbooks/attributes', exact: true, name: 'Attributes', component: AttCat, params: {mode: 'att'}},
   {path: '/workbooks/categories', exact: true, name: 'Categories', component: AttCat, params: {mode: 'cat'}},
