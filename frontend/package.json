@@ -37,7 +37,7 @@
     "react-loadable": "^5.5.0",
     "react-router-dom": "^4.3.1",
     "react-select": "^2.4.3",
-    "react-window": "^1.8.1",
+    "react-window": "git+https://github.com/LesterLyu/react-window.git",
     "reactstrap": "^6.5.0",
     "tinycolor2": "^1.4.1",
     "xlsx-populate": "git+https://github.com/LesterLyu/xlsx-populate.git#formula-support"

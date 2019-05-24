@@ -148,7 +148,7 @@ class Cell extends Component {
     return style;
   }
 
-  dataValidation(dataValidation, cell, value, style) {
+  renderDataValidation(dataValidation, cell, value, style) {
     return (
       <div style={style}>
         <div>
@@ -158,6 +158,28 @@ class Cell extends Component {
             {String.fromCharCode(9660)}
           </div>
         </div>
+      </div>
+    )
+  }
+
+  renderHyperlink(hyperlink, cell, value, style) {
+    // TODO: FIX
+    const location = hyperlink.attributes.location;
+    return (
+      <div style={style}>
+        {location ? (
+          <a href={window.location.href} onClick={() => {
+            const sheet = cell.sheet()._hyperlinks.parse(location).sheet;
+            if (sheet)
+              excel.switchSheet(sheet);
+          }}>
+            {value}
+          </a>
+        ) : (
+          <a href={cell.hyperlink()} target="_blank">
+            {value}
+          </a>
+        )}
       </div>
     )
   }
@@ -195,17 +217,16 @@ class Cell extends Component {
     // render data validation
     const dataValidation = cell.dataValidation();
     if (dataValidation && dataValidation.type === 'list') {
-      return this.dataValidation(dataValidation, cell, value, mergedStyle);
+      return this.renderDataValidation(dataValidation, cell, value, mergedStyle);
     }
 
     // render hyperlink
-
+    const hyperlink = cell.sheet()._hyperlinks.get(cell.address());
+    if (hyperlink) {
+      return this.renderHyperlink(hyperlink, cell, value, mergedStyle);
+    }
 
     // render normal cell
-    if (rowIndex === 0) {
-      mergedStyle.zIndex = 1000;
-      mergedStyle.position = 'fixed';
-    }
     return (
       <div style={mergedStyle} onClick={() => {
         console.log(`Clicked ${rowIndex}, ${columnIndex}`)
@@ -272,6 +293,13 @@ class Worksheets extends Component {
       return height === undefined ? 80 : height / 0.11;
     };
 
+    const panes = sheet.panes();
+    let freezeRowCount = 0, freezeColumnCount = 0;
+    if (panes && panes.state === 'frozen') {
+      freezeRowCount = panes.ySplit;
+      freezeColumnCount = panes.xSplit;
+    }
+
     return (
       <VariableSizeGrid
         ref={this.sheetContainerRef}
@@ -285,7 +313,9 @@ class Worksheets extends Component {
         overscanColumnsCount={5}
         estimatedColumnWidth={80}
         estimatedRowHeight={24}
-        itemData={sheet}>
+        itemData={sheet}
+        freezeRowCount={freezeRowCount}
+        freezeColumnCount={freezeColumnCount}>
         {Cell}
       </VariableSizeGrid>
     )
