@@ -60,6 +60,44 @@ module.exports = {
         })
     },
 
+    // Create a new filled workbook
+    // that is a union from two exist filled workbook
+    union_filled_workbook: (req, res, next) =>{
+        //
+        if(req.body.data.length !== 2){
+            let errMessage = "The request's body must include 2 excel files.";
+            console.log(errMessage);
+            return res.status(500).json({success: false, message: errMessage});
+        }
+        let data_0 = req.body.data[0];
+        let data_1 = req.body.data[1];
+
+        //
+        const name = req.body[0].name + "_" + req.body[1].name;
+        const username = req.session.user.username;
+        const date = Date.now();
+        const groupNumber = req.session.user.groupNumber;
+
+        //
+        let unionData = data_0;
+
+                // create a filled workbook
+                let newFilledWorkbook = new FilledWorkbook({
+                    name: name,
+                    username: username,
+                    groupNumber: groupNumber,
+                    data: unionData
+                });
+                newFilledWorkbook.save((err, updatedFilledWorkbook) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    return res.json({success: true, message: 'Successfully added filled workbook ' + name + '.'});
+                })
+
+    },
+
     // Create or Update filled workbook
     update_filled_workbook: (req, res, next) => {
         const name = req.body.name;

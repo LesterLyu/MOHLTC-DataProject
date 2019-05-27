@@ -17,6 +17,9 @@ router.get('/api/filled-workbook/:name', workbookController.get_filled_workbook)
 // POST Create or Update filled workbook
 router.post('/api/filled-workbook', workbookController.update_filled_workbook);
 
+// POST Create a new filled workbook that is a union from two exist filled workbook
+router.post('/api/union-filled-workbook', workbookController.union_filled_workbook);
+
 // DELETE Delete filled workbook
 router.delete('/api/filled-workbook', workbookController.delete_filled_workbook);
 
