@@ -22,8 +22,8 @@ class Login extends Component {
     this.user = new UserManager(props);
 
     this.state = {
-      username: '',
-      password: '',
+      username: 'lester',
+      password: 'lester',
 
       isServerErrormessage: false,
       ServerErrormessage: null,
