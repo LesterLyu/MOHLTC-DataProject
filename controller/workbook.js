@@ -51,8 +51,7 @@ module.exports = {
                 }
                 if (!filledWorkbook) {
                     return res.json({success: true, workbook: workbook});
-                }
-                else {
+                } else {
                     workbook.data = filledWorkbook.data;
                     return res.json({success: true, workbook: workbook});
                 }
@@ -63,9 +62,9 @@ module.exports = {
 
     // Create a new filled workbook
     // that is a union from two exist filled workbook
-    union_filled_workbook: (req, res, next) =>{
+    union_filled_workbook: (req, res, next) => {
         //
-        if(req.body.data.length !== 2){
+        if (req.body.data.length !== 2) {
             let errMessage = "The request's body must include 2 excel files.";
             console.log(errMessage);
             return res.status(500).json({success: false, message: errMessage});
@@ -82,20 +81,20 @@ module.exports = {
         //
         let unionData = data_0;
 
-                // create a filled workbook
-                let newFilledWorkbook = new FilledWorkbook({
-                    name: name,
-                    username: username,
-                    groupNumber: groupNumber,
-                    data: unionData
-                });
-                newFilledWorkbook.save((err, updatedFilledWorkbook) => {
-                    if (err) {
-                        console.log(err);
-                        return res.status(500).json({success: false, message: err});
-                    }
-                    return res.json({success: true, message: 'Successfully added filled workbook ' + name + '.'});
-                })
+        // create a filled workbook
+        let newFilledWorkbook = new FilledWorkbook({
+            name: name,
+            username: username,
+            groupNumber: groupNumber,
+            data: unionData
+        });
+        newFilledWorkbook.save((err, updatedFilledWorkbook) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            return res.json({success: true, message: 'Successfully added filled workbook ' + name + '.'});
+        })
 
     },
 
@@ -122,8 +121,7 @@ module.exports = {
                     }
                     return res.json({success: true, message: 'Successfully updated filled workbook ' + name + '.'})
                 });
-            }
-            else {
+            } else {
                 // create a filled workbook
                 let newFilledWorkbook = new FilledWorkbook({
                     name: name,
@@ -199,37 +197,35 @@ module.exports = {
                 for (let sheetKey in file.data) {                                           // sheet
                     const sheet = file.data[sheetKey];
                     let attributes = [];
-                    for(let rowKey in sheet){                                               // row
+                    for (let rowKey in sheet) {                                               // row
                         let rowLine = sheet[rowKey];
                         // the first line for Attribute
-                        if(rowKey === '0') {
-                                attributes= rowLine;
+                        if (rowKey === '0') {
+                            attributes = rowLine;
                         }
 
                         let category = '';
-                        for(let colKey in rowLine){                                      // col
+                        for (let colKey in rowLine) {                                      // col
                             // the first column
-                            if(colKey === '0'){
+                            if (colKey === '0') {
                                 category = rowLine[0];
                             }
                             let hasAttribute = false;
-                            for(let attribueKey in attributes){
-                                if(attribueKey === colKey){
+                            for (let attribueKey in attributes) {
+                                if (attribueKey === colKey) {
                                     hasAttribute = true;
                                 }
                             };
-                            if(category !== '' && hasAttribute){
+                            if (category !== '' && hasAttribute) {
 
-
-
-                                    let line = [];
-                                    line.push({'username': username});
-                                    line.push({"workbookname": filename});
-                                    line.push({"sheetname": sheetKey});
-                                    line.push({"category": category});
-                                    line.push({"attribute": attributes[colKey]});
-                                    line.push({"value": rowLine[colKey]});
-                                    result.push(line);
+                                let line = [];
+                                line.push({'username': username});
+                                line.push({"workbookname": filename});
+                                line.push({"sheetname": sheetKey});
+                                line.push({"category": category});
+                                line.push({"attribute": attributes[colKey]});
+                                line.push({"value": rowLine[colKey]});
+                                result.push(line);
                             }
                         }
 
@@ -351,8 +347,7 @@ module.exports = {
             }
             if (!workbook) {
                 return res.status(500).json({success: false, message: 'Workbook not found.'});
-            }
-            else {
+            } else {
                 // update it
                 workbook.name = name;
                 workbook.data = data;
@@ -412,8 +407,7 @@ module.exports = {
                                     message: 'Successfully added filled workbook ' + workbookName + '.'
                                 });
                             })
-                        }
-                        else {
+                        } else {
                             // TO-DO check integrity
                             workbook.data = data;
                             workbook.save((err, updated) => {
@@ -553,8 +547,7 @@ module.exports = {
                         }
                         if (!filledWorkbook) {
                             workbookData = workbook.data;
-                        }
-                        else {
+                        } else {
                             // found filled workbook
                             workbookData = filledWorkbook.data;
                         }
