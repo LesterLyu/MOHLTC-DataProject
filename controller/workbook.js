@@ -30,6 +30,7 @@ module.exports = {
         })
     },
 
+
     // get a filled workbook, if not exists, send an empty workbook
     get_filled_workbook: (req, res, next) => {
         const name = req.params.name;
@@ -174,6 +175,82 @@ module.exports = {
                 return res.json({success: true, workbooks: workbooks});
             });
         })
+    },
+
+    // retrieve standard data from all filled workbooks in current group for a user
+    retrieveAllData_filled_workbook: (req, res, next) => {
+        const username = req.session.user.username;
+        const wookbookname = req.body.wookbookname;
+        const sheetname = req.body.sheetname;
+        const attributeId = req.body.attributeId;
+        const categoryId = req.body.categoryId;
+        FilledWorkbook.find({username: username}, (err, filledWorkbooks) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            // retrieve data from all filledWordbooks
+            let result = [];
+            // result.push(filledWorkbooks);
+
+            for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
+                const file = filledWorkbooks[indexOfDoc];
+                const filename = file.name;
+                for (let sheetKey in file.data) {                                           // sheet
+                    const sheet = file.data[sheetKey];
+                    let attributes = [];
+                    for(let rowKey in sheet){                                               // row
+                        let rowLine = sheet[rowKey];
+                        // the first line for Attribute
+                        if(rowKey === '0') {
+                                attributes= rowLine;
+                        }
+
+                        let category = '';
+                        for(let colKey in rowLine){                                      // col
+                            // the first column
+                            if(colKey === '0'){
+                                category = rowLine[0];
+                            }
+                            let hasAttribute = false;
+                            for(let attribueKey in attributes){
+                                if(attribueKey === colKey){
+                                    hasAttribute = true;
+                                }
+                            };
+                            if(category !== '' && hasAttribute){
+
+
+
+                                    let line = [];
+                                    line.push({'username': username});
+                                    line.push({"workbookname": filename});
+                                    line.push({"sheetname": sheetKey});
+                                    line.push({"category": category});
+                                    line.push({"attribute": attributes[colKey]});
+                                    line.push({"value": rowLine[colKey]});
+                                    result.push(line);
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            // for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
+            //     for (let indexOfSheet = 0; indexOfSheet < filledWorkbooks[indexOfDoc].length; indexOfSheet++) {   // sheet
+            //         for (let indexOfRow = 0; indexOfRow < filledWorkbooks[indexOfDoc][indexOfSheet].length; indexOfRow++) {   // row
+            //             for (let indexOfCol = 0; indexOfCol < filledWorkbooks[indexOfDoc][indexOfSheet][indexOfRow].length; indexOfCol++) {   // col
+            //                 //     result.push(filledWorkbooks[indexOfDoc][indexOfSheet][indexOfRow][indexOfCol]);
+            //                 result.push("xxx");
+            //                 // }
+            //             }
+            //         }
+            //     }
+            // }
+
+            return res.json({success: true, filledWorkbooks: result});
+        });
     },
 
     get_filled_workbooks: (req, res, next) => {
