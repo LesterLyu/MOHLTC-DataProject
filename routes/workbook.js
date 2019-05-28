@@ -27,7 +27,12 @@ router.delete('/api/filled-workbook', workbookController.delete_filled_workbook)
 router.get('/api/workbooks', workbookController.get_unfilled_workbooks);
 
 // GET Find all filled workbooks in current group for a user
-router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
+// router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
+// FIXME: please restore after debugging
+router.get('/api/filled-workbooks', workbookController.retrieveAllData_filled_workbook);
+
+// GET retrieve standard data from all filled workbooks in current group for a user
+router.get('/api/filled-workbook/retrieveAllData', workbookController.retrieveAllData_filled_workbook);
 
 // GET Find all filled workbooks in current group for a user
 router.get('/api/admin/workbooks', workbookController.admin_get_workbooks);
