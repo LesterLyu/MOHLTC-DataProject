@@ -199,8 +199,14 @@ module.exports = {
                     let attributes = [];
                     for (let rowKey in sheet) {                                               // row
                         let rowLine = sheet[rowKey];
-                        // the first line for Attribute
-                        if (rowKey === '0') {
+                        // FIXME: retrive attributes from map
+                        // the first line is Attributes
+                        if (rowKey === '0') {                                                  // attributes
+                            for (let attributeKey in rowLine) {
+                                if (!/^\d+$/.test(rowLine[attributeKey])) {             // validation
+                                    delete rowLine[attributeKey];
+                                }
+                            }
                             attributes = rowLine;
                         }
 
@@ -210,41 +216,29 @@ module.exports = {
                             if (colKey === '0') {
                                 category = rowLine[0];
                             }
+                            // FIXME: UPDATE
                             let hasAttribute = false;
                             for (let attribueKey in attributes) {
                                 if (attribueKey === colKey) {
                                     hasAttribute = true;
                                 }
-                            };
-                            if (category !== '' && hasAttribute) {
+                            }
 
-                                let line = [];
-                                line.push({'username': username});
-                                line.push({"workbookname": filename});
-                                line.push({"sheetname": sheetKey});
-                                line.push({"category": category});
-                                line.push({"attribute": attributes[colKey]});
-                                line.push({"value": rowLine[colKey]});
-                                result.push(line);
+                            if (category !== '' && hasAttribute) {
+                                result.push({
+                                    username,
+                                    workbookname: filename,
+                                    sheetname: sheetKey,
+                                    category: category + '--' + rowKey,
+                                    attribute: attributes[colKey] + '--' + colKey,
+                                    value: rowLine[colKey]
+                                });
                             }
                         }
 
                     }
                 }
             }
-
-            // for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
-            //     for (let indexOfSheet = 0; indexOfSheet < filledWorkbooks[indexOfDoc].length; indexOfSheet++) {   // sheet
-            //         for (let indexOfRow = 0; indexOfRow < filledWorkbooks[indexOfDoc][indexOfSheet].length; indexOfRow++) {   // row
-            //             for (let indexOfCol = 0; indexOfCol < filledWorkbooks[indexOfDoc][indexOfSheet][indexOfRow].length; indexOfCol++) {   // col
-            //                 //     result.push(filledWorkbooks[indexOfDoc][indexOfSheet][indexOfRow][indexOfCol]);
-            //                 result.push("xxx");
-            //                 // }
-            //             }
-            //         }
-            //     }
-            // }
-
             return res.json({success: true, filledWorkbooks: result});
         });
     },
@@ -495,7 +489,6 @@ module.exports = {
                             })
                         });
                     });
-
                 });
         });
     },
