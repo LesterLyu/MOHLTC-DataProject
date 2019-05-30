@@ -47,18 +47,18 @@ class Workbooks extends Component {
   }
 
   filledWorkbooks() {
-    // console.log(this.workbooks[0]);
-    const list = [];
-    const filledWorkbooks = this.workbooks[0];
-    for (let i = 0; i < filledWorkbooks.length; i++) {
-      const name = filledWorkbooks[i].name;
-      list.push(
-        <Grid key={i} item>
-          <SheetCard fileName={name} deleteCb={this.deleteWorkbookForUser} editHref={'/workbooks/fill/' + name}/>
-        </Grid>
-      )
-    }
-    return list;
+    console.log(this.workbooks[0]);
+    // const list = [];
+    // const filledWorkbooks = this.workbooks[0];
+    // for (let i = 0; i < filledWorkbooks.length; i++) {
+    //   const name = filledWorkbooks[i].name;
+    //   list.push(
+    //     <Grid key={i} item>
+    //       <SheetCard fileName={name} deleteCb={this.deleteWorkbookForUser} editHref={'/workbooks/fill/' + name}/>
+    //     </Grid>
+    //   )
+    // }
+    // return list;
   }
 
   unFilledWorkbooks() {
