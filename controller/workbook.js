@@ -183,61 +183,42 @@ module.exports = {
         const sheetname = req.body.sheetname;
         const attributeId = req.body.attributeId;
         const categoryId = req.body.categoryId;
-        FilledWorkbook.find({username: username}, (err, filledWorkbooks) => {
+        Workbook.find({}, (err, workbooks) => {  // all
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
-            // retrieve data from all filledWordbooks
+            // retrieve data from all
             let result = [];
-            // result.push(filledWorkbooks);
 
-            for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
-                const file = filledWorkbooks[indexOfDoc];
+            for (let indexOfDoc = 0; indexOfDoc < workbooks.length; indexOfDoc++) {   // document
+                const file = workbooks[indexOfDoc];
                 const filename = file.name;
-                for (let sheetKey in file.data) {                                           // sheet
-                    const sheet = file.data[sheetKey];
-                    let attributes = [];
-                    for (let rowKey in sheet) {                                               // row
-                        let rowLine = sheet[rowKey];
-                        // FIXME: retrive attributes from map
-                        // the first line is Attributes
-                        if (rowKey === '0') {                                                  // attributes
-                            for (let attributeKey in rowLine) {
-                                if (!/^\d+$/.test(rowLine[attributeKey])) {             // validation
-                                    delete rowLine[attributeKey];
-                                }
-                            }
-                            attributes = rowLine;
+                const attMap = file.attMap;
+                const catMap = file.catMap;
+                // result.push({
+                //     username,
+                //     workbookname: filename,
+                //     sheetname: '',
+                //     // FIXME: REMOVE  -- TAG for debugging
+                //     category: catMap,
+                //     attribute: attMap,
+                //     value: ''
+                // });
+
+                for (let sheetKey in catMap) {
+                    for (let catkey in catMap[sheetKey]) {
+                        for (let attKey in attMap[sheetKey]) {
+                            result.push({
+                                username,
+                                workbookname: filename,
+                                sheetname: sheetKey,
+                                // FIXME: REMOVE  -- TAG for debugging
+                                category: catkey + '--' + catMap[sheetKey][catkey],
+                                attribute: attKey + '--' + attMap[sheetKey][attKey],
+                                value: '-'
+                            });
                         }
-
-                        let category = '';
-                        for (let colKey in rowLine) {                                      // col
-                            // the first column
-                            if (colKey === '0') {
-                                category = rowLine[0];
-                            }
-                            // FIXME: UPDATE
-                            let hasAttribute = false;
-                            for (let attribueKey in attributes) {
-                                if (attribueKey === colKey) {
-                                    hasAttribute = true;
-                                }
-                            }
-
-                            if (category !== '' && hasAttribute) {
-                                result.push({
-                                    username,
-                                    workbookname: filename,
-                                    sheetname: sheetKey,
-                                    // FIXME: REMOVE  -- TAG for debugging
-                                    category: category + '--' + rowKey,
-                                    attribute: attributes[colKey] + '--' + colKey,
-                                    value: rowLine[colKey]
-                                });
-                            }
-                        }
-
                     }
                 }
             }
@@ -245,7 +226,7 @@ module.exports = {
         });
     },
 
-    // retrieve standard data from all filled workbooks in current group for a user
+// retrieve standard data from all filled workbooks in current group for a user
     retrieveAllData_filled_workbook: (req, res, next) => {
         const username = req.session.user.username;
         const wookbookname = req.body.wookbookname;
@@ -314,285 +295,269 @@ module.exports = {
         });
     },
 
-    get_filled_workbooks: (req, res, next) => {
-        const username = req.session.user.username;
-        const groupNumber = req.session.user.groupNumber;
-        FilledWorkbook.find({username: username, groupNumber: groupNumber}, 'name', (err, filledWorkbooks) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            return res.json({success: true, filledWorkbooks: filledWorkbooks});
-        })
-    },
-
-    // admin
-    admin_create_workbook: (req, res, next) => {
-        if (!checkPermission(req)) {
-            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        }
-        const name = req.body.name;
-        const groupNumber = req.session.user.groupNumber;
-        let data = req.body.data;
-        if (name === '') {
-            return res.status(500).json({success: false, message: 'Name cannot be empty.'});
-        }
-
-        Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            if (workbook) {
-                return res.status(400).json({success: false, message: 'Workbook exists.'})
-            }
-            let newWorkbook = new Workbook({
-                name: name,
-                groupNumber: groupNumber,
-                data: data
-            });
-            newWorkbook.save((err, updatedWorkbook) => {
+    get_filled_workbooks:
+        (req, res, next) => {
+            const username = req.session.user.username;
+            const groupNumber = req.session.user.groupNumber;
+            FilledWorkbook.find({username: username, groupNumber: groupNumber}, 'name', (err, filledWorkbooks) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).json({success: false, message: err});
                 }
-                return res.json({success: true, message: 'Successfully added workbook ' + name + '.'});
+                return res.json({success: true, filledWorkbooks: filledWorkbooks});
             })
+        },
 
-        });
-    },
-
-    admin_delete_workbook: (req, res, next) => {
-        if (!checkPermission(req)) {
-            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        }
-        const name = req.body.name;
-        const groupNumber = req.session.user.groupNumber;
-        Workbook.deleteOne({name: name, groupNumber: groupNumber}, (err) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err})
+    // admin
+    admin_create_workbook:
+        (req, res, next) => {
+            if (!checkPermission(req)) {
+                return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
             }
-            FilledWorkbook.deleteMany({name: name, groupNumber: groupNumber}, (err) => {
+            const name = req.body.name;
+            const groupNumber = req.session.user.groupNumber;
+            let data = req.body.data;
+            if (name === '') {
+                return res.status(500).json({success: false, message: 'Name cannot be empty.'});
+            }
+
+            Workbook.findOne({name: name, groupNumber: groupNumber}, (err, workbook) => {
                 if (err) {
                     console.log(err);
-                    return res.status(500).json({success: false, message: err})
+                    return res.status(500).json({success: false, message: err});
                 }
-                return res.json({success: true, message: 'Deleted workbook ' + name + '.'})
-            });
-        })
-    },
-
-    admin_get_workbooks: (req, res, next) => {
-        if (!checkPermission(req)) {
-            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        }
-        const groupNumber = req.session.user.groupNumber;
-        Workbook.find({groupNumber: groupNumber}, 'name', (err, workbooks) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            return res.json({success: true, workbooks: workbooks});
-        })
-    },
-
-    admin_edit_workbooks: (req, res, next) => {
-        if (!checkPermission(req)) {
-            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        }
-        const name = req.body.name;
-        const oldName = req.body.oldName;
-        const groupNumber = req.session.user.groupNumber;
-        let data = req.body.data;
-        Workbook.findOne({name: oldName, groupNumber: groupNumber}, (err, workbook) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            if (!workbook) {
-                return res.status(500).json({success: false, message: 'Workbook not found.'});
-            } else {
-                // update it
-                workbook.name = name;
-                workbook.data = data;
-                workbook.save((err, updated) => {
+                if (workbook) {
+                    return res.status(400).json({success: false, message: 'Workbook exists.'})
+                }
+                let newWorkbook = new Workbook({
+                    name: name,
+                    groupNumber: groupNumber,
+                    data: data
+                });
+                newWorkbook.save((err, updatedWorkbook) => {
                     if (err) {
                         console.log(err);
                         return res.status(500).json({success: false, message: err});
                     }
-                    return res.json({success: true, message: 'Successfully updated workbook ' + name + '.'})
-                });
+                    return res.json({success: true, message: 'Successfully added workbook ' + name + '.'});
+                })
+
+            });
+        },
+
+    admin_delete_workbook:
+        (req, res, next) => {
+            if (!checkPermission(req)) {
+                return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
             }
-        });
-    },
+            const name = req.body.name;
+            const groupNumber = req.session.user.groupNumber;
+            Workbook.deleteOne({name: name, groupNumber: groupNumber}, (err) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err})
+                }
+                FilledWorkbook.deleteMany({name: name, groupNumber: groupNumber}, (err) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err})
+                    }
+                    return res.json({success: true, message: 'Deleted workbook ' + name + '.'})
+                });
+            })
+        },
 
-    user_import_workbook: (req, res, next) => {
-        if (!req.files)
-            return res.status(400).json({success: false, message: 'No files were uploaded.'});
+    admin_get_workbooks:
+        (req, res, next) => {
+            if (!checkPermission(req)) {
+                return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+            }
+            const groupNumber = req.session.user.groupNumber;
+            Workbook.find({groupNumber: groupNumber}, 'name', (err, workbooks) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                return res.json({success: true, workbooks: workbooks});
+            })
+        },
 
-        const workbookName = req.params.workbookName;
-        const fileName = req.params.fileName;
-        const username = req.session.user.username;
-        const groupNumber = req.session.user.groupNumber;
-
-        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-        let excelFile = req.files.excel;
-        const path = './uploads/' + username + '_' + fileName;
-
-        // Use the mv() method to place the file somewhere on your server
-        excelFile.mv(path, function (err) {
-            if (err)
-                return res.status(500).json({success: false, message: err});
-
-            const wb = new ExcelWorkbook(path, groupNumber);
-            wb.getData()
-                .then(data => {
-                    FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
+    admin_edit_workbooks:
+        (req, res, next) => {
+            if (!checkPermission(req)) {
+                return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+            }
+            const name = req.body.name;
+            const oldName = req.body.oldName;
+            const groupNumber = req.session.user.groupNumber;
+            let data = req.body.data;
+            Workbook.findOne({name: oldName, groupNumber: groupNumber}, (err, workbook) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                if (!workbook) {
+                    return res.status(500).json({success: false, message: 'Workbook not found.'});
+                } else {
+                    // update it
+                    workbook.name = name;
+                    workbook.data = data;
+                    workbook.save((err, updated) => {
                         if (err) {
                             console.log(err);
                             return res.status(500).json({success: false, message: err});
                         }
+                        return res.json({success: true, message: 'Successfully updated workbook ' + name + '.'})
+                    });
+                }
+            });
+        },
 
-                        if (!workbook) {
-                            let newFilledWorkbook = new FilledWorkbook({
-                                name: workbookName,
-                                username: username,
-                                groupNumber: groupNumber,
-                                data: data
-                            });
-                            newFilledWorkbook.save((err, updated) => {
-                                if (err) {
-                                    console.log(err);
-                                    return res.status(500).json({success: false, message: err});
-                                }
-                                return res.json({
-                                    success: true,
-                                    workbook: updated,
-                                    message: 'Successfully added filled workbook ' + workbookName + '.'
+    user_import_workbook:
+        (req, res, next) => {
+            if (!req.files)
+                return res.status(400).json({success: false, message: 'No files were uploaded.'});
+
+            const workbookName = req.params.workbookName;
+            const fileName = req.params.fileName;
+            const username = req.session.user.username;
+            const groupNumber = req.session.user.groupNumber;
+
+            // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+            let excelFile = req.files.excel;
+            const path = './uploads/' + username + '_' + fileName;
+
+            // Use the mv() method to place the file somewhere on your server
+            excelFile.mv(path, function (err) {
+                if (err)
+                    return res.status(500).json({success: false, message: err});
+
+                const wb = new ExcelWorkbook(path, groupNumber);
+                wb.getData()
+                    .then(data => {
+                        FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
+                            if (err) {
+                                console.log(err);
+                                return res.status(500).json({success: false, message: err});
+                            }
+
+                            if (!workbook) {
+                                let newFilledWorkbook = new FilledWorkbook({
+                                    name: workbookName,
+                                    username: username,
+                                    groupNumber: groupNumber,
+                                    data: data
                                 });
-                            })
-                        } else {
-                            // TO-DO check integrity
+                                newFilledWorkbook.save((err, updated) => {
+                                    if (err) {
+                                        console.log(err);
+                                        return res.status(500).json({success: false, message: err});
+                                    }
+                                    return res.json({
+                                        success: true,
+                                        workbook: updated,
+                                        message: 'Successfully added filled workbook ' + workbookName + '.'
+                                    });
+                                })
+                            } else {
+                                // TO-DO check integrity
+                                workbook.data = data;
+                                workbook.save((err, updated) => {
+                                    if (err) {
+                                        console.log(err);
+                                        return res.status(500).json({success: false, message: err});
+                                    }
+                                    return res.json({
+                                        success: true,
+                                        workbook: updated,
+                                        message: 'Successfully updated workbook' + req.params.name + '.',
+                                    })
+                                });
+                            }
+                        });
+                    });
+
+
+            });
+        },
+
+    // import workbook
+    // TO-DO validate col/rows
+    admin_upload_style:
+        (req, res, next) => {
+            if (!checkPermission(req)) {
+                return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+            }
+            let start = new Date();
+            if (!req.files)
+                return res.status(400).json({success: false, message: 'No files were uploaded.'});
+
+            const workbookName = req.params.workbookName;
+            const fileName = req.params.fileName;
+            const path = './uploads/' + fileName;
+            const groupNumber = req.session.user.groupNumber;
+
+            // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
+            let excelFile = req.files.excel;
+
+            // Use the mv() method to place the file somewhere on your server
+            excelFile.mv(path, function (err) {
+                if (err)
+                    return res.status(500).json({success: false, message: err});
+                console.log('upload takes: ' + (new Date() - start) + 'ms');
+                start = new Date();
+                const wb = new ExcelWorkbook(path, groupNumber);
+                wb.getAll()
+                    .then(([data, extra, attMap, catMap]) => {
+                        console.log('processFile takes: ' + (new Date() - start) + 'ms');
+                        start = new Date();
+                        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
+                            if (err) {
+                                console.log(err);
+                                return res.status(500).json({success: false, message: err});
+                            }
+                            if (!workbook) {
+                                return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                            }
+                            workbook.fileName = fileName;
+                            // compress the string
+                            const extraString = JSON.stringify(extra);
+                            console.log('stringify takes: ' + (new Date() - start) + 'ms');
+                            start = new Date();
+                            const compressedExtra = pako.deflate(extraString, {to: 'string'});
+                            console.log('gzip takes: ' + (new Date() - start) + 'ms');
+                            start = new Date();
+                            // calculate compression rate
+                            const buf = Buffer.from(extraString);
+                            console.info('gzip compression saved ' + (1 - (compressedExtra.length / buf.length)) * 100 + '% spaces!');
+                            workbook.extra = compressedExtra;
                             workbook.data = data;
+                            workbook.attMap = attMap;
+                            workbook.catMap = catMap;
                             workbook.save((err, updated) => {
                                 if (err) {
                                     console.log(err);
                                     return res.status(500).json({success: false, message: err});
                                 }
+                                console.log('workbook.save takes: ' + (new Date() - start) + 'ms');
+
                                 return res.json({
                                     success: true,
                                     workbook: updated,
-                                    message: 'Successfully updated workbook' + req.params.name + '.',
+                                    message: 'Successfully updated workbook style' + req.params.name + '.',
                                 })
                             });
-                        }
-                    });
-                });
-
-
-        });
-    },
-
-    // import workbook
-    // TO-DO validate col/rows
-    admin_upload_style: (req, res, next) => {
-        if (!checkPermission(req)) {
-            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        }
-        let start = new Date();
-        if (!req.files)
-            return res.status(400).json({success: false, message: 'No files were uploaded.'});
-
-        const workbookName = req.params.workbookName;
-        const fileName = req.params.fileName;
-        const path = './uploads/' + fileName;
-        const groupNumber = req.session.user.groupNumber;
-
-        // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file
-        let excelFile = req.files.excel;
-
-        // Use the mv() method to place the file somewhere on your server
-        excelFile.mv(path, function (err) {
-            if (err)
-                return res.status(500).json({success: false, message: err});
-            console.log('upload takes: ' + (new Date() - start) + 'ms');
-            start = new Date();
-            const wb = new ExcelWorkbook(path, groupNumber);
-            wb.getAll()
-                .then(([data, extra, attMap, catMap]) => {
-                    console.log('processFile takes: ' + (new Date() - start) + 'ms');
-                    start = new Date();
-                    Workbook.findOne({name: workbookName, groupNumber: groupNumber}, (err, workbook) => {
-                        if (err) {
-                            console.log(err);
-                            return res.status(500).json({success: false, message: err});
-                        }
-                        if (!workbook) {
-                            return res.status(400).json({success: false, message: 'Workbook does not exist.'});
-                        }
-                        workbook.fileName = fileName;
-                        // compress the string
-                        const extraString = JSON.stringify(extra);
-                        console.log('stringify takes: ' + (new Date() - start) + 'ms');
-                        start = new Date();
-                        const compressedExtra = pako.deflate(extraString, {to: 'string'});
-                        console.log('gzip takes: ' + (new Date() - start) + 'ms');
-                        start = new Date();
-                        // calculate compression rate
-                        const buf = Buffer.from(extraString);
-                        console.info('gzip compression saved ' + (1 - (compressedExtra.length / buf.length)) * 100 + '% spaces!');
-                        workbook.extra = compressedExtra;
-                        workbook.data = data;
-                        workbook.attMap = attMap;
-                        workbook.catMap = catMap;
-                        workbook.save((err, updated) => {
-                            if (err) {
-                                console.log(err);
-                                return res.status(500).json({success: false, message: err});
-                            }
-                            console.log('workbook.save takes: ' + (new Date() - start) + 'ms');
-
-                            return res.json({
-                                success: true,
-                                workbook: updated,
-                                message: 'Successfully updated workbook style' + req.params.name + '.',
-                            })
                         });
                     });
-                });
-        });
-    },
+            });
+        },
 
-    admin_export_workbook: (req, res, next) => {
-        const groupNumber = req.session.user.groupNumber;
-        const username = req.session.user.username;
-        const workbookName = req.params.workbookName;
-        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, 'fileName data', (err, workbook) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            if (!workbook) {
-                return res.status(400).json({success: false, message: 'Workbook does not exist.'});
-            }
-            // found workbook
-            const fileName = workbook.fileName ? workbook.fileName : workbookName + '_new.xlsx';
-
-            excel.exportExcel(fileName, workbook.data, username)
-                .then(() => {
-                    const path = './temp/export_' + username + '_' + fileName;
-                    res.download(path, fileName);
-                })
-        });
-
-    },
-
-    user_export_workbook: (req, res, next) => {
-        const groupNumber = req.session.user.groupNumber;
-        const username = req.session.user.username;
-        const workbookName = req.params.workbookName;
-        Workbook.findOne({name: workbookName, groupNumber: groupNumber}, 'fileName data', (err, workbook) => {
+    admin_export_workbook:
+        (req, res, next) => {
+            const groupNumber = req.session.user.groupNumber;
+            const username = req.session.user.username;
+            const workbookName = req.params.workbookName;
+            Workbook.findOne({name: workbookName, groupNumber: groupNumber}, 'fileName data', (err, workbook) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).json({success: false, message: err});
@@ -600,33 +565,58 @@ module.exports = {
                 if (!workbook) {
                     return res.status(400).json({success: false, message: 'Workbook does not exist.'});
                 }
+                // found workbook
                 const fileName = workbook.fileName ? workbook.fileName : workbookName + '_new.xlsx';
 
-                let workbookData;
-                FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber, username: username},
-                    (err, filledWorkbook) => {
-                        if (err) {
-                            console.log(err);
-                            return res.status(500).json({success: false, message: err});
-                        }
-                        if (!filledWorkbook) {
-                            workbookData = workbook.data;
-                        } else {
-                            // found filled workbook
-                            workbookData = filledWorkbook.data;
-                        }
-                        excel.exportExcel(fileName, workbookData, username)
-                            .then(() => {
-                                const path = './temp/export_' + username + '_' + fileName;
-                                res.download(path, fileName);
-                            })
+                excel.exportExcel(fileName, workbook.data, username)
+                    .then(() => {
+                        const path = './temp/export_' + username + '_' + fileName;
+                        res.download(path, fileName);
                     })
+            });
+
+        },
+
+    user_export_workbook:
+        (req, res, next) => {
+            const groupNumber = req.session.user.groupNumber;
+            const username = req.session.user.username;
+            const workbookName = req.params.workbookName;
+            Workbook.findOne({name: workbookName, groupNumber: groupNumber}, 'fileName data', (err, workbook) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    if (!workbook) {
+                        return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                    }
+                    const fileName = workbook.fileName ? workbook.fileName : workbookName + '_new.xlsx';
+
+                    let workbookData;
+                    FilledWorkbook.findOne({name: workbookName, groupNumber: groupNumber, username: username},
+                        (err, filledWorkbook) => {
+                            if (err) {
+                                console.log(err);
+                                return res.status(500).json({success: false, message: err});
+                            }
+                            if (!filledWorkbook) {
+                                workbookData = workbook.data;
+                            } else {
+                                // found filled workbook
+                                workbookData = filledWorkbook.data;
+                            }
+                            excel.exportExcel(fileName, workbookData, username)
+                                .then(() => {
+                                    const path = './temp/export_' + username + '_' + fileName;
+                                    res.download(path, fileName);
+                                })
+                        })
 
 
-            }
-        );
+                }
+            );
 
-    }
+        }
 
 
 }
