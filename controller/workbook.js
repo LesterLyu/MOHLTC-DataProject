@@ -175,6 +175,76 @@ module.exports = {
         })
     },
 
+
+// GET retrieve standard data from all workbooks based on attributes and categories
+    retrieveAllData_workbook: (req, res, next) => {
+        const username = req.session.user.username;
+        const wookbookname = req.body.wookbookname;
+        const sheetname = req.body.sheetname;
+        const attributeId = req.body.attributeId;
+        const categoryId = req.body.categoryId;
+        FilledWorkbook.find({username: username}, (err, filledWorkbooks) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            // retrieve data from all filledWordbooks
+            let result = [];
+            // result.push(filledWorkbooks);
+
+            for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
+                const file = filledWorkbooks[indexOfDoc];
+                const filename = file.name;
+                for (let sheetKey in file.data) {                                           // sheet
+                    const sheet = file.data[sheetKey];
+                    let attributes = [];
+                    for (let rowKey in sheet) {                                               // row
+                        let rowLine = sheet[rowKey];
+                        // FIXME: retrive attributes from map
+                        // the first line is Attributes
+                        if (rowKey === '0') {                                                  // attributes
+                            for (let attributeKey in rowLine) {
+                                if (!/^\d+$/.test(rowLine[attributeKey])) {             // validation
+                                    delete rowLine[attributeKey];
+                                }
+                            }
+                            attributes = rowLine;
+                        }
+
+                        let category = '';
+                        for (let colKey in rowLine) {                                      // col
+                            // the first column
+                            if (colKey === '0') {
+                                category = rowLine[0];
+                            }
+                            // FIXME: UPDATE
+                            let hasAttribute = false;
+                            for (let attribueKey in attributes) {
+                                if (attribueKey === colKey) {
+                                    hasAttribute = true;
+                                }
+                            }
+
+                            if (category !== '' && hasAttribute) {
+                                result.push({
+                                    username,
+                                    workbookname: filename,
+                                    sheetname: sheetKey,
+                                    // FIXME: REMOVE  -- TAG for debugging
+                                    category: category + '--' + rowKey,
+                                    attribute: attributes[colKey] + '--' + colKey,
+                                    value: rowLine[colKey]
+                                });
+                            }
+                        }
+
+                    }
+                }
+            }
+            return res.json({success: true, filledWorkbooks: result});
+        });
+    },
+
     // retrieve standard data from all filled workbooks in current group for a user
     retrieveAllData_filled_workbook: (req, res, next) => {
         const username = req.session.user.username;
@@ -229,6 +299,7 @@ module.exports = {
                                     username,
                                     workbookname: filename,
                                     sheetname: sheetKey,
+                                    // FIXME: REMOVE  -- TAG for debugging
                                     category: category + '--' + rowKey,
                                     attribute: attributes[colKey] + '--' + colKey,
                                     value: rowLine[colKey]
