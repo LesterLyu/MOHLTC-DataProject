@@ -228,21 +228,20 @@ module.exports = {
 
 
     // retrieveAllData_basedOnWorkbookMap
-
     retrieveAllData_basedOnWorkbookMap: (req, res, next) => {
-        // const groupNumber = req.session.user.groupNumber;
-        // const workbookname = req.body.workbookname;
-        // const sheetname = req.body.sheetname;
-        // const attributeId = req.body.attributeId;
-        // const categoryId = req.body.categoryId;
+        // FIXME: REMOVE hard code
+        const groupNumber = req.session.user.groupNumber ? req.session.user.groupNumber : 1;
+        const queryWorkbookname = req.body.workbookname ? req.body.workbookname : '2018-19 CAPS LHIN Managed BLANK V1.xlsx';
 
-        // FIXME: use the parameter instead of hard code
-        const groupNumber = 1;
-        const workbookname = '2018-19 CAPS LHIN Managed BLANK V1.xlsx';
+        const queryUsername = req.body.username;
+        const querySheetname = req.body.sheetname;
+        const queryAttributeId = req.body.attributeId;
+        const queryCategoryId = req.body.categoryId;
+
         // Firstly retrieve the category map and attribute map from a template (unfilled workbook)
         // Then based on these two map to get all value from sheets
         // that are filled by the same template
-        Workbook.findOne({groupNumber: groupNumber, name: workbookname}, (err, workbook) => {
+        Workbook.findOne({groupNumber: groupNumber, name: queryWorkbookname}, (err, workbook) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).json({success: false, message: err});
@@ -250,7 +249,7 @@ module.exports = {
                 // retrieve data from all filledWordbooks
                 const attMap = workbook.attMap;
                 const catMap = workbook.catMap;
-                FilledWorkbook.find({groupNumber: groupNumber, name: workbookname}, (err, filledWorkbooks) => {
+                FilledWorkbook.find({groupNumber: groupNumber, name: queryWorkbookname}, (err, filledWorkbooks) => {
                     if (err) {
                         console.log(err);
                         return res.status(500).json({success: false, message: err});
