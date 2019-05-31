@@ -271,18 +271,14 @@ module.exports = {
                                     const rowIndex = catMap[sheetKey][catKey];
                                     const colIndex = attMap[sheetKey][attKey];
                                     const value = data[sheetKey][rowIndex][colIndex];
-                                    if (value !== null || value !== '') {
-                                        result.push({
-                                            username,
-                                            workbookname: filename,
-                                            sheetname: sheetKey,
-                                            // FIXME: REMOVE  -- TAG for debugging
-                                            category: catKey + '--' + rowIndex,
-                                            attribute: attKey + '--' + colIndex,
-                                            value,
-                                        });
-                                    }
-
+                                    result.push([
+                                        username,
+                                        // workbookname: filename,
+                                        sheetKey,
+                                        catKey,
+                                        attKey,
+                                        value,
+                                    ]);
                                 }
                             }
                         }
