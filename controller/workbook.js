@@ -179,7 +179,7 @@ module.exports = {
 // GET retrieve standard data from all workbooks based on attributes and categories
     retrieveAllData_workbook: (req, res, next) => {
         const username = req.session.user.username;
-        const wookbookname = req.body.wookbookname;
+        const workbookname = req.body.workbookname;
         const sheetname = req.body.sheetname;
         const attributeId = req.body.attributeId;
         const categoryId = req.body.categoryId;
@@ -227,82 +227,76 @@ module.exports = {
     },
 
 
-
-
     // retrieveAllData_basedOnWorkbookMap
+
     retrieveAllData_basedOnWorkbookMap: (req, res, next) => {
-        const username = req.session.user.username;
-        const groupNumber = req.session.user.groupNumber;
-        const wookbookname = req.body.wookbookname;
-        const sheetname = req.body.sheetname;
-        const attributeId = req.body.attributeId;
-        const categoryId = req.body.categoryId;
-        FilledWorkbook.find({username: username}, (err, filledWorkbooks) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
-            }
-            // retrieve data from all filledWordbooks
-            let result = [];
-            // result.push(filledWorkbooks);
+        // const groupNumber = req.session.user.groupNumber;
+        // const workbookname = req.body.workbookname;
+        // const sheetname = req.body.sheetname;
+        // const attributeId = req.body.attributeId;
+        // const categoryId = req.body.categoryId;
 
-            for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
-                const file = filledWorkbooks[indexOfDoc];
-                const filename = file.name;
-                for (let sheetKey in file.data) {                                           // sheet
-                    const sheet = file.data[sheetKey];
-                    let attributes = [];
-                    for (let rowKey in sheet) {                                               // row
-                        let rowLine = sheet[rowKey];
-                        // FIXME: retrive attributes from map
-                        // the first line is Attributes
-                        if (rowKey === '0') {                                                  // attributes
-                            for (let attributeKey in rowLine) {
-                                if (!/^\d+$/.test(rowLine[attributeKey])) {             // validation
-                                    delete rowLine[attributeKey];
-                                }
-                            }
-                            attributes = rowLine;
-                        }
-
-                        let category = '';
-                        for (let colKey in rowLine) {                                      // col
-                            // the first column
-                            if (colKey === '0') {
-                                category = rowLine[0];
-                            }
-                            // FIXME: UPDATE
-                            let hasAttribute = false;
-                            for (let attribueKey in attributes) {
-                                if (attribueKey === colKey) {
-                                    hasAttribute = true;
-                                }
-                            }
-
-                            if (category !== '' && hasAttribute) {
-                                result.push({
-                                    username,
-                                    workbookname: filename,
-                                    sheetname: sheetKey,
-                                    // FIXME: REMOVE  -- TAG for debugging
-                                    category: category + '--' + rowKey,
-                                    attribute: attributes[colKey] + '--' + colKey,
-                                    value: rowLine[colKey]
-                                });
-                            }
-                        }
-
-                    }
+        // FIXME: use the parameter instead of hard code
+        const groupNumber = 1;
+        const workbookname = '2018-19 CAPS LHIN Managed BLANK V1.xlsx';
+        // Firstly retrieve the category map and attribute map from a template (unfilled workbook)
+        // Then based on these two map to get all value from sheets
+        // that are filled by the same template
+        Workbook.findOne({groupNumber: groupNumber, name: workbookname}, (err, workbook) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
                 }
+                // retrieve data from all filledWordbooks
+                const attMap = workbook.attMap;
+                const catMap = workbook.catMap;
+                FilledWorkbook.find({groupNumber: groupNumber, name: workbookname}, (err, filledWorkbooks) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+
+                    // retrieve data from all filledWordbooks
+                    let result = [];
+                    // result.push(filledWorkbooks);
+
+                    for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
+                        const file = filledWorkbooks[indexOfDoc];
+                        const filename = file.name;
+                        const username = file.username;
+                        const data = file.data;
+                        for (let sheetKey in catMap) {                                           // sheet
+                            for (let catKey in catMap[sheetKey]) {                                               // row
+                                for (let attKey in attMap[sheetKey]) {                                      // col
+                                    const rowIndex = catMap[sheetKey][catKey];
+                                    const colIndex = attMap[sheetKey][attKey];
+                                    const value = data[sheetKey][rowIndex][colIndex];
+                                    if (value !== null || value !== '') {
+                                        result.push({
+                                            username,
+                                            workbookname: filename,
+                                            sheetname: sheetKey,
+                                            // FIXME: REMOVE  -- TAG for debugging
+                                            category: catKey + '--' + rowIndex,
+                                            attribute: attKey + '--' + colIndex,
+                                            value,
+                                        });
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                    return res.json({success: true, filledWorkbooks: result});
+                });
             }
-            return res.json({success: true, filledWorkbooks: result});
-        });
+        );
     },
 
 // retrieve standard data from all filled workbooks in current group for a user
     retrieveAllData_filled_workbook: (req, res, next) => {
         const username = req.session.user.username;
-        const wookbookname = req.body.wookbookname;
+        const workbookname = req.body.workbookname;
         const sheetname = req.body.sheetname;
         const attributeId = req.body.attributeId;
         const categoryId = req.body.categoryId;
