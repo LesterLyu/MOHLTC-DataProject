@@ -247,23 +247,38 @@ module.exports = {
                     return res.status(500).json({success: false, message: err});
                 }
                 // retrieve data from all filledWordbooks
-                const attMap = workbook.attMap;
-                const catMap = workbook.catMap;
-                FilledWorkbook.find({groupNumber: groupNumber, name: queryWorkbookname}, (err, filledWorkbooks) => {
+                let attMap = workbook.attMap;
+                let catMap = workbook.catMap;
+                let query = {groupNumber: groupNumber, name: queryWorkbookname};
+                if (queryUsername) {
+                    query.username = queryUsername;
+                }
+                if (queryUsername) {
+                    query.username = queryUsername;
+                }
+                FilledWorkbook.find(query, (err, filledWorkbooks) => {
                     if (err) {
                         console.log(err);
                         return res.status(500).json({success: false, message: err});
                     }
 
-                    // retrieve data from all filledWordbooks
                     let result = [];
-                    // result.push(filledWorkbooks);
-
                     for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
                         const file = filledWorkbooks[indexOfDoc];
                         const filename = file.name;
                         const username = file.username;
                         const data = file.data;
+
+                        // FIXME: sheetname can not get from database
+                        // queryAttributeId
+                        // queryCategoryId
+                        if (queryCategoryId) {
+                            catMap = catMap[queryCategoryId];
+                        }
+                        if (queryAttributeId) {
+                            attMap = attMap[queryAttributeId];
+                        }
+
                         for (let sheetKey in catMap) {                                           // sheet
                             for (let catKey in catMap[sheetKey]) {                                               // row
                                 for (let attKey in attMap[sheetKey]) {                                      // col
