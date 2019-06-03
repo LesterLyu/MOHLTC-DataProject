@@ -9649,7 +9649,7 @@ react-transition-group@^4.0.0:
 
 "react-window@git+https://github.com/LesterLyu/react-window.git":
   version "1.8.2"
-  resolved "git+https://github.com/LesterLyu/react-window.git#eba445c499bb6d59569116ca8ba66fe1290fbf94"
+  resolved "git+https://github.com/LesterLyu/react-window.git#56d49566c41eb5427154fe353148199747acdad2"
   dependencies:
     "@babel/runtime" "^7.0.0"
     memoize-one ">=3.1.1 <6"
@@ -11999,7 +11999,7 @@ x-is-string@^0.1.0:
 
 "xlsx-populate@git+https://github.com/LesterLyu/xlsx-populate.git#formula-support":
   version "1.19.1"
-  resolved "git+https://github.com/LesterLyu/xlsx-populate.git#4dd3c145cc381f71642303bb1cc0e33870e56526"
+  resolved "git+https://github.com/LesterLyu/xlsx-populate.git#1d19d13a3e982f3d6685e10262d2691270cdd835"
   dependencies:
     cfb "^1.1.0"
     fast-formula-parser "git+https://github.com/LesterLyu/fast-formula-parser.git"
