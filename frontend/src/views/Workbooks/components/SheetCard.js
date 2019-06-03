@@ -44,12 +44,12 @@ class SheetCard extends Component {
           <Link to={editHref}>
             <CardActionArea>
               <CardContent className={classes.cardContent}>
-                <Grid container alignItems="center" justify="center" spacing={16}>
+                <Grid container alignItems="center" justify="center" spacing={2}>
                   <Grid item xs={12} style={{textAlign: 'center'}}>
                     <FileTableOutline className={classes.icon}/>
                   </Grid>
                   <Grid item xs={12}>
-                    <Typography variant="body1" gutterBottom noWrap>
+                    <Typography variant="subtitle1" noWrap style={{color: 'rgba(0,0,0,0.87)'}}>
                       {fileName}
                     </Typography>
                   </Grid>
@@ -65,7 +65,9 @@ class SheetCard extends Component {
               Edit
             </Button>
           </Link>
-          {deleteCb ?  <Button size="small" color="primary" onClick={() => {deleteCb(fileName)}}>
+          {deleteCb ? <Button size="small" color="primary" onClick={() => {
+            deleteCb(fileName)
+          }}>
             Delete
           </Button> : ''}
 

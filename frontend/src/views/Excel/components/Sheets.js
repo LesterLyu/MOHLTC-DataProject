@@ -27,6 +27,7 @@ class Worksheets extends Component {
     this.isMouseDown = false;
     this.startCell = [];
     this.selections = null;
+    window.Cell = Cell;
   }
 
   get grid() {
@@ -55,6 +56,7 @@ class Worksheets extends Component {
     this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
     this.sheetContainerRef.current.scrollTo({scrollLeft: 0, scrollTop: 0});
     this.selections.reset();
+    Cell.clear();
   }
 
   /**
@@ -154,6 +156,7 @@ class Worksheets extends Component {
           onMouseUp: this.onMouseUp,
           onMouseOver: this.onMouseOver,
           onMouseClick: this.onMouseClick,
+          selections: this.selections,
         }}
         freezeRowCount={freezeRowCount + 1} // add one for header
         freezeColumnCount={freezeColumnCount + 1} // add one for header

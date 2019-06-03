@@ -32,6 +32,10 @@ button:focus {
   background: rgb(184, 226, 196);
 }
 
+.sheet-header.highlight {
+  background: rgb(200, 200, 200);
+}
+
 .not-selectable {
   -webkit-user-select:none;
   -khtml-user-select:none;

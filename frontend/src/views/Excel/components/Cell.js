@@ -36,6 +36,14 @@ class Cell extends PureComponent {
     excel = window.excel;
   }
 
+  static rowHeaders = [];
+  static colHeaders = [];
+
+  static clear() {
+    Cell.rowHeaders = [];
+    Cell.colHeaders = [];
+  }
+
   /**
    * @param {Sheet} sheet
    * @param {Cell} cell
@@ -203,9 +211,17 @@ class Cell extends PureComponent {
   }
 
   renderColumnHeader(index, style) {
+    const {selections} = this.props.data;
+    let ref = Cell.colHeaders[index];
+    if (!ref)
+      ref = Cell.colHeaders[index] = React.createRef();
+    let className = 'sheet-header not-selectable';
+    if (selections.data[1] <= index && index <= selections.data[3])
+      className += ' highlight';
+
     const value = ac.columnNumberToName(index);
     return (
-      <div style={style} className={"sheet-header"} onClick={() => {
+      <div ref={ref} style={style} className={className} onClick={() => {
         console.log(`Clicked Column header ${value}`)
       }}>
         {value}
@@ -214,8 +230,15 @@ class Cell extends PureComponent {
   }
 
   renderRowHeader(index, style) {
+    const {selections} = this.props.data;
+    let ref = Cell.rowHeaders[index];
+    if (!ref)
+      ref = Cell.rowHeaders[index] = React.createRef();
+    let className = 'sheet-header not-selectable';
+    if (selections.data[0] <= index && index <= selections.data[2])
+      className += ' highlight';
     return (
-      <div style={style} className={"sheet-header"} onClick={() => {
+      <div ref={ref} style={style} className={className} onClick={() => {
         console.log(`Clicked Row header ${index}`)
       }}>
         {index}

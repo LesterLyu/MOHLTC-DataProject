@@ -1,5 +1,6 @@
 import React, {PureComponent, Component} from "react";
 import {calculateRealSelections} from "../helpers";
+import Cell from './Cell';
 
 const DefaultStyle = {
   zIndex: 100000,
@@ -18,7 +19,9 @@ export default class Selections {
       topRight: React.createRef(),
       bottomLeft: React.createRef(),
       bottomRight: React.createRef(),
-    }
+    };
+    // select first cell by default
+    this._data = [1, 1, 1, 1];
   }
 
   /**
@@ -34,7 +37,7 @@ export default class Selections {
   };
 
   setSelections = (selections) => {
-    const {freezeRowCount, freezeColumnCount, sheet} = this.props;
+    const {freezeRowCount, freezeColumnCount, sheet, gridRef} = this.props;
     selections = calculateRealSelections(sheet, ...selections);
     this._data = selections;
     let topLeft, topRight, bottomLeft, bottomRight;
@@ -64,8 +67,32 @@ export default class Selections {
     this.setSelectionsOnPane('bottomLeft', bottomLeft);
     this.setSelectionsOnPane('topLeft', topLeft);
     this.setSelectionsOnPane('topRight', topRight);
+    this.updateHeaders(selections);
     return selections;
   };
+
+  updateHeaders(selections) {
+    // row headers
+    for (let i = 1; i < Cell.rowHeaders.length; i++) {
+      const ref = Cell.rowHeaders[i];
+      if (!ref || !ref.current) continue;
+      if (selections[0] <= i && i <= selections[2]) {
+        ref.current.classList.add('highlight');
+      } else {
+        ref.current.classList.remove('highlight');
+      }
+    }
+    // col headers
+    for (let i = 0; i < Cell.colHeaders.length; i++) {
+      const ref = Cell.colHeaders[i];
+      if (!ref || !ref.current) continue;
+      if (selections[1] <= i && i <= selections[3]) {
+        ref.current.classList.add('highlight');
+      } else {
+        ref.current.classList.remove('highlight');
+      }
+    }
+  }
 
   setSelectionsOnPane = (pane, selections) => {
     if (!selections) {
@@ -80,7 +107,7 @@ export default class Selections {
     const style = {
       left: topLeftStyle.left,
       top: pane === 'bottomLeft' ?
-        topLeftStyle.top - grid._getItemStyle(freezeRowCount + 1, freezeColumnCount + 1).top: topLeftStyle.top,
+        topLeftStyle.top - grid._getItemStyle(freezeRowCount + 1, freezeColumnCount + 1).top : topLeftStyle.top,
       width: botRightStyle.left - topLeftStyle.left + botRightStyle.width,
       height: botRightStyle.top - topLeftStyle.top + botRightStyle.height,
       display: null,
