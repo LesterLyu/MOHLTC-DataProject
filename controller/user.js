@@ -53,6 +53,29 @@ const getUser = (username, cb) => {
 module.exports = {
     get_user: getUser,
 
+    // Get isEmailRegistered
+    get_isemailregistered: (req, res) => {
+        const email = req.query.email;
+        User.findOne({email: email}, (err, user) => {
+            if (user) {
+                return res.json({message: email + ' already in use.'});
+            }
+            return res.json();
+        });
+    },
+
+    // Get isUsernameRegistered
+    get_isusernameregistered: (req, res) => {
+        const username = req.query.username;
+        getUser(username, (err, user) => {
+            if (user) {
+                return res.json({message: username + ' already in use.'});
+            }
+            return res.json();
+        });
+    },
+
+
     get_profile: (req, res, next) => {
         const username = req.session.user.username;
         getUser(username, (err, user) => {
