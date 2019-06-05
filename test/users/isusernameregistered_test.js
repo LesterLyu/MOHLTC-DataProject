@@ -80,5 +80,4 @@ describe('To check if the user is registered', function () {
             });
     });
 
-
 });
