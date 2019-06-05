@@ -90,10 +90,25 @@ class Register extends Component {
 
   validateUsername = () => {
     // local validate
-    if (this.state.username.length >= 1 && this.state.username.length <= 20) {
-      this.setState({
-        isUsernameError: false,
-        usernameErrorMessage: '',
+    const username = this.state.username;
+    if (username.length >= 1 && username.length <= 20) {
+      // validate in back-end
+      this.user.isUsernameRegistered(username).then((response) => {
+        const serverMessage = response.data.message;
+        if (serverMessage) {
+          this.setState({
+            isUsernameError: true,
+            usernameErrorMessage: serverMessage,
+          });
+          console.log(serverMessage);
+          return false;
+        } else {
+          this.setState({
+            isUsernameError: false,
+            usernameErrorMessage: '',
+          });
+          return true;
+        }
       });
     } else {
       this.setState({
@@ -105,12 +120,26 @@ class Register extends Component {
   };
 
   validateEmail = () => {
-    if (this.state.email !== '@ontario.ca' && this.state.email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
-      this.setState({
-        isEmailError: false,
-        emailErrorMessage: '*Required',
+    const email = this.state.email;
+    if (email !== '@ontario.ca' && email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
+      // validate in back-end
+      this.user.isusernameregistered(email).then((response) => {
+        const serverMessage = response.data.message;
+        if (serverMessage) {
+          this.setState({
+            isEmailError: true,
+            emailErrorMessage: serverMessage,
+          });
+          console.log(serverMessage);
+          return false;
+        } else {
+          this.setState({
+            isEmailError: false,
+            emailErrorMessage: '',
+          });
+          return true;
+        }
       });
-      return true;
     } else {
       this.setState({
         isEmailError: true,

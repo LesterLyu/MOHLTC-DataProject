@@ -33,7 +33,7 @@ describe('To check if the user is registered', function () {
 
     it('check the registered username', (done) => {
         this.timeout(10000);
-        requester.get('/api/isusernameregistered?username=' + oneUsername)
+        requester.get('/api/isusernameregistered/' + oneUsername)
             .then((res) => {
                 expect(res.body.message).to.equal(oneUsername + ' already in use.');
                 done();
@@ -45,7 +45,7 @@ describe('To check if the user is registered', function () {
 
     it('check the unregistered username', (done) => {
         this.timeout(10000);
-        requester.get('/api/isusernameregistered?username=' + oneUsername + 'abc')
+        requester.get('/api/isusernameregistered/' + oneUsername + 'abc')
             .then((res) => {
                 expect(res.body).have.lengthOf(0);
                 done();
@@ -58,7 +58,7 @@ describe('To check if the user is registered', function () {
 
     it('check the registered email', (done) => {
         this.timeout(10000);
-        requester.get('/api/isemailregistered?email=' + oneEmail)
+        requester.get('/api/isemailregistered/' + oneEmail)
             .then((res) => {
                 expect(res.body.message).to.equal(oneEmail + ' already in use.');
                 done();
@@ -70,7 +70,7 @@ describe('To check if the user is registered', function () {
 
     it('check the unregistered user email', (done) => {
         this.timeout(10000);
-        requester.get('/api/isemailregistered?email=' + oneEmail + '.abc.com')
+        requester.get('/api/isemailregistered/' + oneEmail + '.abc.com')
             .then((res) => {
                 expect(res.body).have.lengthOf(0);
                 done();

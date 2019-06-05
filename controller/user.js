@@ -55,7 +55,7 @@ module.exports = {
 
     // Get isEmailRegistered
     get_isemailregistered: (req, res) => {
-        const email = req.query.email;
+        const email = req.params.email;
         User.findOne({email: email}, (err, user) => {
             if (user) {
                 return res.json({message: email + ' already in use.'});
@@ -66,7 +66,7 @@ module.exports = {
 
     // Get isUsernameRegistered
     get_isusernameregistered: (req, res) => {
-        const username = req.query.username;
+        const username = req.params.username;
         getUser(username, (err, user) => {
             if (user) {
                 return res.json({message: username + ' already in use.'});

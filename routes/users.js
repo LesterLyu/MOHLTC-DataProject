@@ -29,8 +29,8 @@ router.get('/api/isloggedin', function (req, res) {
 
 router.get('/api/organization_details', user_controller.getOrganizationDetails);
 
-router.get('/api/isemailregistered', user_controller.get_isemailregistered);
-router.get('/api/isusernameregistered', user_controller.get_isusernameregistered);
+router.get('/api/isemailregistered/:email', user_controller.get_isemailregistered);
+router.get('/api/isusernameregistered/:username', user_controller.get_isusernameregistered);
 
 // POST request for user sign up from ldap server
 
