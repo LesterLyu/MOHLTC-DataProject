@@ -25,18 +25,15 @@ router.delete('/api/filled-workbook', workbookController.delete_filled_workbook)
 
 // GET Find all unfilled workbooks in current group
 router.get('/api/workbooks', workbookController.get_unfilled_workbooks);
-
 // GET Find all filled workbooks in current group for a user
-// router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
-// FIXME: please restore after debugging
-router.get('/api/filled-workbooks', workbookController.retrieveAllData_basedOnWorkbookMap);
+router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 
-// GET retrieve standard data from all filled workbooks in current group for a user
-router.get('/api/filled-workbook/retrieveAllData', workbookController.retrieveAllData_filled_workbook);
-router.get('/api/filled-workbook/retrieveAllData', workbookController.retrieveAllData_basedOnWorkbookMap);
+// GET Query user entered workbook data for your group.
+router.get('/api/query/workbook', workbookController.get_many_filledworkbooks_of_one_workbook);
 
-// GET retrieve standard data from all workbooks
-router.get('/api/workbook/retrieveAllData', workbookController.retrieveAllData_workbook);
+router.get('/api/test/retrieveAllData01', workbookController.retrieveAllData_basedOnWorkbookMap);
+router.get('/api/test/retrieveAllData02', workbookController.retrieveAllData_based_attribute_category);
+router.get('/api/test/retrieveAllData03', workbookController.retrieveAllData_filled_workbook);
 
 // GET Find all filled workbooks in current group for a user
 router.get('/api/admin/workbooks', workbookController.admin_get_workbooks);
