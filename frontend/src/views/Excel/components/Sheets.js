@@ -1,243 +1,8 @@
-import {Component, PureComponent} from "react";
+import {Component} from "react";
 import React from "react";
 import {VariableSizeGrid} from 'react-window';
-import RichText from "xlsx-populate/lib/worksheets/RichText";
-import {SSF} from 'fast-formula-parser';
-import {argbToRgb, colorToRgb} from "../helpers";
-
-const borderStyle2Width = {thin: 1, medium: 2, thick: 3};
-
-const supported = {
-  horizontalAlignment: ['left', 'right', 'center', 'justify'],
-  verticalAlignment: ['top', 'center', 'bottom']
-};
-
-const defaultStyle = {
-  borderRight: '1px solid #ccc',
-  borderBottom: '1px solid #ccc',
-  padding: '0 4px 0 4px',
-  lineHeight: 'normal',
-  textAlign: 'left',
-  whiteSpace: 'pre',
-  overflow: 'visible',
-};
-
-let excel;
-
-class Cell extends Component {
-
-  /**
-   * @param {Sheet} sheet
-   * @param {Cell} cell
-   */
-  static getCellStyles(sheet, cell) {
-    const style = {};
-    let rowHeight = cell.row().height;
-    rowHeight = rowHeight ? 24 : rowHeight / 0.6;
-
-    if (!sheet.gridLinesVisible()) {
-      style.borderRight = '1px solid #0000';
-      style.borderBottom = '1px solid #0000';
-    }
-    if (cell.getStyle('bold')) {
-      style.fontWeight = 'bold';
-    }
-    if (cell.getStyle('italic')) {
-      style.fontStyle = 'italic';
-    }
-    if (cell.getStyle('underline')) {
-      style.textDecoration = 'underline';
-    }
-    if (cell.getStyle('strikethrough')) {
-      if (style.textDecoration)
-        style.textDecoration += ' line-through';
-      else
-        style.textDecoration = 'line-through';
-    }
-    const fontSize = cell.getStyle('fontSize');
-    if (fontSize != null) {
-      style.fontSize = fontSize + 'pt';
-      if (rowHeight < fontSize * 0.75) {
-        style.overflow = 'hidden';
-      }
-    }
-    const fontFamily = cell.getStyle('fontFamily');
-    if (fontFamily) {
-      style.fontFamily = fontFamily;
-    }
-    const fontColor = cell.getStyle('fontColor');
-    if (fontColor) {
-      style.color = '#' + argbToRgb(fontColor);
-    }
-    const fill = cell.getStyle('fill');
-    if (fill) {
-      if (fill.type === 'solid') {
-        style.background = '#' + colorToRgb(fill.color);
-      }
-    }
-
-    // top and left borders first, since border can be applied to empty cells with empty styles
-    let rowNum = cell.rowNumber(), colNum = cell.columnNumber();
-
-    // check if bottom cell has top border
-    const bottomCell = sheet.getCell(rowNum + 1, colNum);
-    const topBorder = bottomCell.getStyle('topBorder');
-    if (topBorder) {
-      const color = colorToRgb(topBorder.color) || '000';
-      style.borderBottom = `${borderStyle2Width[topBorder.style]}px solid #${color}`;
-    }
-    // check if right cell has left border
-    const leftBorder = sheet.getCell(rowNum, colNum + 1).getStyle('leftBorder');
-    if (leftBorder) {
-      const color = colorToRgb(leftBorder.color) || '000';
-      style.borderRight = `${borderStyle2Width[leftBorder.style]}px solid #${color}`;
-    }
-    // right and bottom borders
-    const rightBorder = cell.getStyle('rightBorder');
-    const bottomBorder = cell.getStyle('bottomBorder');
-    if (rightBorder) {
-      const color = colorToRgb(rightBorder.color) || '000';
-      style.borderRight = `${borderStyle2Width[rightBorder.style]}px solid #${color}`;
-    }
-    if (bottomBorder) {
-      const color = colorToRgb(bottomBorder.color) || '000';
-      style.borderBottom = `${borderStyle2Width[bottomBorder.style]}px solid #${color}`;
-    }
-
-    // horizontalAlignment
-    const horizontalAlignment = cell.getStyle('horizontalAlignment');
-    if (horizontalAlignment && supported.horizontalAlignment.includes(horizontalAlignment)) {
-      style.textAlign = horizontalAlignment;
-    } else {
-      // default
-      style.textAlign = 'left';
-    }
-
-    // verticalAlignment
-    const verticalAlignment = cell.getStyle('verticalAlignment');
-    if (verticalAlignment && supported.verticalAlignment.includes(verticalAlignment)) {
-      switch (verticalAlignment) {
-        case 'top':
-          style.verticalAlign = 'top';
-          break;
-        case 'center':
-          style.verticalAlign = 'middle';
-          break;
-        case 'bottom':
-          style.verticalAlign = 'bottom';
-          break;
-        default:
-          break;
-      }
-    }
-
-    // font text wrap
-    const wrapText = cell.getStyle('wrapText');
-    if (wrapText) {
-      style.wordWrap = 'break-word';
-      style.whiteSpace = 'pre-wrap';
-    }
-
-    // TODO: textRotation
-    const textRotation = cell.getStyle('textRotation');
-    if (typeof textRotation === 'number') {
-      style.display = 'block';
-      style.transform = 'rotate(-' + textRotation + 'deg)';
-    }
-
-    return style;
-  }
-
-  renderDataValidation(dataValidation, cell, value, style) {
-    return (
-      <div style={style}>
-        <div>
-          {value}
-          <div className={"dropdownArrow"} style={{top: style.height / 2 - 5}}
-               onClick={event => excel.showDropdown(event, cell)}>
-            {String.fromCharCode(9660)}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  renderHyperlink(hyperlink, cell, value, style) {
-    // TODO: FIX
-    const location = hyperlink.attributes.location;
-    return (
-      <div style={style}>
-        {location ? (
-          <a href={window.location.href} onClick={() => {
-            const sheet = cell.sheet()._hyperlinks.parse(location).sheet;
-            if (sheet)
-              excel.switchSheet(sheet);
-          }}>
-            {value}
-          </a>
-        ) : (
-          <a href={cell.hyperlink()} target="_blank">
-            {value}
-          </a>
-        )}
-      </div>
-    )
-  }
-
-  render() {
-    const {data, rowIndex, columnIndex, style} = this.props;
-    const cell = data.getCell(rowIndex + 1, columnIndex + 1);
-    let value = cell.getValue();
-    if (value != null) {
-      if (value.error) {
-        value = value.error();
-      } else if (value instanceof RichText) {
-        value = value.text();
-      }
-    }
-    if (value == null) value = '';
-    const numFmt = cell.getStyle('numberFormat');
-    if (numFmt !== null && numFmt !== undefined) {
-      value = SSF.format(numFmt.replace('\\', ''), value);
-    }
-    // do not render the cell if the cell's row or column is hidden
-    let mergedStyle;
-    if (style.width === 0 || style.height === 0) {
-      value = null;
-      mergedStyle = Object.assign({}, style);
-    } else {
-      mergedStyle = Object.assign({}, defaultStyle, style, Cell.getCellStyles(data, cell));
-    }
-
-    // text overflow
-    if (value != null && value !== '') {
-      mergedStyle.zIndex = columnIndex + 1;
-    }
-
-    // render data validation
-    const dataValidation = cell.dataValidation();
-    if (dataValidation && dataValidation.type === 'list') {
-      return this.renderDataValidation(dataValidation, cell, value, mergedStyle);
-    }
-
-    // render hyperlink
-    const hyperlink = cell.sheet()._hyperlinks.get(cell.address());
-    if (hyperlink) {
-      return this.renderHyperlink(hyperlink, cell, value, mergedStyle);
-    }
-
-    // render normal cell
-    return (
-      <div style={mergedStyle} onClick={() => {
-        console.log(`Clicked ${rowIndex}, ${columnIndex}`)
-      }}>
-        <span style={{pointerEvents: 'none'}}>
-        {value}
-        </span>
-      </div>
-    )
-  }
-}
+import Cell from './Cell';
+import Selections from './Selections';
 
 /**
  * @typedef {Object}
@@ -248,9 +13,10 @@ class Worksheets extends Component {
 
   constructor(props) {
     super(props);
-    excel = this.excel = props.context;
+    this.excel = props.context;
     this.sheetContainerRef = React.createRef();
     this.excel.sheetContainerRef = this.sheetContainerRef;
+    this.excel.outerRef = this.outerRef = React.createRef();
     this.state = {
       sheetWidth: this.excel.state.sheetWidth,
       sheetHeight: this.excel.state.sheetHeight,
@@ -258,6 +24,14 @@ class Worksheets extends Component {
     this.history = {
       currentSheetIdx: props.context.currentSheetIdx,
     };
+    this.isMouseDown = false;
+    this.startCell = [];
+    this.selections = null;
+    window.Cell = Cell;
+  }
+
+  get grid() {
+    return this.sheetContainerRef.current;
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
@@ -267,31 +41,86 @@ class Worksheets extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
+    if (this.history.currentSheetIdx !== this.props.context.currentSheetIdx) {
+      this.reset();
+    }
     this.history.currentSheetIdx = this.props.context.currentSheetIdx;
     this.history.initialFileName = this.props.context.initialFileName;
-    this.reset();
+  }
+
+  componentDidMount() {
+
   }
 
   reset() {
     this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
     this.sheetContainerRef.current.scrollTo({scrollLeft: 0, scrollTop: 0});
+    this.selections.reset();
+    Cell.clear();
   }
+
+  /**
+   * 0-based index
+   * @param sheet
+   * @return {Function}
+   */
+  static rowHeight = sheet => index => {
+    if (index === 0) return 24;
+    const row = sheet.row(index);
+    if (row.hidden()) return 0;
+    const height = row.height();
+    return height === undefined ? 24 : height / 0.6;
+  };
+
+  /**
+   * 0-based index
+   * @param sheet
+   * @return {Function}
+   */
+  static colWidth = sheet => index => {
+    if (index === 0) return 40;
+    const col = sheet.column(index);
+    if (col.hidden()) return 0;
+    const height = col.width();
+    return height === undefined ? 80 : height / 0.11;
+  };
+
+  onMouseDown = (row, col, cellStyle) => {
+    // console.log(`Mouse down: ${row}, ${col}`);
+    this.isMouseDown = true;
+    this.startCell = [row, col, row, col];
+    this.selections.setSelections(this.startCell);
+  };
+
+  onMouseUp = (row, col, cellStyle) => {
+    // console.log(`Mouse up: ${row}, ${col}`);
+    this.isMouseDown = false;
+  };
+
+  onMouseOver = (row, col, cellStyle) => {
+    if (this.isMouseDown) {
+      // console.log(`Mouse over: ${row}, ${col}`);
+      this.selections.setSelections([
+        Math.min(row, this.startCell[0]),
+        Math.min(col, this.startCell[1]),
+        Math.max(row, this.startCell[0]),
+        Math.max(col, this.startCell[1]),
+      ]);
+    }
+  };
+
+  onMouseClick = (row, col, cellStyle) => {
+    console.log('click');
+    this.isMouseDown = false;
+  };
 
   render() {
     const sheet = this.excel.sheet;
     const range = sheet.usedRange();
-    const rowHeight = index => {
-      const row = sheet.row(index + 1);
-      if (row.hidden()) return 0;
-      const height = row.height();
-      return height === undefined ? 24 : height / 0.6;
-    };
-    const colWidth = index => {
-      const col = sheet.column(index + 1);
-      if (col.hidden()) return 0;
-      const height = col.width();
-      return height === undefined ? 80 : height / 0.11;
-    };
+    const columnCount = range ? range._maxColumnNumber + 5 : 30;
+    const rowCount = range ? range._maxRowNumber + 10 : 200;
+    const rowHeight = Worksheets.rowHeight(sheet);
+    const colWidth = Worksheets.colWidth(sheet);
 
     const panes = sheet.panes();
     let freezeRowCount = 0, freezeColumnCount = 0;
@@ -300,22 +129,41 @@ class Worksheets extends Component {
       freezeColumnCount = panes.xSplit;
     }
 
+    this.selections = new Selections({
+        freezeRowCount,
+        freezeColumnCount,
+        gridRef: this.sheetContainerRef,
+        sheet
+      });
+
     return (
       <VariableSizeGrid
         ref={this.sheetContainerRef}
-        columnCount={range._maxColumnNumber + 5}
-        rowCount={range._maxRowNumber + 10}
+        outerRef={this.outerRef}
+        columnCount={columnCount}
+        rowCount={rowCount}
         width={this.excel.state.sheetWidth}
         height={this.excel.state.sheetHeight}
         rowHeight={rowHeight}
         columnWidth={colWidth}
-        overscanRowsCount={10}
-        overscanColumnsCount={5}
+        overscanRowCount={0}
+        overscanColumnCount={0}
         estimatedColumnWidth={80}
         estimatedRowHeight={24}
-        itemData={sheet}
-        freezeRowCount={freezeRowCount}
-        freezeColumnCount={freezeColumnCount}>
+        itemData={{
+          sheet,
+          onMouseDown: this.onMouseDown,
+          onMouseUp: this.onMouseUp,
+          onMouseOver: this.onMouseOver,
+          onMouseClick: this.onMouseClick,
+          selections: this.selections,
+        }}
+        freezeRowCount={freezeRowCount + 1} // add one for header
+        freezeColumnCount={freezeColumnCount + 1} // add one for header
+        extraTopLeftElement={this.selections.renderTopLeft()}
+        extraTopRightElement={this.selections.renderTopRight()}
+        extraBottomLeftElement={this.selections.renderBottomLeft()}
+        extraBottomRightElement={this.selections.renderBottomRight()}>
         {Cell}
       </VariableSizeGrid>
     )

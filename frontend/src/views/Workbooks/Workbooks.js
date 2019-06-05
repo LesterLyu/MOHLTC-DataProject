@@ -26,8 +26,8 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 const styles = theme => ({
   root: {
     ...theme.mixins.gutters(),
-    paddingTop: theme.spacing.unit * 2,
-    paddingBottom: theme.spacing.unit * 2,
+    paddingTop: theme.spacing(2),
+    paddingBottom: theme.spacing(2),
   },
 });
 
@@ -194,7 +194,7 @@ class Workbooks extends Component {
       return (
         <div className="animated fadeIn">
           <Paper className={classes.root} elevation={1}>
-            <Grid container spacing={16}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="h6" gutterBottom>
                   Empty Workbooks
@@ -204,7 +204,7 @@ class Workbooks extends Component {
             </Grid>
             <br/>
             <Divider/><br/>
-            <Grid container spacing={16}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="h6" gutterBottom>
                   Filled Workbooks
@@ -220,7 +220,7 @@ class Workbooks extends Component {
       return (
         <div className="animated fadeIn">
           <Paper className={classes.root} elevation={1}>
-            <Grid container spacing={16}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
                 <Typography variant="h6" gutterBottom>
                   All Workbooks

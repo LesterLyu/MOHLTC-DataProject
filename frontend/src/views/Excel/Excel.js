@@ -6,7 +6,7 @@ import {
   LinearProgress,
 } from "@material-ui/core";
 
-import {
+import helpers, {
   init, generateTableData, generateTableStyle, createArray, colCache, getCellType,
 } from './helpers';
 
@@ -74,6 +74,7 @@ class Excel extends Component {
     console.log('mode:', props.params.mode);
     // TODO: disable some cell editing for user (formula editing...)
     window.excel = this;
+    window.helpers = helpers;
     this.state = {
       completed: 5,
       sheetHeight: 0,

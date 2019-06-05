@@ -88,7 +88,7 @@ class Dropdown extends Component {
       value = cell.value();
       console.log('chose ' + value);
       // get options
-      options = cell.renderDataValidation().formula1Result;
+      options = cell.dataValidation().formula1Result;
     }
     options = options.map((option, index) => {
       if (typeof option === "string") option = option.trim();

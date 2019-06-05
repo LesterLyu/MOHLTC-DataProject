@@ -195,6 +195,7 @@ class Worksheets extends Component {
           return width;
         },
         afterMergeCells: (cellRange, mergeParent, auto) => {
+          if (!mergeParent || isNaN(cellRange.from.row)) return;
           const mergeCells = excel.currentSheet.mergeCells;
           // find mergeCell, if found, do nothing
           for (let i = 0; i < mergeCells.length; i++) {

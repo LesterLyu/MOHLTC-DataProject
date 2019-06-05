@@ -11,10 +11,58 @@ export let excelInstance;
 export function init(instance) {
   excelInstance = instance;
 }
+
 /**
  * Internal functions
  */
 
+export const shallowCompare = (obj1, obj2) =>
+  Object.keys(obj1).length === Object.keys(obj2).length &&
+  Object.keys(obj1).every(key =>
+    obj2.hasOwnProperty(key) && obj1[key] === obj2[key]
+  );
+
+/**
+ * Calculate the real range selections.
+ * Note: using 1-based indexing
+ * @param {Sheet} sheet - Sheet of the selections.
+ * @param {number} startRow - From mouse down event.
+ * @param {number} startCol - From mouse down event.
+ * @param {number} endRow - From mouse up event.
+ * @param {number} endCol - From mouse up event.
+ */
+export const calculateRealSelections = (sheet, startRow, startCol, endRow, endCol) => {
+  const selections = [startRow, startCol, endRow, endCol];
+  // check outer cells and adjust selections
+  for (let i = startCol; i <= endCol; i++) {
+    // iterate through first row
+    const topCellMerged = sheet.getCell(startRow, i).merged();
+    if (topCellMerged && topCellMerged.from.row < selections[0]) {
+      selections[0] = topCellMerged.from.row;
+    }
+
+    // iterate through last row
+    const botCellMerged = sheet.getCell(endRow, i).merged();
+    if (botCellMerged && botCellMerged.to.row > selections[2]) {
+      selections[2] = botCellMerged.to.row;
+    }
+  }
+
+  for (let i = startRow; i <= endRow; i++) {
+    // iterate through first col
+    const leftCellMerged = sheet.getCell(i, startCol).merged();
+    if (leftCellMerged && leftCellMerged.from.col < selections[1]) {
+      selections[1] = leftCellMerged.from.col;
+    }
+
+    // iterate through last col
+    const rightCellMerged = sheet.getCell(i, endCol).merged();
+    if (rightCellMerged && rightCellMerged.to.col > selections[3]) {
+      selections[3] = rightCellMerged.to.col;
+    }
+  }
+  return selections;
+};
 
 export function argbToRgb(color) {
   if (typeof color === 'string') {
@@ -161,3 +209,5 @@ export function readSheet(sheet) {
 
   return {data, styles, rowHeights, colWidths, mergeCells};
 }
+
+export default {calculateRealSelections, shallowCompare, argbToRgb, }

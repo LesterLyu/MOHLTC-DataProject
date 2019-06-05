@@ -17,3 +17,30 @@ button:focus {
 .dropdownArrow:hover {
   color: #4f4f4f;
 }
+
+.sheet-header {
+  text-align: center;
+  overflow: hidden;
+  background: rgb(247, 248, 249);
+  color: rgb(87, 90, 95);
+  border-right: 1px solid rgb(185, 185, 185);
+  border-bottom: 1px solid rgb(185, 185, 185);
+  font-size: 13px;
+}
+
+.sheet-header:hover {
+  background: rgb(184, 226, 196);
+}
+
+.sheet-header.highlight {
+  background: rgb(200, 200, 200);
+}
+
+.not-selectable {
+  -webkit-user-select:none;
+  -khtml-user-select:none;
+  -moz-user-select:none;
+  -ms-user-select:none;
+  -o-user-select:none;
+  user-select:none;
+}

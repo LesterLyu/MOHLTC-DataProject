@@ -19,10 +19,10 @@ const styles = theme => ({
   tabRoot: {
     minHeight: '30px',
     textTransform: 'initial',
-    padding: '0',
     fontFamily: 'inherit',
     fontSize: '0.8125rem',
     minWidth: 72,
+    padding: '6px 24px',
     // background: '#ffffff',
     '&:hover': {
       backgroundColor: 'rgba(24, 24, 24, 0.15)',
@@ -36,10 +36,9 @@ const styles = theme => ({
     // background: '#1890ff1f',
     color: '#1890ff',
   },
-  labelContainer: {
+  tabWrapper: {
     // padding: '6px 12px',
-    width: '100%',
-    boxSizing: 'border-box'
+    flexDirection: 'row',
   },
   tabsRoot: {
     minHeight: '30px',
@@ -47,12 +46,15 @@ const styles = theme => ({
     // borderBottom: '1px solid #e8e8e8',
   },
   indicator: {
-    height: '36px',
+    height: 40,
     backgroundColor: 'rgba(24, 144, 255, 0.15)',
     pointerEvents: 'none',
   },
   scrollButtons: {
     width: 25,
+    '&:hover': {
+      backgroundColor: 'rgba(24, 24, 24, 0.15)',
+    },
   },
   addSheetButton: {
     padding: 7,
@@ -60,7 +62,6 @@ const styles = theme => ({
   sheetToggle: {
     marginLeft: 5,
     marginRight: -8,
-    paddingBottom: 5,
     '&:hover': {
       backgroundColor: '#b3b3b5',
       opacity: 1,
@@ -123,7 +124,7 @@ class ExcelBottomBar extends Component {
 
       tabs.push(
         <Tab
-          classes={{root: classes.tabRoot, selected: classes.tabSelected, labelContainer: classes.labelContainer}}
+          classes={{root: classes.tabRoot, selected: classes.tabSelected, wrapper: classes.tabWrapper}}
           style={{borderBottom: '3px solid ' + rgb}}
           // className={this.props.classes.tab}
           key={sheetNames[i]}
