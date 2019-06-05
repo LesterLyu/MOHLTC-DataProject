@@ -53,10 +53,13 @@ class Worksheets extends Component {
   }
 
   reset() {
-    this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
-    this.sheetContainerRef.current.scrollTo({scrollLeft: 0, scrollTop: 0});
+    // reset selections
     this.selections.reset();
-    Cell.clear();
+    // re-render sheet
+    this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
+    // reset scrolling position
+    this.sheetContainerRef.current.scrollTo({scrollLeft: 0, scrollTop: 0});
+    this.selections.setSelections([1, 1, 1, 1]);
   }
 
   /**
@@ -109,9 +112,12 @@ class Worksheets extends Component {
     }
   };
 
-  onMouseClick = (row, col, cellStyle) => {
-    console.log('click');
-    this.isMouseDown = false;
+  onMouseDoubleClick = (row, col, cellStyle, e) => {
+    this.excel.showEditor(row, col, cellStyle, e);
+  };
+
+  onKeyDown = (row, col, cellStyle, e) => {
+    console.log(e.key);
   };
 
   render() {
@@ -130,11 +136,11 @@ class Worksheets extends Component {
     }
 
     this.selections = new Selections({
-        freezeRowCount,
-        freezeColumnCount,
-        gridRef: this.sheetContainerRef,
-        sheet
-      });
+      freezeRowCount,
+      freezeColumnCount,
+      gridRef: this.sheetContainerRef,
+      sheet
+    });
 
     return (
       <VariableSizeGrid
@@ -155,7 +161,8 @@ class Worksheets extends Component {
           onMouseDown: this.onMouseDown,
           onMouseUp: this.onMouseUp,
           onMouseOver: this.onMouseOver,
-          onMouseClick: this.onMouseClick,
+          onMouseDoubleClick: this.onMouseDoubleClick,
+          onKeyDown: this.onKeyDown,
           selections: this.selections,
         }}
         freezeRowCount={freezeRowCount + 1} // add one for header

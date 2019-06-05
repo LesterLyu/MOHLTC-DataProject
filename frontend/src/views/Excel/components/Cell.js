@@ -1,4 +1,4 @@
-import React, {PureComponent} from "react";
+import React, {PureComponent, Component} from "react";
 import {colorToRgb} from "../helpers";
 import RichText from "xlsx-populate/lib/worksheets/RichText";
 import ac from "xlsx-populate/lib/addressConverter";
@@ -38,11 +38,6 @@ class Cell extends PureComponent {
 
   static rowHeaders = [];
   static colHeaders = [];
-
-  static clear() {
-    Cell.rowHeaders = [];
-    Cell.colHeaders = [];
-  }
 
   /**
    * @param {Sheet} sheet
@@ -291,7 +286,7 @@ class Cell extends PureComponent {
 
   render() {
     const {data, rowIndex, columnIndex, style} = this.props;
-    const {sheet, onMouseDown, onMouseUp, onMouseOver, onMouseClick} = data;
+    const {sheet, onMouseDown, onMouseUp, onMouseOver, onMouseDoubleClick, onKeyDown} = data;
     let innerContent = null;
 
     // render row/column header
@@ -326,7 +321,9 @@ class Cell extends PureComponent {
 
     return (
       <div style={mergedStyle} className={"not-selectable"}
-           onClick={(e) => onMouseClick(rowIndex, columnIndex, mergedStyle, e)}
+           tabIndex={0}
+           onKeyDown={(e) => onKeyDown(rowIndex, columnIndex, mergedStyle, e)}
+           onDoubleClick={(e) => onMouseDoubleClick(rowIndex, columnIndex, mergedStyle, e)}
            onMouseDown={(e) => onMouseDown(rowIndex, columnIndex, mergedStyle, e)}
            onPointerEnter={(e) => onMouseOver(rowIndex, columnIndex, mergedStyle, e)}
            onMouseUp={(e) => onMouseUp(rowIndex, columnIndex, mergedStyle, e)}>

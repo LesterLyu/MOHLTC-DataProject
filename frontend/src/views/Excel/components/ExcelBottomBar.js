@@ -6,7 +6,7 @@ import {
   Tab, IconButton, Tabs, MenuItem, Divider, Menu,
 } from "@material-ui/core";
 import PropTypes from "prop-types";
-import {argbToRgb} from "../helpers";
+import {colorToRgb} from "../helpers";
 import {Add as AddIcon, ArrowDropDown} from "@material-ui/icons";
 import tinycolor from 'tinycolor2';
 
@@ -23,6 +23,7 @@ const styles = theme => ({
     fontSize: '0.8125rem',
     minWidth: 72,
     padding: '6px 24px',
+    whiteSpace: 'pre',
     // background: '#ffffff',
     '&:hover': {
       backgroundColor: 'rgba(24, 24, 24, 0.15)',
@@ -120,7 +121,7 @@ class ExcelBottomBar extends Component {
     const {sheetNames} = excel.global;
     const tabs = [];
     for (let i = 0; i < sheetNames.length; i++) {
-      const rgb = tinycolor(argbToRgb(excel.getSheet(i).tabColor) || 'f5f5f5');
+      const rgb = tinycolor(colorToRgb(excel.workbook.sheet(i).tabColor()) || 'f5f5f5');
 
       tabs.push(
         <Tab

@@ -7,11 +7,9 @@ import {
 } from "@material-ui/core";
 
 import helpers, {
-  init, generateTableData, generateTableStyle, createArray, colCache, getCellType,
+  init, generateTableData, generateTableStyle, createArray, getCellType,
 } from './helpers';
 
-import Renderer from './renderer';
-import Editor from './editor';
 import './style.css';
 import WorkbookManager from "../../controller/workbookManager";
 import Sheets from './components/Sheets'
@@ -23,7 +21,7 @@ import FormulaBar from "./components/FormulaBar";
 import SetIdDialog from "./components/SetIdDialog";
 import Dropdown from './components/Dropdown';
 import DataValidationDialog from './components/DataValidationDialog';
-window.colCache = colCache;
+import CellEditor from './components/Editor';
 
 function defaultSheet() {
   return {
@@ -41,31 +39,6 @@ function defaultSheet() {
 
 const styles = theme => ({});
 
-/**
- * @typedef {Array.<SheetStore>} WorkbookStore
- */
-
-/**
- * @typedef {Object} SheetStore
- * @property {Array.<Array.<string|object>>} data
- * @property {string} name
- * @property {string} state
- * @property {Array.<Array.<object|undefined|null>>} styles
- * @property {Array.<Array.<number>>} colWidths
- * @property {Array.<Array.<number>>} rowHeights
- * @property {string|undefined|null} tabColor
- * @property {Object} views
- */
-
-/**
- * @typedef {Object} Excel
- * @property {Object} global sheets data
- * @property {Handsontable} hotInstance
- * @property {Workbook} workbook
- * @property {string} currentSheetName
- * @property {SheetStore} currentSheet
- * @property {number} currentSheetIdx
- */
 class Excel extends Component {
 
   constructor(props) {
@@ -85,8 +58,10 @@ class Excel extends Component {
       openSetId: null,
       openDropdown: null,
       openDataValidationDialog: false,
+      openEditor: null,
       dropdownCell: null,
       setIdCell: null,
+      editorCell: null,
       fileName: 'Untitled workbook'
     };
     this.global = {
@@ -99,11 +74,10 @@ class Excel extends Component {
     this.initialFileName = null; // uploaded file name
     this.workbookManager = new WorkbookManager(props);
 
-    this.renderer = new Renderer(this);
-    this.editor = new Editor(this);
     init(this); // init helper functions
     this.sheetContainerRef = React.createRef();
     this.sheetRef = React.createRef();
+    this.editorRef = React.createRef();
     this.hooks = [];
 
     // set ID dialog
@@ -114,6 +88,9 @@ class Excel extends Component {
     this.errorDialog = {};
   }
 
+  get editor() {
+    return this.editorRef.current;
+  }
 
   get isLoaded() {
     return this.state.loaded;
@@ -200,11 +177,9 @@ class Excel extends Component {
    * @param {number} row
    * @param {number} col
    * @param {string|number} rawValue - can be any excel data type
-   * @param {'internal'| 'edit'} [source] - 'internal' means internal update, i.e. formula updates
-   *                                      'edit' means edit by the user
    */
-  setData(sheetNo, row, col, rawValue, source) {
-    sheetNo = sheetNo === null || sheetNo === undefined ? this.currentSheetIdx : sheetNo;
+  setData(sheetNo, row, col, rawValue) {
+    sheetNo = sheetNo == null ? this.currentSheetIdx : sheetNo;
     const sheet = this.workbook.sheet(sheetNo);
     const cell = sheet.getCell(row + 1, col + 1);
     let updates;
@@ -235,13 +210,13 @@ class Excel extends Component {
       updates = cell.setValue(rawValue);
     }
 
-    this.renderCell(row, col);
-    // add to next render list
-    updates.forEach(ref => {
-      if (ref.sheet === this.currentSheetName) {
-        this.renderCell(ref.row - 1, ref.col - 1);
-      }
-    });
+    // this.renderCell(row, col);
+    // // add to next render list
+    // updates.forEach(ref => {
+    //   if (ref.sheet === this.currentSheetName) {
+    //     this.renderCell(ref.row - 1, ref.col - 1);
+    //   }
+    // });
     console.log(`Updated ${updates.length + 1} cells.`)
   };
 
@@ -338,11 +313,27 @@ class Excel extends Component {
      */
     const dropdownCell = this.state.dropdownCell;
     this.setData(this.currentSheetIdx, dropdownCell.rowNumber() - 1, dropdownCell.columnNumber() - 1, selected.value);
-    this.setState({openDropdown: null, dropdownCell: null});
+    this.handleCloseDropdown();
   };
 
   handleCloseDropdown = () => {
     this.setState({openDropdown: null, dropdownCell: null});
+  };
+
+  showEditor = (rowIndex, columnIndex, style, e) => {
+    const cell = this.sheet.getCell(rowIndex, columnIndex);
+    this.editor.prepare(cell, style);
+    this.setState({openEditor: e.target, editorCell: cell});
+  };
+
+  handleCloseEditor = input => {
+    /**
+     * @type {Cell|undefined}
+     */
+    const cell = this.state.editorCell;
+    this.setData(this.currentSheetIdx, cell.rowNumber() - 1, cell.columnNumber() - 1, input);
+    this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
+    this.setState({openEditor: null, editorCell: null});
   };
 
   showDataValidationDialog = () => {
@@ -472,6 +463,7 @@ class Excel extends Component {
       || this.state.openDropdown !== nextState.openDropdown
       || this.state.fileName !== nextState.fileName
       || this.state.openDataValidationDialog !== nextState.openDataValidationDialog
+      || this.state.openEditor !== nextState.openEditor
   }
 
   common() {
@@ -482,6 +474,12 @@ class Excel extends Component {
           cell={this.state.dropdownCell}
           handleClose={this.handleCloseDropdown}
           handleChange={this.handleChangeDropdown}
+        />
+        <CellEditor
+          ref={this.editorRef}
+          anchorEl={this.state.openEditor}
+          cell={this.state.editorCell}
+          handleClose={this.handleCloseEditor}
         />
         <DataValidationDialog
           open={this.state.openDataValidationDialog}
@@ -514,7 +512,7 @@ class Excel extends Component {
             <ExcelAppBar fileName={this.state.fileName} onFileNameChange={this.onFileNameChange} context={this}/>
             <ExcelToolBar context={this}/>
             <FormulaBar context={this}/>
-            <Sheets context={this} sheetIdx={this.currentSheetIdx}/>
+            <Sheets ref={this.sheetRef} context={this} sheetIdx={this.currentSheetIdx}/>
             <ExcelBottomBar context={this}/>
           </Card>
           <SetIdDialog
@@ -534,7 +532,7 @@ class Excel extends Component {
           <Card xs={12}>
             <ExcelAppBar fileName={this.state.fileName} onFileNameChange={this.onFileNameChange} context={this}/>
             <ExcelToolBarUser context={this}/>
-            <Sheets context={this}/>
+            <Sheets ref={this.sheetRef} context={this}/>
             <ExcelBottomBar context={this}/>
           </Card>
           {this.common()}

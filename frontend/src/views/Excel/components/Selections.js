@@ -34,6 +34,7 @@ export default class Selections {
 
   reset = () => {
     Object.keys(this.ref).forEach(key => this.ref[key].current.reset());
+    this._data = [1, 1, 1, 1];
   };
 
   setSelections = (selections) => {
@@ -138,6 +139,8 @@ class Selection extends Component {
   state = {style: {left: 0, top: 0, width: 0, height: 0}};
 
   update(style) {
+    if (style.width === 0 || style.height === 0)
+      style.display = 'none';
     this.setState({style});
   }
 
