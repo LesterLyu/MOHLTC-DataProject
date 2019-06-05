@@ -14,6 +14,7 @@ Query user entered workbook data **for your group**.
 | ----------- |:-------------:| :--------: | :---------- |
 | workbookName | `string`       |   *required*         | Name of the workbook you want to query |
 | [username]   | `string`       |   `undefined\|null`  | The user you want to query, returns all users if not provided. |
+| [sheetName]   | `string`       |   `undefined\|null`  | Name of the sheet you want to constraint, returns all sheets if not provided. |
 | [attId]      | `number`       |   `undefined\|null`  | The attribute ID you want to constraint, returns all attribute IDs if not provided. |
 | [catId]      | `number`       |   `undefined\|null`  | The category ID you want to constraint, returns all category IDs if not provided |
 
