@@ -1,7 +1,7 @@
 import axios, {AxiosRequestConfig} from "axios";
 import config from "./../config/config";
 import XlsxPopulate from "xlsx-populate";
-import {readSheet, excelInstance} from "../views/Excel/helpers";
+import {excelInstance} from "../views/Excel/helpers";
 
 const axiosConfig = {withCredentials: true};
 
@@ -242,22 +242,6 @@ class WorkbookManager {
     excelInstance.global.sheetNames = sheetNames;
     excelInstance.currentSheetName = sheetNames[0];
     excelInstance.initialFileName = fileName;
-
-    // load into {WorkbookStore}
-    workbook.sheets().forEach(sheet => {
-      const {data, styles, rowHeights, colWidths, mergeCells} = readSheet(sheet);
-      sheets.push({
-        tabColor: sheet.tabColor(),
-        data,
-        styles,
-        name: sheet.name(),
-        state: 'visible',
-        views: [],
-        mergeCells,
-        rowHeights,
-        colWidths,
-      })
-    });
     if (cb) {
       cb(sheets, sheetNames, workbook);
       excelInstance.setState({fileName});

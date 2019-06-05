@@ -1,24 +1,7 @@
 import React from 'react';
-import Excel from './CreateExcel';
+import Excel from './Excel';
 import {mount, shallow, render} from "enzyme/build";
 import XlsxPopulate from "xlsx-populate";
-import FormulaError from 'fast-formula-parser/formulas/error';
-import sinon from 'sinon';
-import {
-  FormatBold, FormatColorFill, SaveAlt, CloudUploadOutlined, WrapText,
-  FormatItalic, FormatUnderlined, FormatStrikethrough, FormatColorText,
-  FormatAlignCenter, FormatAlignLeft, FormatAlignRight, FormatAlignJustify,
-  VerticalAlignBottom, VerticalAlignCenter, VerticalAlignTop,
-  BorderTop, BorderRight, BorderBottom, BorderLeft, BorderClear, BorderAll, //BorderColor,ZoomIn, ZoomOut,
-} from "@material-ui/icons";
-import ExcelToolBar from './components/ExcelToolBar';
-import {
-  AppBar,
-  Button,
-  Grid,
-  withStyles,
-  Popover,
-} from "@material-ui/core";
 
 describe('<Excel />', () => {
   let wrapper, excel, toolbar;

@@ -2,12 +2,12 @@ const WorkerPlugin = require('worker-plugin');
 const {FormulaParser} = require("fast-formula-parser/grammar/hooks");
 const allTokenNames = FormulaParser.allTokens.map(tokenType => tokenType.name);
 const TerserPlugin = require('terser-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 module.exports = {
   webpack: function (config, env) {
-    config.plugins.push(
-      new WorkerPlugin()
-    );
+    config.plugins.push(new WorkerPlugin());
+    // config.plugins.push(new BundleAnalyzerPlugin());
 
     config.optimization.minimizer[0] = new TerserPlugin({
       terserOptions: {
