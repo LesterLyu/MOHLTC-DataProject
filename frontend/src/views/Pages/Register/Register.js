@@ -93,7 +93,7 @@ class Register extends Component {
     const username = this.state.username;
     if (username.length >= 1 && username.length <= 20) {
       // validate in back-end
-      this.user.isUsernameRegistered(username).then((response) => {
+      this.user.checkUsername(username).then((response) => {
         const serverMessage = response.data.message;
         if (serverMessage) {
           this.setState({
@@ -123,7 +123,7 @@ class Register extends Component {
     const email = this.state.email;
     if (email !== '@ontario.ca' && email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
       // validate in back-end
-      this.user.isusernameregistered(email).then((response) => {
+      this.user.checkEmail(email).then((response) => {
         const serverMessage = response.data.message;
         if (serverMessage) {
           this.setState({

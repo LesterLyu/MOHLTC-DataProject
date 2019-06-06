@@ -29,11 +29,10 @@ router.get('/api/isloggedin', function (req, res) {
 
 router.get('/api/organization_details', user_controller.getOrganizationDetails);
 
-router.get('/api/isemailregistered/:email', user_controller.get_isemailregistered);
-router.get('/api/isusernameregistered/:username', user_controller.get_isusernameregistered);
+router.get('/api/check/email/:email', user_controller.check_email);
+router.get('/api/check/username/:username', user_controller.check_username);
 
 // POST request for user sign up from ldap server
-
 router.post('/api/signup', registration_ldap_controller.user_ldap_signup);
 // POST request for user sign up locally
 router.post('/api/signup/local', registration_local_controller.user_sign_up_local);

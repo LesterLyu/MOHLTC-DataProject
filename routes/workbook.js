@@ -17,9 +17,6 @@ router.get('/api/filled-workbook/:name', workbookController.get_filled_workbook)
 // POST Create or Update filled workbook
 router.post('/api/filled-workbook', workbookController.update_filled_workbook);
 
-// POST Create a new filled workbook that is a union from two exist filled workbook
-router.post('/api/union-filled-workbook', workbookController.union_filled_workbook);
-
 // DELETE Delete filled workbook
 router.delete('/api/filled-workbook', workbookController.delete_filled_workbook);
 
@@ -30,10 +27,6 @@ router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 
 // GET Query user entered workbook data for your group.
 router.get('/api/query/workbook', workbookController.get_many_filledworkbooks_of_one_workbook);
-
-router.get('/api/test/retrieveAllData01', workbookController.retrieveAllData_basedOnWorkbookMap);
-router.get('/api/test/retrieveAllData02', workbookController.retrieveAllData_based_attribute_category);
-router.get('/api/test/retrieveAllData03', workbookController.retrieveAllData_filled_workbook);
 
 // GET Find all filled workbooks in current group for a user
 router.get('/api/admin/workbooks', workbookController.admin_get_workbooks);

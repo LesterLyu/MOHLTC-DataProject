@@ -22,10 +22,10 @@ class UserManager {
   }
 
   /**
-   * Check if the user is registered by username or email.
+   * Check if the user is registered by username
    */
-  isUsernameRegistered(username) {
-    const urlStr = config.server + '/api/isusernameregistered/' + username;
+  checkUsername(username) {
+    const urlStr = config.server + '/api/check/username/' + username;
     return axios.get(urlStr, {withCredentials: true})
       .then((response => {
         return response;
@@ -33,10 +33,10 @@ class UserManager {
   }
 
   /**
-   * Check if the user is registered by username or email.
+   * Check if the user is registered by email.
    */
-  isusernameregistered(email) {
-    const urlStr = config.server + '/api/isemailregistered/' + email;
+  checkEmail(email) {
+    const urlStr = config.server + '/api/check/email/' + email;
     return axios.get(urlStr, {withCredentials: true})
       .then((response => {
         return response;

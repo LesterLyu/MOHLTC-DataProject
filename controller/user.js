@@ -53,8 +53,7 @@ const getUser = (username, cb) => {
 module.exports = {
     get_user: getUser,
 
-    // Get isEmailRegistered
-    get_isemailregistered: (req, res) => {
+    check_email: (req, res) => {
         const email = req.params.email;
         User.findOne({email: email}, (err, user) => {
             if (user) {
@@ -64,8 +63,7 @@ module.exports = {
         });
     },
 
-    // Get isUsernameRegistered
-    get_isusernameregistered: (req, res) => {
+    check_username: (req, res) => {
         const username = req.params.username;
         getUser(username, (err, user) => {
             if (user) {
