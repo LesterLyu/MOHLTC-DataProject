@@ -5,7 +5,6 @@ import {
   Button,
   Grid,
   withStyles,
-  Popover,
 } from "@material-ui/core";
 import PropTypes from "prop-types";
 import {FileTableOutline} from "mdi-material-ui";

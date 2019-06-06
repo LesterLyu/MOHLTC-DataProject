@@ -1,4 +1,4 @@
-import React, {PureComponent, Component} from "react";
+import React, {PureComponent} from "react";
 import {colorToRgb, RichText, SSF} from "../helpers";
 import ac from "xlsx-populate/lib/addressConverter";
 import Worksheets from "./Sheets";

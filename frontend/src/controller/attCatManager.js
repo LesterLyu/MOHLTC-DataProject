@@ -1,4 +1,4 @@
-import axios, {AxiosRequestConfig} from "axios";
+import axios from "axios";
 import config from "./../config/config";
 const axiosConfig = {withCredentials: true};
 

@@ -1,4 +1,4 @@
-import React, {PureComponent, Component} from "react";
+import React, {Component} from "react";
 import {calculateRealSelections} from "../helpers";
 import Cell from './Cell';
 
@@ -38,7 +38,7 @@ export default class Selections {
   };
 
   setSelections = (selections) => {
-    const {freezeRowCount, freezeColumnCount, sheet, gridRef} = this.props;
+    const {freezeRowCount, freezeColumnCount, sheet} = this.props;
     selections = calculateRealSelections(sheet, ...selections);
     this._data = selections;
     let topLeft, topRight, bottomLeft, bottomRight;

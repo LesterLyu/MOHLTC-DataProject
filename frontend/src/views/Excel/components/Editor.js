@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {Popover, InputBase, withStyles} from "@material-ui/core";
+import {Popover, withStyles} from "@material-ui/core";
 import {getCellType} from "../helpers";
 import PropTypes from "prop-types";
 
@@ -60,7 +60,7 @@ class CellEditor extends PureComponent {
   };
 
   render() {
-    const {cell, anchorEl, classes} = this.props;
+    const {anchorEl, classes} = this.props;
     const open = Boolean(anchorEl);
     let style = {resize: 'none', overflow: 'hidden'};
     if (open) {
