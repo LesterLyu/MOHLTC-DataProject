@@ -56,7 +56,6 @@ module.exports = {
                     return res.json({success: true, workbook: workbook});
                 }
             });
-
         })
     },
 
@@ -158,6 +157,10 @@ module.exports = {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
+            if(!workbook){
+                return res.json({success: false, filledWorkbooks: null});
+            }
+
             // retrieve data from all filledWordbooks
             let attMap = workbook.attMap;
             let catMap = workbook.catMap;
@@ -189,11 +192,11 @@ module.exports = {
 
                     for (let sheetKey in catMap) {                                           // sheet
                         for (let catKey in catMap[sheetKey]) {                                               // row
-                            if (queryCategoryId !== '-1' && queryCategoryId !== catKey) {
+                            if (queryCategoryId !== '-1' && queryCategoryId !== '' && queryCategoryId !== catKey) {
                                 continue;
                             }
                             for (let attKey in attMap[sheetKey]) {                                      // col
-                                if (queryAttributeId !== '-1' && queryAttributeId !== attKey) {
+                                if (queryAttributeId !== '-1' && queryAttributeId !== '' && queryAttributeId !== attKey) {
                                     continue;
                                 }
 
