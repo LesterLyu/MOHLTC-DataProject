@@ -1,20 +1,19 @@
 import React from 'react';
 import DefaultLayout from './containers/DefaultLayout';
 
-const Dashboard = React.lazy(() => import('./views/Dashboard'));
+const Dashboard = React.lazy(() => import('./views/Dashboard' /* webpackChunkName: "dashboard" */));
 
-const Profile = React.lazy(() => import('./views/Profile/Profile'));
+const Profile = React.lazy(() => import('./views/Profile/Profile' /* webpackChunkName: "profile" */));
 
-const userRequest = React.lazy(() => import("./views/Users/RegistrationRequests"));
-const addOrganization = React.lazy(() => import("./views/Users/AddOrganization"));
+const userRequest = React.lazy(() => import("./views/Users/RegistrationRequests" /* webpackChunkName: "registration-requests" */));
+const addOrganization = React.lazy(() => import("./views/Users/AddOrganization" /* webpackChunkName: "add-organization" */));
 
-const Users = React.lazy(() => import('./views/Users/Users'));
-const User = React.lazy(() => import('./views/Users/User'));
-const Workbooks = React.lazy(() => import('./views/Workbooks/Workbooks'));
+const Users = React.lazy(() => import('./views/Users/Users' /* webpackChunkName: "users" */));
+const Workbooks = React.lazy(() => import('./views/Workbooks/Workbooks' /* webpackChunkName: "workbooks" */));
 
 
-const AttCat = React.lazy(() => import('./views/AttCat/AttCat'));
-const Excel = React.lazy(() => import('./views/Excel/Excel'));
+const AttCat = React.lazy(() => import('./views/AttCat/AttCat' /* webpackChunkName: "attCat" */));
+const Excel = React.lazy(() => import('./views/Excel/Excel'/* webpackChunkName: "excel" */));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -27,7 +26,6 @@ const routes = [
   {path: "/addOrganization", exact:true, name:"Add Organization", component:addOrganization},
 
   {path: '/users', exact: true, name: 'Users', component: Users},
-  {path: '/users/:id', exact: true, name: 'User Details', component: User},
   {path: '/workbooks/fill', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'user'}},
   {path: '/workbooks/fill/:name', exact: true, name: 'Fill Workbook', component: Excel, params: {mode: 'user edit'}},
   {path: '/workbooks/template', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'admin'}},

@@ -2,12 +2,26 @@ const WorkerPlugin = require('worker-plugin');
 const {FormulaParser} = require("fast-formula-parser/grammar/hooks");
 const allTokenNames = FormulaParser.allTokens.map(tokenType => tokenType.name);
 const TerserPlugin = require('terser-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const {DuplicatesPlugin} = require("inspectpack/plugin");
 
 module.exports = {
   webpack: function (config, env) {
+    config.stats = {
+      reasons: true,
+    };
     config.plugins.push(new WorkerPlugin());
-    // config.plugins.push(new BundleAnalyzerPlugin());
+    config.plugins.push(new BundleAnalyzerPlugin({
+      analyzerMode: 'static',
+      defaultSizes: 'parsed',
+      reportFilename: 'webpack-report.html',
+    }));
+    // config.plugins.push(new DuplicatesPlugin({
+    //   // Emit compilation warning or error? (Default: `false`)
+    //   emitErrors: false,
+    //   // Display full duplicates information? (Default: `false`)
+    //   verbose: false
+    // }));
 
     config.optimization.minimizer[0] = new TerserPlugin({
       terserOptions: {

@@ -12,7 +12,7 @@ describe('<Excel />', () => {
     excel.attOptions = ['att1', 'att2'];
     excel.catOptions = ['cat1', 'cat2'];
     // wait for async functions
-    await excel.workbookManager.createWorkbookLocal();
+    await excel.excelManager.createWorkbookLocal();
   });
 
   it('should load an empty workbook', () => {
@@ -72,7 +72,7 @@ describe('<Excel />', () => {
       XlsxPopulate.fromFileAsync('./test/excels/egginc.xlsx')
         .then(wb => {
           workbook = wb;
-          excel.workbookManager._readWorkbook(wb, (sheets, sheetNames, workbook) => {
+          excel.excelManager._readWorkbook(wb, (sheets, sheetNames, workbook) => {
             excel.global.sheetNames = sheetNames;
             excel.global.sheets = sheets;
             excel.workbook = workbook;

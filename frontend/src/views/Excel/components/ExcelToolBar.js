@@ -91,14 +91,14 @@ class ExcelToolBar extends Component {
   }
 
   downloadWorkbook = () => {
-    this.excel.workbookManager.downloadWorkbook(this.excel.workbook, this.excel.state.fileName)
+    this.excel.excelManager.downloadWorkbook(this.excel.workbook, this.excel.state.fileName)
       .then(() => {
         console.log('downloaded')
       })
   };
 
   uploadWorkbook = () => {
-    this.excel.workbookManager.readWorkbookLocal((sheets, sheetNames, workbook) => {
+    this.excel.excelManager.readWorkbookLocal((sheets, sheetNames, workbook) => {
       console.log(sheets, sheetNames, workbook);
       this.excel.global.sheetNames = sheetNames;
       this.excel.global.sheets = sheets;
@@ -108,7 +108,7 @@ class ExcelToolBar extends Component {
     })
   };
   saveWorkbook = () => {
-    this.excel.workbookManager.saveWorkbookAdmin(this.excel.workbook);
+    this.excel.excelManager.saveWorkbookAdmin(this.excel.workbook);
   };
 
   style = (name, value, ranges = this.getSelected()) => {

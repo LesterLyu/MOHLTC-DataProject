@@ -11,7 +11,8 @@ import helpers, {
 } from './helpers';
 
 import './style.css';
-import WorkbookManager from "../../controller/workbookManager";
+import ExcelManager from "../../controller/excelManager";
+import AttCatManager from "../../controller/attCatManager";
 import Sheets from './components/Sheets'
 import ExcelAppBar from './components/ExcelAppBar';
 import ExcelToolBar from './components/ExcelToolBar';
@@ -72,7 +73,8 @@ class Excel extends Component {
       current: {}
     };
     this.initialFileName = null; // uploaded file name
-    this.workbookManager = new WorkbookManager(props);
+    this.excelManager = new ExcelManager(props);
+    this.attCatManager = new AttCatManager(props);
 
     init(this); // init helper functions
     this.sheetContainerRef = React.createRef();
@@ -352,12 +354,12 @@ class Excel extends Component {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
     const sheetHeight = this.sheetContainerRef.current.offsetHeight;
 
-    this.workbookManager.get('att').then(atts => this.attOptions = atts);
-    this.workbookManager.get('cat').then(cats => this.catOptions = cats);
+    this.attCatManager.get('att').then(atts => this.attOptions = atts);
+    this.attCatManager.get('cat').then(cats => this.catOptions = cats);
 
     if (this.mode === 'admin create') {
       // create local workbook storage
-      this.workbookManager.createWorkbookLocal()
+      this.excelManager.createWorkbookLocal()
         .then(workbook => {
           this.currentSheetName = 'Sheet1';
           this.workbook = workbook;
@@ -369,7 +371,7 @@ class Excel extends Component {
         });
     } else if (this.mode === 'admin edit') {
       const {name} = this.props.match.params;
-      this.workbookManager.readWorkbookFromDatabase(name)
+      this.excelManager.readWorkbookFromDatabase(name)
         .then(data => {
           const {sheets, sheetNames, workbook, fileName} = data;
           this.global.sheetNames = sheetNames;
@@ -386,7 +388,7 @@ class Excel extends Component {
     }
     if (this.mode === 'user edit') {
       const {name} = this.props.match.params;
-      this.workbookManager.readWorkbookFromDatabase(name, false)
+      this.excelManager.readWorkbookFromDatabase(name, false)
         .then(data => {
           const {sheets, sheetNames, workbook, fileName} = data;
           this.global.sheetNames = sheetNames;

@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import MUIDataTable from "mui-datatables";
-import WorkbookManager from "../../controller/workbookManager";
+import AttCatManager from "../../controller/attCatManager";
 import {
   LinearProgress,
   Grid,
@@ -32,7 +32,7 @@ class AttCat extends Component {
   constructor(props) {
     super(props);
     this.mode = this.props.params.mode; // can be att or cat
-    this.workbookManager = new WorkbookManager(props);
+    this.workbookManager = new AttCatManager(props);
     this.state = {
       loading: true, openSetId: false, newValue: '',
     };

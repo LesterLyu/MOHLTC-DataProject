@@ -1,6 +1,8 @@
 import React, {Component} from 'react';
-import MaterialTable from 'material-table'
 import UserManager from "../../controller/userManager";
+// import LibraryLoader from "../../controller/LibraryLoader";
+
+const MaterialTable = React.lazy(() =>import('material-table' /* webpackChunkName: "material-table" */));
 
 class RegistrationRequests extends Component {
 
