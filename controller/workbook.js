@@ -501,7 +501,6 @@ module.exports = {
                     console.log(err);
                     return res.status(500).json({success: false, message: err});
                 }
-
                 let result = [];
                 for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
                     const file = filledWorkbooks[indexOfDoc];
