@@ -318,8 +318,7 @@ module.exports = {
 
 
         });
-    }
-    ,
+    },
 
     // import workbook
     // TO-DO validate col/rows
@@ -455,7 +454,8 @@ module.exports = {
             }
         );
 
-    },
+    }
+    ,
 
 // GET Query user entered workbook data for your group.
     get_many_filledworkbooks_of_one_workbook: (req, res) => {
