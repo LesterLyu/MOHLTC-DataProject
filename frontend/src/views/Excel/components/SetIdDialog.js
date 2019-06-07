@@ -3,11 +3,8 @@ import classNames from 'classnames';
 import {withStyles} from '@material-ui/core/styles';
 import {
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
-  DialogTitle,
   NoSsr,
   Typography,
   TextField,

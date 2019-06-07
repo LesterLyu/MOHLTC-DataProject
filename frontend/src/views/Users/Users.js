@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import {Badge} from 'reactstrap';
-import MaterialTable from 'material-table'
 import UserManager from "../../controller/userManager";
 import {FormControl, InputLabel, Select, Input, Checkbox, MenuItem, ListItemText} from "@material-ui/core";
 
-const log = console.log;
+const MaterialTable = React.lazy(() =>import('material-table' /* webpackChunkName: "material-table" */));
 
 function PermissionSelect(props) {
   const {permissions, selected, handleChange, username} = props;

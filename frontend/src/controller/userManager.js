@@ -1,8 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
 
-const log = console.log;
-
 /**
  * Singleton Pattern
  */

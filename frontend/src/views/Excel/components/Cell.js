@@ -1,8 +1,6 @@
-import React, {PureComponent, Component} from "react";
-import {colorToRgb} from "../helpers";
-import RichText from "xlsx-populate/lib/worksheets/RichText";
+import React, {PureComponent} from "react";
+import {colorToRgb, RichText, SSF} from "../helpers";
 import ac from "xlsx-populate/lib/addressConverter";
-import {SSF} from "fast-formula-parser";
 import Worksheets from "./Sheets";
 
 const borderStyle2Width = {thin: 1, medium: 2, thick: 3};

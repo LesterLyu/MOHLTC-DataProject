@@ -19,7 +19,6 @@ import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
 
 
-
 export function ToolBarDivider() {
   return <div style={{borderLeft: '1px #9b9b9b6e solid', margin: '5px 3px 5px 5px'}}/>;
 }
@@ -68,7 +67,7 @@ class ExcelToolBar extends Component {
         selectedFillColor: style.fill ? style.fill : '#000',
         selectedTextColor: style.fontColor ? style.fontColor : '#fff',
         selectedFontSize: style.fontSize ? style.fontSize : 11,
-        selectedFontFamily: style.fontFamily ? style.fontFamily: 'Calibri' ,
+        selectedFontFamily: style.fontFamily ? style.fontFamily : 'Calibri',
       });
       this.history.current = {row, col}
     });
@@ -91,14 +90,14 @@ class ExcelToolBar extends Component {
   }
 
   downloadWorkbook = () => {
-    this.excel.workbookManager.downloadWorkbook(this.excel.workbook, this.excel.state.fileName)
+    this.excel.excelManager.downloadWorkbook(this.excel.workbook, this.excel.state.fileName)
       .then(() => {
         console.log('downloaded')
       })
   };
 
   uploadWorkbook = () => {
-    this.excel.workbookManager.readWorkbookLocal((sheets, sheetNames, workbook) => {
+    this.excel.excelManager.readWorkbookLocal((sheets, sheetNames, workbook) => {
       console.log(sheets, sheetNames, workbook);
       this.excel.global.sheetNames = sheetNames;
       this.excel.global.sheets = sheets;
@@ -108,7 +107,7 @@ class ExcelToolBar extends Component {
     })
   };
   saveWorkbook = () => {
-    this.excel.workbookManager.saveWorkbookAdmin(this.excel.workbook);
+    this.excel.excelManager.saveWorkbookAdmin(this.excel.workbook);
   };
 
   style = (name, value, ranges = this.getSelected()) => {
@@ -196,7 +195,7 @@ class ExcelToolBar extends Component {
     if (!ranges) {
       return;
     }
-    const style2Width = {thin: 1, medium: 2, thick: 3};
+    // const style2Width = {thin: 1, medium: 2, thick: 3};
 
     if (borderPosition === 'all') {
       this.style('border',
@@ -218,19 +217,14 @@ class ExcelToolBar extends Component {
       // separate borders
       for (let i = 0; i < ranges.length; i++) {
         const range = ranges[i];
-        switch (borderPosition) {
-          case 'top':
-            range[2] = range[0];
-            break;
-          case 'bottom':
-            range[0] = range[2];
-            break;
-          case 'right':
-            range[1] = range[3];
-            break;
-          case 'left':
-            range[3] = range[1];
-            break;
+        if (borderPosition === 'top') {
+          range[2] = range[0];
+        } else if (borderPosition === 'bottom') {
+          range[0] = range[2];
+        } else if (borderPosition === 'right') {
+          range[1] = range[3];
+        } else if (borderPosition === 'left') {
+          range[3] = range[1];
         }
       }
       this.style('border', {[borderPosition]: {style, color}}, ranges);

@@ -1,10 +1,8 @@
 import React from "react";
-import OutlinedText from "../../views/Base/OutlinedText";
 import {Paper, Button} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core/styles";
 import classNames from "classnames";
-import TextField from "../Base/OutlinedText";
 const log = console.log;
 
 const styles = theme => ({

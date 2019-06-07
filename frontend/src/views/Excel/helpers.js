@@ -1,9 +1,8 @@
-import RichTexts from "xlsx-populate/lib/worksheets/RichText";
-import XlsxPopulate from "xlsx-populate";
+import XlsxPopulate, {RichText, FormulaError, FormulaParser} from "xlsx-populate";
+const {SSF} = FormulaParser;
+export {FormulaError, XlsxPopulate, RichText, FormulaParser, SSF};
 
-const FormulaError = XlsxPopulate.FormulaError;
-// import {Parser as FormulaParser} from 'hot-formula-parser/src';
-export {FormulaError, XlsxPopulate};
+
 
 export let excelInstance;
 
@@ -139,7 +138,7 @@ export function getCellType(cell) {
     return undefined;
   else if (typeof cell.formula() === 'string') {
     return 'formula';
-  } else if (cell.value() instanceof RichTexts) {
+  } else if (cell.value() instanceof RichText) {
     return 'richtext';
   } else if (cell.value() instanceof Date) {
     return 'date';
