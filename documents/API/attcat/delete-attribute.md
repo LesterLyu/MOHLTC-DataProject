@@ -1,7 +1,5 @@
 # Delete a attribute
 
-Query the current user logged in.
-
 **URL** : `/api/att/:attributeId`
 
 **Method** : `DELETE`
