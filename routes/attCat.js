@@ -22,6 +22,7 @@ router.get('/api/attributes', att_cat_controller.get_attributes);
 
 router.get('/api/categories', att_cat_controller.get_categories);
 
+router.put('/api/edit-att', att_cat_controller.user_edit_att);
 
 // web pages
 router.get('/add-att-cat', (req, res, next) => {

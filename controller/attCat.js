@@ -290,5 +290,44 @@ module.exports = {
             }
             return res.json({success: true, categories: categories});
         })
-    }
-}
+    },
+
+    user_edit_att: (req, res, next) => {
+
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+
+        const attribute = req.body.attribute;
+        const groupNumber = req.session.user.groupNumber;
+        if (attribute === '') {
+            return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
+        }
+        Attribute.findOne({attribute: attribute, groupNumber: groupNumber}, (err, attribute) => {
+
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+
+            if (attribute) {
+                return res.status(400).json({success: false, message: 'Attribute ' + attribute.attribute + ' exists.'});
+            } else {
+
+                let newAttribute = new Attribute({
+
+                    attribute: req.body.attribute,
+                    groupNumber: groupNumber,
+                });
+                newAttribute.save((err, updatedAttribute) => {
+                    if (err) {
+                        console.log(err);
+                        return next(err);
+                    }
+
+                    return res.json({success: true, message: 'Attribute ' + updatedAttribute.attribute + ' added.'})
+                });
+            }
+        });
+    },
+};
