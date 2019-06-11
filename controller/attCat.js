@@ -63,12 +63,13 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         // save multiple documents to the collection 
         Attribute.insertMany(attributes, function (err, docs) {
+            let message = "";
             if (err) {
-                console.log(err);
-                return res.status(500).json({ success: false, message: err });
+                message = err.errmsg;
+                return res.status(500).json({ success: false, message: message });
             }
-
-            return res.json({ success: true, message: 'added ' + docs.length + ' attributes.' })
+            message = docs.length + ' attributes added.';
+            return res.json({ success: true, message: message, docs: docs })
         });
     },
 
