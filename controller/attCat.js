@@ -24,7 +24,7 @@ module.exports = {
         if (attribute === '') {
             return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
         }
-        Attribute.findOne({attribute: attribute, groupNumber: groupNumber}, (err, attribute) => {
+        Attribute.findOne({id: id, groupNumber: groupNumber}, (err, attribute) => {
 
             if (err) {
                 console.log(err);
@@ -46,7 +46,6 @@ module.exports = {
                         console.log(err);
                         return next(err);
                     }
-
                     return res.json({success: true, message: 'Attribute ' + updatedAttribute.attribute + ' added.'})
                 });
             }
@@ -350,7 +349,7 @@ module.exports = {
                     return res.json({ success: true, message: 'Attribute ' + dbAttribute.attribute + ' updated.' });
                 });
             } else {
-                return res.status(400).json({success: false, message: 'Attribute ' + dbAttribute.attribute + ' does not exist.'});
+                return res.status(400).json({ success: false, message: attribute + ' does not exist.'});
             }
         });
     },
