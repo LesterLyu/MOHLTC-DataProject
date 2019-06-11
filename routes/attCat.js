@@ -7,6 +7,7 @@ const error = require('../config/error');
 
 // add attribute and category api
 router.post('/api/add-att', att_cat_controller.user_add_att);
+router.post('/api/attributes', att_cat_controller.user_add_atts);
 
 router.post('/api/add-cat', att_cat_controller.user_add_cat);
 

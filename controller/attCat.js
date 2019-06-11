@@ -18,6 +18,8 @@ module.exports = {
         }
 
         const attribute = req.body.attribute;
+        const id = req.body.id;
+        const description = req.body.description;
         const groupNumber = req.session.user.groupNumber;
         if (attribute === '') {
             return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
@@ -34,7 +36,8 @@ module.exports = {
             } else {
 
                 let newAttribute = new Attribute({
-
+                    id : id,
+                    description : description,
                     attribute: req.body.attribute,
                     groupNumber: groupNumber,
                 });
@@ -49,6 +52,27 @@ module.exports = {
             }
         });
     },
+
+    user_add_atts: (req, res, next) => {
+
+        if (!checkPermission(req)) {
+            return res.status(403).json({ success: false, message: error.api.NO_PERMISSION })
+        }
+
+        const attributes = req.body.attributes;
+        const groupNumber = req.session.user.groupNumber;
+        // save multiple documents to the collection 
+        Attribute.insertMany(attributes, function (err, docs) {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ success: false, message: err });
+            }
+
+            return res.json({ success: true, message: 'added ' + docs.length + ' attributes.' })
+        });
+    },
+
+
 
     user_delete_att: (req, res, next) => {
         if (!checkPermission(req)) {
@@ -298,35 +322,34 @@ module.exports = {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
 
+        const id = req.body.id;
         const attribute = req.body.attribute;
+        const description = req.body.description;
         const groupNumber = req.session.user.groupNumber;
         if (attribute === '') {
             return res.status(400).json({success: false, message: 'Attribute cannot be empty.'});
         }
-        Attribute.findOne({attribute: attribute, groupNumber: groupNumber}, (err, attribute) => {
+        Attribute.findOne({attribute: attribute, groupNumber: groupNumber}, (err, dbAttribute) => {
 
             if (err) {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
 
-            if (attribute) {
-                return res.status(400).json({success: false, message: 'Attribute ' + attribute.attribute + ' exists.'});
-            } else {
+            if (dbAttribute) {
+                dbAttribute.id = id;
+                dbAttribute.description = description;
 
-                let newAttribute = new Attribute({
-
-                    attribute: req.body.attribute,
-                    groupNumber: groupNumber,
-                });
-                newAttribute.save((err, updatedAttribute) => {
+                dbAttribute.save((err, dbAttribute) => {
                     if (err) {
                         console.log(err);
                         return next(err);
                     }
 
-                    return res.json({success: true, message: 'Attribute ' + updatedAttribute.attribute + ' added.'})
+                    return res.json({ success: true, message: 'Attribute ' + dbAttribute.attribute + ' updated.' });
                 });
+            } else {
+                return res.status(400).json({success: false, message: 'Attribute ' + dbAttribute.attribute + ' does not exist.'});
             }
         });
     },
