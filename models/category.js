@@ -6,6 +6,6 @@ let categorySchema = new mongoose.Schema({
     groupNumber: {type: Number, required: true}
 });
 
-categorySchema.plugin(AutoIncrement, {inc_field: 'id', id: 'categoryId'});
+// categorySchema.plugin(AutoIncrement, {inc_field: 'id', id: 'categoryId'});
 
 module.exports = mongoose.model('Category', categorySchema);
