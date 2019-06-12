@@ -122,7 +122,6 @@ router.get('/profile', function (req, res) {
 });
 
 // update profile
-
 router.post('/api/update-profile', user_controller.update_user_info);
 
 
