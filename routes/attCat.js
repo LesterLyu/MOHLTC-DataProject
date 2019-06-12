@@ -15,6 +15,9 @@ router.delete('/api/delete-cat', att_cat_controller.user_delete_cat);
 
 router.delete('/api/delete-att', att_cat_controller.user_delete_att);
 
+// Delete a attribute
+router.delete('/api/att/:attributeId', att_cat_controller.user_delete_attribute);
+
 router.delete('/api/cats/delete', att_cat_controller.user_delete_cats);
 
 router.delete('/api/atts/delete', att_cat_controller.user_delete_atts);

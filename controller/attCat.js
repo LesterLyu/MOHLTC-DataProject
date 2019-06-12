@@ -46,7 +46,8 @@ module.exports = {
                         console.log(err);
                         return next(err);
                     }
-                    return res.json({success: true, message: 'Attribute ' + updatedAttribute.attribute + ' added.'})
+                    const msg = 'Attribute(id: ' + updatedAttribute.id + ' , ' + updatedAttribute.attribute + ') added.';
+                    return res.json({success: true, message: msg})
                 });
             }
         });
@@ -352,4 +353,59 @@ module.exports = {
             }
         });
     },
+
+    user_delete_attribute: (req, res) => {
+
+        if (!req.session.user.permissions.includes(config.permissions.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        const queryAttributeId = req.params.attributeId;
+
+        // condition 1: this attribute exist
+        Attribute.findOne({id: queryAttributeId}, (err, attribute) => {
+            if (err) {
+                return res.status(500).json({success: false, message: err});
+            }
+
+            if (!attribute) {
+                const msg = 'Attribute(id:' + queryAttributeId + ') ' + 'does not exist.';
+                return res.status(400).json({success: false, message: msg});
+            }
+
+            // condition 2: this attribute does not be used in workbook
+            Workbook.find({}, (err, workbooks) => {
+                if (err) {
+                    return res.status(500).json({success: false, message: err});
+                }
+
+                if (workbooks) {
+                    for (var i = 0; i < workbooks.length; i++) {
+                        var attMap = workbooks[i].attMap;
+                        for (var indexOfWorksheet in attMap) {
+                            worksheet = attMap[indexOfWorksheet];
+                            for (var dbAttributeId in worksheet) {
+                                if (dbAttributeId === queryAttributeId) {
+                                    const msg = 'Attribute(id:' + queryAttributeId + ') ' +
+                                        'cannot be deleted, ' +
+                                        workbooks[i].name +
+                                        ' are using this attribute.'
+                                    return res.status(400).json({success: false, message: msg});
+                                }
+                            }
+                        }
+                    }
+                }
+                // Detete attribute
+                Attribute.deleteOne({_id: attribute._id}, function (err) {
+                    if (err) {
+                        return res.status(500).json({success: false, message: err});
+                    } else {
+                        const msg = 'Attribute(id:' + queryAttributeId + ') ' + ' deleted.';
+                        return res.json({success: true, message: msg});
+                    }
+                });
+            });
+        });
+    },
+
 };
