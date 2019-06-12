@@ -36,8 +36,8 @@ module.exports = {
             } else {
 
                 let newAttribute = new Attribute({
-                    id : id,
-                    description : description,
+                    id: id,
+                    description: description,
                     attribute: req.body.attribute,
                     groupNumber: groupNumber,
                 });
@@ -55,7 +55,7 @@ module.exports = {
     user_add_atts: (req, res, next) => {
 
         if (!checkPermission(req)) {
-            return res.status(403).json({ success: false, message: error.api.NO_PERMISSION })
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
 
         const attributes = req.body.attributes;
@@ -65,13 +65,12 @@ module.exports = {
             let message = "";
             if (err) {
                 message = err.errmsg;
-                return res.status(500).json({ success: false, message: message });
+                return res.status(500).json({success: false, message: message});
             }
             message = docs.length + ' attributes added.';
-            return res.json({ success: true, message: message, docs: docs })
+            return res.json({success: true, message: message, docs: docs})
         });
     },
-
 
 
     user_delete_att: (req, res, next) => {
@@ -88,7 +87,7 @@ module.exports = {
             }
             for (var i = 0; i < workbooks.length; i++) {
                 console.log(workbooks.length);
-                var workbookData =  workbooks[i].data;
+                var workbookData = workbooks[i].data;
                 console.log(workbookData.length);
                 for (var workbookSheetName in workbookData) {
                     var workbookSheet = workbookData[workbookSheetName];
@@ -145,7 +144,7 @@ module.exports = {
             }
             for (var i = 0; i < workbooks.length; i++) {
                 console.log(workbooks.length);
-                var workbookData =  workbooks[i].data;
+                var workbookData = workbooks[i].data;
                 console.log(workbookData.length);
                 for (var workbookSheetName in workbookData) {
                     var workbookSheet = workbookData[workbookSheetName];
@@ -346,10 +345,10 @@ module.exports = {
                         return next(err);
                     }
 
-                    return res.json({ success: true, message: 'Attribute ' + dbAttribute.attribute + ' updated.' });
+                    return res.json({success: true, message: 'Attribute ' + dbAttribute.attribute + ' updated.'});
                 });
             } else {
-                return res.status(400).json({ success: false, message: attribute + ' does not exist.'});
+                return res.status(400).json({success: false, message: attribute + ' does not exist.'});
             }
         });
     },
