@@ -42,7 +42,7 @@ function generateToken(username, expireTime) {
 }
 
 const getUser = (username, cb) => {
-    User.findOne({username: username}, (err, user) => {
+    User.findOne({ username: username }, (err, user) => {
         if (err) {
             return cb(err);
         }
@@ -55,9 +55,9 @@ module.exports = {
 
     check_email: (req, res) => {
         const email = req.params.email;
-        User.findOne({email: email}, (err, user) => {
+        User.findOne({ email: email }, (err, user) => {
             if (user) {
-                return res.json({message: email + ' already in use.'});
+                return res.json({ message: email + ' already in use.' });
             }
             return res.json();
         });
@@ -67,7 +67,7 @@ module.exports = {
         const username = req.params.username;
         getUser(username, (err, user) => {
             if (user) {
-                return res.json({message: username + ' already in use.'});
+                return res.json({ message: username + ' already in use.' });
             }
             return res.json();
         });
@@ -78,9 +78,9 @@ module.exports = {
         const username = req.session.user.username;
         getUser(username, (err, user) => {
             if (err) {
-                return res.status(500).json({success: false, message: err});
+                return res.status(500).json({ success: false, message: err });
             }
-            return res.json({success: true, profile: user});
+            return res.json({ success: true, profile: user });
         });
     },
 
@@ -88,13 +88,65 @@ module.exports = {
         const username = req.session.user.username;
         getUser(username, (err, user) => {
             if (err) {
-                return res.status(500).json({success: false, msg: err});
+                return res.status(500).json({ success: false, msg: err });
             }
             if (user) {
-                return res.json({success: true, user: user});
+                return res.json({ success: true, user: user });
             } else {
-                return res.json({success: true, user: null});
+                return res.json({ success: true, user: null });
             }
+        });
+    },
+
+    check_user_active: (req, res) => {
+        if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
+            return res.status(403).json({ success: false, message: error.api.NO_PERMISSION })
+        }
+
+        const checkingUsername = req.params.username;
+        User.findOne({ username: checkingUsername }, (err, dbUser) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ success: false, message: err });
+            }
+
+            if (dbUser) {
+                const msg = dbUser.username + ' now is ' + dbUser.active;
+                return res.json({
+                    success: true,
+                    message: msg,
+                })
+            } else {
+                return res.status(400).json({ success: false, message: checkingUsername + 'does not exist.' });
+            }
+        });
+    },
+
+    update_user_active: (req, res) => {
+        if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
+            return res.status(403).json({ success: false, message: error.api.NO_PERMISSION })
+        }
+
+        const updatingUsername = req.params.username;
+        User.findOne({ username: updatingUsername }, (err, dbUser) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({ success: false, message: err });
+            }
+
+            if (dbUser) {
+                dbUser.active = !dbUser.active;
+                dbUser.save((err, updatedUser) => {
+                    if (err) {
+                        return res.status(500).json({ success: false, message: err });
+                    }
+                    return res.json({ success: true, active: updatedUser.active, message: updatedUser.username + ' now is ' + updatedUser.active })
+                });
+
+            } else {
+                return res.status(400).json({ success: false, message: updatingUsername + ' does not exist.' });
+            }
+
         });
     },
 
@@ -104,15 +156,15 @@ module.exports = {
         var confirmPassword = req.body.confirmPassword;
         var username = req.session.user.username;
         if (confirmPassword !== newPassword) {
-            return res.status(400).json({success: false, message: "New Password does not match!"});
+            return res.status(400).json({ success: false, message: "New Password does not match!" });
         }
-        User.findOne({username: username}, (err, user) => {
+        User.findOne({ username: username }, (err, user) => {
             if (err) {
-                return res.status(400).json({success: false, message: err});
+                return res.status(400).json({ success: false, message: err });
             }
             user.changePassword(oldPassword, newPassword, (err) => {
                 if (err) {
-                    return res.status(400).json({success: false, message: "Wrong Old Password!"});
+                    return res.status(400).json({ success: false, message: "Wrong Old Password!" });
                 }
                 req.logIn(user, function (err) {
                     if (err) {
@@ -121,17 +173,17 @@ module.exports = {
                     // set user info in the session
                     req.session.user = user;
                 });
-                return res.json({success: true, message: "The password has been changed"});
+                return res.json({ success: true, message: "The password has been changed" });
             });
         });
     },
 
 
     update_user_info: (req, res, next) => {
-        User.findOne({username: req.body.username}, (err, user) => {
+        User.findOne({ username: req.body.username }, (err, user) => {
             if (err) {
                 console.log(err);
-                return res.json({success: false, message: err});
+                return res.json({ success: false, message: err });
             }
             if (user) {
                 if (user._id === req.session.user._id) {
@@ -143,25 +195,25 @@ module.exports = {
                     user.save((err, user2) => {
                         if (err) {
                             console.log(err);
-                            return res.status(400).json({success: false, message: err});
+                            return res.status(400).json({ success: false, message: err });
                         }
                         req.login(user2, function (err) {
                             if (err) {
                                 console.log(err);
-                                return res.json({success: false, message: err});
+                                return res.json({ success: false, message: err });
                             }
                             req.session.user = user2;
                         });
-                        return res.json({success: true, message: "Profile is updated!"});
+                        return res.json({ success: true, message: "Profile is updated!" });
                     });
                 } else {
-                    return res.json({success: false, message: "Username has existed!"});
+                    return res.json({ success: false, message: "Username has existed!" });
                 }
             } else {
-                User.findOne({_id: req.session.user._id}, (err, user) => {
+                User.findOne({ _id: req.session.user._id }, (err, user) => {
                     if (err) {
                         console.log(err);
-                        return res.json({success: false, message: err});
+                        return res.json({ success: false, message: err });
                     }
                     user.username = req.body.username;
                     user.firstName = req.body.firstName;
@@ -171,16 +223,16 @@ module.exports = {
                     user.save((err, user2) => {
                         if (err) {
                             console.log(err);
-                            return res.status(400).json({success: false, message: err});
+                            return res.status(400).json({ success: false, message: err });
                         }
                         req.login(user2, function (err) {
                             if (err) {
                                 console.log(err);
-                                return res.json({success: false, message: err});
+                                return res.json({ success: false, message: err });
                             }
                             req.session.user = user2;
                         });
-                        return res.json({success: true, message: "Profile is updated!"});
+                        return res.json({ success: true, message: "Profile is updated!" });
                     });
                 });
             }
@@ -198,36 +250,36 @@ module.exports = {
         Organization.find({}, (err, organizations) => {
             if (err) {
                 console.log(err);
-                return res.json({success: false, message: err});
+                return res.json({ success: false, message: err });
             }
-            return res.json({success: true, organizations: organizations});
+            return res.json({ success: true, organizations: organizations });
         });
     },
 
     user_sign_up: (req, res, next) => {
         // check if email is taken (passport will check other errors, i.e. username taken)
-        User.findOne({username: req.body.username}, (err, user) => {
+        User.findOne({ username: req.body.username }, (err, user) => {
             if (err) {
                 console.log(err);
-                return res.json({success: false, message: err});
+                return res.json({ success: false, message: err });
             }
             if (user) {
-                return res.status(400).json({success: false, message: 'Username taken.'});
+                return res.status(400).json({ success: false, message: 'Username taken.' });
             }
-            User.findOne({email: req.body.email}, (err, user) => {
+            User.findOne({ email: req.body.email }, (err, user) => {
                 if (err) {
                     console.log(err);
-                    return res.json({success: false, message: err});
+                    return res.json({ success: false, message: err });
                 }
 
                 if (user) {
-                    return res.status(400).json({success: false, message: 'Email taken.'});
+                    return res.status(400).json({ success: false, message: 'Email taken.' });
                 }
                 if (!isEmail(req.body.email)) {
-                    return res.status(400).json({success: false, message: 'Email format error.'});
+                    return res.status(400).json({ success: false, message: 'Email format error.' });
                 }
                 if (!schema.validate(req.body.password)) {
-                    return res.status(400).json({success: false, message: 'Password is not valid.'});
+                    return res.status(400).json({ success: false, message: 'Password is not valid.' });
                 }
                 console.log(req.body.phoneNumber);
                 var groupNumber = config.organizations[req.body.organization];
@@ -245,11 +297,11 @@ module.exports = {
                 newRequest.save((err, user) => {
                     if (err) {
                         console.log(err);
-                        return res.json({success: false, message: err});
+                        return res.json({ success: false, message: err });
                     }
                     console.log('success submit request');
                     sendMail.sendRegisterSubmitEmail(req.body.email, req.body.username, (info) => {
-                        return res.json({success: true, redirect: '/register-success-submit'});
+                        return res.json({ success: true, redirect: '/register-success-submit' });
                     });
                 });
             });
@@ -266,7 +318,7 @@ module.exports = {
                     return next(err);
                 }
                 if (!user) {
-                    return res.status(401).json({success: false, message: info.message})
+                    return res.status(401).json({ success: false, message: info.message })
                 }
                 req.logIn(user, function (err) {
                     if (err) {
@@ -288,7 +340,7 @@ module.exports = {
                         redirectUrl = req.session.originalUrl;
                         delete req.session.originalUrl;
                     }
-                    return res.json({success: true, username: user.username, redirect: redirectUrl});
+                    return res.json({ success: true, username: user.username, redirect: redirectUrl });
                 });
             })(req, res, next);
 
@@ -307,9 +359,9 @@ module.exports = {
     user_reset_password: (req, res, next) => {
         var username = req.body.username;
         var email = req.body.email;
-        User.findOne({username: username}, (err, user) => {
+        User.findOne({ username: username }, (err, user) => {
             if (err) {
-                return res.status(400).json({success: false, message: err});
+                return res.status(400).json({ success: false, message: err });
             } else if (user) {
                 if (user.email == email) {
                     return res.json({
@@ -317,10 +369,10 @@ module.exports = {
                         message: "An email has been sent to your email, please reset your password in email!"
                     });
                 } else {
-                    return res.json({success: false, message: "Email address does not match!"});
+                    return res.json({ success: false, message: "Email address does not match!" });
                 }
             } else {
-                return res.json({success: false, message: "Username does not exist!"});
+                return res.json({ success: false, message: "Username does not exist!" });
             }
         });
     },
@@ -329,7 +381,7 @@ module.exports = {
         console.log(req.body);
         const token = generateToken(req.body.username, 60);
         sendMail.sendResetEmail(req.body.email, token, (info) => {
-            return res.json({success: true, message: info});
+            return res.json({ success: true, message: info });
         });
     },
 
@@ -338,7 +390,7 @@ module.exports = {
         // create token and sent by email
         const token = generateToken(req.session.user.username, 60);
         sendMail.sendValidationEmail(req.session.user.email, token, (info) => {
-            return res.json({success: true, message: info});
+            return res.json({ success: true, message: info });
         });
     },
 
@@ -347,26 +399,26 @@ module.exports = {
         var confirmPassword = req.body.confirmPassword;
         var username = req.session.user.username;
         if (confirmPassword !== newPassword) {
-            return res.status(400).json({success: false, message: "New Password does not match!"});
+            return res.status(400).json({ success: false, message: "New Password does not match!" });
         }
-        User.findOne({username: username}, (err, user) => {
+        User.findOne({ username: username }, (err, user) => {
             if (err) {
-                return res.status(400).json({success: false, message: err});
+                return res.status(400).json({ success: false, message: err });
             }
             user.setPassword(newPassword, (err) => {
                 if (err) {
                     console.log(err);
-                    return res.status(400).json({success: false, message: err});
+                    return res.status(400).json({ success: false, message: err });
                 }
                 user.save(function (err) {
                     if (err) {
-                        return res.status(400).json({success: false, message: err});
+                        return res.status(400).json({ success: false, message: err });
                     }
                     req.session.user = user;
                 })
 
                 console.log(req.session);
-                return res.json({success: true, message: "The password has been changed"});
+                return res.json({ success: true, message: "The password has been changed" });
             });
         });
     },
@@ -376,9 +428,9 @@ module.exports = {
         (req, res, next) => {
             jwt.verify(req.params.token, config.superSecret, function (err, decoded) {
                 if (err) {
-                    return res.json({success: false, message: 'Failed to authenticate token.'});
+                    return res.json({ success: false, message: 'Failed to authenticate token.' });
                 } else {
-                    User.findOne({username: decoded.username}, (err, user) => {
+                    User.findOne({ username: decoded.username }, (err, user) => {
                         console.log(user);
                         if (err) {
                             console.log(err);
@@ -396,9 +448,9 @@ module.exports = {
         (req, res, next) => {
             jwt.verify(req.params.token, config.superSecret, function (err, decoded) {
                 if (err) {
-                    return res.json({success: false, message: 'Failed to authenticate token.'});
+                    return res.json({ success: false, message: 'Failed to authenticate token.' });
                 } else {
-                    User.findOne({username: decoded.username}, (err, user) => {
+                    User.findOne({ username: decoded.username }, (err, user) => {
                         if (err) {
                             console.log(err);
                             return next(err);

@@ -59,7 +59,7 @@ router.get('/reset/:token', user_controller.password_reset_validate);
 router.post('/api/reset-password-link', user_controller.reset_password_link);
 
 router.get('/reset-password-link', function (req, res) {
-    res.render('ForgetPasswordLink.ejs', { username: req.session.user.username });
+    res.render('ForgetPasswordLink.ejs', {username: req.session.user.username});
 });
 
 // validate account from email link
@@ -72,8 +72,7 @@ router.use((req, res, next) => {
         if (req.method === 'GET' && !req.originalUrl.includes('api'))
             req.session.originalUrl = req.originalUrl;
         return res.redirect('/login');
-    }
-    else {
+    } else {
         next();
     }
 });
@@ -95,7 +94,7 @@ router.get('/validate-now', function (req, res, next) {
             user_controller.logout(req);
             return res.redirect('/login');
         }
-        res.render('tobevalidated.ejs', { user: req.session.user });
+        res.render('tobevalidated.ejs', {user: req.session.user});
     })
 });
 
@@ -112,9 +111,14 @@ router.get('/api/profile', user_controller.get_profile);
 // Query the current user logged in.
 router.get('/api/users/current', user_controller.get_current_logged_in_user);
 
+// Update a user's status. Used to disable or enable an account.
+router.get('/api/users/:username/check-active/', user_controller.check_user_active);
+// Update a user's status. Used to disable or enable an account.
+router.put('/api/users/:username/active/', user_controller.update_user_active);
+
 // profile page
 router.get('/profile', function (req, res) {
-    res.render('sidebar/profile.ejs', { user: req.session.user });
+    res.render('sidebar/profile.ejs', {user: req.session.user});
 });
 
 // update profile
@@ -123,7 +127,7 @@ router.post('/api/update-profile', user_controller.update_user_info);
 
 
 router.get('/update-profile', function (req, res) {
-    res.render('sidebar/updateProfile.ejs', { user: req.session.user });
+    res.render('sidebar/updateProfile.ejs', {user: req.session.user});
 });
 
 // change password
