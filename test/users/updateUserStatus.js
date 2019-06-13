@@ -16,17 +16,20 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
     const secondUsername = 'lester02';
     const secondEmail = 'lester02@mail.com';
 
+    const agent = chai.request.agent(app);
+
     before((done) => {
 
         User.remove({}, () => {
         });
         // Sign up a new user
-        requester.post('/api/signup/local')
+        agent
+            .post('/api/signup/local')
             .send({
                 username: oneUsername,
                 email: oneEmail,
                 password: onePassword,
-                permissions : [
+                permissions: [
                     "CRUD-workbook-template",
                     "system-management",
                     "workbook-query",
@@ -37,12 +40,29 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
             .then((res) => {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
+                // Login
+                agent
+                    .post('/api/login/local')
+                    .send({
+                        username: oneUsername,
+                        password: onePassword
+                    })
+                    .then((res) => {
+                        expect(res).to.have.status(200);
+                        expect(res.body.success).to.be.true;
+                        done();
+                    })
+                    .catch(function (err) {
+                        throw err;
+                    });
+
             })
             .catch(function (err) {
                 throw err;
             });
         // Sing up the second user
-        requester.post('/api/signup/local')
+        agent
+            .post('/api/signup/local')
             .send({
                 username: secondUsername,
                 email: secondEmail,
@@ -52,6 +72,24 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
             .then((res) => {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
+            })
+            .catch(function (err) {
+                throw err;
+            });
+
+
+    });
+
+    it('Update a user\'s status: active - true ', (done) => {
+        this.timeout(10000);
+        const activeValue = true;
+        const urlStr = '/api/users/' + secondUsername + '/active/';
+        agent.put(urlStr)
+            .send({active: activeValue})
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                expect(res.body.message).to.deep.include(secondUsername.toString());
                 done();
             })
             .catch(function (err) {
@@ -62,87 +100,74 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
     it('Update a user\'s status: active - true ', (done) => {
         this.timeout(10000);
         const activeValue = true;
-        // Login firstly
-        const agent = chai.request.agent(app);
-        agent
-            .post('/api/login/local')
-            .send({
-                username: oneUsername,
-                password: onePassword
-            })
-            .then((res) => {
+        const urlStr = '/api/users/' + secondUsername + '/active/';
+        agent.put(urlStr)
+            .send({active: activeValue})
+            .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                const urlStr = '/api/users/' + secondUsername +'/active/';
-                return agent.put(urlStr)
-                    .send({active: activeValue})
-                    .then(function (res) {
-                        expect(res).to.have.status(200);
-                        expect(res.body.success).to.be.true;
-                        expect(res.body.message).to.deep.include(secondUsername.toString());
-                        done();
-                    })
-                    .catch(function (err) {
-                        throw err;
-                    });
+                expect(res.body.message).to.deep.include(secondUsername.toString());
+                done();
+            })
+            .catch(function (err) {
+                throw err;
             });
     });
 
     it('Update a user\'s status: active - false ', (done) => {
         this.timeout(10000);
         const activeValue = false;
-        // Login firstly
-        const agent = chai.request.agent(app);
-        agent
-            .post('/api/login/local')
-            .send({
-                username: oneUsername,
-                password: onePassword
-            })
-            .then((res) => {
+
+        const urlStr = '/api/users/' + secondUsername + '/active/';
+        agent.put(urlStr)
+            .send({active: activeValue})
+            .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                const urlStr = '/api/users/' + secondUsername +'/active/';
-                return agent.put(urlStr)
-                    .send({active: activeValue})
-                    .then(function (res) {
-                        expect(res).to.have.status(200);
-                        expect(res.body.success).to.be.true;
-                        expect(res.body.message).to.deep.include(secondUsername.toString());
-                        done();
-                    })
-                    .catch(function (err) {
-                        throw err;
-                    });
+                expect(res.body.message).to.deep.include(secondUsername.toString());
+                done();
+            })
+            .catch(function (err) {
+                throw err;
             });
     });
 
-    it('Update a user\'s status: active - other ', (done) => {
+    it('Update a user\'s status: error - no user ', (done) => {
         this.timeout(10000);
-        const activeValue = 'other';
-        // Login firstly
-        const agent = chai.request.agent(app);
-        agent
-            .post('/api/login/local')
-            .send({
-                username: oneUsername,
-                password: onePassword
+        const activeValue = false;
+
+        const urlStr = '/api/users/' + 'no user' + '/active/';
+        agent.put(urlStr)
+            .send({active: activeValue})
+            .then(function (res) {
+                expect(res).to.have.status(400);
+                expect(res.body.success).to.be.false;
+                console.log(res.body.message.errors);
+                expect(res.body.message.errors).not.to.be.null;
+                done();
             })
-            .then((res) => {
-                expect(res).to.have.status(200);
-                expect(res.body.success).to.be.true;
-                const urlStr = '/api/users/' + secondUsername +'/active/';
-                return agent.put(urlStr)
-                    .send({active: activeValue})
-                    .then(function (res) {
-                        expect(res).to.have.status(500);
-                        expect(res.body.success).to.be.false;
-                        expect(res.body.message.errors).not.to.be.null;
-                        done();
-                    })
-                    .catch(function (err) {
-                        throw err;
-                    });
+            .catch(function (err) {
+                throw err;
+            });
+
+    });
+
+    it('Update a user\'s status: 400 Bad Request ', (done) => {
+        this.timeout(10000);
+        const activeValue = '400 Bad Request';
+        // Login firstly
+
+        const urlStr = '/api/users/' + secondUsername + '/active/';
+        agent.put(urlStr)
+            .send({active: activeValue})
+            .then(function (res) {
+                expect(res).to.have.status(500);
+                expect(res.body.success).to.be.false;
+                expect(res.body.message.errors).not.to.be.null;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
             });
     });
 });
