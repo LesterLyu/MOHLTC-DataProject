@@ -1,9 +1,9 @@
-import React, {Component} from 'react';
+import React, {Component, Suspense} from 'react';
 import {Badge} from 'reactstrap';
 import UserManager from "../../controller/userManager";
 import {FormControl, InputLabel, Select, Input, Checkbox, MenuItem, ListItemText} from "@material-ui/core";
 
-const MaterialTable = React.lazy(() =>import('material-table' /* webpackChunkName: "material-table" */));
+const MaterialTable = React.lazy(() => import('material-table' /* webpackChunkName: "material-table" */));
 
 function PermissionSelect(props) {
   const {permissions, selected, handleChange, username} = props;
@@ -94,46 +94,48 @@ class Users extends Component {
     return (
       <div className="animated fadeIn">
         <div style={{maxWidth: '100%'}}>
-          <MaterialTable
-            columns={[
-              {
-                title: 'username', field: 'username',
-                // render: rowData => {
-                //   const userLink = `/users/${rowData.uid}`;
-                //   return (<Link to={userLink}>{rowData.username}</Link>)
-                // }
-              },
-              {title: 'email', field: 'email'},
-              {
-                title: 'Register Time', field: 'createDate', type: 'date',
-                render: rowData => {
-                  return new Date(rowData.createDate).toLocaleString()
+          <Suspense fallback={<div>Loading...</div>}>
+            <MaterialTable
+              columns={[
+                {
+                  title: 'username', field: 'username',
+                  // render: rowData => {
+                  //   const userLink = `/users/${rowData.uid}`;
+                  //   return (<Link to={userLink}>{rowData.username}</Link>)
+                  // }
+                },
+                {title: 'email', field: 'email'},
+                {
+                  title: 'Register Time', field: 'createDate', type: 'date',
+                  render: rowData => {
+                    return new Date(rowData.createDate).toLocaleString()
+                  }
+                },
+                {
+                  title: 'permissions', field: 'permissions',
+                  render: rowData => {
+                    return (
+                      <PermissionSelect
+                        username={rowData.username}
+                        selected={rowData.permissions}
+                        handleChange={this.onPermissionChange}
+                        permissions={this.permissions}
+                      />
+                    )
+                  }
+                },
+                {
+                  title: 'status', field: 'disabled',
+                  render: rowData => {
+                    return (<Badge
+                      color={rowData.validated === true ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
+                  }
                 }
-              },
-              {
-                title: 'permissions', field: 'permissions',
-                render: rowData => {
-                  return (
-                    <PermissionSelect
-                      username={rowData.username}
-                      selected={rowData.permissions}
-                      handleChange={this.onPermissionChange}
-                      permissions={this.permissions}
-                    />
-                  )
-                }
-              },
-              {
-                title: 'status', field: 'disabled',
-                render: rowData => {
-                  return (<Badge
-                    color={rowData.validated === true ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
-                }
-              }
-            ]}
-            data={userList}
-            title="All Accounts"
-          />
+              ]}
+              data={userList}
+              title="All Accounts"
+            />
+          </Suspense>
         </div>
       </div>
     )
