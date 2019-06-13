@@ -14,7 +14,7 @@ router.get('/api/check/username/:username', user_controller.check_username);
 // Update a user's status. Used to disable or enable an account.
 router.get('/api/users/:username/check-active/', user_controller.check_user_active);
 // Update a user's status. Used to disable or enable an account.
-router.put('/api/users/:username/active/', user_controller.taggle_user_active);
+router.put('/api/users/:username/active/', user_controller.edit_user_active);
 // Query the current user logged in.
 router.get('/api/users/current', user_controller.get_current_logged_in_user);
 

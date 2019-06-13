@@ -88,7 +88,7 @@ module.exports = {
         const username = req.session.user.username;
         getUser(username, (err, user) => {
             if (err) {
-                return res.status(500).json({success: false, msg: err});
+                return res.status(500).json({success: false, message: err});
             }
             if (user) {
                 return res.json({success: true, user: user});
@@ -112,11 +112,11 @@ module.exports = {
             }
 
             if (dbUser) {
-                const msg = dbUser.username + ' now is ' + dbUser.active;
+                const messageStr = dbUser.username + ' now is ' + dbUser.active;
                 return res.json({
                     success: true,
                     active: dbUser.active,
-                    message: msg,
+                    message: messageStr,
                 })
             } else {
                 return res.status(400).json({success: false, message: checkingUsername + ' does not exist.'});
@@ -124,7 +124,7 @@ module.exports = {
         });
     },
 
-    update_user_active: (req, res) => {
+    edit_user_active: (req, res) => {
         if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
