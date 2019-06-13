@@ -7,7 +7,7 @@ const requester = config.requester;
 const User = require('../../models/user');
 const app = require('../../app');
 
-describe('Query the current user logged in.', function () {
+describe('Update a user\'s status. Used to disable or enable an account.', function () {
 
     const oneUsername = 'lester';
     const oneEmail = 'lester@mail.com';
@@ -59,22 +59,9 @@ describe('Query the current user logged in.', function () {
             });
     });
 
-
-    it('when not logged in', (done) => {
+    it('Update a user\'s status: active - true ', (done) => {
         this.timeout(10000);
-        requester.get('/api/users/current/')
-            .then((res) => {
-                expect(res.body.success).to.be.true;
-                expect(res.body.user).to.equal(null);
-                done();
-            })
-            .catch(function (err) {
-                throw err;
-            });
-    });
-
-    it('when a user logged in', (done) => {
-        this.timeout(10000);
+        const activeValue = true;
         // Login firstly
         const agent = chai.request.agent(app);
         agent
@@ -86,12 +73,13 @@ describe('Query the current user logged in.', function () {
             .then((res) => {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                return agent.get('/api/users/current/')
+                const urlStr = '/api/users/' + secondUsername +'/active/';
+                return agent.put(urlStr)
+                    .send({active: activeValue})
                     .then(function (res) {
                         expect(res).to.have.status(200);
                         expect(res.body.success).to.be.true;
-                        expect(res.body.user).to.deep.include({username: oneUsername});
-                        console.log(res.body.user.username);
+                        expect(res.body.message).to.deep.include(secondUsername.toString());
                         done();
                     })
                     .catch(function (err) {
@@ -100,4 +88,61 @@ describe('Query the current user logged in.', function () {
             });
     });
 
+    it('Update a user\'s status: active - false ', (done) => {
+        this.timeout(10000);
+        const activeValue = false;
+        // Login firstly
+        const agent = chai.request.agent(app);
+        agent
+            .post('/api/login/local')
+            .send({
+                username: oneUsername,
+                password: onePassword
+            })
+            .then((res) => {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                const urlStr = '/api/users/' + secondUsername +'/active/';
+                return agent.put(urlStr)
+                    .send({active: activeValue})
+                    .then(function (res) {
+                        expect(res).to.have.status(200);
+                        expect(res.body.success).to.be.true;
+                        expect(res.body.message).to.deep.include(secondUsername.toString());
+                        done();
+                    })
+                    .catch(function (err) {
+                        throw err;
+                    });
+            });
+    });
+
+    it('Update a user\'s status: active - other ', (done) => {
+        this.timeout(10000);
+        const activeValue = 'other';
+        // Login firstly
+        const agent = chai.request.agent(app);
+        agent
+            .post('/api/login/local')
+            .send({
+                username: oneUsername,
+                password: onePassword
+            })
+            .then((res) => {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                const urlStr = '/api/users/' + secondUsername +'/active/';
+                return agent.put(urlStr)
+                    .send({active: activeValue})
+                    .then(function (res) {
+                        expect(res).to.have.status(500);
+                        expect(res.body.success).to.be.false;
+                        expect(res.body.message.errors).not.to.be.null;
+                        done();
+                    })
+                    .catch(function (err) {
+                        throw err;
+                    });
+            });
+    });
 });
