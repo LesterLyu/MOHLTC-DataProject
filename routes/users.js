@@ -9,6 +9,16 @@ let router = express.Router();
 
 passport.use(new LdapStrategy(config.OPTS));
 
+router.get('/api/check/email/:email', user_controller.check_email);
+router.get('/api/check/username/:username', user_controller.check_username);
+// Update a user's status. Used to disable or enable an account.
+router.get('/api/users/:username/check-active/', user_controller.check_user_active);
+// Update a user's status. Used to disable or enable an account.
+router.put('/api/users/:username/active/', user_controller.taggle_user_active);
+// Query the current user logged in.
+router.get('/api/users/current', user_controller.get_current_logged_in_user);
+
+
 router.get('/login', function (req, res) {
     if (req.isAuthenticated()) {
         return res.redirect('/profile');
@@ -29,10 +39,8 @@ router.get('/api/isloggedin', function (req, res) {
 
 router.get('/api/organization_details', user_controller.getOrganizationDetails);
 
-router.get('/api/check/email/:email', user_controller.check_email);
-router.get('/api/check/username/:username', user_controller.check_username);
-
 // POST request for user sign up from ldap server
+
 router.post('/api/signup', registration_ldap_controller.user_ldap_signup);
 // POST request for user sign up locally
 router.post('/api/signup/local', registration_local_controller.user_sign_up_local);
@@ -72,7 +80,8 @@ router.use((req, res, next) => {
         if (req.method === 'GET' && !req.originalUrl.includes('api'))
             req.session.originalUrl = req.originalUrl;
         return res.redirect('/login');
-    } else {
+    }
+    else {
         next();
     }
 });
@@ -108,20 +117,13 @@ router.use((req, res, next) => {
 
 router.get('/api/profile', user_controller.get_profile);
 
-// Query the current user logged in.
-router.get('/api/users/current', user_controller.get_current_logged_in_user);
-
-// Update a user's status. Used to disable or enable an account.
-router.get('/api/users/:username/check-active/', user_controller.check_user_active);
-// Update a user's status. Used to disable or enable an account.
-router.put('/api/users/:username/active/', user_controller.update_user_active);
-
 // profile page
 router.get('/profile', function (req, res) {
     res.render('sidebar/profile.ejs', {user: req.session.user});
 });
 
 // update profile
+
 router.post('/api/update-profile', user_controller.update_user_info);
 
 
