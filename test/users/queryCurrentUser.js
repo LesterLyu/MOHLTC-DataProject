@@ -1,11 +1,9 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-const config = require('../config');
+const {agent, requester} = require('../config');
 
-const requester = config.requester;
 const User = require('../../models/user');
-const app = require('../../app');
 
 describe('Query the current user logged in.', function () {
 
@@ -76,7 +74,6 @@ describe('Query the current user logged in.', function () {
     it('when a user logged in', (done) => {
         this.timeout(10000);
         // Login firstly
-        const agent = chai.request.agent(app);
         agent
             .post('/api/login/local')
             .send({

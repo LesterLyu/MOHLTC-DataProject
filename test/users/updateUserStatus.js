@@ -1,10 +1,9 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-const config = require('../config');
+const {agent} = require('../config');
 
 const User = require('../../models/user');
-const app = require('../../app');
 
 describe('Update a user\'s status. Used to disable or enable an account.', function () {
 
@@ -16,7 +15,6 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
     const secondUsername = 'lester02';
     const secondEmail = 'lester02@mail.com';
 
-    const agent = chai.request.agent(app);
 
     before((done) => {
 
