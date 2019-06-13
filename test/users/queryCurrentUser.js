@@ -100,4 +100,5 @@ describe('Query the current user logged in.', function () {
             });
     });
 
+    //FIXME: add the third test case, 500 INTERNAL ERROR
 });

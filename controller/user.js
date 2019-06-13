@@ -83,7 +83,7 @@ module.exports = {
             return res.json({success: true, profile: user});
         });
     },
-
+    // Query the current user logged in.
     get_current_logged_in_user: (req, res) => {
         if(!req.session.user){
             return res.json({success: true, user: null});
@@ -107,7 +107,6 @@ module.exports = {
         }
 
         const checkingUsername = req.params.username;
-
         User.findOne({username: checkingUsername}, (err, dbUser) => {
             if (err) {
                 console.log(err);
@@ -118,7 +117,6 @@ module.exports = {
                 const messageStr = dbUser.username + ' now is ' + dbUser.active;
                 return res.json({
                     success: true,
-                    active: dbUser.active,
                     message: messageStr,
                 })
             } else {

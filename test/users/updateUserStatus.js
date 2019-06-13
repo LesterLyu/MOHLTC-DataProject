@@ -3,7 +3,6 @@ const expect = chai.expect;
 
 const config = require('../config');
 
-const requester = config.requester;
 const User = require('../../models/user');
 const app = require('../../app');
 
@@ -12,6 +11,7 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
     const oneUsername = 'lester';
     const oneEmail = 'lester@mail.com';
     const onePassword = 'lester';
+    const oneActiveValue = true;
 
     const secondUsername = 'lester02';
     const secondEmail = 'lester02@mail.com';
@@ -29,6 +29,7 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
                 username: oneUsername,
                 email: oneEmail,
                 password: onePassword,
+                active: oneActiveValue,
                 permissions: [
                     "CRUD-workbook-template",
                     "system-management",
@@ -78,6 +79,21 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
             });
 
 
+    });
+
+    it('Check a user\'s status: active - true ', (done) => {
+        this.timeout(10000);
+        const urlStr = '/api/users/' + secondUsername + '/check-active/';
+        agent.get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                expect(res.body.message).to.deep.include(oneActiveValue.toString());
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
     });
 
     it('Update a user\'s status: active - true ', (done) => {
@@ -142,7 +158,6 @@ describe('Update a user\'s status. Used to disable or enable an account.', funct
             .then(function (res) {
                 expect(res).to.have.status(400);
                 expect(res.body.success).to.be.false;
-                console.log(res.body.message.errors);
                 expect(res.body.message.errors).not.to.be.null;
                 done();
             })
