@@ -84,11 +84,14 @@ module.exports = {
         });
     },
 
-    get_current_logged_in_user: (req, res, next) => {
+    get_current_logged_in_user: (req, res) => {
+        if(!req.session.user){
+            return res.json({success: true, user: null});
+        }
         const username = req.session.user.username;
         getUser(username, (err, user) => {
             if (err) {
-                return res.status(500).json({success: false, message: err});
+                return res.status(500).json({success: false, user: null, message: err});
             }
             if (user) {
                 return res.json({success: true, user: user});
@@ -130,6 +133,7 @@ module.exports = {
         }
 
         const updatingUsername = req.params.username;
+        const updatingActive = req.body.active;
         User.findOne({username: updatingUsername}, (err, dbUser) => {
             if (err) {
                 console.log(err);
@@ -137,14 +141,13 @@ module.exports = {
             }
 
             if (dbUser) {
-                dbUser.active = !dbUser.active;
+                dbUser.active = updatingActive;
                 dbUser.save((err, updatedUser) => {
                     if (err) {
                         return res.status(500).json({success: false, message: err});
                     }
                     return res.json({
                         success: true,
-                        active: updatedUser.active,
                         message: updatedUser.username + ' now is ' + updatedUser.active
                     })
                 });
