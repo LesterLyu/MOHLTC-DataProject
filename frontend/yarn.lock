@@ -11956,7 +11956,7 @@ x-is-string@^0.1.0:
 
 "xlsx-populate@git+https://github.com/LesterLyu/xlsx-populate.git#formula-support":
   version "1.19.1"
-  resolved "git+https://github.com/LesterLyu/xlsx-populate.git#377d12102fc99106fc8ef220205360812807d890"
+  resolved "git+https://github.com/LesterLyu/xlsx-populate.git#b80b604032be1bd9fd3d184eb8d720d7876bada3"
   dependencies:
     cfb "^1.1.0"
     fast-formula-parser "git+https://github.com/LesterLyu/fast-formula-parser.git"
