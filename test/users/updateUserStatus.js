@@ -1,7 +1,7 @@
 const chai = require('chai');
 const expect = chai.expect;
 
-const { agent } = require('../config');
+const {agent} = require('../config');
 
 const User = require('../../models/user');
 
@@ -96,7 +96,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
         const urlStr = '/api/users/' + secondUsername + '/active/';
         agent
             .put(urlStr)
-            .send({ active: activeValue })
+            .send({active: activeValue})
             .then(function(res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
@@ -116,7 +116,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
         const urlStr = '/api/users/' + secondUsername + '/active/';
         agent
             .put(urlStr)
-            .send({ active: activeValue })
+            .send({active: activeValue})
             .then(function(res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
@@ -137,7 +137,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
         const urlStr = '/api/users/' + secondUsername + '/active/';
         agent
             .put(urlStr)
-            .send({ active: activeValue })
+            .send({active: activeValue})
             .then(function(res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
@@ -158,7 +158,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
         const urlStr = '/api/users/' + 'no user' + '/active/';
         agent
             .put(urlStr)
-            .send({ active: activeValue })
+            .send({active: activeValue})
             .then(function(res) {
                 expect(res).to.have.status(400);
                 expect(res.body.success).to.be.false;
@@ -178,7 +178,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
         const urlStr = '/api/users/' + secondUsername + '/active/';
         agent
             .put(urlStr)
-            .send({ active: activeValue })
+            .send({active: activeValue})
             .then(function(res) {
                 expect(res).to.have.status(500);
                 expect(res.body.success).to.be.false;

@@ -1,8 +1,8 @@
-const Attribute = require("../models/attribute");
-const Category = require("../models/category");
-const Workbook = require("../models/workbook");
-const error = require("../config/error");
-const config = require("../config/config");
+const Attribute = require('../models/attribute');
+const Category = require('../models/category');
+const Workbook = require('../models/workbook');
+const error = require('../config/error');
+const config = require('../config/config');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(
@@ -24,23 +24,26 @@ module.exports = {
         const id = req.body.id;
         const description = req.body.description;
         const groupNumber = req.session.user.groupNumber;
-        if (attribute === "") {
-            return res
-                .status(400)
-                .json({success: false, message: "Attribute cannot be empty."});
+        if (attribute === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Attribute cannot be empty.'
+            });
         }
         Attribute.findOne(
             {id: id, groupNumber: groupNumber},
             (err, attribute) => {
                 if (err) {
                     console.log(err);
-                    return res.status(500).json({success: false, message: err.message});
+                    return res
+                        .status(500)
+                        .json({success: false, message: err.message});
                 }
 
                 if (attribute) {
                     return res.status(400).json({
                         success: false,
-                        message: "Attribute " + attribute.attribute + " exists."
+                        message: 'Attribute ' + attribute.attribute + ' exists.'
                     });
                 } else {
                     let newAttribute = new Attribute({
@@ -55,11 +58,11 @@ module.exports = {
                             return next(err);
                         }
                         const messageStr =
-                            "Attribute(id: " +
+                            'Attribute(id: ' +
                             updatedAttribute.id +
-                            " , " +
+                            ' , ' +
                             updatedAttribute.attribute +
-                            ") added.";
+                            ') added.';
                         return res.json({success: true, message: messageStr});
                     });
                 }
@@ -78,12 +81,12 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         // save multiple documents to the collection
         Attribute.insertMany(attributes, function (err, docs) {
-            let message = "";
+            let message = '';
             if (err) {
                 message = err.errmsg;
                 return res.status(500).json({success: false, message: message});
             }
-            message = docs.length + " attributes added.";
+            message = docs.length + ' attributes added.';
             return res.json({success: true, message: message, docs: docs});
         });
     },
@@ -115,7 +118,7 @@ module.exports = {
                         if (attribute == workbookAttributes[h]) {
                             if (workbooks[i].groupNumber === groupNumber) {
                                 existAttribute.push(
-                                    workbooks[i].name + "/" + workbookSheetName
+                                    workbooks[i].name + '/' + workbookSheetName
                                 );
                             } else {
                                 existAttribute_othergroup = true;
@@ -130,25 +133,36 @@ module.exports = {
                     err => {
                         if (err) {
                             console.log(err);
-                            return res.status(500).json({success: false, message: err});
+                            return res
+                                .status(500)
+                                .json({success: false, message: err});
                         }
                         return res.json({
                             success: true,
-                            message: "Deleted attribute " + attribute
+                            message: 'Deleted attribute ' + attribute
                         });
                     }
                 );
             } else {
                 if (existAttribute.length !== 0) {
                     var message =
-                        "The attribute " + '"' + attribute + '"' + " has been used in ";
+                        'The attribute ' +
+                        '"' +
+                        attribute +
+                        '"' +
+                        ' has been used in ';
                     for (var i = 0; i < existAttribute.length - 1; i++) {
-                        message = message + existAttribute[i] + ", ";
+                        message = message + existAttribute[i] + ', ';
                     }
-                    message = message + existAttribute[existAttribute.length - 1] + ". ";
+                    message =
+                        message +
+                        existAttribute[existAttribute.length - 1] +
+                        '. ';
                 }
                 if (existAttribute_othergroup) {
-                    message = message + "This attribute has been used in other groups!";
+                    message =
+                        message +
+                        'This attribute has been used in other groups!';
                 }
                 console.log(message);
                 return res.json({success: false, message: message});
@@ -179,7 +193,9 @@ module.exports = {
                     for (var j = 0; j < workbookSheet.length; j++) {
                         if (category == workbookSheet[j][0]) {
                             if (workbooks[i].groupNumber === groupNumber) {
-                                existCategory.push(workbooks[i].name + "/" + workbookSheetName);
+                                existCategory.push(
+                                    workbooks[i].name + '/' + workbookSheetName
+                                );
                             } else {
                                 existCategory_othergroup = true;
                             }
@@ -193,25 +209,36 @@ module.exports = {
                     err => {
                         if (err) {
                             console.log(err);
-                            return res.status(500).json({success: false, message: err});
+                            return res
+                                .status(500)
+                                .json({success: false, message: err});
                         }
                         return res.json({
                             success: true,
-                            message: "Deleted category " + category
+                            message: 'Deleted category ' + category
                         });
                     }
                 );
             } else {
                 if (existCategory.length !== 0) {
                     var message =
-                        "The category " + '"' + category + '"' + " has been used in ";
+                        'The category ' +
+                        '"' +
+                        category +
+                        '"' +
+                        ' has been used in ';
                     for (var i = 0; i < existCategory.length - 1; i++) {
-                        message = message + existCategory[i] + ", ";
+                        message = message + existCategory[i] + ', ';
                     }
-                    message = message + existCategory[existCategory.length - 1] + ". ";
+                    message =
+                        message +
+                        existCategory[existCategory.length - 1] +
+                        '. ';
                 }
                 if (existCategory_othergroup) {
-                    message = message + "This category has been used in other groups!";
+                    message =
+                        message +
+                        'This category has been used in other groups!';
                 }
                 console.log(message);
                 return res.json({success: false, message: message});
@@ -249,12 +276,12 @@ module.exports = {
             if (fails.length !== 0) {
                 return res.json({
                     success: false,
-                    message: "Failed to remove attribute id: " + fails
+                    message: 'Failed to remove attribute id: ' + fails
                 });
             }
             return res.json({
                 success: true,
-                message: "Success removed attribute id: " + ids + "."
+                message: 'Success removed attribute id: ' + ids + '.'
             });
         });
     },
@@ -289,12 +316,12 @@ module.exports = {
             if (fails.length !== 0) {
                 return res.json({
                     success: false,
-                    message: "Failed to remove category id: " + fails
+                    message: 'Failed to remove category id: ' + fails
                 });
             }
             return res.json({
                 success: true,
-                message: "Success removed category id: " + ids + "."
+                message: 'Success removed category id: ' + ids + '.'
             });
         });
     },
@@ -308,10 +335,10 @@ module.exports = {
 
         const category = req.body.category;
         const groupNumber = req.session.user.groupNumber;
-        if (category === "") {
+        if (category === '') {
             return res
                 .status(400)
-                .json({success: false, message: "Category cannot be empty."});
+                .json({success: false, message: 'Category cannot be empty.'});
         }
         Category.findOne(
             {category: category, groupNumber: groupNumber},
@@ -324,7 +351,7 @@ module.exports = {
                 if (category) {
                     return res.status(400).json({
                         success: false,
-                        message: "Category " + category.category + " exists."
+                        message: 'Category ' + category.category + ' exists.'
                     });
                 } else {
                     let newCategory = new Category({
@@ -338,7 +365,10 @@ module.exports = {
                         }
                         return res.json({
                             success: true,
-                            message: "Category " + updatedCategory.category + " added."
+                            message:
+                                'Category ' +
+                                updatedCategory.category +
+                                ' added.'
                         });
                     });
                 }
@@ -350,7 +380,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         Attribute.find(
             {groupNumber: groupNumber},
-            "attribute id",
+            'attribute id',
             (err, attributes) => {
                 if (err) {
                     console.log(err);
@@ -365,7 +395,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         Category.find(
             {groupNumber: groupNumber},
-            "category id",
+            'category id',
             (err, categories) => {
                 if (err) {
                     console.log(err);
@@ -381,15 +411,17 @@ module.exports = {
         const queryAttributeId = req.params.attributeId;
         Attribute.findOne(
             {id: queryAttributeId, groupNumber: groupNumber},
-            "category id",
+            'category id',
             (err, attribute) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).json({success: false, message: err});
                 }
-                if(!attribute){
-                    const msgString = queryAttributeId + "does not exists.";
-                    return res.status(400).json({success: false, message: msgString});
+                if (!attribute) {
+                    const msgString = queryAttributeId + 'does not exists.';
+                    return res
+                        .status(400)
+                        .json({success: false, message: msgString});
                 }
                 return res.json({success: true, attribute: attribute});
             }
@@ -401,7 +433,7 @@ module.exports = {
         const queryCategoryId = req.params.categoryId;
         Category.findOne(
             {id: queryCategoryId, groupNumber: groupNumber},
-            "category id",
+            'category id',
             (err, category) => {
                 if (err) {
                     console.log(err);
@@ -423,10 +455,11 @@ module.exports = {
         const attribute = req.body.attribute;
         const description = req.body.description;
         const groupNumber = req.session.user.groupNumber;
-        if (attribute === "") {
-            return res
-                .status(400)
-                .json({success: false, message: "Attribute cannot be empty."});
+        if (attribute === '') {
+            return res.status(400).json({
+                success: false,
+                message: 'Attribute cannot be empty.'
+            });
         }
         Attribute.findOne(
             {attribute: attribute, groupNumber: groupNumber},
@@ -448,13 +481,17 @@ module.exports = {
 
                         return res.json({
                             success: true,
-                            message: "Attribute " + dbAttribute.attribute + " updated."
+                            message:
+                                'Attribute ' +
+                                dbAttribute.attribute +
+                                ' updated.'
                         });
                     });
                 } else {
-                    return res
-                        .status(400)
-                        .json({success: false, message: attribute + " does not exist."});
+                    return res.status(400).json({
+                        success: false,
+                        message: attribute + ' does not exist.'
+                    });
                 }
             }
         );
@@ -480,8 +517,13 @@ module.exports = {
 
             if (!attribute) {
                 const messageStr =
-                    "Attribute(id: " + queryAttributeId + ") " + "does not exist.";
-                return res.status(400).json({success: false, message: messageStr});
+                    'Attribute(id: ' +
+                    queryAttributeId +
+                    ') ' +
+                    'does not exist.';
+                return res
+                    .status(400)
+                    .json({success: false, message: messageStr});
             }
 
             // condition 2: this attribute does not be used in workbook
@@ -498,15 +540,16 @@ module.exports = {
                             for (var dbAttributeId in worksheet) {
                                 if (dbAttributeId === queryAttributeId) {
                                     const messageStr =
-                                        "Attribute(id:" +
+                                        'Attribute(id:' +
                                         queryAttributeId +
-                                        ") " +
-                                        "cannot be deleted, " +
+                                        ') ' +
+                                        'cannot be deleted, ' +
                                         workbooks[i].name +
-                                        " are using this attribute.";
-                                    return res
-                                        .status(400)
-                                        .json({success: false, message: messageStr});
+                                        ' are using this attribute.';
+                                    return res.status(400).json({
+                                        success: false,
+                                        message: messageStr
+                                    });
                                 }
                             }
                         }
@@ -515,10 +558,15 @@ module.exports = {
                 // Detete attribute
                 Attribute.deleteOne({_id: attribute._id}, function (err) {
                     if (err) {
-                        return res.status(500).json({success: false, message: err});
+                        return res
+                            .status(500)
+                            .json({success: false, message: err});
                     } else {
                         const messageStr =
-                            "Attribute(id:" + queryAttributeId + ") " + " deleted.";
+                            'Attribute(id:' +
+                            queryAttributeId +
+                            ') ' +
+                            ' deleted.';
                         return res.json({success: true, message: messageStr});
                     }
                 });

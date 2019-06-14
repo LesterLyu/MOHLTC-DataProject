@@ -85,7 +85,7 @@ module.exports = {
     },
     // Query the current user logged in.
     get_current_logged_in_user: (req, res) => {
-        if(!req.session.user){
+        if (!req.session.user) {
             return res.json({success: true, user: null});
         }
         const username = req.session.user.username;
@@ -422,7 +422,7 @@ module.exports = {
                         return res.status(400).json({success: false, message: err});
                     }
                     req.session.user = user;
-                })
+                });
 
                 console.log(req.session);
                 return res.json({success: true, message: "The password has been changed"});
