@@ -23,8 +23,10 @@ router.delete('/api/cats/delete', att_cat_controller.user_delete_cats);
 router.delete('/api/atts/delete', att_cat_controller.user_delete_atts);
 
 router.get('/api/attributes', att_cat_controller.get_attributes);
+router.get('/api/attributes/:attributeId', att_cat_controller.get_one_attribute);
 
 router.get('/api/categories', att_cat_controller.get_categories);
+router.get('/api/categories/:categoryId', att_cat_controller.get_one_category);
 
 router.put('/api/edit-att', att_cat_controller.user_edit_att);
 
