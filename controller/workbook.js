@@ -125,7 +125,7 @@ module.exports = {
                 return res.status(500).json({success: false, message: err});
             }
             // remove filled workbooks
-            FilledWorkbook.find({username: username, groupNumber: groupNumber}, 'name', (err, filledWorkbooks) => {
+            Workbook.find({username: username, groupNumber: groupNumber}, 'name', (err, filledWorkbooks) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).json({success: false, message: err});

@@ -115,6 +115,38 @@ describe('CRUD workbook', function () {
             });
     });
 
+    it('Get all unfilled workbook : success)', done => {
+        this.timeout(10000);
+        const urlStr = '/api/workbooks' ;
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                expect(res.body.workbooks).not.to.be.null;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
+    it('Get all filled workbook : success)', done => {
+        this.timeout(10000);
+        const urlStr = '/api/filled-workbooks' ;
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                expect(res.body.filledWorkbooks).not.to.be.null;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
     it('Get filledworkbooks by filename - success', done => {
         this.timeout(10000);
         const fileName = '2018-19 CAPS LHIN Managed BLANK V1.xlsx';
