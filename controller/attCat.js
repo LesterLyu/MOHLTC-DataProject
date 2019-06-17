@@ -376,7 +376,7 @@ module.exports = {
         );
     },
 
-    get_attributes: (req, res, next) => {
+    get_attributes: (req, res) => {
         const groupNumber = req.session.user.groupNumber;
         Attribute.find(
             {groupNumber: groupNumber},
@@ -387,6 +387,23 @@ module.exports = {
                     return res.status(500).json({success: false, message: err});
                 }
                 return res.json({success: true, attributes: attributes});
+            }
+        );
+    },
+
+    get_similar_attributes: (req, res) => {
+        const groupNumber = req.session.user.groupNumber;
+        const regex = new RegExp(req.params.queryPartialAttribute, "i");
+        const query = {attribute: regex, groupNumber: groupNumber};
+        Attribute.find(
+            query,
+            (err, attributes) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                const count = attributes.length;
+                return res.json({success: true, count: count, attributes: attributes});
             }
         );
     },

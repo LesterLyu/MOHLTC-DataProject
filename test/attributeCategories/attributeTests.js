@@ -18,8 +18,6 @@ describe('CRUD attribute', function () {
     before(done => {
         User.remove({}, () => {
         });
-        Attribute.remove({}, (err, res) => {
-        });
 
         // Sign up a new user
         agent
@@ -88,13 +86,35 @@ describe('CRUD attribute', function () {
             .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                expect(res.body.categories).not.to.be.null;
+                expect(res.body.attributes).not.to.be.null;
                 done();
             })
             .catch(function (err) {
                 throw err;
             });
     });
+
+    it('Get similar attributes - success', done => {
+        this.timeout(10000);
+        const queryPartialAttribute = 'Expenses';
+        const urlStr = '/api/attributes/similar/' + queryPartialAttribute;
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                res.body.attributes.forEach( i => {
+                    console.log(i.attribute + ' from ' + i.description);
+                });
+                console.log('found ' + res.body.count + ' attributes');
+                expect(res.body.attributes).not.to.be.null;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
     it('Get one attribute - success', done => {
         this.timeout(10000);
         const urlStr = '/api/attributes/' + oneId;
@@ -103,7 +123,7 @@ describe('CRUD attribute', function () {
             .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                expect(res.body.category).not.to.be.null;
+                expect(res.body.attributes).not.to.be.null;
                 done();
             })
             .catch(function (err) {
@@ -140,7 +160,7 @@ describe('CRUD attribute', function () {
             });
     });
 
-    it('Add a attribute - success', done => {
+    xit('Add a attribute - success', done => {
         this.timeout(10000);
         const urlStr = '/api/add-att';
         agent
@@ -161,7 +181,7 @@ describe('CRUD attribute', function () {
                 throw err;
             });
     });
-    it('Add Many attributes - success', done => {
+    xit('Add Many attributes - success', done => {
         this.timeout(10000);
 
         const attributes = [

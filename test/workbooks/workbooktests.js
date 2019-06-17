@@ -18,8 +18,6 @@ describe('CRUD workbook', function () {
     before(done => {
         User.remove({}, () => {
         });
-        Attribute.remove({}, (err, res) => {
-        });
 
         // Sign up a new user
         agent
