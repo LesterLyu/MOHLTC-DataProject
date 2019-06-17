@@ -479,7 +479,8 @@ module.exports = {
                 return res.status(500).json({success: false, message: err});
             }
             if(!workbook){
-                return res.json({success: false, filledWorkbooks: null});
+                const msgStr = queryWorkbookName + 'does not exist.';
+                return res.status(400).json({success: false, message: msgStr});
             }
 
             // retrieve data from all filledWordbooks
