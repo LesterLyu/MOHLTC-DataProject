@@ -420,8 +420,8 @@ module.exports = {
                 if (!attribute) {
                     const msgString = queryAttributeId + 'does not exists.';
                     return res
-                        .status(400)
-                        .json({success: false, message: msgString});
+                        .status(200)
+                        .json({success: true, message: msgString});
                 }
                 return res.json({success: true, attribute: attribute});
             }

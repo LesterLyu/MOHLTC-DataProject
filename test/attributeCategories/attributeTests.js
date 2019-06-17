@@ -116,8 +116,23 @@ describe('CRUD attribute', function () {
         agent
             .get(urlStr)
             .then(function (res) {
-                expect(res).to.have.status(400);
-                expect(res.body.success).to.be.false;
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                expect(res.body.message).include('does not exists');
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+    it('Get one attribute - id is empty', done => {
+        this.timeout(10000);
+        const urlStr = '/api/attributes/' + '   ';
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                expect(res.body.attributes).not.to.be.null;
                 done();
             })
             .catch(function (err) {
@@ -217,6 +232,7 @@ describe('CRUD attribute', function () {
                 console.log(res.body.message);
                 expect(res).to.have.status(400);
                 expect(res.body.success).to.be.false;
+                expect(res.body.message).include('Attribute cannot be empty');
                 done();
             })
             .catch(function (err) {

@@ -24,7 +24,7 @@ module.exports = {
                 return res.status(500).json({success: false, message: err});
             }
             if (!workbook) {
-                return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                return res.status(200).json({success: true, message: 'Workbook does not exist.'});
             }
             return res.json({success: true, workbook: workbook});
         })
@@ -459,6 +459,12 @@ module.exports = {
 
 // GET Query user entered workbook data for your group.
     get_many_filledworkbooks_of_one_workbook: (req, res) => {
+        // validation
+        if(req.query.workbookName == null || req.query.workbookName.trim().length <= 1){
+            const msgStr = 'workbook name can not be empty.';
+            return res.status(400).json({success: true, message: msgStr, filledWorkbooks: null});
+        }
+
         const groupNumber = req.session.user.groupNumber;
         const queryWorkbookName = req.query.workbookName;
         const queryUsername = req.query.username ? req.query.username : '';
@@ -466,6 +472,8 @@ module.exports = {
         const querySheetName = req.query.sheetName ? req.query.sheetName : '-1';
         const queryCategoryId = req.query.catId ? req.query.catId : '-1';
         const queryAttributeId = req.query.attId ? req.query.attId : '-1';
+
+
 
         // Firstly retrieve the category map and attribute map from a template (unfilled workbook)
         // Then based on these two map to get all value from sheets
@@ -475,12 +483,11 @@ module.exports = {
             catMap: 1
         }, (err, workbook) => {
             if (err) {
-                console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
             if(!workbook){
                 const msgStr = queryWorkbookName + 'does not exist.';
-                return res.status(400).json({success: false, message: msgStr});
+                return res.status(200).json({success: true, message: msgStr, filledWorkbooks: null});
             }
 
             // retrieve data from all filledWordbooks

@@ -89,10 +89,25 @@ describe('CRUD workbook', function () {
         agent
             .get(urlStr)
             .then(function (res) {
-                expect(res).to.have.status(400);
-                expect(res.body.success).to.be.false;
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
                 expect(res.body.workbook == null).to.be.true;
                 expect(res.body.message).include('does not exist.');
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
+    it('Get one workbook by filename - Workbook is empty (no router suitable)', done => {
+        this.timeout(10000);
+        const fileName = '                       ';
+        const urlStr = '/api/workbook/' + fileName;
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(404);
                 done();
             })
             .catch(function (err) {
@@ -143,10 +158,10 @@ describe('CRUD workbook', function () {
         agent
             .get(urlStr)
             .then(function (res) {
-                expect(res).to.have.status(400);
-                expect(res.body.success).to.be.false;
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
                 expect(res.body.filledWorkbooks == null).to.be.true;
-                expect(res.body.message).include('does not exist.');
+                expect(res.body.message).include('does not exist');
                 done();
             })
             .catch(function (err) {
@@ -156,16 +171,16 @@ describe('CRUD workbook', function () {
 
     it('Get filledworkbooks  - filename is empty', done => {
         this.timeout(10000);
-        const fileName = '';
+        const fileName = '                            ';
         const urlStr = '/api/query/workbook?workbookName=' + fileName;
         agent
             .get(urlStr)
             .then(function (res) {
                 expect(res).to.have.status(400);
                 console.log(res.body);
-                expect(res.body.success).to.be.false;
+                expect(res.body.success).to.be.true;
                 expect(res.body.filledWorkbooks == null).to.be.true;
-                expect(res.body.message).include('does not exist.');
+                expect(res.body.message).include('can not be empty');
                 done();
             })
             .catch(function (err) {
