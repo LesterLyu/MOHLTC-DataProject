@@ -380,7 +380,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         Attribute.find(
             {groupNumber: groupNumber},
-            'attribute id',
+            'attribute id description',
             (err, attributes) => {
                 if (err) {
                     console.log(err);

@@ -115,6 +115,7 @@ describe('CRUD attribute', function () {
             });
     });
 
+
     it('Get one attribute - success', done => {
         this.timeout(10000);
         const urlStr = '/api/attributes/' + oneId;
