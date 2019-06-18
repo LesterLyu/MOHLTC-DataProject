@@ -125,7 +125,7 @@ module.exports = {
                 return res.status(500).json({success: false, message: err});
             }
             // remove filled workbooks
-            Workbook.find({username: username, groupNumber: groupNumber}, 'name', (err, filledWorkbooks) => {
+            FilledWorkbook.find({username: username, groupNumber: groupNumber}, 'name', (err, filledWorkbooks) => {
                 if (err) {
                     console.log(err);
                     return res.status(500).json({success: false, message: err});
@@ -548,5 +548,93 @@ module.exports = {
             });
         });
     },
-}
-;
+
+    get_all_filledworkbooks: (req, res) => {
+        const groupNumber = req.session.user.groupNumber;
+        const queryUsername = req.query.username ? req.query.username : '';
+        //  filter the content of body
+        const queryCategoryId = req.query.catId ? req.query.catId : '-1';
+        const queryAttributeId = req.query.attId ? req.query.attId : '-1';
+
+
+
+        // Firstly retrieve the category map and attribute map from a template (unfilled workbook)
+        // Then based on these two map to get all value from sheets
+        // that are filled by the same template
+        Workbook.find({groupNumber: groupNumber}, {
+            attMap: 1,
+            catMap: 1
+        }, (err, workbooks) => {
+            if (err) {
+                return res.status(500).json({success: false, message: err});
+            }
+            if(!workbooks){
+                const msgStr = queryWorkbookName + 'does not exist.';
+                return res.status(200).json({success: true, message: msgStr, filledWorkbooks: null});
+            }
+
+            // loop
+            const filledWorkbooks = [];
+            workbooks.forEach( workbook => {
+                // retrieve data from all filledWordbooks
+                let attMap = workbook.attMap;
+                let catMap = workbook.catMap;
+
+                let query = {groupNumber: groupNumber, name: queryWorkbookName};
+                if (queryUsername !== '') {
+                    query.username = queryUsername;
+                }
+
+                let projection = {
+                    name: 1,
+                    username: 1,
+                    data: 1
+                };
+                FilledWorkbook.find(query, projection, (err, filledWorkbooks) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    let result = [];
+                    for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
+                        const file = filledWorkbooks[indexOfDoc];
+                        const filename = file.name;
+                        const username = file.username;
+                        const data = file.data;
+
+                        // FIXME: sheetname can not get from database
+                        for (let sheetKey in catMap) {                                           // sheet
+                            for (let catKey in catMap[sheetKey]) {                                               // row
+                                if (queryCategoryId !== '-1' && queryCategoryId !== '' && queryCategoryId !== catKey) {
+                                    continue;
+                                }
+                                for (let attKey in attMap[sheetKey]) {                                      // col
+                                    if (queryAttributeId !== '-1' && queryAttributeId !== '' && queryAttributeId !== attKey) {
+                                        continue;
+                                    }
+
+                                    const rowIndex = catMap[sheetKey][catKey];
+                                    const colIndex = attMap[sheetKey][attKey];
+                                    const value = data[sheetKey][rowIndex][colIndex];
+
+                                    result.push({
+                                        username,
+                                        // workbookname: filename,
+                                        sheetKey,
+                                        catKey,
+                                        attKey,
+                                        value
+                                    });
+                                }
+                            }
+                        }
+                    }
+                    filledWorkbooks.push(result)
+                });
+            });//end of forEach
+
+            return res.json({success: true, filledWorkbooks: filledWorkbooks});
+        });
+    },
+
+};
