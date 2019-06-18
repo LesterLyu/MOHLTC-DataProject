@@ -2,26 +2,30 @@ const chai = require('chai');
 const expect = chai.expect;
 
 const {agent} = require('../config');
-const Attribute = require('../../models/attribute');
+const Category = require('../../models/category');
 const User = require('../../models/user');
 
-describe('CRUD attribute', function () {
-    const oneId = 300001;
-    const oneAttribute = 'id-300001';
+describe('CRUD category', function () {
+    const oneId = 600001;
+    const oneCategory = 'id-600001';
     const oneGroupNumber = 1;
-    const oneDescription = 'description: id-300001';
+    const oneDescription = 'description: id-600001';
 
-    const secondId = 300003;
-    const secondAttribute = 'id-300003';
-    const secondDescription = 'description: id-300003';
+    const secondId = 600003;
+    const secondCategory = 'id-600003';
+    const secondDescription = 'description: id-600003';
 
     before(done => {
         User.remove({}, () => {
         });
-        Attribute.remove({id: oneId}, ()=>{});
-        Attribute.remove({id: secondId}, ()=>{});
-        Attribute.remove({id: secondId + 3000}, ()=>{});
-        Attribute.remove({id: secondId + 3001}, ()=>{});
+        Category.remove({id: [oneId, secondId,  secondId + 3000,  secondId + 3001]}, (err)=>{
+            if (!err) {
+                console.log('removed success: ')
+            }
+            else {
+                console.log(err)
+            }
+        });
 
         // Sign up a new user
         agent
@@ -53,12 +57,12 @@ describe('CRUD attribute', function () {
                     .then(res => {
                         expect(res).to.have.status(200);
                         expect(res.body.success).to.be.true;
-                        // add one attribute
+                        // add one category
                         agent
-                            .post('/api/add-att')
+                            .post('/api/add-cat')
                             .send({
                                 id: oneId,
-                                attribute: oneAttribute,
+                                category: oneCategory,
                                 groupNumber: oneGroupNumber,
                                 description: oneDescription
                             })
@@ -82,7 +86,7 @@ describe('CRUD attribute', function () {
             });
     });
 
-    it('Get attributes - success', done => {
+    it('Get categories - success', done => {
         this.timeout(10000);
         const urlStr = '/api/categories';
         agent
@@ -90,7 +94,7 @@ describe('CRUD attribute', function () {
             .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                expect(res.body.attributes).not.to.be.null;
+                expect(res.body.categories).not.to.be.null;
                 done();
             })
             .catch(function (err) {
@@ -98,20 +102,20 @@ describe('CRUD attribute', function () {
             });
     });
 
-    it('Get similar attributes - success', done => {
+    it('Get similar categories - success', done => {
         this.timeout(10000);
-        const queryPartialAttribute = 'Expenses';
-        const urlStr = '/api/attributes/similar/' + queryPartialAttribute;
+        const queryPartialCategory = 'id';
+        const urlStr = '/api/categories/similar/' + queryPartialCategory;
         agent
             .get(urlStr)
             .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                res.body.attributes.forEach( i => {
-                    console.log(i.attribute + ' from ' + i.description);
+                res.body.categories.forEach( i => {
+                    console.log(i.category + ' from ' + i.description);
                 });
-                console.log('found ' + res.body.count + ' attributes');
-                expect(res.body.attributes).not.to.be.null;
+                console.log('found ' + res.body.count + ' categories');
+                expect(res.body.categories).not.to.be.null;
                 done();
             })
             .catch(function (err) {
@@ -120,24 +124,24 @@ describe('CRUD attribute', function () {
     });
 
 
-    it('Get one attribute - success', done => {
+    it('Get one category - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/attributes/' + oneId;
+        const urlStr = '/api/categories/' + oneId;
         agent
             .get(urlStr)
             .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                expect(res.body.attributes).not.to.be.null;
+                expect(res.body.categories).not.to.be.null;
                 done();
             })
             .catch(function (err) {
                 throw err;
             });
     });
-    it('Get one attribute - id does not exist', done => {
+    it('Get one category - id does not exist', done => {
         this.timeout(10000);
-        const urlStr = '/api/attributes/' + '9999';
+        const urlStr = '/api/categories/' + '9999';
         agent
             .get(urlStr)
             .then(function (res) {
@@ -150,14 +154,14 @@ describe('CRUD attribute', function () {
                 throw err;
             });
     });
-    it('Get one attribute - id is empty', done => {
+    it('Get one category - id is empty', done => {
         this.timeout(10000);
-        const urlStr = '/api/attributes/' + '   ';
+        const urlStr = '/api/categories/' + '   ';
         agent
             .get(urlStr)
             .then(function (res) {
                 expect(res).to.have.status(200);
-                expect(res.body.attributes).not.to.be.null;
+                expect(res.body.categories).not.to.be.null;
                 done();
             })
             .catch(function (err) {
@@ -165,14 +169,14 @@ describe('CRUD attribute', function () {
             });
     });
 
-    it('Add a attribute - success', done => {
+    it('Add a category - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-att';
+        const urlStr = '/api/add-cat';
         agent
             .post(urlStr)
             .send({
                 id: secondId,
-                attribute: secondAttribute,
+                category: secondCategory,
                 groupNumber: oneGroupNumber,
                 description: secondDescription
             })
@@ -186,29 +190,29 @@ describe('CRUD attribute', function () {
                 throw err;
             });
     });
-    it('Add Many attributes - success', done => {
+    it('Add Many categories - success', done => {
         this.timeout(10000);
 
-        const attributes = [
+        const categories = [
             {
                 id: secondId + 3000,
-                attribute: secondAttribute,
+                category: secondCategory,
                 groupNumber: oneGroupNumber,
                 description: secondDescription
             },
             {
                 id: secondId + 3001,
-                attribute: secondAttribute,
+                category: secondCategory,
                 groupNumber: oneGroupNumber,
                 description: secondDescription
             }
         ];
 
-        const urlStr = '/api/attributes';
+        const urlStr = '/api/categories';
         agent
             .post(urlStr)
             .send({
-                attributes: attributes
+                categories: categories
             })
             .then(function (res) {
                 console.log(res.body.message);
@@ -221,14 +225,14 @@ describe('CRUD attribute', function () {
             });
     });
 
-    it('Add a attribute - id exists', done => {
+    it('Add a category - id exists', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-att';
+        const urlStr = '/api/add-cat';
         agent
             .post(urlStr)
             .send({
                 id: oneId,
-                attribute: oneAttribute,
+                category: oneCategory,
                 groupNumber: oneGroupNumber,
                 description: oneDescription + ' repeat.'
             })
@@ -242,14 +246,14 @@ describe('CRUD attribute', function () {
                 throw err;
             });
     });
-    it('Add a attribute - Attribute cannot be empty.', done => {
+    it('Add a category - Category cannot be empty.', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-att';
+        const urlStr = '/api/add-cat';
         agent
             .post(urlStr)
             .send({
                 id: oneId,
-                attribute: '',
+                category: '',
                 groupNumber: oneGroupNumber,
                 description: oneDescription
             })
@@ -257,7 +261,7 @@ describe('CRUD attribute', function () {
                 console.log(res.body.message);
                 expect(res).to.have.status(400);
                 expect(res.body.success).to.be.false;
-                expect(res.body.message).include('Attribute cannot be empty');
+                expect(res.body.message).include('Category cannot be empty');
                 done();
             })
             .catch(function (err) {
@@ -265,14 +269,14 @@ describe('CRUD attribute', function () {
             });
     });
 
-    it('Edit a attribute - success', done => {
+    it('Edit a category - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-att';
+        const urlStr = '/api/edit-cat';
         agent
             .put(urlStr)
             .send({
                 id: oneId,
-                attribute: oneAttribute,
+                category: oneCategory,
                 groupNumber: oneGroupNumber,
                 description: secondDescription + 'edited'
             })
@@ -286,14 +290,14 @@ describe('CRUD attribute', function () {
                 throw err;
             });
     });
-    it('Edit a attribute - Attribute cannot be empty.', done => {
+    it('Edit a category - Category cannot be empty.', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-att';
+        const urlStr = '/api/edit-cat';
         agent
             .put(urlStr)
             .send({
                 id: oneId,
-                attribute: '',
+                category: '',
                 groupNumber: oneGroupNumber,
                 description: secondDescription + 'edited'
             })
@@ -307,14 +311,14 @@ describe('CRUD attribute', function () {
                 throw err;
             });
     });
-    it('Edit a attribute - Attribute does not exist', done => {
+    it('Edit a category - Category does not exist', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-att';
+        const urlStr = '/api/edit-cat';
         agent
             .put(urlStr)
             .send({
                 id: oneId,
-                attribute: 'Attribute does not exist',
+                category: 'Category does not exist',
                 groupNumber: oneGroupNumber,
                 description: secondDescription + 'edited'
             })
@@ -329,9 +333,9 @@ describe('CRUD attribute', function () {
             });
     });
 
-    it('Delete one attribute - success', done => {
+    it('Delete one category - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/att/' + oneId;
+        const urlStr = '/api/cat/' + oneId;
         agent
             .delete(urlStr)
             .then(function (res) {
@@ -345,9 +349,9 @@ describe('CRUD attribute', function () {
             });
     });
 
-    it('Delete one attribute - id does not exist', done => {
+    it('Delete one category - id does not exist', done => {
         this.timeout(10000);
-        const urlStr = '/api/att/' + '9988';
+        const urlStr = '/api/cat/' + '9988';
         agent
             .delete(urlStr)
             .then(function (res) {
@@ -360,5 +364,5 @@ describe('CRUD attribute', function () {
             });
     });
 
-    //FIXME: delete one attribute that used in workbook
+    //FIXME: delete one category that used in workbook
 });

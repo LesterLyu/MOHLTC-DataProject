@@ -10,6 +10,7 @@ router.post('/api/add-att', att_cat_controller.user_add_att);
 router.post('/api/attributes', att_cat_controller.user_add_atts);
 
 router.post('/api/add-cat', att_cat_controller.user_add_cat);
+router.post('/api/categories', att_cat_controller.user_add_cats);
 
 router.delete('/api/delete-cat', att_cat_controller.user_delete_cat);
 
@@ -17,6 +18,7 @@ router.delete('/api/delete-att', att_cat_controller.user_delete_att);
 
 // Delete a attribute
 router.delete('/api/att/:attributeId', att_cat_controller.user_delete_attribute);
+router.delete('/api/cat/:categoryId', att_cat_controller.user_delete_category);
 
 router.delete('/api/cats/delete', att_cat_controller.user_delete_cats);
 
@@ -25,11 +27,13 @@ router.delete('/api/atts/delete', att_cat_controller.user_delete_atts);
 router.get('/api/attributes', att_cat_controller.get_attributes);
 router.get('/api/attributes/similar/:queryPartialAttribute', att_cat_controller.get_similar_attributes);
 router.get('/api/attributes/:attributeId', att_cat_controller.get_one_attribute);
+router.get('/api/categories/similar/:queryPartialCategory', att_cat_controller.get_similar_categories);
 
 router.get('/api/categories', att_cat_controller.get_categories);
 router.get('/api/categories/:categoryId', att_cat_controller.get_one_category);
 
 router.put('/api/edit-att', att_cat_controller.user_edit_att);
+router.put('/api/edit-cat', att_cat_controller.user_edit_cat);
 
 // web pages
 router.get('/add-att-cat', (req, res, next) => {
