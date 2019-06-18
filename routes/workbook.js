@@ -27,6 +27,7 @@ router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 
 // GET Query user entered workbook data for your group.
 router.get('/api/query/workbook', workbookController.get_many_filledworkbooks_of_one_workbook);
+router.get('/api/query/workbooks', workbookController.get_all_filledworkbooks);
 
 // GET Find all filled workbooks in current group for a user
 router.get('/api/admin/workbooks', workbookController.admin_get_workbooks);
