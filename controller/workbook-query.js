@@ -8,7 +8,7 @@ const config = require('../config/config');
 const {gzip, ungzip} = require('node-gzip');
 const pako = require('pako');
 const ExcelWorkbook = require('./excel/workbook');
-const processQuery = require('./workers/processQueries');
+const {processQuery, processQueryS} = require('./workers/processQueries2');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(config.permissions.WORKBOOK_QUERY);

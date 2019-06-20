@@ -41,6 +41,8 @@
     "systeminformation": "^4.9.0",
     "tinycolor2": "^1.4.1",
     "tinytinycolor": "0.0.4",
+    "worker-threads-pool": "^2.0.0",
+    "workerpool": "^3.1.2",
     "xlsx": "^0.14.3",
     "xlsx-populate": "^1.19.1",
     "xml2js": "^0.4.19"

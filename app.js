@@ -76,6 +76,7 @@ const whitelist = [
 const corsOptions = {
     credentials: true,
     origin: function (origin, callback) {
+        return callback(null, true);
         if (!origin || whitelist.indexOf(origin) !== -1) {
             callback(null, true)
         } else {
