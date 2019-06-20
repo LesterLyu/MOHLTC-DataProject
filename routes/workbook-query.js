@@ -16,6 +16,8 @@ router.get('/api/query/workbook/names', workbookQueryController.get_workbook_nam
 
 router.get('/api/query/workbook/detail', workbookQueryController.get_workbook_query_detail);
 
+router.get('/api/query/workbook', workbookQueryController.get_many_filledworkbooks_of_one_workbook);
+
 // only internal use!!!
 router.post('/api/batch/signup', batch.multiSignUp);
 

@@ -8,6 +8,7 @@ const config = require('../config/config');
 const {gzip, ungzip} = require('node-gzip');
 const pako = require('pako');
 const ExcelWorkbook = require('./excel/workbook');
+const processQuery = require('./workers/processQueries');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(config.permissions.WORKBOOK_QUERY);
@@ -35,8 +36,7 @@ async function getDataAtLocation(includeAttCatId, onlyFilled, groupNumber, wbNam
         {name: 1, data: 1, attMap: 1, catMap: 1}).then((workbook) => {
         if (!workbook) {
             console.log('workbook not found.');
-        }
-        else {
+        } else {
             attMap = workbook.attMap;
             catMap = workbook.catMap;
             wbData = workbook.data;
@@ -85,8 +85,7 @@ async function getDataAtLocation(includeAttCatId, onlyFilled, groupNumber, wbNam
                         if (data !== null && typeof data === "object" && 'result' in data) {
                             data = data.result;
                         }
-                    }
-                    else {
+                    } else {
                         data = '';
                     }
                     if (includeAttCatId) {
@@ -96,8 +95,7 @@ async function getDataAtLocation(includeAttCatId, onlyFilled, groupNumber, wbNam
                             attId: attId,
                             data: data,
                         });
-                    }
-                    else {
+                    } else {
                         currCatAtt.push({
                             username: filledWorkbooks[i].username,
                             data: data,
@@ -139,7 +137,10 @@ module.exports = {
                 console.log(err);
                 return res.status(400).json({success: false, message: err});
             }
-            docs = docs.reduce((arr, obj) => {arr.push(obj.name); return arr;}, []);
+            docs = docs.reduce((arr, obj) => {
+                arr.push(obj.name);
+                return arr;
+            }, []);
             res.json({success: true, names: docs})
         })
     },
@@ -148,7 +149,7 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-        Workbook.findOne({name: req.query.name}, {data: 1, attMap: 1, catMap:1}, (err, doc) => {
+        Workbook.findOne({name: req.query.name}, {data: 1, attMap: 1, catMap: 1}, (err, doc) => {
             if (err) {
                 console.log(err);
                 return res.status(400).json({success: false, message: err});
@@ -168,6 +169,66 @@ module.exports = {
             }
             res.json({success: true, worksheetNames: names, cat: cat, att: att})
         })
+    },
+
+    get_many_filledworkbooks_of_one_workbook: (req, res) => {
+        const groupNumber = req.session.user.groupNumber;
+        const queryWorkbookName = req.query.workbookName;
+        const queryUsername = req.query.username ? req.query.username : undefined;
+        //  filter the content of body
+        const querySheetName = req.query.sheetName ? req.query.sheetName : '-1';
+        const queryCategoryId = req.query.catId ? req.query.catId : '-1';
+        const queryAttributeId = req.query.attId ? req.query.attId : '-1';
+
+        // Firstly retrieve the category map and attribute map from a template (unfilled workbook)
+        // Then based on these two map to get all value from sheets
+        // that are filled by the same template
+        Workbook.findOne({groupNumber: groupNumber, name: queryWorkbookName}, {
+            attMap: 1,
+            catMap: 1
+        }, (err, workbook) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            if (!workbook) {
+                return res.json({success: false, filledWorkbooks: null});
+            }
+
+            let attMap = workbook.attMap;
+            let catMap = workbook.catMap;
+            // const projects = {};
+
+            let query = {groupNumber: groupNumber, name: queryWorkbookName};
+            if (queryUsername != null) {
+                query.username = queryUsername;
+            }
+
+            FilledWorkbook.aggregate([
+                {$match: query},
+                {
+                    $project: {
+                        name: 1,
+                        username: 1,
+                        data: 1
+                    }
+                }
+            ]).exec((err, filledWorkbooks) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                Promise.all(filledWorkbooks.map(filledWorkbook => {
+                    return processQuery(attMap, catMap, queryWorkbookName, filledWorkbook.username, querySheetName,
+                        queryCategoryId, queryAttributeId, filledWorkbook.data);
+                })).then(arrays => {
+                    return res.json({success: true, filledWorkbooks: [].concat(...arrays)});
+                }).catch(err => {
+                    console.error(err);
+                    return res.status(500).json({success: false, message: err});
+                });
+            });
+        });
     },
 
 };
