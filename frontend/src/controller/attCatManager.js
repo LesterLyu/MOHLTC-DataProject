@@ -66,7 +66,7 @@ export default class AttCatManager {
           const atts = response.data.attributes;
           const res = [];
           for (let i = 0; i < atts.length; i++) {
-            res.push([atts[i].id, atts[i].attribute])
+            res.push([atts[i].id, atts[i].attribute, atts[i].description]);
           }
           return res;
 
@@ -81,7 +81,7 @@ export default class AttCatManager {
           const cats = response.data.categories;
           const res = [];
           for (let i = 0; i < cats.length; i++) {
-            res.push([cats[i].id, cats[i].category])
+            res.push([cats[i].id, cats[i].category, cats[i].description]);
           }
           return res;
         }

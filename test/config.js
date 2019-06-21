@@ -7,6 +7,7 @@ class config {
         // config.requester is a static variable
         if (!config.requester) {
             const app = require('../app');
+            config.agent = chai.request.agent(app);
             config.requester = chai.request(app).keepOpen();
         }
     }

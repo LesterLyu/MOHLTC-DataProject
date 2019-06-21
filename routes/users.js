@@ -9,6 +9,12 @@ let router = express.Router();
 
 passport.use(new LdapStrategy(config.OPTS));
 
+router.get('/api/check/email/:email', user_controller.check_email);
+router.get('/api/check/username/:username', user_controller.check_username);
+// Query the current user logged in.
+router.get('/api/users/current', user_controller.get_current_logged_in_user);
+
+
 router.get('/login', function (req, res) {
     if (req.isAuthenticated()) {
         return res.redirect('/profile');
@@ -29,10 +35,8 @@ router.get('/api/isloggedin', function (req, res) {
 
 router.get('/api/organization_details', user_controller.getOrganizationDetails);
 
-router.get('/api/check/email/:email', user_controller.check_email);
-router.get('/api/check/username/:username', user_controller.check_username);
-
 // POST request for user sign up from ldap server
+
 router.post('/api/signup', registration_ldap_controller.user_ldap_signup);
 // POST request for user sign up locally
 router.post('/api/signup/local', registration_local_controller.user_sign_up_local);
@@ -77,6 +81,11 @@ router.use((req, res, next) => {
         next();
     }
 });
+
+// Update a user's status. Used to disable or enable an account.
+router.get('/api/users/:username/check-active/', user_controller.check_user_active);
+// Update a user's status. Used to disable or enable an account.
+router.put('/api/users/:username/active/', user_controller.edit_user_active);
 
 // GET log out current account
 router.get('/api/logout', user_controller.user_log_out);

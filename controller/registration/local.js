@@ -56,6 +56,7 @@ module.exports = {
                     lastName: req.body.lastName,
                     groupNumber: req.body.groupNumber,
                     phoneNumber: req.body.phoneNumber,
+                    permissions: req.body.permissions,
                     validated: false,
                     type: 2, // system admin=0, form manager=1, user=2
                     email: req.body.email,

@@ -1,3 +1,5 @@
+const Attribute = require('../models/attribute');
+const Category = require('../models/category');
 const Workbook = require('../models/workbook');
 const FilledWorkbook = require('../models/filledWorkbook');
 const error = require('../config/error');
@@ -24,7 +26,7 @@ module.exports = {
                 return res.status(500).json({success: false, message: err});
             }
             if (!workbook) {
-                return res.status(400).json({success: false, message: 'Workbook does not exist.'});
+                return res.status(200).json({success: true, message: 'Workbook does not exist.'});
             }
             return res.json({success: true, workbook: workbook});
         })
@@ -50,8 +52,7 @@ module.exports = {
                 }
                 if (!filledWorkbook) {
                     return res.json({success: true, workbook: workbook});
-                }
-                else {
+                } else {
                     workbook.data = filledWorkbook.data;
                     return res.json({success: true, workbook: workbook});
                 }
@@ -83,8 +84,7 @@ module.exports = {
                     }
                     return res.json({success: true, message: 'Successfully updated filled workbook ' + name + '.'})
                 });
-            }
-            else {
+            } else {
                 // create a filled workbook
                 let newFilledWorkbook = new FilledWorkbook({
                     name: name,
@@ -236,8 +236,7 @@ module.exports = {
             }
             if (!workbook) {
                 return res.status(500).json({success: false, message: 'Workbook not found.'});
-            }
-            else {
+            } else {
                 // update it
                 workbook.name = name;
                 workbook.data = data;
@@ -297,8 +296,7 @@ module.exports = {
                                     message: 'Successfully added filled workbook ' + workbookName + '.'
                                 });
                             })
-                        }
-                        else {
+                        } else {
                             // TO-DO check integrity
                             workbook.data = data;
                             workbook.save((err, updated) => {
@@ -438,8 +436,7 @@ module.exports = {
                         }
                         if (!filledWorkbook) {
                             workbookData = workbook.data;
-                        }
-                        else {
+                        } else {
                             // found filled workbook
                             workbookData = filledWorkbook.data;
                         }
@@ -459,6 +456,12 @@ module.exports = {
 
 // GET Query user entered workbook data for your group.
     get_many_filledworkbooks_of_one_workbook: (req, res) => {
+        // validation
+        if(req.query.workbookName == null || req.query.workbookName.trim().length <= 1){
+            const msgStr = 'workbook name can not be empty.';
+            return res.status(400).json({success: true, message: msgStr, filledWorkbooks: null});
+        }
+
         const groupNumber = req.session.user.groupNumber;
         const queryWorkbookName = req.query.workbookName;
         const queryUsername = req.query.username ? req.query.username : '';
@@ -466,6 +469,7 @@ module.exports = {
         const querySheetName = req.query.sheetName ? req.query.sheetName : '-1';
         const queryCategoryId = req.query.catId ? req.query.catId : '-1';
         const queryAttributeId = req.query.attId ? req.query.attId : '-1';
+
 
         // Firstly retrieve the category map and attribute map from a template (unfilled workbook)
         // Then based on these two map to get all value from sheets
@@ -475,18 +479,18 @@ module.exports = {
             catMap: 1
         }, (err, workbook) => {
             if (err) {
-                console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
             if(!workbook){
-                return res.json({success: false, filledWorkbooks: null});
+                const msgStr = queryWorkbookName + 'does not exist.';
+                return res.status(200).json({success: true, message: msgStr, filledWorkbooks: null});
             }
 
             // retrieve data from all filledWordbooks
             let attMap = workbook.attMap;
             let catMap = workbook.catMap;
-
-            let query = {groupNumber: groupNumber, name: queryWorkbookName};
+            const regex = new RegExp(queryWorkbookName.substring(0, queryWorkbookName.length-5), "i");
+            let query = {groupNumber: groupNumber, name: regex};  // name includes queryWorkbookName
             if (queryUsername !== '') {
                 query.username = queryUsername;
             }
@@ -540,5 +544,6 @@ module.exports = {
             });
         });
     },
-}
-;
+
+
+};

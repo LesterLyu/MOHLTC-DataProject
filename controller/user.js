@@ -83,6 +83,79 @@ module.exports = {
             return res.json({success: true, profile: user});
         });
     },
+    // Query the current user logged in.
+    get_current_logged_in_user: (req, res) => {
+        if (!req.session.user) {
+            return res.json({success: true, user: null});
+        }
+        const username = req.session.user.username;
+        getUser(username, (err, user) => {
+            if (err) {
+                return res.status(500).json({success: false, user: null, message: err});
+            }
+            if (user) {
+                return res.json({success: true, user: user});
+            } else {
+                return res.json({success: true, user: null});
+            }
+        });
+    },
+
+    check_user_active: (req, res) => {
+        if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+
+        const checkingUsername = req.params.username;
+        User.findOne({username: checkingUsername}, (err, dbUser) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+
+            if (dbUser) {
+                const messageStr = dbUser.username + ' now is ' + dbUser.active;
+                return res.json({
+                    success: true,
+                    message: messageStr,
+                })
+            } else {
+                return res.status(400).json({success: false, message: checkingUsername + ' does not exist.'});
+            }
+        });
+    },
+
+    edit_user_active: (req, res) => {
+        if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+
+        const updatingUsername = req.params.username;
+        const updatingActive = req.body.active;
+        User.findOne({username: updatingUsername}, (err, dbUser) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+
+            if (dbUser) {
+                dbUser.active = updatingActive;
+                dbUser.save((err, updatedUser) => {
+                    if (err) {
+                        return res.status(500).json({success: false, message: err});
+                    }
+                    return res.json({
+                        success: true,
+                        message: updatedUser.username + ' now is ' + updatedUser.active
+                    })
+                });
+
+            } else {
+                return res.status(400).json({success: false, message: updatingUsername + ' does not exist.'});
+            }
+
+        });
+    },
 
     change_password: (req, res, next) => {
         var oldPassword = req.body.oldPassword;
@@ -113,26 +186,25 @@ module.exports = {
     },
 
 
-
     update_user_info: (req, res, next) => {
-        User.findOne({username:  req.body.username}, (err, user) => {
+        User.findOne({username: req.body.username}, (err, user) => {
             if (err) {
                 console.log(err);
                 return res.json({success: false, message: err});
             }
             if (user) {
                 if (user._id === req.session.user._id) {
-                    user.username=req.body.username;
-                    user.firstName=req.body.firstName;
-                    user.lastName=req.body.lastName;
-                    user.email=req.body.email;
-                    user.phoneNumber=req.body.phoneNumber;
-                    user.save((err,user2)=> {
+                    user.username = req.body.username;
+                    user.firstName = req.body.firstName;
+                    user.lastName = req.body.lastName;
+                    user.email = req.body.email;
+                    user.phoneNumber = req.body.phoneNumber;
+                    user.save((err, user2) => {
                         if (err) {
                             console.log(err);
                             return res.status(400).json({success: false, message: err});
                         }
-                        req.login(user2, function(err) {
+                        req.login(user2, function (err) {
                             if (err) {
                                 console.log(err);
                                 return res.json({success: false, message: err});
@@ -145,22 +217,22 @@ module.exports = {
                     return res.json({success: false, message: "Username has existed!"});
                 }
             } else {
-                User.findOne({_id:req.session.user._id}, (err, user) => {
+                User.findOne({_id: req.session.user._id}, (err, user) => {
                     if (err) {
                         console.log(err);
                         return res.json({success: false, message: err});
                     }
-                    user.username=req.body.username;
-                    user.firstName=req.body.firstName;
-                    user.lastName=req.body.lastName;
-                    user.email=req.body.email;
-                    user.phoneNumber=req.body.phoneNumber;
-                    user.save((err,user2)=> {
+                    user.username = req.body.username;
+                    user.firstName = req.body.firstName;
+                    user.lastName = req.body.lastName;
+                    user.email = req.body.email;
+                    user.phoneNumber = req.body.phoneNumber;
+                    user.save((err, user2) => {
                         if (err) {
                             console.log(err);
                             return res.status(400).json({success: false, message: err});
                         }
-                        req.login(user2, function(err) {
+                        req.login(user2, function (err) {
                             if (err) {
                                 console.log(err);
                                 return res.json({success: false, message: err});
@@ -176,10 +248,10 @@ module.exports = {
 
 
     logout: (req) => {
-            req.logout();
-            // clear user info in the session
-            req.session.user = {};
-        },
+        req.logout();
+        // clear user info in the session
+        req.session.user = {};
+    },
 
     getOrganizationDetails: (req, res, next) => {
         Organization.find({}, (err, organizations) => {
@@ -213,7 +285,7 @@ module.exports = {
                 if (!isEmail(req.body.email)) {
                     return res.status(400).json({success: false, message: 'Email format error.'});
                 }
-                if (! schema.validate(req.body.password)) {
+                if (!schema.validate(req.body.password)) {
                     return res.status(400).json({success: false, message: 'Password is not valid.'});
                 }
                 console.log(req.body.phoneNumber);
@@ -259,15 +331,15 @@ module.exports = {
                     if (err) {
                         return next(err);
                     }
-                  //  Organization.find({}, (err, organization) => {
-                 //       console.log(organization);
-                 //       for (var i = 0; i < organization.length; i++) {
-                 //           config.organizations[organization[i].name] = organization[i].groupNumber;
-                 //           if (organization[i].groupNumber > config.maxGroupNumber) {
-               //                 config.maxGroupNumber = organization[i].groupNumber;
-              //              }
-             //           }
-             //       });
+                    //  Organization.find({}, (err, organization) => {
+                    //       console.log(organization);
+                    //       for (var i = 0; i < organization.length; i++) {
+                    //           config.organizations[organization[i].name] = organization[i].groupNumber;
+                    //           if (organization[i].groupNumber > config.maxGroupNumber) {
+                    //                 config.maxGroupNumber = organization[i].groupNumber;
+                    //              }
+                    //           }
+                    //       });
                     // set user info in the session
                     req.session.user = user;
                     let redirectUrl = '/profile';
@@ -294,19 +366,22 @@ module.exports = {
     user_reset_password: (req, res, next) => {
         var username = req.body.username;
         var email = req.body.email;
-      User.findOne({username: username}, (err, user) => {
-          if (err) {
-              return res.status(400).json({success: false, message: err});
-          }else if (user) {
-              if (user.email == email) {
-                  return res.json({success: true, message: "An email has been sent to your email, please reset your password in email!"});
-              } else {
-                  return res.json({success: false, message: "Email address does not match!"});
-              }
-          } else {
-              return res.json({success: false, message: "Username does not exist!"});
-          }
-      });
+        User.findOne({username: username}, (err, user) => {
+            if (err) {
+                return res.status(400).json({success: false, message: err});
+            } else if (user) {
+                if (user.email == email) {
+                    return res.json({
+                        success: true,
+                        message: "An email has been sent to your email, please reset your password in email!"
+                    });
+                } else {
+                    return res.json({success: false, message: "Email address does not match!"});
+                }
+            } else {
+                return res.json({success: false, message: "Username does not exist!"});
+            }
+        });
     },
 
     user_send_reset_email: (req, res, next) => {
@@ -342,12 +417,12 @@ module.exports = {
                     console.log(err);
                     return res.status(400).json({success: false, message: err});
                 }
-                user.save(function(err){
-                        if (err) {
-                            return res.status(400).json({success: false, message: err});
-                        }
-                        req.session.user = user;
-                })
+                user.save(function (err) {
+                    if (err) {
+                        return res.status(400).json({success: false, message: err});
+                    }
+                    req.session.user = user;
+                });
 
                 console.log(req.session);
                 return res.json({success: true, message: "The password has been changed"});
@@ -367,8 +442,7 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             return next(err);
-                        }
-                        else {
+                        } else {
                             req.session.user = user;
                             return res.redirect('/reset-password-link');
                         }
@@ -387,8 +461,7 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             return next(err);
-                        }
-                        else {
+                        } else {
                             user.validated = true;
                             user.save((err, updatedUser) => {
                                 if (err) {
