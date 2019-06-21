@@ -80,6 +80,7 @@ module.exports = {
         const attributes = req.body.attributes;
         const groupNumber = req.session.user.groupNumber;
         // save multiple documents to the collection
+        // FIXME: when an record is duplicate, all records can not insert
         Attribute.insertMany(attributes, function (err, docs) {
             let message = '';
             if (err) {

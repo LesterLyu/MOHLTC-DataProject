@@ -3,6 +3,7 @@ const expect = chai.expect;
 
 const {agent} = require('../config');
 const Attribute = require('../../models/attribute');
+
 const User = require('../../models/user');
 
 describe('CRUD workbook', function () {

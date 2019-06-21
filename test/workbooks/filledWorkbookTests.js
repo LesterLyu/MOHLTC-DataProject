@@ -15,6 +15,8 @@ describe('CRUD filled workbook', function () {
     const secondAttribute = 'id-300003';
     const secondDescription = 'description: id-300003';
 
+    const oneFileName = 'HOSPQ_2018_Q3_HOSP_981_Chatham-KentHealthAlliance_LHIN1.xlsx';
+
     before(done => {
         User.remove({}, () => {
         });
@@ -118,8 +120,7 @@ describe('CRUD filled workbook', function () {
 
     it('Get filled workbooks by filename - success', done => {
         this.timeout(10000);
-        const fileName = '2018-19 CAPS LHIN Managed BLANK V1.xlsx';
-        const urlStr = '/api/query/workbook?workbookName=' + fileName;
+        const urlStr = '/api/query/workbook?workbookName=' + oneFileName;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -135,8 +136,8 @@ describe('CRUD filled workbook', function () {
 
     it('Get special filled workbooks by filename and attribute id - success', done => {
         this.timeout(10000);
-        const fileName = '2018-19 CAPS LHIN Managed BLANK V1.xlsx';
-        const conditionStr = '&attId=100041840&catId=100640208';
+        const fileName = oneFileName;
+        const conditionStr = '&attId=100049523&catId=100722810';
         const urlStr = '/api/query/workbook?workbookName=' + fileName + conditionStr;
         agent
             .get(urlStr)
@@ -152,6 +153,24 @@ describe('CRUD filled workbook', function () {
             });
     });
 
+    it('Get special filled workbooks by attribute string - success', done => {
+        this.timeout(10000);
+        const categoryStr = 'LHIN Global Allocation';
+        const attributeStr = '2018-19 YE Forecast';
+        const urlStr = '/api/query/workbooks?category=' + categoryStr +'&attribute=' + attributeStr;
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                console.log(res.body);
+                expect(res.body.success).to.be.true;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
 
 
 
@@ -159,3 +178,13 @@ describe('CRUD filled workbook', function () {
 
     //FIXME: delete one attribute that used in workbook
 });
+
+/*
+use dataproject
+db.getCollection('categories').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['categories'].insert(d); });
+db.getCollection('attributes').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['attributes'].insert(d); });
+db.getCollection('workbooks').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['workbooks'].insert(d); });
+db.getCollection('fillerworkbooks').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['fillerworkbooks'].insert(d); });
+
+ db.getCollection('attributes').find({"description" :  {$regex : ".*HOSPQ_2018_Q3_HOSP_981_Chatham-KentHealt.*"}})
+* */
