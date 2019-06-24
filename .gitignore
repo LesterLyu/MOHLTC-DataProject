@@ -6,6 +6,4 @@ build/
 .vs/
 .vscode/
 mochawesome-report/
-
-
-frontend/dist/webpack-report.html
+frontend/dist/
