@@ -25,6 +25,7 @@ router.delete('/api/cats/delete', att_cat_controller.user_delete_cats);
 router.delete('/api/atts/delete', att_cat_controller.user_delete_atts);
 
 router.get('/api/attributes', att_cat_controller.get_attributes);
+
 router.get('/api/categories', att_cat_controller.get_categories);
 
 // FIXME: use one api to enable sorting, filtering and pagination capabilities
