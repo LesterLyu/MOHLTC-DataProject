@@ -55,7 +55,7 @@ describe('CRUD attribute', function () {
                         expect(res.body.success).to.be.true;
                         // add one attribute
                         agent
-                            .post('/api/add-att')
+                            .post('/api/attribute')
                             .send({
                                 id: oneId,
                                 attribute: oneAttribute,
@@ -167,7 +167,7 @@ describe('CRUD attribute', function () {
 
     it('Add a attribute - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-att';
+        const urlStr = '/api/attribute';
         agent
             .post(urlStr)
             .send({
@@ -223,7 +223,7 @@ describe('CRUD attribute', function () {
 
     it('Add a attribute - id exists', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-att';
+        const urlStr = '/api/attribute';
         agent
             .post(urlStr)
             .send({
@@ -244,7 +244,7 @@ describe('CRUD attribute', function () {
     });
     it('Add a attribute - Attribute cannot be empty.', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-att';
+        const urlStr = '/api/attribute';
         agent
             .post(urlStr)
             .send({
@@ -267,7 +267,7 @@ describe('CRUD attribute', function () {
 
     it('Edit a attribute - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-att';
+        const urlStr = '/api/attribute';
         agent
             .put(urlStr)
             .send({
@@ -288,7 +288,7 @@ describe('CRUD attribute', function () {
     });
     it('Edit a attribute - Attribute cannot be empty.', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-att';
+        const urlStr = '/api/attribute';
         agent
             .put(urlStr)
             .send({
@@ -309,7 +309,7 @@ describe('CRUD attribute', function () {
     });
     it('Edit a attribute - Attribute does not exist', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-att';
+        const urlStr = '/api/attribute';
         agent
             .put(urlStr)
             .send({
@@ -331,7 +331,7 @@ describe('CRUD attribute', function () {
 
     it('Delete one attribute - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/att/' + oneId;
+        const urlStr = '/api/attribute/' + oneId;
         agent
             .delete(urlStr)
             .then(function (res) {
@@ -347,7 +347,7 @@ describe('CRUD attribute', function () {
 
     it('Delete one attribute - id does not exist', done => {
         this.timeout(10000);
-        const urlStr = '/api/att/' + '9988';
+        const urlStr = '/api/attribute/' + '9988';
         agent
             .delete(urlStr)
             .then(function (res) {

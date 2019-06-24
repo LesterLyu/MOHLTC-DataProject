@@ -59,7 +59,7 @@ describe('CRUD category', function () {
                         expect(res.body.success).to.be.true;
                         // add one category
                         agent
-                            .post('/api/add-cat')
+                            .post('/api/category')
                             .send({
                                 id: oneId,
                                 category: oneCategory,
@@ -171,7 +171,7 @@ describe('CRUD category', function () {
 
     it('Add a category - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-cat';
+        const urlStr = '/api/category';
         agent
             .post(urlStr)
             .send({
@@ -227,7 +227,7 @@ describe('CRUD category', function () {
 
     it('Add a category - id exists', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-cat';
+        const urlStr = '/api/category';
         agent
             .post(urlStr)
             .send({
@@ -248,7 +248,7 @@ describe('CRUD category', function () {
     });
     it('Add a category - Category cannot be empty.', done => {
         this.timeout(10000);
-        const urlStr = '/api/add-cat';
+        const urlStr = '/api/category';
         agent
             .post(urlStr)
             .send({
@@ -271,7 +271,7 @@ describe('CRUD category', function () {
 
     it('Edit a category - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-cat';
+        const urlStr = '/api/category';
         agent
             .put(urlStr)
             .send({
@@ -292,7 +292,7 @@ describe('CRUD category', function () {
     });
     it('Edit a category - Category cannot be empty.', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-cat';
+        const urlStr = '/api/category';
         agent
             .put(urlStr)
             .send({
@@ -313,7 +313,7 @@ describe('CRUD category', function () {
     });
     it('Edit a category - Category does not exist', done => {
         this.timeout(10000);
-        const urlStr = '/api/edit-cat';
+        const urlStr = '/api/category';
         agent
             .put(urlStr)
             .send({
@@ -335,7 +335,7 @@ describe('CRUD category', function () {
 
     it('Delete one category - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/cat/' + oneId;
+        const urlStr = '/api/category/' + oneId;
         agent
             .delete(urlStr)
             .then(function (res) {
@@ -351,7 +351,7 @@ describe('CRUD category', function () {
 
     it('Delete one category - id does not exist', done => {
         this.timeout(10000);
-        const urlStr = '/api/cat/' + '9988';
+        const urlStr = '/api/category/' + '9988';
         agent
             .delete(urlStr)
             .then(function (res) {

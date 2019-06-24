@@ -1,6 +1,6 @@
 # Delete a attribute
 
-**URL** : `/api/att/:attributeId`
+**URL** : `/api/attribute/:attributeId`
 
 **Method** : `DELETE`
 
