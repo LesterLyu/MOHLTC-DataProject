@@ -3,7 +3,7 @@ $("#categoryForm").submit(function(e) {
     hideAlert();
     hideErrorAlert();
     $.ajax({
-        url: '/api/category',
+        url: '/api/add-cat',
         type: 'POST',
         data: $('#categoryForm').serialize(),
     }).done(function (response) {
@@ -22,7 +22,7 @@ $("#attributeForm").submit(function(e) {
     hideAlert();
     hideErrorAlert();
     $.ajax({
-        url: '/api/attribute',
+        url: '/api/add-att',
         type: 'POST',
         data: $('#attributeForm').serialize(),
     }).done(function (response) {

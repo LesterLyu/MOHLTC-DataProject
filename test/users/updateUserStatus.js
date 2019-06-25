@@ -74,7 +74,7 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
 
     it("Check a user's status: active - true ", done => {
         this.timeout(10000);
-        const urlStr = '/api/users/' + secondUsername + '/check-active/';
+        const urlStr = '/api/users/' + secondUsername + '/active/';
         agent
             .get(urlStr)
             .then(function(res) {
