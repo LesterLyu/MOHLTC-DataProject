@@ -6,7 +6,7 @@ const Attribute = require('../../models/attribute');
 
 const User = require('../../models/user');
 
-describe('CRUD workbook', function () {
+describe.skip('CRUD workbook', function () {
     const oneId = 300001;
     const oneAttribute = 'id-300001';
     const oneGroupNumber = 1;

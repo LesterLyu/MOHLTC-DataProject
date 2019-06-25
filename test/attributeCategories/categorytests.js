@@ -5,7 +5,7 @@ const {agent} = require('../config');
 const Category = require('../../models/category');
 const User = require('../../models/user');
 
-describe('CRUD category', function () {
+describe.skip('CRUD category', function () {
     const oneId = 600001;
     const oneCategory = 'id-600001';
     const oneGroupNumber = 1;

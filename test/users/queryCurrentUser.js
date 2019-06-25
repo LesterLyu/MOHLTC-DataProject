@@ -5,7 +5,7 @@ const {agent, requester} = require('../config');
 
 const User = require('../../models/user');
 
-describe('Query the current user logged in.', function() {
+describe.skip('Query the current user logged in.', function() {
     const oneUsername = 'lester';
     const oneEmail = 'lester@mail.com';
     const onePassword = 'lester';
