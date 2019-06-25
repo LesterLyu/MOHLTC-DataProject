@@ -26,7 +26,7 @@ module.exports = {
                 return res.status(500).json({success: false, message: err});
             }
             if (!workbook) {
-                return res.status(200).json({success: true, message: 'Workbook does not exist.'});
+                return res.status(400).json({success: false, message: 'Workbook does not exist.'});
             }
             return res.json({success: true, workbook: workbook});
         })
@@ -452,9 +452,7 @@ module.exports = {
         );
 
     }
-    ,
 
 
-
-
-};
+}
+;
