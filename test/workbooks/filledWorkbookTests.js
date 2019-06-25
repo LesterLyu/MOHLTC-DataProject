@@ -153,11 +153,31 @@ describe('CRUD filled workbook', function () {
             });
     });
 
-    it('Get special filled workbooks by attribute string - success', done => {
+    it('Get special filled workbooks by attribute and category - success', done => {
         this.timeout(10000);
         const categoryStr = 'LHIN Global Allocation';
-        const attributeStr = '2018-19 YE Forecast';
+        const attributeStr = '2018-19 Annual Budget';
         const urlStr = '/api/query/workbooks?category=' + categoryStr +'&attribute=' + attributeStr;
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                console.log(res.body);
+                expect(res.body.success).to.be.true;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
+    it('Get special filled workbooks only by attribute string - success', done => {
+        this.timeout(2000);
+        console.log()
+        const categoryStr = '';
+        const attributeStr = '2018-19 Annual Budget';
+        const urlStr = '/api/query/workbooks?category=' + categoryStr +'&attribute=' + attributeStr;
+        console.log("search attribute:  " + attributeStr);
         agent
             .get(urlStr)
             .then(function (res) {
@@ -180,7 +200,9 @@ describe('CRUD filled workbook', function () {
 });
 
 /*
-use dataproject
+use dataproject;
+db.getCollection('attributes').remove({});
+db.getCollection('categories').remove({})
 db.getCollection('categories').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['categories'].insert(d); });
 db.getCollection('attributes').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['attributes'].insert(d); });
 db.getCollection('workbooks').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['workbooks'].insert(d); });
