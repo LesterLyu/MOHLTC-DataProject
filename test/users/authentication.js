@@ -7,7 +7,7 @@ const requester = config.requester;
 
 const User = require('../../models/user');
 
-describe.skip('Local Authentication', function () {
+describe('Local Authentication', function () {
     before((done) => {
         // remove all users
         User.remove({}, () => {
