@@ -279,11 +279,12 @@ module.exports = {
             for (let key in allAttributes) {
                 attributeMap.set(allAttributes[key].id, allAttributes[key].attribute);
             }
-
-            let regex = new RegExp(req.query.attribute, "i");
-            const attributes = await Attribute.find({attribute: regex});
+            var regex = new RegExp(req.query.attribute, "i");
+            const attributes = allAttributes.filter(a =>
+                regex.test(a.attribute));
             regex = new RegExp(req.query.category, "i");
-            const categories = await Category.find({category: regex});
+            const categories = allCategories.filter(a =>
+                regex.test(a.category));
             if (!attributes || !categories) {
                 return res.status(404).json({success: false, message: 'no category or attribute found'});
             }
