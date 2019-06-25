@@ -5,7 +5,7 @@ const {agent} = require('../config');
 const Attribute = require('../../models/attribute');
 const User = require('../../models/user');
 
-describe('CRUD filled workbook', function () {
+describe.skip('CRUD filled workbook', function () {
     const oneId = 300001;
     const oneAttribute = 'id-300001';
     const oneGroupNumber = 1;
