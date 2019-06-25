@@ -269,8 +269,21 @@ module.exports = {
                 return res.status(400).json({success: false, message: 'category and attribute can not be empty.'});
             }
 
-            const attributes = await Attribute.find({attribute: req.query.attribute});
-            const categories = await Category.find({category: req.query.category});
+            const allCategories = await Category.find({});
+            const allAttributes = await Attribute.find({});
+            const categoryMap = new Map();
+            for (let key in allCategories) {
+                categoryMap.set(allCategories[key].id, allCategories[key].category);
+            }
+            const attributeMap = new Map();
+            for (let key in allAttributes) {
+                attributeMap.set(allAttributes[key].id, allAttributes[key].attribute);
+            }
+
+            let regex = new RegExp(req.query.attribute, "i");
+            const attributes = await Attribute.find({attribute: regex});
+            regex = new RegExp(req.query.category, "i");
+            const categories = await Category.find({category: regex});
             if (!attributes || !categories) {
                 return res.status(404).json({success: false, message: 'no category or attribute found'});
             }
@@ -332,16 +345,22 @@ module.exports = {
                                 // Retrieve data
                                 for (const c in colsIndex) {           // Column
                                     const categoryId = firstCellInRow;
+                                    const categoryName = categoryMap.get(categoryId);
                                     const attributeId = firstRow[colsIndex[c]];
-                                    result.push({
-                                        username,
-                                        workbookname: filename,
-                                        sheetname: sheetKey,
-                                        // FIXME: REMOVE  -- TAG for debugging
-                                        category: categoryId + '--' + rowIndex,
-                                        attribute: attributeId + '--' + colsIndex[c],
-                                        value: rowLine[colsIndex[c]]
-                                    });
+                                    const attributeName = attributeMap.get(attributeId);
+                                    const cellDataValue = rowLine[colsIndex[c]];
+                                    if (cellDataValue) {
+                                        result.push({
+                                            value: cellDataValue,
+                                            // FIXME: REMOVE  -- TAG for debugging
+                                            category: categoryId + '--' + rowIndex + " :: " + categoryName,
+                                            attribute: attributeId + '--' + colsIndex[c] + " :: " + attributeName,
+                                            username,
+                                            workbookname: filename,
+                                            sheetname: sheetKey,
+                                        });
+                                    }
+
                                 } // end of column
                             }
                         } // end of for loop --CatIds
@@ -354,8 +373,8 @@ module.exports = {
             }
             return res.status(200).json({
                 success: true,
+                message: result.length + ' records found.',
                 data: result,
-                message: 'data found.'
             });
 
         } catch (err) {
