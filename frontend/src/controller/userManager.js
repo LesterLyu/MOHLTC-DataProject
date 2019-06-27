@@ -20,6 +20,27 @@ class UserManager {
   }
 
   /**
+   * Check if the user is registered by username
+   */
+  checkUsername(username) {
+    const urlStr = config.server + '/api/check/username/' + username;
+    return axios.get(urlStr, {withCredentials: true})
+      .then((response => {
+        return response;
+      }))
+  }
+
+  /**
+   * Check if the user is registered by email.
+   */
+  checkEmail(email) {
+    const urlStr = config.server + '/api/check/email/' + email;
+    return axios.get(urlStr, {withCredentials: true})
+      .then((response => {
+        return response;
+      }))
+  }
+  /**
    * Check if the user is logged in, result will go to call back function.
    * Available to use right after the web page refreshes, to check if there is a user logged in.
    */

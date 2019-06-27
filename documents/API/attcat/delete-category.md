@@ -1,6 +1,6 @@
 # Delete a category
 
-**URL** : `/api/cat/:categoryId`
+**URL** : `/api/category/:categoryId`
 
 **Method** : `DELETE`
 

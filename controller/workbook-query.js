@@ -3,6 +3,8 @@ const async = require("async");
 const User = require('../models/user');
 const Workbook = require('../models/workbook');
 const FilledWorkbook = require('../models/filledWorkbook');
+const Attribute = require('../models/attribute');
+const Category = require('../models/category');
 const error = require('../config/error');
 const config = require('../config/config');
 const {gzip, ungzip} = require('node-gzip');
@@ -137,10 +139,7 @@ module.exports = {
                 console.log(err);
                 return res.status(400).json({success: false, message: err});
             }
-            docs = docs.reduce((arr, obj) => {
-                arr.push(obj.name);
-                return arr;
-            }, []);
+            docs = docs.reduce((arr, obj) => {arr.push(obj.name); return arr;}, []);
             res.json({success: true, names: docs})
         })
     },
@@ -171,7 +170,7 @@ module.exports = {
         })
     },
 
-    get_many_filledworkbooks_of_one_workbook: (req, res) => {
+    get_many_filledworkbooks_of_one_workbook_multi_threading: (req, res) => {
         const groupNumber = req.session.user.groupNumber;
         const queryWorkbookName = req.query.workbookName;
         const queryUsername = req.query.username ? req.query.username : undefined;
@@ -230,6 +229,217 @@ module.exports = {
                 });
             });
         });
+    },
+
+    // GET Query user filled workbook data by the name of a workbook and the Id of attribute, category.
+    get_many_filledworkbooks_of_one_workbook: (req, res) => {
+        // validation
+        if (req.query.workbookName == null || req.query.workbookName.trim().length <= 1) {
+            const msgStr = 'workbook name can not be empty.';
+            return res.status(400).json({success: true, message: msgStr, filledWorkbooks: null});
+        }
+
+        const groupNumber = req.session.user.groupNumber;
+        const queryWorkbookName = req.query.workbookName;
+        const queryUsername = req.query.username ? req.query.username : '';
+        //  filter the content of body
+        const querySheetName = req.query.sheetName ? req.query.sheetName : '-1';
+        const queryCategoryId = req.query.catId ? req.query.catId : '-1';
+        const queryAttributeId = req.query.attId ? req.query.attId : '-1';
+
+
+        // Firstly retrieve the category map and attribute map from a template (unfilled workbook)
+        // Then based on these two map to get all value from sheets
+        // that are filled by the same template
+        Workbook.findOne({groupNumber: groupNumber, name: queryWorkbookName}, {
+            attMap: 1,
+            catMap: 1
+        }, (err, workbook) => {
+            if (err) {
+                return res.status(500).json({success: false, message: err});
+            }
+            if (!workbook) {
+                const msgStr = queryWorkbookName + 'does not exist.';
+                return res.status(200).json({success: true, message: msgStr, filledWorkbooks: null});
+            }
+
+            // retrieve data from all filledWordbooks
+            let attMap = workbook.attMap;
+            let catMap = workbook.catMap;
+            const regex = new RegExp(queryWorkbookName.substring(0, queryWorkbookName.length - 5), "i");
+            let query = {groupNumber: groupNumber, name: regex};  // name includes queryWorkbookName
+            if (queryUsername !== '') {
+                query.username = queryUsername;
+            }
+
+            let projection = {
+                name: 1,
+                username: 1,
+                data: 1
+            };
+            FilledWorkbook.find(query, projection, (err, filledWorkbooks) => {
+                if (err) {
+                    console.log(err);
+                    return res.status(500).json({success: false, message: err});
+                }
+                let result = [];
+                for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
+                    const file = filledWorkbooks[indexOfDoc];
+                    const filename = file.name;
+                    const username = file.username;
+                    const data = file.data;
+
+                    // FIXME: sheetname can not get from database
+
+                    for (let sheetKey in catMap) {                                           // sheet
+                        for (let catKey in catMap[sheetKey]) {                                               // row
+                            if (queryCategoryId !== '-1' && queryCategoryId !== '' && queryCategoryId !== catKey) {
+                                continue;
+                            }
+                            for (let attKey in attMap[sheetKey]) {                                      // col
+                                if (queryAttributeId !== '-1' && queryAttributeId !== '' && queryAttributeId !== attKey) {
+                                    continue;
+                                }
+
+                                const rowIndex = catMap[sheetKey][catKey];
+                                const colIndex = attMap[sheetKey][attKey];
+                                const value = data[sheetKey][rowIndex][colIndex];
+
+                                result.push({
+                                    username,
+                                    // workbookname: filename,
+                                    sheetKey,
+                                    catKey,
+                                    attKey,
+                                    value
+                                });
+                            }
+                        }
+                    }
+                }
+                return res.json({success: true, filledWorkbooks: result});
+            });
+        });
+    },
+    // GET Query filled workbook data by the name of attribute and category.
+    get_many_filledWorkbooks_by_attributeName_categoryName: async (req, res) => {
+        try {
+            if (!req.query.attribute && !req.query.category) {
+                return res.status(400).json({success: false, message: 'category and attribute can not be empty.'});
+            }
+
+            const allCategories = await Category.find({});
+            const allAttributes = await Attribute.find({});
+            const categoryMap = new Map();
+            for (let key in allCategories) {
+                categoryMap.set(allCategories[key].id, allCategories[key].category);
+            }
+            const attributeMap = new Map();
+            for (let key in allAttributes) {
+                attributeMap.set(allAttributes[key].id, allAttributes[key].attribute);
+            }
+            var regex = new RegExp(req.query.attribute, "i");
+            const attributes = allAttributes.filter(a =>
+                regex.test(a.attribute));
+            regex = new RegExp(req.query.category, "i");
+            const categories = allCategories.filter(a =>
+                regex.test(a.category));
+            if (!attributes || !categories) {
+                return res.status(404).json({success: false, message: 'no category or attribute found'});
+            }
+
+            let attIds = [];
+            await attributes.forEach(a => attIds.push(a.id));
+            let catIds = [];
+            await categories.forEach(c => catIds.push(c.id));
+
+            //
+            const filledWorkbooks = await FilledWorkbook.find({});
+            if (!filledWorkbooks) {
+                return res.status(404).json({success: false, message: 'No filled workbook exists'});
+            }
+
+            // search filled workbook
+            let result = [];
+            for (let indexOfDoc = 0; indexOfDoc < filledWorkbooks.length; indexOfDoc++) {   // document
+                const file = filledWorkbooks[indexOfDoc];
+                const filename = file.name;
+                const username = file.username;
+                for (let sheetKey in file.data) {                            // sheet
+                    const sheet = file.data[sheetKey];
+                    const firstRow = sheet[0];
+                    let colsIndex = [];
+
+                    // 1. ? row 0
+                    if (!firstRow) {
+                        continue;       // to next sheet
+                    }
+
+                    // 2. ? the first line includes attIds
+                    for (let colIndex in firstRow) {
+                        for (let attIndex in attIds) {
+                            if (/^\d+$/.test(firstRow[colIndex]) && firstRow[colIndex] === attIds[attIndex]) {
+                                colsIndex.push(colIndex);
+                            }
+                        }
+                    }
+                    if (colsIndex.length <= 0) {
+                        continue;       // to next sheet
+                    }
+
+                    // search one row by one row from 2 line
+                    for (let rowIndex in sheet) {                             // Row
+                        const rowLine = sheet[rowIndex];
+                        if (rowIndex == 0) {
+                            continue; // jump to the second line
+                        }
+                        // 3. ? col 0 has validated category id
+                        const firstCellInRow = rowLine[0];
+                        if (!firstCellInRow || !/^\d+$/.test(firstCellInRow)) {
+                            continue; // jump to the second line
+                        }
+
+                        // 4. ? firstCol is within catIds
+                        for (const catIndex in catIds) {
+                            if (firstCellInRow === catIds[catIndex]) {
+                                // Retrieve data
+                                for (const c in colsIndex) {           // Column
+                                    const categoryId = firstCellInRow;
+                                    const categoryName = categoryMap.get(categoryId);
+                                    const attributeId = firstRow[colsIndex[c]];
+                                    const attributeName = attributeMap.get(attributeId);
+                                    const cellDataValue = rowLine[colsIndex[c]];
+                                    if (cellDataValue) {
+                                        result.push({
+                                            value: cellDataValue,
+                                            // FIXME: REMOVE  -- TAG for debugging
+                                            category: categoryId + '--' + rowIndex + " :: " + categoryName,
+                                            attribute: attributeId + '--' + colsIndex[c] + " :: " + attributeName,
+                                            username,
+                                            workbookname: filename,
+                                            sheetname: sheetKey,
+                                        });
+                                    }
+
+                                } // end of column
+                            }
+                        } // end of for loop --CatIds
+                    } // end of for loop -- row
+                } // end of for loop -- sheet
+            } // end of for loop -- document
+            //
+            if (result.length <= 0) {
+                return res.status(404).json({success: false, message: 'No suitable record found'});
+            }
+            return res.status(200).json({
+                success: true,
+                message: result.length + ' records found.',
+                data: result,
+            });
+
+        } catch (err) {
+            return res.status(500).json({success: false, message: err});
+        }
     },
 
 };

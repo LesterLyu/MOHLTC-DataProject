@@ -147,7 +147,7 @@ class AttCat extends Component {
       onRowsDelete: this.handleDeleteRows,
     };
 
-    const columns = [idTitle, "Description"];
+    const columns = [idTitle, "name", "Description"];
 
     if (loading) {
       return (

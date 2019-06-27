@@ -9,6 +9,12 @@ let router = express.Router();
 
 passport.use(new LdapStrategy(config.OPTS));
 
+router.get('/api/check/email/:email', user_controller.check_email);
+router.get('/api/check/username/:username', user_controller.check_username);
+// Query the current user logged in.
+router.get('/api/users/current', user_controller.get_current_logged_in_user);
+
+
 router.get('/login', function (req, res) {
     if (req.isAuthenticated()) {
         return res.redirect('/profile');
@@ -75,6 +81,11 @@ router.use((req, res, next) => {
         next();
     }
 });
+
+// Update a user's status. Used to disable or enable an account.
+router.get('/api/users/:username/active/', user_controller.check_user_active);
+// Update a user's status. Used to disable or enable an account.
+router.put('/api/users/:username/active/', user_controller.edit_user_active);
 
 // GET log out current account
 router.get('/api/logout', user_controller.user_log_out);

@@ -22,7 +22,6 @@ router.delete('/api/filled-workbook', workbookController.delete_filled_workbook)
 
 // GET Find all unfilled workbooks in current group
 router.get('/api/workbooks', workbookController.get_unfilled_workbooks);
-
 // GET Find all filled workbooks in current group for a user
 router.get('/api/filled-workbooks', workbookController.get_filled_workbooks);
 
