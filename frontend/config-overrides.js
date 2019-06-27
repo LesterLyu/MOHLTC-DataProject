@@ -22,6 +22,7 @@ module.exports = {
     //   // Display full duplicates information? (Default: `false`)
     //   verbose: false
     // }));
+    config.externals = ['child_process', 'worker_threads'];
 
     config.optimization.minimizer[0] = new TerserPlugin({
       terserOptions: {

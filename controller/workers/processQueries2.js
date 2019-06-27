@@ -1,5 +1,6 @@
 const workerpool = require('workerpool');
-const {isMainThread} = require('worker_threads');
+const os = require('os');
+const poolSize = os.cpus().length - 1;
 
 function processQuery(attMap, catMap, queryWorkbookName, queryUsername, querySheetName, queryCategoryId, queryAttributeId, data) {
     const result = [];
@@ -22,12 +23,15 @@ function processQuery(attMap, catMap, queryWorkbookName, queryUsername, queryShe
             }
         }
     }
+    // for(let i = 0; i < 3999999999; i++){} // 5 seconds
     return result;
 }
 
-const worker = workerpool.worker({processQuery});
+const pool = workerpool.pool({nodeWorker: 'thread', maxWorkers: poolSize});
 
-// module.exports.processQuery = (...args) => {
-//     return worker.exec('processQuery', args);
-// };
-//
+module.exports = {
+    processQuery: (...args) => {
+        return pool.exec(processQuery, args);
+    },
+    processQueryS: processQuery,
+};

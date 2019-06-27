@@ -8,7 +8,7 @@ const config = require('../config/config');
 const {gzip, ungzip} = require('node-gzip');
 const pako = require('pako');
 const ExcelWorkbook = require('./excel/workbook');
-const {processQuery, processQueryS} = require('./workers/processQueries2');
+const {processQuery, processQueryS, splitQuery} = require('./workers/processQueries2');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(config.permissions.WORKBOOK_QUERY);
@@ -219,6 +219,7 @@ module.exports = {
                     return res.status(500).json({success: false, message: err});
                 }
                 Promise.all(filledWorkbooks.map(filledWorkbook => {
+                    // This might be slower but does not block the event loop. (multi-threading)
                     return processQuery(attMap, catMap, queryWorkbookName, filledWorkbook.username, querySheetName,
                         queryCategoryId, queryAttributeId, filledWorkbook.data);
                 })).then(arrays => {
