@@ -3,3 +3,7 @@ public/dist/
 node_modules/
 .idea/
 build/
+.vs/
+.vscode/
+mochawesome-report/
+frontend/dist/

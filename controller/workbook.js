@@ -1,3 +1,5 @@
+const Attribute = require('../models/attribute');
+const Category = require('../models/category');
 const Workbook = require('../models/workbook');
 const FilledWorkbook = require('../models/filledWorkbook');
 const error = require('../config/error');
@@ -50,8 +52,7 @@ module.exports = {
                 }
                 if (!filledWorkbook) {
                     return res.json({success: true, workbook: workbook});
-                }
-                else {
+                } else {
                     workbook.data = filledWorkbook.data;
                     return res.json({success: true, workbook: workbook});
                 }
@@ -83,8 +84,7 @@ module.exports = {
                     }
                     return res.json({success: true, message: 'Successfully updated filled workbook ' + name + '.'})
                 });
-            }
-            else {
+            } else {
                 // create a filled workbook
                 let newFilledWorkbook = new FilledWorkbook({
                     name: name,
@@ -236,8 +236,7 @@ module.exports = {
             }
             if (!workbook) {
                 return res.status(500).json({success: false, message: 'Workbook not found.'});
-            }
-            else {
+            } else {
                 // update it
                 workbook.name = name;
                 workbook.data = data;
@@ -297,8 +296,7 @@ module.exports = {
                                     message: 'Successfully added filled workbook ' + workbookName + '.'
                                 });
                             })
-                        }
-                        else {
+                        } else {
                             // TO-DO check integrity
                             workbook.data = data;
                             workbook.save((err, updated) => {
@@ -438,8 +436,7 @@ module.exports = {
                         }
                         if (!filledWorkbook) {
                             workbookData = workbook.data;
-                        }
-                        else {
+                        } else {
                             // found filled workbook
                             workbookData = filledWorkbook.data;
                         }
