@@ -5,19 +5,19 @@ AttributeGroup = require('../../models/attributeGroup');
 CategoryGroup = require('../../models/categoryGroup');
 const {agent} = require('../config');
 
-describe.skip('CRUD group', function () {
+describe('CRUD group', function () {
 
-    before(done => {
-        AttributeGroup.deleteMany({}, () => {
-        });
-        CategoryGroup.deleteMany({}, () => {
-        });
-        done();
-    });
+    // before(done => {
+    //     AttributeGroup.deleteMany({}, () => {
+    //     });
+    //     CategoryGroup.deleteMany({}, () => {
+    //     });
+    //     done();
+    // });
 
-    it('Add a attributeGroups - success', done => {
+    xit('Add a attributeGroups - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/attributeGroups';
+        const urlStr = '/api/generateAttributeGroups';
         agent
             .get(urlStr)
             .send({
@@ -32,6 +32,21 @@ describe.skip('CRUD group', function () {
             .catch(function (err) {
                 console.log(err);
                 expect(false).to.be.true;
+            });
+    });
+
+    it('Get attributeGroups - success', done => {
+        this.timeout(10000);
+        const urlStr = '/api/attributeGroups';
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
             });
     });
 });
