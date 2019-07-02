@@ -36,11 +36,13 @@ router.post('/api/v2/attribute', async (req, res, next) => {
     }
 });
 
-router.post('/api/v2/attribute/assign/group', async (req, res, next) => {
+// Modify attribute groups
+router.post('/api/v2/attribute/group', async (req, res, next) => {
 
 });
 
-router.post('/api/v2/group/attribute', async (req, res, next) => {
+// Get attribute groups
+router.get('/api/v2/attribute/group', async (req, res, next) => {
 
 });
 
