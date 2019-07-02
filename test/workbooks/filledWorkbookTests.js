@@ -192,11 +192,6 @@ describe.skip('CRUD filled workbook', function () {
     });
 
 
-
-
-
-
-    //FIXME: delete one attribute that used in workbook
 });
 
 /*
