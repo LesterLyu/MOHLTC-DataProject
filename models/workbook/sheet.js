@@ -4,15 +4,24 @@ module.exports = mongoose.model('Sheet',
     new mongoose.Schema({
         groupNumber: {type: Number, required: true},
         name: {type: String, required: true},
-        attIds: [Number], // Attribute._id
-        catIds: [Number], // Category._id
+        attIds: [Number], // Attribute.id
+        catIds: [Number], // Category.id
 
-        /*
-            {
-                id: option,
-                id: option,
-            }
+        /**
+         {
+             id: option,
+             id: option,
+         }
          */
-        headers: {}
+        headers: {},
+
+        /**
+         * {
+         *     attId: column number, // attribute ID to column number
+         *     ...
+         * }
+         */
+        attMap: {},
+        catMap: {}, // same as attMap
 
     }));

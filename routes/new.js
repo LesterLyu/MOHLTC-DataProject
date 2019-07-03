@@ -1,7 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const Attribute = require('../models/workbook/attrubute');
+const Attribute = require('../models/workbook/attribute');
+const AttributeGroup = require('../models/workbook/attributeGroup');
+const Value = require('../models/workbook/value');
+const config = require('../config/config');
 const error = require('../config/error');
+
+const mongoose = require('mongoose');
 
 function checkPermission(req) {
     return req.session.user.permissions.includes(config.permissions.ATTRIBUTE_CATEGORY_MANAGEMENT);
@@ -37,13 +42,73 @@ router.post('/api/v2/attribute', async (req, res, next) => {
 });
 
 // Modify attribute groups
-router.post('/api/v2/attribute/group', async (req, res, next) => {
+router.post('/api/v2/attribute/group', (req, res, next) => {
+    if (!checkPermission(req)) {
+        return res.status(403).json({success: false, message: error.api.NO_PERMISSION});
+    }
+    const groupNumber = req.session.user.groupNumber;
+    /** @type {Array} */
+    const documents = req.body.documents;
+    const operations = [];
+    for (let i = 0; i < documents.length; i++) {
+        const document = documents[i];
+        document.groupNumber = groupNumber;
+        operations.push({
+            replaceOne: {
+                filter: {_id: document._id}, // cast string to mongoose.Types.ObjectId ?
+                replacement: document,
+                upsert: true
+            }
+        });
+    }
+
+    AttributeGroup.bulkWrite(operations)
+        .then(result => {
+            res.json({success: true, result})
+        })
+        .catch(err => next(err));
 
 });
 
 // Get attribute groups
 router.get('/api/v2/attribute/group', async (req, res, next) => {
+    if (!checkPermission(req)) {
+        return res.status(403).json({success: false, message: error.api.NO_PERMISSION});
+    }
+    const groupNumber = req.session.user.groupNumber;
+    AttributeGroup.find({groupNumber}, 'name children parent', (err, documents) => {
+        if (err) return next(err);
+        res.json({success: true, documents});
+    })
+});
 
+router.get('/api/v2/generate/id/:number', (req, res, next) => {
+    const number = req.params.number;
+    const ids = [];
+    for (let i = 0; i < number; i++) {
+        ids.push(mongoose.Types.ObjectId());
+    }
+    res.json({success: true, ids})
+});
+
+router.post('/api/v2/test', (req, res, next) => {
+    const data = {};
+    for (let i = 0; i < 1000; i++) {
+        const inner = {};
+        for (let j = 0; j < 1000; j++) {
+            inner[j] = i + j;
+        }
+        data[i] = inner;
+    }
+    const newValue = new Value({
+        groupNumber: Math.random(),
+        data
+    });
+
+    newValue.save(err => {
+        if (err) return next(err);
+        res.json({success: true});
+    })
 });
 
 

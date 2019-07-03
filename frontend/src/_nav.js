@@ -64,6 +64,16 @@ export default {
           icon: 'mdi mdi-checkbook',
         },
         {
+          name: 'Attribute Group',
+          url: '/attribute/group',
+          icon: 'mdi mdi-checkbook',
+        },
+        {
+          name: 'Category Group',
+          url: '/category/group',
+          icon: 'mdi mdi-checkbook',
+        },
+        {
           name: 'Query',
           url: '/5fghfgh',
           icon: 'mdi mdi-magnify',

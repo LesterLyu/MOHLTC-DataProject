@@ -5,6 +5,6 @@ module.exports = mongoose.model('Category',
     new mongoose.Schema({
         groupNumber: {type: Number, required: true},
         name: {type: String, required: true},
-        _id: {type: Number, required: true, unique: true},
+        id: {type: Number, required: true, unique: true},
         groups: [ObjectId],
     }));

@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
+
 const axiosConfig = {withCredentials: true};
 
 /**
@@ -115,4 +116,94 @@ export default class AttCatManager {
       })
   }
 
+  getAttributeGroup() {
+    return axios.get(config.server + '/api/v2/attribute/group', axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+      .then(data => {
+        return this._buildTree(data.documents);
+      })
+  }
+
+  updateAttributeGroup(tree) {
+    return axios.post(config.server + '/api/v2/attribute/group', {documents: this._flatTree(tree)}, axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+  }
+
+  /**
+   * Build group tree.
+   * @param documents
+   * @param [currNode]
+   * @param [tree]
+   * @param {Array} [childIds] - array of ids
+   * @private
+   */
+  _buildTree(documents, currNode, tree = [], childIds) {
+    // basis
+    if (currNode == null) {
+      for (let document of documents) {
+        if (!document.parent) {
+          // does not have parent, master node
+          const node = {
+            title: document.name,
+            _id: document._id,
+            children: []
+          };
+          tree.push(node);
+          this._buildTree(documents, node, tree, document.children);
+        }
+      }
+      return tree;
+    } else {
+      if (childIds.length === 0) return;
+      for (let document of documents) {
+        if (childIds.includes(document._id)) {
+          const node = {
+            title: document.name,
+            _id: document._id,
+            children: []
+          };
+          currNode.children.push(node)
+          this._buildTree(documents, node, tree, document.children);
+        }
+      }
+    }
+  }
+
+  _flatTree(tree, documents = [], currNode, currDocument) {
+    // basis
+    if (!currNode) {
+      for (let node of tree) {
+        const document = {
+          _id: node._id,
+          name: node.title,
+          children: []
+        };
+        documents.push(document);
+        this._flatTree(tree, documents, node, document);
+      }
+      return documents;
+    } else {
+      if (!currNode.children || currNode.children.length === 0) return;
+      for (let node of currNode.children) {
+        currDocument.children.push(node._id);
+        const document = {
+          _id: node._id,
+          name: node.title,
+          children: [],
+          parent: currNode._id
+        };
+        documents.push(document);
+        this._flatTree(tree, documents, node, document);
+      }
+    }
+
+  }
 }
