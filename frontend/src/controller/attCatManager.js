@@ -134,7 +134,30 @@ export default class AttCatManager {
         if (this.check(response)) {
           return response.data;
         }
-      })
+      });
+  }
+
+  removeAttributeGroup(_id) {
+    return axios.delete(config.server + '/api/v2/attribute/group/' + _id, axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      });
+  }
+
+  /**
+   * Generate a _id
+   * @param {number} [number=1]
+   * @return {Promise<AxiosResponse<T> | never>}
+   */
+  generateId(number = 1) {
+    return axios.get(config.server + '/api/v2/generate/id/' + number, axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      });
   }
 
   /**
