@@ -70,8 +70,20 @@ router.post('/api/v2/attribute/group', (req, res, next) => {
 
 });
 
+// delete attribute group
+router.delete('/api/v2/attribute/group/:_id', async (req, res, next) => {
+    const _id = req.params._id;
+    const groupNumber = req.session.user.groupNumber;
+    try {
+        const doc = await AttributeGroup.findOneAndRemove({_id, groupNumber});
+        res.json({success: true, message: `Removed attribute group ${doc.name} (${_id})`});
+    } catch (e) {
+        next(e);
+    }
+});
+
 // Get attribute groups
-router.get('/api/v2/attribute/group', async (req, res, next) => {
+router.get('/api/v2/attribute/group', (req, res, next) => {
     if (!checkPermission(req)) {
         return res.status(403).json({success: false, message: error.api.NO_PERMISSION});
     }

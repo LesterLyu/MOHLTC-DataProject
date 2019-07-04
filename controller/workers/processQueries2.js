@@ -1,6 +1,7 @@
 const workerpool = require('workerpool');
 const os = require('os');
-const poolSize = os.cpus().length - 1;
+let poolSize = os.cpus().length - 1;
+if (!poolSize) poolSize = 2;
 
 function processQuery(attMap, catMap, queryWorkbookName, queryUsername, querySheetName, queryCategoryId, queryAttributeId, data) {
     const result = [];
@@ -27,7 +28,7 @@ function processQuery(attMap, catMap, queryWorkbookName, queryUsername, queryShe
     return result;
 }
 
-const pool = workerpool.pool({nodeWorker: 'thread', maxWorkers: poolSize});
+const pool = workerpool.pool({nodeWorker: 'auto', maxWorkers: poolSize});
 
 module.exports = {
     processQuery: (...args) => {

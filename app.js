@@ -60,6 +60,7 @@ app.use(express.static(path.join(__dirname, 'public/moh.css')));
 mongoose.connect(process.env.NODE_ENV === 'test' ? config.testDatabase : config.database, {
     useNewUrlParser: true
 });
+mongoose.set('useFindAndModify', false);
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
