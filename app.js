@@ -28,6 +28,8 @@ const cors = require('cors');
 
 const config = require('./config/config');
 
+const error = require('./config/error');
+
 const indexRouter = require('./routes/index');
 
 const usersRouter = require('./routes/users');
@@ -44,7 +46,7 @@ const userManagementRouter = require('./routes/userManagement');
 
 const systemManagementRouter = require('./routes/systemManagement');
 
-const newRouter = require('./routes/new');
+const RouterV2 = require('./routes/v2');
 
 const User = require('./models/user');
 
@@ -120,16 +122,6 @@ app.use(fileUpload({
 
 setup.setup();
 
-//app.post('/api/login', passport.authenticate('ldapauth', {session: false}, function(err, user, info){
-//  console.log(err);
-//console.log(user.username);
-//console.log(info);
-//}), function (req, res){
-//  console.log("ss");
-// res.send({status: 'ok'});
-//});
-
-
 // home page
 app.use('/', indexRouter);
 // user authentication related
@@ -141,7 +133,7 @@ app.use('/', workbookRouter);
 app.use('/', workbookQueryRouter);
 app.use('/', userManagementRouter);
 app.use('/', systemManagementRouter);
-app.use('/', newRouter);
+app.use('/', ...RouterV2);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -152,11 +144,15 @@ app.use(function (req, res, next) {
 
 // error handler (four parameters)
 app.use(function (err, req, res, next) {
-    res.status(err.status || 500).json({
-        success: false,
-        message: err.message,
-        stack: req.app.get('env') === 'development' ? err.stack : {},
-    })
+    if (err === error.api.NO_PERMISSION) {
+        res.status(403).json({success: false, message: error.api.NO_PERMISSION});
+    } else {
+        res.status(err.status || 500).json({
+            success: false,
+            message: err.message,
+            stack: req.app.get('env') === 'development' ? err.stack : {},
+        })
+    }
 });
 const server = http.createServer(app);
 
