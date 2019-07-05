@@ -116,8 +116,13 @@ export default class AttCatManager {
       })
   }
 
-  getAttributeGroup() {
-    return axios.get(config.server + '/api/v2/attribute/group', axiosConfig)
+  /**
+   * @param {boolean} isAttribute
+   * @return {*}
+   */
+  getGroup(isAttribute) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.get(`${config.server}/api/v2/${what}/group`, axiosConfig)
       .then(response => {
         if (this.check(response)) {
           return response.data;
@@ -128,8 +133,13 @@ export default class AttCatManager {
       })
   }
 
-  updateAttributeGroup(tree) {
-    return axios.post(config.server + '/api/v2/attribute/group', {documents: this._flatTree(tree)}, axiosConfig)
+  getAttributeGroup = () => this.getGroup(true);
+
+  getCategoryGroup = () => this.getGroup(false);
+
+  updateGroup(isAttribute, tree) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.post(`${config.server}/api/v2/${what}/group`, {documents: this._flatTree(tree)}, axiosConfig)
       .then(response => {
         if (this.check(response)) {
           return response.data;
@@ -137,14 +147,23 @@ export default class AttCatManager {
       });
   }
 
-  removeAttributeGroup(_id) {
-    return axios.delete(config.server + '/api/v2/attribute/group/' + _id, axiosConfig)
+  updateAttributeGroup = (tree) => this.updateGroup(true, tree);
+
+  updateCategoryGroup = (tree) => this.updateGroup(false, tree);
+
+  removeGroup(isAttribute, _id) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.delete(`${config.server}/api/v2/${what}/group/${_id}`, axiosConfig)
       .then(response => {
         if (this.check(response)) {
           return response.data;
         }
       });
   }
+
+  removeAttributeGroup = (_id) => this.removeGroup(true, _id);
+
+  removeCategoryGroup = (_id) => this.removeGroup(false, _id);
 
   /**
    * Generate a _id

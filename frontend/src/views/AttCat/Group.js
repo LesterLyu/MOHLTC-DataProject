@@ -55,7 +55,7 @@ class AttCatGroup extends Component {
       dialogValue: '',
     };
     this.showMessage = this.props.showMessage;
-    this.attCatManager.getAttributeGroup().then(data => {
+    this.attCatManager.getGroup(this.mode === 'att').then(data => {
       console.log('set', data);
       this.setState({
         loading: false,
@@ -71,7 +71,7 @@ class AttCatGroup extends Component {
   save = async treeData => {
     if (!treeData) treeData = this.state.treeData;
     try {
-      await this.attCatManager.updateAttributeGroup(treeData)
+      await this.attCatManager.updateGroup(this.mode === 'att', treeData);
       return true;
     } catch (err) {
       this.props.showMessage(err.response.data.message, 'error');
@@ -80,7 +80,7 @@ class AttCatGroup extends Component {
   };
 
   delete = (_id, path) => () => {
-    this.attCatManager.removeAttributeGroup(_id)
+    this.attCatManager.removeAttributeGroup(this.mode === 'att', _id)
       .then(res => {
         const treeData = removeNodeAtPath({treeData: this.state.treeData, path, getNodeKey: this.getNodeKey});
         this.showMessage(res.message, 'success');
