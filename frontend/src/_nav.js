@@ -107,7 +107,7 @@ export default {
       children: [
         {
           name: 'Server Info',
-          url: '/3rgerg',
+          url: '/system',
           icon: 'mdi mdi-information',
         },
         {
