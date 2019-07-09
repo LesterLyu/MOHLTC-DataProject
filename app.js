@@ -20,7 +20,7 @@ const bodyParser = require('body-parser');
 
 const logger = require('morgan'); //Note logger = morgan~!
 
-const session = require('express-session');
+const cookieSession = require('cookie-session');
 
 const fileUpload = require('express-fileupload');
 
@@ -100,11 +100,10 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use('/documents', express.static(path.join(__dirname, 'documents')));
 app.use('/test', express.static(path.join(__dirname, 'mochawesome-report')));
 
-app.use(session({
+app.use(cookieSession({
+    name: 'session',
     secret: config.superSecret,
-    resave: true,
-    saveUninitialized: true,
-    cookie: {maxAge: 3600 * 1000} //1 hour
+    cookie: {maxAge: 24 * 3600 * 1000} // 24 hours
 }));
 
 app.use(compression());
