@@ -41,8 +41,7 @@ module.exports = {
         /**
          * @type {string}
          */
-        const name = req.body.name;
-        const id = req.body.id;
+        const {id, name, description} = req.body;
         const groupNumber = req.session.user.groupNumber;
         if (name.length === 0) {
             return res.status(400).json({
@@ -56,7 +55,7 @@ module.exports = {
                 message: `Category id ${id} (${category.name}) exists.`
             });
         } else {
-            const newCategory = new Category({id, name, groupNumber});
+            const newCategory = new Category({id, name, description, groupNumber});
             await newCategory.save();
             return res.json({success: true, message: `Category (${id}, ${name}) saved.`});
         }

@@ -41,8 +41,7 @@ module.exports = {
         /**
          * @type {string}
          */
-        const name = req.body.name;
-        const id = req.body.id;
+        const {id, name, description} = req.body;
         const groupNumber = req.session.user.groupNumber;
         if (name.length === 0) {
             return res.status(400).json({
@@ -56,7 +55,7 @@ module.exports = {
                 message: `Attribute id ${id} (${attribute.name}) exists.`
             });
         } else {
-            const newAttribute = new Attribute({id, name, groupNumber});
+            const newAttribute = new Attribute({id, name, description, groupNumber});
             await newAttribute.save();
             return res.json({success: true, message: `Attribute (${id}, ${name}) saved.`});
         }
