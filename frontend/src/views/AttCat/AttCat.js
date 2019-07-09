@@ -4,19 +4,15 @@ import AttCatManager from "../../controller/attCatManager";
 import {
   LinearProgress,
   Grid,
-  Button,
-  Dialog,
-  DialogTitle,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  TextField,
+  Fade
 } from "@material-ui/core";
 import {withStyles} from "@material-ui/core";
 import PropTypes from "prop-types";
+import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 
 import CustomToolbar from "./components/CustomToolbar";
-
+import CustomToolbarSelect from "./components/CustomToolbarSelect";
+import AddDialog from "./components/AddDialog";
 
 const styles = theme => ({
   root: {
@@ -32,16 +28,17 @@ class AttCat extends Component {
   constructor(props) {
     super(props);
     this.mode = this.props.params.mode; // can be att or cat
-    this.workbookManager = new AttCatManager(props);
+    this.attCatManager = new AttCatManager(props);
     this.state = {
-      loading: true, openSetId: false, newValue: '',
+      loading: true, openSetId: false,
     };
     this.showMessage = this.props.showMessage;
+    this.dialogRef = React.createRef();
     this.getData();
   }
 
   getData() {
-    this.workbookManager.get(this.mode === 'att')
+    this.attCatManager.get(this.mode === 'att')
       .then(data => {
         if (!data)
           return;
@@ -49,12 +46,11 @@ class AttCat extends Component {
       })
   }
 
-  // add dialog
-  handleNewValue = name => event => {
-    this.setState({[name]: event.target.value})
-  };
-
   handleClickOpen = () => {
+    this.attCatManager.generateId(this.mode === 'att')
+      .then(id => {
+        this.dialogRef.current.setId(id);
+      });
     this.setState({openSetId: true});
   };
 
@@ -62,15 +58,13 @@ class AttCat extends Component {
     this.setState({openSetId: false});
   };
 
-  handelAdd = () => {
+  handelAdd = (id, name, description) => {
     this.setState({openSetId: false});
-    const newValue = document.querySelector('#description').value;
-    this.workbookManager.add(this.mode === 'att', newValue)
+    this.attCatManager.add(this.mode === 'att', id, name, description)
       .then(data => {
         if (data.success) {
           this.showMessage(data.message, 'success');
-        }
-        else {
+        } else {
           this.showMessage(data.message, 'error')
         }
         this.getData();
@@ -78,8 +72,7 @@ class AttCat extends Component {
       .catch(err => {
         try {
           this.showMessage(err.response.data.message, 'error')
-        }
-        catch (e) {
+        } catch (e) {
           this.showMessage(err.message, 'error')
         }
       });
@@ -91,7 +84,7 @@ class AttCat extends Component {
     for (let i = 0; i < indices.length; i++) {
       ids.push(this.state.data[indices[i]][0])
     }
-    return this.workbookManager.delete(this.mode === 'att', ids)
+    return this.attCatManager.delete(this.mode === 'att', ids)
       .then(data => {
         if (data.success) {
           // remove from data array
@@ -100,20 +93,28 @@ class AttCat extends Component {
           this.setState({data: newData});
 
           this.showMessage(data.message, 'success')
-        }
-        else {
+        } else {
           this.showMessage(data.message, 'error')
         }
       })
       .catch(err => {
         try {
           this.showMessage(err.response.data.message, 'error')
-        }
-        catch (e) {
+        } catch (e) {
           this.showMessage(err.message, 'error')
         }
       });
   };
+
+  getMuiTheme = () => createMuiTheme({
+    overrides: {
+      MUIDataTable: {
+        responsiveScroll: {
+          maxHeight: 'calc(100vh - 270px)'
+        }
+      }
+    }
+  });
 
   /**
    * Override default behaviour to prevent some re-renders
@@ -125,7 +126,8 @@ class AttCat extends Component {
   shouldComponentUpdate(nextProps, nextState, nextContent) {
     return !(this.state.loading === nextState.loading
       && this.state.openSetId === nextState.openSetId
-      && this.state.data.length === nextState.data.length);
+      && this.state.data.length === nextState.data.length
+      && this.state.id === nextState.id);
   }
 
   render() {
@@ -144,64 +146,49 @@ class AttCat extends Component {
           <CustomToolbar addClick={this.handleClickOpen}/>
         );
       },
+      customToolbarSelect: (selectedRows, displayData, setSelectedRows) => {
+        return (
+          <CustomToolbarSelect selectedRows={selectedRows} onRowsDelete={this.handleDeleteRows}/>
+        )
+      },
       onRowsDelete: this.handleDeleteRows,
     };
 
-    const columns = [idTitle, "name", "Description"];
+    const columns = [idTitle, "Name", "Description"];
 
     if (loading) {
       return (
-        <div className="animated fadeIn">
+        <div>
           <h3>Loading...</h3><br/>
           <LinearProgress variant="indeterminate"/>
         </div>
       );
     }
     return (
-      <div className="animated fadeIn">
-        <Grid container>
-          <Grid item xs={12} md={10} lg={8} xl={6}>
-            <MUIDataTable
-              title={title}
-              data={data}
-              columns={columns}
-              options={options}
-            />
+      <React.Fragment>
+        <Fade in={true}>
+          <Grid container>
+            <Grid item xs={12} md={12} lg={10} xl={8}>
+              <MuiThemeProvider theme={this.getMuiTheme()}>
+                <MUIDataTable
+                  title={title}
+                  data={data}
+                  columns={columns}
+                  options={options}
+                />
+              </MuiThemeProvider>
+            </Grid>
           </Grid>
-        </Grid>
-
-        <Dialog
+        </Fade>
+        <AddDialog
+          ref={this.dialogRef}
           open={this.state.openSetId}
-          onClose={this.handleClose}
-          aria-labelledby="form-dialog-title"
-        >
-          <DialogTitle id="form-dialog-title">{"Add " + key}</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Enter the description below.
-            </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="description"
-              label="Description"
-              type="text"
-              // value={this.state.newValue}
-              // onChange={this.handleNewValue('newValue')}
-              fullWidth
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.handleClose} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={this.handelAdd} color="primary">
-              Add
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-      </div>
+          handleClose={this.handleClose}
+          handelAdd={this.handelAdd}
+          title={"Add " + key}
+          showMessage={this.props.showMessage}
+        />
+      </React.Fragment>
     )
   }
 }

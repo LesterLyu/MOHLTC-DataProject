@@ -32,17 +32,9 @@ export default class AttCatManager {
     return true;
   };
 
-  add(isAttribute, newValue) {
+  add(isAttribute, id, name, description) {
     const what = isAttribute ? 'attribute' : 'category';
-    return axios.get(config.server + '/api/v2/' + what + '/generate/id', axiosConfig)
-      .then(res => {
-        if (this.check(res)) {
-          return res.data.id;
-        }
-      })
-      .then(id => {
-        return axios.post(config.server + '/api/v2/' + what, {id, name: newValue}, axiosConfig)
-      })
+    return axios.post(config.server + '/api/v2/' + what, {id, name, description}, axiosConfig)
       .then(response => {
         if (this.check(response)) {
           return response.data;
@@ -63,7 +55,7 @@ export default class AttCatManager {
           const data = response.data.data;
           const res = [];
           for (let i = 0; i < data.length; i++) {
-            res.push([data[i].id, data[i].name, data[i].description]);
+            res.push([data[i].id, data[i].name, data[i].description || '']);
           }
           return res;
         }
@@ -88,7 +80,7 @@ export default class AttCatManager {
     return axios.get(`${config.server}/api/v2/${what}/generate/id`, axiosConfig)
       .then(response => {
         if (this.check(response)) {
-          return response.data;
+          return response.data.id;
         }
       })
   }
