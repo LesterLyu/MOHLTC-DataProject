@@ -1,9 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const {attributeController} = require('../../controller/v2');
-const {addAttribute, modifyAttributeGroup, deleteAttributeGroup, getAttributeGroup} = attributeController;
+const {
+    addAttribute, getAttributes, generateAttributeId, deleteAttribute, modifyAttributeGroup, deleteAttributeGroup,
+    getAttributeGroup,
+} = attributeController;
+
+router.get('/api/v2/attribute', getAttributes);
 
 router.post('/api/v2/attribute', addAttribute);
+
+router.delete('/api/v2/attribute', deleteAttribute);
+
+router.get('/api/v2/attribute/generate/id', generateAttributeId);
 
 // Modify attribute groups
 router.post('/api/v2/attribute/group', modifyAttributeGroup);

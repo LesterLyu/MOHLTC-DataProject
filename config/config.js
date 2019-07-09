@@ -31,8 +31,12 @@ module.exports = {
         SYSTEM_MANAGEMENT: 'system-management',
         WORKBOOK_QUERY: 'workbook-query'
     },
+    constants: {
+        categoryIdStartFrom: 1000000,
+        attributeIdStartFrom: 3000000,
+    },
     disableEmailValidation: true,
     disableLdap: true,
     organizations: [],
-    maxGroupNumber: 0
+    maxGroupNumber: 0,
 };

@@ -2,8 +2,38 @@ const Category = require('../../models/workbook/category');
 const CategoryGroup = require('../../models/workbook/categoryGroup');
 const {checkPermission, Permission} = require('./helpers');
 const error = require('../../config/error');
+const config = require('../../config/config');
 
 module.exports = {
+    generateCategoryId: async (req, res, next) => {
+        let docs;
+        try {
+            docs = await Category.find({}, 'id')
+        } catch (e) {
+            next(e);
+        }
+        // if does not have categories, generate id from 1,000,000
+        let max = config.constants.categoryIdStartFrom;
+        if (docs.length !== 0) {
+            for (let i = 0; i < docs.length; i++) {
+                const doc = docs[i];
+                if (doc.id > max) max = doc.id;
+            }
+            max++;
+        }
+        return res.json({success: true, id: max});
+    },
+
+    getCategories: async (req, res, next) => {
+        const groupNumber = req.session.user.groupNumber;
+        try {
+            const categories = await Category.find({groupNumber});
+            res.json({success: true, data: categories})
+        } catch (e) {
+            next(e);
+        }
+    },
+
     addCategory: async (req, res, next) => {
         if (!checkPermission(req, Permission.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
             return next(error.api.NO_PERMISSION);
@@ -12,23 +42,46 @@ module.exports = {
          * @type {string}
          */
         const name = req.body.name;
-        const _id = req.body.id;
+        const id = req.body.id;
         const groupNumber = req.session.user.groupNumber;
         if (name.length === 0) {
             return res.status(400).json({
-                success: false, message: 'Attribute name cannot be empty.'
+                success: false, message: 'Category name cannot be empty.'
             });
         }
-        const attribute = await Category.findOne({_id, groupNumber});
-        if (attribute) {
+        const category = await Category.findOne({id, groupNumber});
+        if (category) {
             return res.status(400).json({
                 success: false,
-                message: 'Attribute ' + attribute.name + ' exists.'
+                message: `Category id ${id} (${category.name}) exists.`
             });
         } else {
-            const newAttribute = new Attribute({_id, name, groupNumber});
-            await newAttribute.save();
-            return res.json({success: true, message: `Attribute (${_id}, name) saved.`});
+            const newCategory = new Category({id, name, groupNumber});
+            await newCategory.save();
+            return res.json({success: true, message: `Category (${id}, ${name}) saved.`});
+        }
+    },
+
+    deleteCategory: async (req, res, next) => {
+        if (!checkPermission(req, Permission.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const ids = req.body.ids;
+
+        const operations = [];
+        for (let i = 0; i < ids.length; i++) {
+            operations.push({
+                deleteOne: {
+                    filter: {id: ids[i], groupNumber},
+                }
+            });
+        }
+        try {
+            let result = await Category.bulkWrite(operations);
+            res.json({success: true, result, message: `Removed ${result.deletedCount} category(s).`})
+        } catch (e) {
+            next(e);
         }
     },
 
@@ -79,7 +132,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         try {
             const doc = await CategoryGroup.findOneAndRemove({_id, groupNumber});
-            res.json({success: true, message: `Removed attribute group ${doc.name} (${_id})`});
+            res.json({success: true, message: `Removed category group ${doc.name} (${_id})`});
         } catch (e) {
             next(e);
         }
