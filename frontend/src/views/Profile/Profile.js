@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import UserManager from "../../controller/userManager";
 import {Fade, Chip, Typography, Card} from "@material-ui/core";
 import PropTypes from "prop-types";
-import {withStyles} from "@material-ui/core/es";
+import {withStyles} from "@material-ui/core";
 
 import {Clear as No, Done as Yes} from "@material-ui/icons";
 // eslint-disable-next-line

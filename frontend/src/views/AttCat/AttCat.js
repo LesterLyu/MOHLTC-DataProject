@@ -12,7 +12,7 @@ import {
   DialogContentText,
   TextField,
 } from "@material-ui/core";
-import {withStyles} from "@material-ui/core/es";
+import {withStyles} from "@material-ui/core";
 import PropTypes from "prop-types";
 
 import CustomToolbar from "./components/CustomToolbar";
