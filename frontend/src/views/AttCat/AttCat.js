@@ -41,7 +41,7 @@ class AttCat extends Component {
   }
 
   getData() {
-    this.workbookManager.get(this.mode)
+    this.workbookManager.get(this.mode === 'att')
       .then(data => {
         if (!data)
           return;
@@ -65,7 +65,7 @@ class AttCat extends Component {
   handelAdd = () => {
     this.setState({openSetId: false});
     const newValue = document.querySelector('#description').value;
-    this.workbookManager.add(this.mode, newValue)
+    this.workbookManager.add(this.mode === 'att', newValue)
       .then(data => {
         if (data.success) {
           this.showMessage(data.message, 'success');
@@ -91,7 +91,7 @@ class AttCat extends Component {
     for (let i = 0; i < indices.length; i++) {
       ids.push(this.state.data[indices[i]][0])
     }
-    return this.workbookManager.delete(this.mode, ids)
+    return this.workbookManager.delete(this.mode === 'att', ids)
       .then(data => {
         if (data.success) {
           // remove from data array

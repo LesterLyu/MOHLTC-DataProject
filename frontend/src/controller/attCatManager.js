@@ -32,83 +32,60 @@ export default class AttCatManager {
     return true;
   };
 
-  addCategory(category) {
-    return axios.post(config.server + '/api/add-cat', {category}, axiosConfig)
+  add(isAttribute, newValue) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.get(config.server + '/api/v2/' + what + '/generate/id', axiosConfig)
+      .then(res => {
+        if (this.check(res)) {
+          return res.data.id;
+        }
+      })
+      .then(id => {
+        return axios.post(config.server + '/api/v2/' + what, {id, name: newValue}, axiosConfig)
+      })
       .then(response => {
         if (this.check(response)) {
           return response.data;
         }
-      })
-  }
-
-  addAttribute(attribute) {
-    return axios.post(config.server + '/api/add-att', {attribute}, axiosConfig)
-      .then(response => {
-        if (this.check(response)) {
-          return response.data;
-        }
-      })
-  }
-
-  add(what, newValue) {
-    if (what === 'att')
-      return this.addAttribute(newValue);
-    else if (what === 'cat')
-      return this.addCategory(newValue);
-    else {
-      throw new Error('first parameter must be att or cat');
-    }
-  }
-
-  getAttributes() {
-    return axios.get(config.server + '/api/attributes', axiosConfig)
-      .then(response => {
-        if (this.check(response)) {
-          const atts = response.data.attributes;
-          const res = [];
-          for (let i = 0; i < atts.length; i++) {
-            res.push([atts[i].id, atts[i].attribute, atts[i].description]);
-          }
-          return res;
-
-        }
-      })
-  }
-
-  getCategories() {
-    return axios.get(config.server + '/api/categories', axiosConfig)
-      .then(response => {
-        if (this.check(response)) {
-          const cats = response.data.categories;
-          const res = [];
-          for (let i = 0; i < cats.length; i++) {
-            res.push([cats[i].id, cats[i].category, cats[i].description]);
-          }
-          return res;
-        }
-      })
+      });
   }
 
   /**
-   *
-   * @param {'att'|'cat'} what
-   * @return {*}
+   * Get attribute or category
+   * @param isAttribute
+   * @return {Promise<AxiosResponse<T> | never>}
    */
-  get(what) {
-    if (what === 'att')
-      return this.getAttributes();
-    else if (what === 'cat')
-      return this.getCategories();
-    else {
-      throw new Error('first parameter must be att or cat');
-    }
+  get(isAttribute) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.get(config.server + '/api/v2/' + what, axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          const data = response.data.data;
+          const res = [];
+          for (let i = 0; i < data.length; i++) {
+            res.push([data[i].id, data[i].name, data[i].description]);
+          }
+          return res;
+        }
+      })
   }
 
-  delete(what, ids) {
-    return axios.delete(config.server + '/api/' + what + 's/delete', {
+  delete(isAttribute, ids) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.delete(config.server + '/api/v2/' + what + '', {
       data: {ids: ids},
       withCredentials: axiosConfig.withCredentials
     })
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+  }
+
+  generateId(isAttribute) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.get(`${config.server}/api/v2/${what}/generate/id`, axiosConfig)
       .then(response => {
         if (this.check(response)) {
           return response.data;
@@ -170,7 +147,7 @@ export default class AttCatManager {
    * @param {number} [number=1]
    * @return {Promise<AxiosResponse<T> | never>}
    */
-  generateId(number = 1) {
+  generateObjectId(number = 1) {
     return axios.get(config.server + '/api/v2/generate/id/' + number, axiosConfig)
       .then(response => {
         if (this.check(response)) {

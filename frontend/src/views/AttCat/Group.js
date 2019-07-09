@@ -135,7 +135,7 @@ class AttCatGroup extends Component {
   handleDialogAdd = () => {
     const dialogValue = this.state.dialogValue;
     this.setState({dialog: false, dialogValue: ''});
-    this.attCatManager.generateId()
+    this.attCatManager.generateObjectId()
       .then(data => {
         const {treeData} = addNodeUnderParent({
           treeData: this.state.treeData, newNode: {
