@@ -7,8 +7,8 @@ module.exports = {
         port: 465,
         secure: true,
         auth: {
-            user: "w767089351@gmail.com",
-            pass: "wkw1234567"
+            user: "username@email.com",
+            pass: "password"
         },
         sender: '"Will Wang" <w767089351@gmail.com>'
     },

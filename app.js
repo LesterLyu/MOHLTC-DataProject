@@ -1,7 +1,5 @@
 const express = require('express');
 
-const compression = require('compression');
-
 const http = require('http');
 
 const app = express();
@@ -105,8 +103,6 @@ app.use(cookieSession({
     secret: config.superSecret,
     cookie: {maxAge: 24 * 3600 * 1000} // 24 hours
 }));
-
-app.use(compression());
 
 // passport authentication setup
 passport.use(new LocalStrategy(User.authenticate()));
