@@ -6,4 +6,4 @@ let categoryGroupSchema = new mongoose.Schema({
     categoryIds: {type: Array}
 });
 
-module.exports = mongoose.model('CategoryGroup', categoryGroupSchema);
+module.exports = mongoose.model('CategoryGroup2', categoryGroupSchema);

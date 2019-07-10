@@ -1,7 +1,5 @@
 const express = require('express');
 
-const compression = require('compression');
-
 const http = require('http');
 
 const app = express();
@@ -20,13 +18,15 @@ const bodyParser = require('body-parser');
 
 const logger = require('morgan'); //Note logger = morgan~!
 
-const session = require('express-session');
+const cookieSession = require('cookie-session');
 
 const fileUpload = require('express-fileupload');
 
 const cors = require('cors');
 
 const config = require('./config/config');
+
+const error = require('./config/error');
 
 const indexRouter = require('./routes/index');
 
@@ -44,6 +44,8 @@ const userManagementRouter = require('./routes/userManagement');
 
 const systemManagementRouter = require('./routes/systemManagement');
 
+const RouterV2 = require('./routes/v2');
+
 const User = require('./models/user');
 
 const setup = require('./controller/setup');
@@ -58,6 +60,7 @@ app.use(express.static(path.join(__dirname, 'public/moh.css')));
 mongoose.connect(process.env.NODE_ENV === 'test' ? config.testDatabase : config.database, {
     useNewUrlParser: true
 });
+mongoose.set('useFindAndModify', false);
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
@@ -76,6 +79,7 @@ const whitelist = [
 const corsOptions = {
     credentials: true,
     origin: function (origin, callback) {
+        return callback(null, true);
         if (!origin || whitelist.indexOf(origin) !== -1) {
             callback(null, true)
         } else {
@@ -94,14 +98,11 @@ app.use('/node_modules', express.static(path.join(__dirname, 'node_modules')));
 app.use('/documents', express.static(path.join(__dirname, 'documents')));
 app.use('/test', express.static(path.join(__dirname, 'mochawesome-report')));
 
-app.use(session({
+app.use(cookieSession({
+    name: 'session',
     secret: config.superSecret,
-    resave: true,
-    saveUninitialized: true,
-    cookie: {maxAge: 3600 * 1000} //1 hour
+    cookie: {maxAge: 24 * 3600 * 1000} // 24 hours
 }));
-
-app.use(compression());
 
 // passport authentication setup
 passport.use(new LocalStrategy(User.authenticate()));
@@ -116,16 +117,6 @@ app.use(fileUpload({
 
 setup.setup();
 
-//app.post('/api/login', passport.authenticate('ldapauth', {session: false}, function(err, user, info){
-  //  console.log(err);
-    //console.log(user.username);
-    //console.log(info);
-//}), function (req, res){
-  //  console.log("ss");
-   // res.send({status: 'ok'});
-//});
-
-
 // home page
 app.use('/', indexRouter);
 // user authentication related
@@ -137,23 +128,26 @@ app.use('/', workbookRouter);
 app.use('/', workbookQueryRouter);
 app.use('/', userManagementRouter);
 app.use('/', systemManagementRouter);
+app.use('/', ...RouterV2);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    var err = new Error('Not Found');
+    const err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-// error handler
+// error handler (four parameters)
 app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
+    if (err === error.api.NO_PERMISSION) {
+        res.status(403).json({success: false, message: error.api.NO_PERMISSION});
+    } else {
+        res.status(err.status || 500).json({
+            success: false,
+            message: err.message,
+            stack: req.app.get('env') === 'development' ? err.stack : {},
+        })
+    }
 });
 const server = http.createServer(app);
 

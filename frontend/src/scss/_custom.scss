@@ -44,3 +44,7 @@ button:focus {
   -o-user-select:none;
   user-select:none;
 }
+
+.app-body {
+  overflow-x: inherit;
+}

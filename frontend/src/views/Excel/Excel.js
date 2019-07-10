@@ -354,8 +354,8 @@ class Excel extends Component {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
     const sheetHeight = this.sheetContainerRef.current.offsetHeight;
 
-    this.attCatManager.get('att').then(atts => this.attOptions = atts);
-    this.attCatManager.get('cat').then(cats => this.catOptions = cats);
+    this.attCatManager.get(true).then(atts => this.attOptions = atts);
+    this.attCatManager.get(false).then(cats => this.catOptions = cats);
 
     if (this.mode === 'admin create') {
       // create local workbook storage

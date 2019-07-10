@@ -7,4 +7,4 @@ let attributeSchema = new mongoose.Schema({
     description: {type: String},
 });
 
-module.exports = mongoose.model('Attribute', attributeSchema);
+module.exports = mongoose.model('Attribute2', attributeSchema);

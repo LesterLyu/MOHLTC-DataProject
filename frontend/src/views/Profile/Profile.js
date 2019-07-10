@@ -2,9 +2,18 @@ import React, {Component} from 'react';
 import UserManager from "../../controller/userManager";
 import {Fade, Chip, Typography, Card} from "@material-ui/core";
 import PropTypes from "prop-types";
-import {withStyles} from "@material-ui/core/es";
+import {withStyles} from "@material-ui/core";
 
 import {Clear as No, Done as Yes} from "@material-ui/icons";
+// eslint-disable-next-line
+import workerpool from 'workerpool';
+
+const pool = workerpool.pool();
+
+function add(a, b) {
+  for(let i = 0; i < 3999999999; i++){} // 5 seconds
+  return a + b;
+}
 
 const styles = theme => ({
   root: {
@@ -49,6 +58,18 @@ class Profile extends Component {
     this.user.getProfile()
       .then(profile => {
         this.setState({profile});
+      });
+
+
+    pool.exec(add, [3, 4])
+      .then(function (result) {
+        console.log('result', result); // outputs 7
+      })
+      .catch(function (err) {
+        console.error(err);
+      })
+      .then(function () {
+        // pool.terminate(); // terminate all workers when done
       });
   }
 

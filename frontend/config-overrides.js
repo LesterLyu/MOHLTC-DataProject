@@ -11,17 +11,18 @@ module.exports = {
       reasons: true,
     };
     config.plugins.push(new WorkerPlugin());
-    config.plugins.push(new BundleAnalyzerPlugin({
-      analyzerMode: 'static',
-      defaultSizes: 'parsed',
-      reportFilename: 'webpack-report.html',
-    }));
+    // config.plugins.push(new BundleAnalyzerPlugin({
+    //   analyzerMode: 'static',
+    //   defaultSizes: 'parsed',
+    //   reportFilename: 'webpack-report.html',
+    // }));
     // config.plugins.push(new DuplicatesPlugin({
     //   // Emit compilation warning or error? (Default: `false`)
     //   emitErrors: false,
     //   // Display full duplicates information? (Default: `false`)
     //   verbose: false
     // }));
+    config.externals = ['child_process', 'worker_threads'];
 
     config.optimization.minimizer[0] = new TerserPlugin({
       terserOptions: {

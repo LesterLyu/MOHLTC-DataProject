@@ -6,4 +6,4 @@ let attributeGroupSchema = new mongoose.Schema({
     attributeIds: {type: Array}
 });
 
-module.exports = mongoose.model('AttributeGroup', attributeGroupSchema);
+module.exports = mongoose.model('AttributeGroup2', attributeGroupSchema);

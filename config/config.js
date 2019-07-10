@@ -7,8 +7,8 @@ module.exports = {
         port: 465,
         secure: true,
         auth: {
-            user: "w767089351@gmail.com",
-            pass: "wkw1234567"
+            user: "username@email.com",
+            pass: "password"
         },
         sender: '"Will Wang" <w767089351@gmail.com>'
     },
@@ -31,8 +31,12 @@ module.exports = {
         SYSTEM_MANAGEMENT: 'system-management',
         WORKBOOK_QUERY: 'workbook-query'
     },
+    constants: {
+        categoryIdStartFrom: 1000000,
+        attributeIdStartFrom: 3000000,
+    },
     disableEmailValidation: true,
     disableLdap: true,
     organizations: [],
-    maxGroupNumber: 0
+    maxGroupNumber: 0,
 };
