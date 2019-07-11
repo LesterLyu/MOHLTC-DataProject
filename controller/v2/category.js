@@ -84,6 +84,30 @@ module.exports = {
         }
     },
 
+    categoryAssignGroups: async (req, res, next) => {
+        if (!checkPermission(req, Permission.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const ids = req.body.ids;
+        const groups = req.body.groups;
+        const operations = [];
+        ids.forEach(id => {
+            operations.push({
+                updateOne: {
+                    filter: {groupNumber, id},
+                    update: {groups},
+                }
+            })
+        });
+        try {
+            let result = await Category.bulkWrite(operations);
+            res.json({success: true, result, message: `Updated ${result.modifiedCount} category(s).`})
+        } catch (e) {
+            next(e);
+        }
+    },
+
     getCategoryGroup: (req, res, next) => {
         if (!checkPermission(req, Permission.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
             return next(error.api.NO_PERMISSION);
