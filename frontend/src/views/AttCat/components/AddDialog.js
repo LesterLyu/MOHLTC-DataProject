@@ -53,11 +53,11 @@ class AddDialog extends React.Component {
   };
 
   render() {
-    const {open, handleClose, title} = this.props;
+    const {open, onClose, title} = this.props;
     return (
       <Dialog
         open={open}
-        onClose={handleClose}
+        onClose={onClose}
         PaperComponent={PaperComponent}
         aria-labelledby={title}
       >
@@ -95,7 +95,7 @@ class AddDialog extends React.Component {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="primary">
+          <Button onClick={onClose} color="primary">
             Cancel
           </Button>
           <Button onClick={this.onClickAdd} color="primary">
