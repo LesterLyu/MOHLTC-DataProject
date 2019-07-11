@@ -198,8 +198,12 @@ describe.skip('CRUD filled workbook', function () {
 use dataproject;
 db.getCollection('attributes').remove({});
 db.getCollection('categories').remove({})
+db.getCollection('attributegroups').remove({})
+db.getCollection('categorygroups').remove({})
 db.getCollection('categories').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['categories'].insert(d); });
 db.getCollection('attributes').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['attributes'].insert(d); });
+db.getCollection('attributegroups').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['attributegroups'].insert(d); });
+db.getCollection('categorygroups').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['categorygroups'].insert(d); });
 db.getCollection('workbooks').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['workbooks'].insert(d); });
 db.getCollection('fillerworkbooks').find({}).forEach(function(d){ db.getSiblingDB('testdataproject')['fillerworkbooks'].insert(d); });
 

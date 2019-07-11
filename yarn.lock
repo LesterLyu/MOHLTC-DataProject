@@ -2510,7 +2510,7 @@ formidable@^1.2.0, formidable@^1.2.1:
   dependencies:
     bessel "^0.2.0"
     jStat "^1.7.0"
-    numbro "^1.11.0"
+    moment "^2.23.0"
 
 forwarded@~0.1.2:
   version "0.1.2"
@@ -4202,6 +4202,11 @@ mongoose-sequence@^5.0.1:
   dependencies:
     async "^2.5.0"
     lodash "^4.6.1"
+
+mongoose-unique-array@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/mongoose-unique-array/-/mongoose-unique-array-0.3.1.tgz#8371532223ff462d190b037bf1d14b2e16ddd42e"
+  integrity sha512-Cd76M02EUwJ7pb3yfocjyaGmBu/iNJpvmhwF+KvSioB8PUUurgKorzNnF3yX27adVWCyxc9m1MiRhZsOFP1F7Q==
 
 mongoose@^5.5.9:
   version "5.6.4"
