@@ -13,6 +13,7 @@ import {createMuiTheme, MuiThemeProvider} from '@material-ui/core/styles';
 import CustomToolbar from "./components/CustomToolbar";
 import CustomToolbarSelect from "./components/CustomToolbarSelect";
 import AddDialog from "./components/AddDialog";
+import AssignDialog from './components/AssignDialog';
 
 const styles = theme => ({
   root: {
@@ -30,10 +31,11 @@ class AttCat extends Component {
     this.mode = this.props.params.mode; // can be att or cat
     this.attCatManager = new AttCatManager(props);
     this.state = {
-      loading: true, openSetId: false,
+      loading: true, showAddDialog: false, showAssignDialog: false,
     };
     this.showMessage = this.props.showMessage;
-    this.dialogRef = React.createRef();
+    this.addDialogRef = React.createRef();
+    this.assignDialogRef = React.createRef();
     this.getData();
   }
 
@@ -46,20 +48,21 @@ class AttCat extends Component {
       })
   }
 
-  handleClickOpen = () => {
+  // AddDialog methods
+  openAddDialog = () => {
     this.attCatManager.generateId(this.mode === 'att')
       .then(id => {
-        this.dialogRef.current.setId(id);
+        this.addDialogRef.current.setId(id);
       });
-    this.setState({openSetId: true});
+    this.setState({showAddDialog: true});
   };
 
-  handleClose = () => {
-    this.setState({openSetId: false});
+  closeAddDialog = () => {
+    this.setState({showAddDialog: false});
   };
 
-  handelAdd = (id, name, description) => {
-    this.setState({openSetId: false});
+  handleAdd = (id, name, description) => {
+    this.setState({showAddDialog: false});
     this.attCatManager.add(this.mode === 'att', id, name, description)
       .then(data => {
         if (data.success) {
@@ -76,6 +79,47 @@ class AttCat extends Component {
           this.showMessage(err.message, 'error')
         }
       });
+  };
+
+  // Assign Dialog methods
+  openAssignDialog = (selectedRows) => {
+    const data = {};
+    const indices = Object.keys(selectedRows.lookup);
+    for (let i = 0; i < indices.length; i++) {
+      // id => groups
+      const item = this.state.data[indices[i]];
+      data[item[0]] = item[4];
+    }
+    // check if every att/cat contains the same group
+    const ids = Object.keys(data);
+    const first = data[ids[0]];
+    const groupSize = first.length;
+    const haveSameGroups = ids.every(id => groupSize === data[id].length
+      && data[id].every(group => first.includes(group)));
+
+    this.attCatManager.getGroup(this.mode === 'att', 'label')
+      .then(treeData => {
+        this.assignDialogRef.current.setData(treeData, haveSameGroups ? first : []);
+      });
+    this.toAssignIds = ids;
+    this.toAssignIndices = indices;
+    this.assignDialogRef.current.open();
+  };
+
+  handleAssign = (groups) => {
+    // this.props.showMessage('Saving...', 'info');
+    this.attCatManager.assignGroups(this.mode === 'att', {ids: this.toAssignIds, groups})
+      .then(data => this.props.showMessage(data.message, 'success'))
+      .catch(err => this.props.showMessage(err.response.data.message, 'error'));
+
+    const data = this.state.data;
+    for (let i = 0; i < this.toAssignIndices.length; i++) {
+      data[this.toAssignIndices[i]][4] = groups;
+    }
+
+    this.toAssignIds = null;
+    this.toAssignIndices = null;
+    this.assignDialogRef.current.close();
   };
 
   handleDeleteRows = (rowsDeleted) => {
@@ -125,7 +169,8 @@ class AttCat extends Component {
    */
   shouldComponentUpdate(nextProps, nextState, nextContent) {
     return !(this.state.loading === nextState.loading
-      && this.state.openSetId === nextState.openSetId
+      && this.state.showAddDialog === nextState.showAddDialog
+      && this.state.showAssignDialog === nextState.showAssignDialog
       && this.state.data.length === nextState.data.length
       && this.state.id === nextState.id);
   }
@@ -143,12 +188,13 @@ class AttCat extends Component {
       rowsPerPage: 10,
       customToolbar: () => {
         return (
-          <CustomToolbar addClick={this.handleClickOpen}/>
+          <CustomToolbar addClick={this.openAddDialog}/>
         );
       },
       customToolbarSelect: (selectedRows, displayData, setSelectedRows) => {
         return (
-          <CustomToolbarSelect selectedRows={selectedRows} onRowsDelete={this.handleDeleteRows}/>
+          <CustomToolbarSelect selectedRows={selectedRows} onRowsDelete={this.handleDeleteRows}
+                               openAssignDialog={this.openAssignDialog}/>
         )
       },
       onRowsDelete: this.handleDeleteRows,
@@ -181,12 +227,16 @@ class AttCat extends Component {
           </Grid>
         </Fade>
         <AddDialog
-          ref={this.dialogRef}
-          open={this.state.openSetId}
-          handleClose={this.handleClose}
-          handelAdd={this.handelAdd}
+          ref={this.addDialogRef}
+          open={this.state.showAddDialog}
+          onClose={this.closeAddDialog}
+          handelAdd={this.handleAdd}
           title={"Add " + key}
           showMessage={this.props.showMessage}
+        />
+        <AssignDialog
+          ref={this.assignDialogRef}
+          onSave={this.handleAssign}
         />
       </React.Fragment>
     )

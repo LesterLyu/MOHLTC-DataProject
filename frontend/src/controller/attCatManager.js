@@ -55,7 +55,8 @@ export default class AttCatManager {
           const data = response.data.data;
           const res = [];
           for (let i = 0; i < data.length; i++) {
-            res.push([data[i].id, data[i].name, data[i].description || '']);
+            const item = data[i];
+            res.push([item.id, item.name, item.description || '', item._id, item.groups]);
           }
           return res;
         }
@@ -75,6 +76,16 @@ export default class AttCatManager {
       })
   }
 
+  assignGroups(isAttribute, data) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.post(`${config.server}/api/v2/${what}/assign/group`, data, axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      })
+  }
+
   generateId(isAttribute) {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.get(`${config.server}/api/v2/${what}/generate/id`, axiosConfig)
@@ -87,9 +98,10 @@ export default class AttCatManager {
 
   /**
    * @param {boolean} isAttribute
+   * @param labelName
    * @return {*}
    */
-  getGroup(isAttribute) {
+  getGroup(isAttribute, labelName = 'title') {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.get(`${config.server}/api/v2/${what}/group`, axiosConfig)
       .then(response => {
@@ -98,7 +110,7 @@ export default class AttCatManager {
         }
       })
       .then(data => {
-        return this._buildTree(data.documents);
+        return this._buildTree(data.documents, labelName);
       })
   }
 
@@ -151,24 +163,25 @@ export default class AttCatManager {
   /**
    * Build group tree.
    * @param documents
+   * @param labelName
    * @param [currNode]
    * @param [tree]
    * @param {Array} [childIds] - array of ids
    * @private
    */
-  _buildTree(documents, currNode, tree = [], childIds) {
+  _buildTree(documents, labelName, currNode, tree = [], childIds) {
     // basis
     if (currNode == null) {
       for (let document of documents) {
         if (!document.parent) {
           // does not have parent, master node
           const node = {
-            title: document.name,
+            [labelName]: document.name,
             _id: document._id,
             children: []
           };
           tree.push(node);
-          this._buildTree(documents, node, tree, document.children);
+          this._buildTree(documents, labelName, node, tree, document.children);
         }
       }
       return tree;
@@ -177,12 +190,12 @@ export default class AttCatManager {
       for (let document of documents) {
         if (childIds.includes(document._id)) {
           const node = {
-            title: document.name,
+            [labelName]: document.name,
             _id: document._id,
             children: []
           };
-          currNode.children.push(node)
-          this._buildTree(documents, node, tree, document.children);
+          currNode.children.push(node);
+          this._buildTree(documents, labelName, node, tree, document.children);
         }
       }
     }

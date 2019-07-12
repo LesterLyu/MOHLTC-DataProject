@@ -16,29 +16,26 @@ const defaultToolbarSelectStyles = {
 
 class CustomToolbarSelect extends React.Component {
 
-  handleClick = () => {
-    console.log("click! current selected rows", this.props.selectedRows);
-  };
-
   render() {
-    const {onRowsDelete, classes, selectedRows} = this.props;
+    const {onRowsDelete, openAssignDialog, classes, selectedRows} = this.props;
     return (
-      <div className={"custom-toolbar-select " + classes.toolbar}>
-        <Tooltip title={"Assign Group"}>
-          <IconButton className={classes.iconButton} onClick={this.handleClick}>
-            <AssignIcon/>
-          </IconButton>
-        </Tooltip>
-        <Tooltip title={"Delete"}>
-          <IconButton className={classes.iconButton} onClick={() => onRowsDelete(selectedRows)}>
-            <DeleteIcon/>
-          </IconButton>
-        </Tooltip>
-      </div>
+      <>
+        <div className={"custom-toolbar-select " + classes.toolbar}>
+          <Tooltip title={"Assign Group"}>
+            <IconButton className={classes.iconButton} onClick={() => openAssignDialog(selectedRows)}>
+              <AssignIcon/>
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={"Delete"}>
+            <IconButton className={classes.iconButton} onClick={() => onRowsDelete(selectedRows)}>
+              <DeleteIcon/>
+            </IconButton>
+          </Tooltip>
+        </div>
+      </>
     );
   }
 }
-
 
 export default withStyles(defaultToolbarSelectStyles, {
   name: "CustomToolbarSelect"
