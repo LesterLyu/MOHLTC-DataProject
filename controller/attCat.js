@@ -1,5 +1,5 @@
-const Attribute = require('../models/attribute');
-const Category = require('../models/category');
+const Attribute = require('../models/workbook/attribute');
+const Category = require('../models/workbook/category');
 const Workbook = require('../models/workbook');
 const error = require('../config/error');
 const config = require('../config/config');

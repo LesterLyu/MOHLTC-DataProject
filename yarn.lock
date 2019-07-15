@@ -4166,7 +4166,7 @@ moment@2.20.1:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.20.1.tgz#d6eb1a46cbcc14a2b2f9434112c1ff8907f313fd"
   integrity sha512-Yh9y73JRljxW5QxN08Fner68eFLxM5ynNOAw2LbIB1YAGeQzZT8QFSUvkAz609Zf+IHhhaUxqZK8dG3W/+HEvg==
 
-moment@2.x, moment@>=2.14.0, moment@>=2.19.3, moment@^2.10.6:
+moment@2.x, moment@>=2.14.0, moment@>=2.19.3, moment@^2.10.6, moment@^2.23.0:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
@@ -4202,11 +4202,6 @@ mongoose-sequence@^5.0.1:
   dependencies:
     async "^2.5.0"
     lodash "^4.6.1"
-
-mongoose-unique-array@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/mongoose-unique-array/-/mongoose-unique-array-0.3.1.tgz#8371532223ff462d190b037bf1d14b2e16ddd42e"
-  integrity sha512-Cd76M02EUwJ7pb3yfocjyaGmBu/iNJpvmhwF+KvSioB8PUUurgKorzNnF3yX27adVWCyxc9m1MiRhZsOFP1F7Q==
 
 mongoose@^5.5.9:
   version "5.6.4"
@@ -4519,11 +4514,6 @@ numbro@2.1.1:
   integrity sha512-H3VamlHyqYYomNngAbrl/CT92DnOSC2rJxx6hfZrgj0NVnqxAtOvGbwgpOYjv4ASgxodDWBSYHJ1ZxaEq2lfTg==
   dependencies:
     bignumber.js "^4.0.4"
-
-numbro@^1.11.0:
-  version "1.11.1"
-  resolved "https://registry.yarnpkg.com/numbro/-/numbro-1.11.1.tgz#e0d9ba0ddfc3ad5ac01d9558a49383db214f04be"
-  integrity sha512-qL0Etqbunz4RtPx4bNjMONe9HyUpgbrM4Sa3VpWY5oRdp9ry5DufAj6lCvnIcluRBA9QUacrllYc73QK0G6VAw==
 
 oauth-sign@~0.9.0:
   version "0.9.0"
