@@ -11,11 +11,14 @@ module.exports = {
       reasons: true,
     };
     config.plugins.push(new WorkerPlugin());
-    // config.plugins.push(new BundleAnalyzerPlugin({
-    //   analyzerMode: 'static',
-    //   defaultSizes: 'parsed',
-    //   reportFilename: 'webpack-report.html',
-    // }));
+    if (process.env.NODE_ENV === 'production') {
+      config.plugins.push(new BundleAnalyzerPlugin({
+        analyzerMode: 'static',
+        defaultSizes: 'parsed',
+        reportFilename: 'webpack-report.html',
+      }));
+    }
+
     // config.plugins.push(new DuplicatesPlugin({
     //   // Emit compilation warning or error? (Default: `false`)
     //   emitErrors: false,

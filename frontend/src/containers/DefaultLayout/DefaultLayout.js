@@ -1,9 +1,8 @@
 import React, {Component, Suspense} from 'react';
 import {Redirect, Route, Switch} from 'react-router-dom';
-import {Container} from 'reactstrap';
+import {Container} from '@material-ui/core'
 
 import {
-  AppBreadcrumb,
   AppHeader,
   AppSidebar,
   AppSidebarFooter,
@@ -19,8 +18,20 @@ import routes from '../../routes';
 import UserManager from "../../controller/userManager";
 import CustomSnackbarContent from "../../views/AttCat/components/CustomSnackbarContent";
 import {Snackbar} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
+import AppBreadcrumb from '../AppBreadcrumb';
 
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
+
+const styles = {
+  container: {
+    paddingLeft: 12,
+    paddingRight: 12,
+  },
+  main: {
+    backgroundColor: '#f3f4fd'
+  }
+};
 
 class DefaultLayout extends Component {
 
@@ -100,6 +111,7 @@ class DefaultLayout extends Component {
   };
 
   render() {
+    const {classes} = this.props;
     return (
       <div className="app">
         <AppHeader fixed>
@@ -117,9 +129,9 @@ class DefaultLayout extends Component {
             <AppSidebarFooter/>
             <AppSidebarMinimizer/>
           </AppSidebar>
-          <div className="main">
+          <div className={classes.main + ' main'}>
             <AppBreadcrumb appRoutes={routes}/>
-            <Container fluid>
+            <Container maxWidth="xl" className={classes.container}>
               <Suspense fallback={this.loading()}>
                 <Switch>
                   {routes.map((route, idx) => {
@@ -135,7 +147,7 @@ class DefaultLayout extends Component {
                         )}/>
                     ) : (null);
                   })}
-                  <Redirect from="/" to="/dashboard"/>
+                  <Redirect from="/" to="/profile"/>
                 </Switch>
               </Suspense>
             </Container>
@@ -162,4 +174,4 @@ class DefaultLayout extends Component {
   }
 }
 
-export default DefaultLayout;
+export default withStyles(styles)(DefaultLayout);

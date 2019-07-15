@@ -88,16 +88,31 @@ class Worksheets extends Component {
     return height === undefined ? 80 : height / 0.11;
   };
 
-  onMouseDown = (row, col, cellStyle) => {
-    // console.log(`Mouse down: ${row}, ${col}`);
-    this.isMouseDown = true;
-    this.startCell = [row, col, row, col];
-    this.selections.setSelections(this.startCell);
+  /**
+   *
+   * @param row
+   * @param col
+   * @param cellStyle
+   * @param {MouseEvent} e
+   */
+  onMouseDown = (row, col, cellStyle, e) => {
+    console.log(`Mouse down: ${row}, ${col}`);
+    // 2 = right click; 1 = left click.
+    if (e.button === 0) {
+      this.isMouseDown = true;
+      this.startCell = [row, col, row, col];
+      this.selections.setSelections(this.startCell);
+    } else if (e.button === 2) {
+      
+    }
+
   };
 
-  onMouseUp = (row, col, cellStyle) => {
+  onMouseUp = (row, col, cellStyle, e) => {
     // console.log(`Mouse up: ${row}, ${col}`);
-    this.isMouseDown = false;
+    if (e.button === 0) {
+      this.isMouseDown = false;
+    }
   };
 
   onMouseOver = (row, col, cellStyle) => {

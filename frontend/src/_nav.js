@@ -3,15 +3,6 @@ import config from "./config/config";
 export default {
   items: [
     {
-      name: 'Dashboard',
-      url: '/dashboard',
-      icon: 'mdi mdi-view-dashboard',
-      badge: {
-        variant: 'info',
-        // text: 'NEW',
-      },
-    },
-    {
       title: true,
       name: 'User',
     },
@@ -133,7 +124,7 @@ export default {
       url: 'https://github.com/LesterLyu/MOHLTC-DataProject/blob/dev-lester/documents/update-history.md',
       icon: 'icon-cloud-download',
       class: 'mt-auto',
-      attributes: { target: '_blank', rel: "noopener" },
+      attributes: {target: '_blank', rel: "noopener"},
     },
   ],
 
