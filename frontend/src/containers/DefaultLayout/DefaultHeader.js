@@ -19,7 +19,7 @@ class DefaultHeader extends Component {
   render() {
     return (
       <React.Fragment>
-        <AppBar style={{minHeight: 55, backgroundColor: '#536DFE'}}>
+        <AppBar style={{minHeight: 55}} color="default">
           <Toolbar style={{minHeight: 55}}>
             <AppSidebarToggler className="d-lg-none" display="md" mobile/>
             <AppNavbarBrand

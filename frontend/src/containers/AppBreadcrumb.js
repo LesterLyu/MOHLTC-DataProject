@@ -34,7 +34,8 @@ const StyledBreadcrumb = withStyles(() => ({
 const StyledPaper = withStyles(theme => ({
   root: {
     padding: theme.spacing(1),
-    marginBottom: 12
+    marginBottom: 12,
+    borderRadius: 0,
   }
 }))(Paper);
 
