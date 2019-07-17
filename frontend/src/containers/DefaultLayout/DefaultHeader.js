@@ -6,8 +6,7 @@ import {AppHeaderDropdown, AppSidebarToggler, AppNavbarBrand} from '@coreui/reac
 import logo from '../../assets/img/brand/ON_POS_LOGO_BLUE_RGB.svg'
 import sygnet from '../../assets/img/brand/ON_POS_LOGO_RGB_BLUE_NO_FONT_SPACED.svg'
 
-import {AppBar, Toolbar, IconButton} from '@material-ui/core';
-import MenuIcon from '@material-ui/icons/Menu';
+import {AppBar, Toolbar} from '@material-ui/core';
 
 const propTypes = {
   children: PropTypes.node,

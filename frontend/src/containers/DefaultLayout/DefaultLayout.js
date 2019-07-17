@@ -29,7 +29,7 @@ const styles = {
     paddingRight: 12,
   },
   main: {
-    backgroundColor: '#f9fafb'
+    backgroundColor: '#f3f4fd'
   }
 };
 
