@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import MUIDataTable from "mui-datatables";
 import AttCatManager from "../../controller/attCatManager";
 import {
-  LinearProgress,
   Grid,
   Fade
 } from "@material-ui/core";
@@ -14,6 +13,7 @@ import CustomToolbar from "./components/CustomToolbar";
 import CustomToolbarSelect from "./components/CustomToolbarSelect";
 import AddDialog from "./components/AddDialog";
 import AssignDialog from './components/AssignDialog';
+import Loading from "../components/Loading";
 
 const styles = theme => ({
   root: {
@@ -204,10 +204,7 @@ class AttCat extends Component {
 
     if (loading) {
       return (
-        <div>
-          <h3>Loading...</h3><br/>
-          <LinearProgress variant="indeterminate"/>
-        </div>
+        <Loading/>
       );
     }
     return (

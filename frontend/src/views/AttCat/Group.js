@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import AttCatManager from "../../controller/attCatManager";
 import {
-  LinearProgress,
   Grid,
   Button,
   AppBar,
@@ -21,6 +20,7 @@ import SortableTree, {toggleExpandedForAll, addNodeUnderParent, removeNodeAtPath
 import 'react-sortable-tree/style.css';
 import {UnfoldLess, UnfoldMore, Add, Search, NavigateBefore, NavigateNext, Delete} from "@material-ui/icons";
 import {ToolBarDivider} from "../Excel/components/ExcelToolBarUser";
+import Loading from '../components/Loading';
 
 const styles = theme => ({
   button: {
@@ -136,11 +136,11 @@ class AttCatGroup extends Component {
     const dialogValue = this.state.dialogValue;
     this.setState({dialog: false, dialogValue: ''});
     this.attCatManager.generateObjectId()
-      .then(data => {
+      .then(ids => {
         const {treeData} = addNodeUnderParent({
           treeData: this.state.treeData, newNode: {
             title: dialogValue,
-            _id: data.ids[0]
+            _id: ids[0]
           }
         });
         this.save(treeData).then(success => {
@@ -187,12 +187,7 @@ class AttCatGroup extends Component {
     const {classes} = this.props;
     const {searchFocusOffset, searchQuery} = this.state;
     if (this.state.loading) {
-      return (
-        <div>
-          <h3>Loading...</h3><br/>
-          <LinearProgress variant="indeterminate"/>
-        </div>
-      );
+      return <Loading/>;
     }
     return (
       <Paper>

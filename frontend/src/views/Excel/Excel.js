@@ -23,6 +23,7 @@ import SetIdDialog from "./components/SetIdDialog";
 import Dropdown from './components/Dropdown';
 import DataValidationDialog from './components/DataValidationDialog';
 import CellEditor from './components/Editor';
+import Loading from "../components/Loading";
 
 function defaultSheet() {
   return {
@@ -53,7 +54,7 @@ class Excel extends Component {
       completed: 5,
       sheetHeight: 0,
       sheetWidth: 0,
-      loadingMessage: 'Loading...',
+      loadingMessage: 'Loading Workbook...',
       loaded: false,
       currentSheetIdx: 0,
       openSetId: null,
@@ -499,11 +500,9 @@ class Excel extends Component {
     console.log('render create excel');
     if (!this.isLoaded) {
       return (
-        <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px - 58px)'}}
+        <div style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px - 58px)'}}
              ref={this.sheetContainerRef}>
-          <h3>{this.state.loadingMessage}</h3><br/>
-
-          <LinearProgress variant="indeterminate"/>
+          <Loading message={this.state.loadingMessage}/>
         </div>
       );
     } else if (this.mode === 'admin create' || this.mode === 'admin edit') {

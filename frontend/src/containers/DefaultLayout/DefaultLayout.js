@@ -20,6 +20,7 @@ import CustomSnackbarContent from "../../views/AttCat/components/CustomSnackbarC
 import {Snackbar} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
 import AppBreadcrumb from '../AppBreadcrumb';
+import Loading from '../../views/components/Loading';
 
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
 
@@ -61,7 +62,7 @@ class DefaultLayout extends Component {
     }
   }
 
-  loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  loading = () => <Loading/>;
 
   signOut(e) {
     e.preventDefault();
