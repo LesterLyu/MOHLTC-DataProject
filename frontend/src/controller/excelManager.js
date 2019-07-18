@@ -1,6 +1,7 @@
 import axios from "axios";
 import config from "./../config/config";
 import {excelInstance, XlsxPopulate} from "../views/Excel/helpers";
+import {generateObjectId} from './common';
 
 const axiosConfig = {withCredentials: true};
 
@@ -122,6 +123,7 @@ class WorkbookManager {
     const fileName = excelInstance.state.fileName;
     workbook.outputAsync('base64')
       .then(base64 => {
+        this.testSave(workbook, fileName, base64);
         const workbookData = {}, attMap = {}, catMap = {};
         workbook.sheets().forEach((sheet, sheetNo) => {
           workbookData[sheetNo] = {};
@@ -172,6 +174,60 @@ class WorkbookManager {
       .then(response => {
         this.props.showMessage(response.data.message, response.data.success ? 'success' : 'error');
       })
+  }
+
+  async testSave(workbook, fileName, base64) {
+    const data = {};
+    const sheets = workbook.sheets();
+    const ids = await generateObjectId(sheets.length);
+    data.workbook = {
+      name: fileName,
+      file: base64,
+      sheetIds: ids,
+    };
+    data.sheets = [];
+    data.values = {};
+    sheets.forEach((sheet, sheetNo) => {
+      const col2Att = {}, row2Cat = {};
+      data.sheets.push({
+        col2Att, row2Cat, name: sheet.name(), _id: ids[sheetNo]
+      });
+      sheet._rows.forEach((row, rowNumber) => {
+        // first row, check attribute
+        if (rowNumber === 1) {
+          row._cells.forEach((cell, colNumber) => {
+            const cellValue = cell.getValue();
+            if (/^[0-9]*$/.test(cellValue)) {
+              col2Att[colNumber - 1] = cellValue; // 0-based index
+            }
+          });
+          return;
+        }
+        // process each row
+        row._cells.forEach((cell, colNumber) => {
+          // first column, check category
+          if (colNumber === 1) {
+            const cellValue = cell.getValue();
+            if (/^[0-9]*$/.test(cellValue)) {
+              row2Cat[rowNumber - 1] = cellValue;
+            }
+          }
+          const catId = row2Cat[rowNumber - 1], attId = col2Att[colNumber - 1];
+          // skip the cell that have no att or cat id.
+          if (!catId || !attId) return;
+
+          // skip empty cell, rich text,
+          if (cell.value() === undefined || cell.value() === null || cell.value() instanceof XlsxPopulate.RichText) {
+            return;
+          }
+
+          let atts = data.values[catId];
+          if (!atts) atts = data.values[catId] = {};
+          if (!atts[attId]) atts[attId] = cell.getValue();
+        });
+      });
+    });
+    console.log(data);
   }
 }
 

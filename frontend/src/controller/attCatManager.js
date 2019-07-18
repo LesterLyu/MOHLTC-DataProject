@@ -1,5 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
+import {generateObjectId} from './common';
 
 const axiosConfig = {withCredentials: true};
 
@@ -151,14 +152,7 @@ export default class AttCatManager {
    * @param {number} [number=1]
    * @return {Promise<AxiosResponse<T> | never>}
    */
-  generateObjectId(number = 1) {
-    return axios.get(config.server + '/api/v2/generate/id/' + number, axiosConfig)
-      .then(response => {
-        if (this.check(response)) {
-          return response.data;
-        }
-      });
-  }
+  generateObjectId = generateObjectId;
 
   /**
    * Build group tree.
