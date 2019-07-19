@@ -189,9 +189,10 @@ class WorkbookManager {
     data.values = {};
     sheets.forEach((sheet, sheetNo) => {
       const col2Att = {}, row2Cat = {};
-      data.sheets.push({
+      const sheetData = {
         col2Att, row2Cat, name: sheet.name(), _id: ids[sheetNo]
-      });
+      };
+      data.sheets.push(sheetData);
       sheet._rows.forEach((row, rowNumber) => {
         // first row, check attribute
         if (rowNumber === 1) {
@@ -226,7 +227,11 @@ class WorkbookManager {
           if (!atts[attId]) atts[attId] = cell.getValue();
         });
       });
+      sheetData.attIds = Object.values(col2Att);
+      sheetData.catIds = Object.values(row2Cat);
     });
+
+
     console.log(data);
   }
 }
