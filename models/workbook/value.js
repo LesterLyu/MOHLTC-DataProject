@@ -1,7 +1,9 @@
-const {Schema, model} = require('mongoose');
+const mongoose = require('mongoose');
 
-module.exports = model('Value',
-    new Schema({
+
+
+module.exports = mongoose.model('Value',
+    new mongoose.Schema({
         groupNumber: {type: Number, required: true, unique: true},
 
         /**

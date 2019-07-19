@@ -23,5 +23,7 @@ module.exports = mongoose.model('Sheet',
          */
         attMap: {},
         catMap: {}, // same as attMap
+        row2Cat: {},
+        col2Att: {}
 
     }));

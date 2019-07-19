@@ -6,5 +6,5 @@ module.exports = mongoose.model('Workbook',
         groupNumber: {type: Number, required: true},
         name: {type: String, required: true, unique: true},
         sheetIds: [ObjectId], // Sheet._id
-        file: {type: Buffer, required: true}, // base64 encoding
+        file: {type: String, required: true}, // base64 encoding
     }));

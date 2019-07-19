@@ -11,4 +11,4 @@ let workbookSchema = new mongoose.Schema({
     attMap: {},
     catMap: {},
 });
-module.exports = mongoose.model('Workbook', workbookSchema);
+module.exports = mongoose.model('Workbook2', workbookSchema);

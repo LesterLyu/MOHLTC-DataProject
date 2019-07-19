@@ -142,6 +142,7 @@ app.use(function (err, req, res, next) {
     if (err === error.api.NO_PERMISSION) {
         res.status(403).json({success: false, message: error.api.NO_PERMISSION});
     } else {
+        console.error(err);
         res.status(err.status || 500).json({
             success: false,
             message: err.message,

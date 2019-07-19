@@ -230,9 +230,8 @@ class WorkbookManager {
       sheetData.attIds = Object.values(col2Att);
       sheetData.catIds = Object.values(row2Cat);
     });
-
-
     console.log(data);
+    await axios.post(config.server + '/api/v2/test/admin/workbook', data, axiosConfig);
   }
 }
 

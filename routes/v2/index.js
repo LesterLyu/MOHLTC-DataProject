@@ -3,4 +3,5 @@ module.exports = [
     require('./common'),
     require('./category'),
     require('./system'),
+    require('./workbook'),
 ];
