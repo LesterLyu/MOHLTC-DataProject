@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
-import {excelInstance, XlsxPopulate} from "../views/Excel/helpers";
+import {excelInstance, RichText, XlsxPopulate} from "../views/Excel/helpers";
 import {generateObjectId} from './common';
 
 const axiosConfig = {withCredentials: true};
@@ -35,7 +35,7 @@ class WorkbookManager {
   };
 
   getWorkbook(name, admin) {
-    const url = admin ? '/api/workbook/' : '/api/v2/user/filled/';
+    const url = admin ? '/api/v2/workbook/' : '/api/v2/user/filled/';
     return axios.get(config.server + url + name, axiosConfig)
       .then(response => {
         console.log(response);
@@ -50,18 +50,32 @@ class WorkbookManager {
     return XlsxPopulate.fromBlankAsync()
   }
 
-  readWorkbookFromDatabase(fileName, admin = true) {
-    return this.getWorkbook(fileName, admin)
-      .then(response => {
-        const {base64, name} = response.data.workbook;
-        return XlsxPopulate.fromDataAsync(base64, {base64: true})
-          .then(workbook => this._readWorkbook(workbook, null, name));
-      })
-      .catch(err => {
-        console.log(err);
-        this.props.showMessage(err.toString(), 'error');
-      })
-
+  async readWorkbookFromDatabase(fileName, admin = true) {
+    try {
+      const response = await this.getWorkbook(fileName, admin);
+      const {populate, workbook} = response.data;
+      const {file, name} = workbook;
+      const wb = await XlsxPopulate.fromDataAsync(file, {base64: true});
+      for (let i in populate) {
+        const sheet = wb.sheets()[i];
+        const rows = populate[i];
+        for (let rowNum in rows) {
+          rowNum = Number(rowNum);
+          const cols = rows[rowNum];
+          const row = sheet.row(rowNum + 1);
+          for (let colNum in cols) {
+            colNum = Number(colNum);
+            const cell = row.cell(colNum + 1);
+            // only populate the basic values (not formula nor rich text)
+            if (!(cell instanceof RichText)) cell._value = cols[colNum];
+          }
+        }
+      }
+      return this._readWorkbook(wb, null, name);
+    } catch (err) {
+      console.err(err);
+      this.props.showMessage(err.toString(), 'error');
+    }
   }
 
   readWorkbookLocal(cb) {
