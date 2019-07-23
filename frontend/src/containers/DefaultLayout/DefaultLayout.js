@@ -62,6 +62,15 @@ class DefaultLayout extends Component {
     }
   }
 
+  static getDerivedStateFromError(error) {
+    return null;
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.log('catch!' + error);
+    this.showMessage(error.toString() + errorInfo.componentStack.toString(), 'error');
+  }
+
   loading = () => <Loading/>;
 
   signOut(e) {
@@ -113,6 +122,9 @@ class DefaultLayout extends Component {
 
   render() {
     const {classes} = this.props;
+    if (this.state.hasError) {
+
+    }
     return (
       <div className="app">
         <AppHeader fixed>
@@ -146,7 +158,7 @@ class DefaultLayout extends Component {
                           <route.component showMessage={this.showMessage}
                                            params={route.params ? route.params : {}} {...props} />
                         )}/>
-                    ) : (null);
+                    ) : null;
                   })}
                   <Redirect from="/" to="/profile"/>
                 </Switch>

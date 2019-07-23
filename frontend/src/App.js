@@ -19,33 +19,33 @@ const theme = createMuiTheme({
 
 // Containers
 const DefaultLayout = Loadable({
-  loader: () => import('./containers/DefaultLayout'),
+  loader: () => import('./containers/DefaultLayout' /* webpackChunkName: "defaultLayout" */),
   loading
 });
 
 // Pages
 const Login = Loadable({
-  loader: () => import('./views/Pages/Login'),
+  loader: () => import('./views/Pages/Login' /* webpackChunkName: "login" */),
   loading
 });
 
 const Register = Loadable({
-  loader: () => import('./views/Pages/Register'),
+  loader: () => import('./views/Pages/Register' /* webpackChunkName: "register" */),
   loading
 });
 
 const ForgetPassword = Loadable({
-  loader: () => import('./views/Pages/ForgetPassword'),
+  loader: () => import('./views/Pages/ForgetPassword' /* webpackChunkName: "forgetPassword" */),
   loading
 });
 
 const Page404 = Loadable({
-  loader: () => import('./views/Pages/Page404'),
+  loader: () => import('./views/Pages/Page404' /* webpackChunkName: "404" */),
   loading
 });
 
 const Page500 = Loadable({
-  loader: () => import('./views/Pages/Page500'),
+  loader: () => import('./views/Pages/Page500' /* webpackChunkName: "500" */),
   loading
 });
 

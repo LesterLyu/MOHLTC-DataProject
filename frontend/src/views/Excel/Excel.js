@@ -374,6 +374,7 @@ class Excel extends Component {
       const {name} = this.props.match.params;
       this.excelManager.readWorkbookFromDatabase(name)
         .then(data => {
+          if (!data) return;
           const {sheets, sheetNames, workbook, fileName} = data;
           this.global.sheetNames = sheetNames;
           this.global.sheets = sheets;
@@ -391,6 +392,7 @@ class Excel extends Component {
       const {name} = this.props.match.params;
       this.excelManager.readWorkbookFromDatabase(name, false)
         .then(data => {
+          if (!data) return;
           const {sheets, sheetNames, workbook, fileName} = data;
           this.global.sheetNames = sheetNames;
           this.global.sheets = sheets;

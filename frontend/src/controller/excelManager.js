@@ -73,8 +73,8 @@ class WorkbookManager {
       }
       return this._readWorkbook(wb, null, name);
     } catch (err) {
-      console.err(err);
-      this.props.showMessage(err.toString(), 'error');
+      console.error(err);
+      this.props.showMessage(err.stack, 'error');
     }
   }
 
