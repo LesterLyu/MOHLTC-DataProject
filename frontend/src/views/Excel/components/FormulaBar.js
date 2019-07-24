@@ -57,7 +57,7 @@ class FormulaBar extends Component {
 
   focusin = () => {
     console.log('focus in');
-    this.td = this.excel.hotInstance.rootElement.querySelector('td.current.highlight');
+    // this.td = this.excel.hotInstance.rootElement.querySelector('td.current.highlight');
   };
 
   focusout = () => {

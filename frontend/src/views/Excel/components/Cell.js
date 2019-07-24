@@ -284,7 +284,7 @@ class Cell extends PureComponent {
 
   render() {
     const {data, rowIndex, columnIndex, style} = this.props;
-    const {sheet, onMouseDown, onMouseUp, onMouseOver, onMouseDoubleClick, onKeyDown} = data;
+    const {sheet, onMouseDown, onMouseUp, onMouseOver, onMouseDoubleClick, onKeyDown, onContextMenu} = data;
     let innerContent = null;
 
     // render row/column header
@@ -320,6 +320,7 @@ class Cell extends PureComponent {
     return (
       <div style={mergedStyle} className={"not-selectable"}
            tabIndex={0}
+           onContextMenu={e => onContextMenu(rowIndex, columnIndex, mergedStyle, e)}
            onKeyDown={(e) => onKeyDown(rowIndex, columnIndex, mergedStyle, e)}
            onDoubleClick={(e) => onMouseDoubleClick(rowIndex, columnIndex, mergedStyle, e)}
            onMouseDown={(e) => onMouseDown(rowIndex, columnIndex, mergedStyle, e)}

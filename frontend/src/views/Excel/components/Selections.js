@@ -11,6 +11,9 @@ const DefaultStyle = {
   display: 'none',
 };
 
+/**
+ * Four selections.
+ */
 export default class Selections {
   constructor(props) {
     this.props = props;

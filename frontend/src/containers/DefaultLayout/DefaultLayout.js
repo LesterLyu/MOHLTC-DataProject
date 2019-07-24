@@ -62,14 +62,14 @@ class DefaultLayout extends Component {
     }
   }
 
-  static getDerivedStateFromError(error) {
-    return null;
-  }
+  // static getDerivedStateFromError(error) {
+  //   return this.state;
+  // }
 
-  componentDidCatch(error, errorInfo) {
-    console.log('catch!' + error);
-    this.showMessage(error.toString() + errorInfo.componentStack.toString(), 'error');
-  }
+  // componentDidCatch(error, errorInfo) {
+  //   console.log('catch!' + error);
+  //   this.showMessage(error.toString() + errorInfo.componentStack.toString(), 'error');
+  // }
 
   loading = () => <Loading/>;
 

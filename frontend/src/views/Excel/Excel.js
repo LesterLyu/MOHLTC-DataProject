@@ -24,6 +24,7 @@ import Dropdown from './components/Dropdown';
 import DataValidationDialog from './components/DataValidationDialog';
 import CellEditor from './components/Editor';
 import Loading from "../components/Loading";
+import RightClickMenu from "./components/RightClickMenu";
 
 function defaultSheet() {
   return {
@@ -64,7 +65,8 @@ class Excel extends Component {
       dropdownCell: null,
       setIdCell: null,
       editorCell: null,
-      fileName: 'Untitled workbook'
+      fileName: 'Untitled workbook',
+      contextMenu: null,
     };
     this.global = {
       sheetNames: ['Sheet1'],
@@ -89,6 +91,20 @@ class Excel extends Component {
 
     // error dialog
     this.errorDialog = {};
+
+    // right click menu
+    this.menu = {
+      'Set ID': (anchorEl) => {
+        console.log('SET ID');
+        this.setId(anchorEl);
+      },
+      'div1': null,
+      'Copy \t\t\t Ctrl+C': () => {
+      },
+      'Paste \t\t\t Ctrl+V': () => {
+
+      },
+    }
   }
 
   get editor() {
@@ -132,21 +148,10 @@ class Excel extends Component {
   }
 
   /**
-   * @return {Handsontable}
-   */
-  get hotInstance() {
-    return this.sheetRef.current ? this.sheetRef.current.hotInstance : null;
-  }
-
-  /**
-   * @return {{cell: Cell, td: HTMLElement}}
+   * @return {*[]}
    */
   get selected() {
-    const selected = this.hotInstance.getSelected();
-    return {
-      cell: this.sheet.getCell(selected[0][0] + 1, selected[0][1] + 1),
-      td: this.hotInstance.getCell(selected[0][0], selected[0][1])
-    };
+    return this.sheetRef.current.selections.data;
   }
 
   addHook = (name, f) => {
@@ -213,13 +218,6 @@ class Excel extends Component {
       updates = cell.setValue(rawValue);
     }
 
-    // this.renderCell(row, col);
-    // // add to next render list
-    // updates.forEach(ref => {
-    //   if (ref.sheet === this.currentSheetName) {
-    //     this.renderCell(ref.row - 1, ref.col - 1);
-    //   }
-    // });
     console.log(`Updated ${updates.length + 1} cells.`)
   };
 
@@ -276,10 +274,9 @@ class Excel extends Component {
     this.switchSheet(newSheetName);
   };
 
-  setId = () => {
-    const {td, cell} = this.selected;
-    console.log('td', td);
-    this.setState({openSetId: td, setIdCell: cell});
+  setId = (anchorEl) => {
+    const cell = this.selected;
+    this.setState({contextMenu: null, openSetId: anchorEl, setIdCell: cell});
   };
 
   handleSetId = (att = {}, cat = {}) => {
@@ -351,6 +348,18 @@ class Excel extends Component {
     this.setState({openDataValidationDialog: false});
   };
 
+  /**
+   * Right click menu
+   * @param row
+   * @param col
+   * @param cellStyle
+   * @param e
+   */
+  onContextMenu = (row, col, cellStyle, e) => {
+    e.preventDefault();
+    this.setState({contextMenu: e.target})
+  };
+
   componentDidMount() {
     const sheetWidth = this.sheetContainerRef.current.offsetWidth;
     const sheetHeight = this.sheetContainerRef.current.offsetHeight;
@@ -408,55 +417,13 @@ class Excel extends Component {
     }
   }
 
-  renderCell(row, col) {
-    const renderer = this.renderer.cellRendererNG;
-    const cellProperties = this.hotInstance.getCellMeta(row, col);
-    let cellElement;
-    // in test mode, handsontable is unable to get views.
-    try {
-      cellElement = this.hotInstance.getCell(row, col);
-    } catch (e) {
-    }
-    // this cell is not rendered into the dom.
-    if (!cellElement) return;
-
-    renderer(this.hotInstance, cellElement, row, col, null, null, cellProperties);
-  }
-
   renderCurrentSheet() {
-    const changes = this.renderer.changes;
-    for (let sheetId in changes) {
-      if (!changes.hasOwnProperty(sheetId)) continue;
-      const rows = changes[sheetId];
-      // go through rows
-      for (let rowNumber in rows) {
-        if (!rows.hasOwnProperty(rowNumber)) continue;
-        const row = rows[rowNumber];
-        // go through cell
-        for (let colNumber in row) {
-          if (!row.hasOwnProperty(colNumber)) continue;
-          if (row[colNumber]) {
-            this.renderCell(parseInt(rowNumber), parseInt(colNumber));
-            this.renderer.cellUpdated(sheetId, rowNumber, colNumber);
-          }
-        }
-      }
-    }
-    // this.sheetRef.current.hotInstance.render();
+    this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
   }
 
   onFileNameChange = (event) => {
     this.setState({fileName: event.target.value})
   };
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.state.loaded && this.sheetRef) {
-      this.hooks.forEach(hook => {
-        // HandsonTable: adding the same hook twice is now silently ignored, no need to check if hook is added.
-        // this.hotInstance.addHook(hook.name, hook.f);
-      });
-    }
-  }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     return this.state.sheetWidth !== nextState.sheetWidth
@@ -469,6 +436,7 @@ class Excel extends Component {
       || this.state.fileName !== nextState.fileName
       || this.state.openDataValidationDialog !== nextState.openDataValidationDialog
       || this.state.openEditor !== nextState.openEditor
+      || this.state.contextMenu !== nextState.contextMenu
   }
 
   common() {
@@ -493,6 +461,11 @@ class Excel extends Component {
           errorStyle={this.errorDialog.errorStyle}
           handleRetry={this.handleRetryDataValidationDialog}
           handleClose={this.handleCloseDataValidationDialog}
+        />
+        <RightClickMenu
+          handleClose={() => this.setState({contextMenu: null})}
+          anchorEl={this.state.contextMenu}
+          items={this.menu}
         />
       </>
     )

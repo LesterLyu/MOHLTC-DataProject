@@ -3,6 +3,9 @@ import React from "react";
 import {VariableSizeGrid} from 'react-window';
 import Cell from './Cell';
 import Selections from './Selections';
+import RightClickMenu from "./RightClickMenu";
+
+
 
 /**
  * @typedef {Object}
@@ -103,7 +106,7 @@ class Worksheets extends Component {
       this.startCell = [row, col, row, col];
       this.selections.setSelections(this.startCell);
     } else if (e.button === 2) {
-      
+      this.selections.setSelections([row, col, row, col]);
     }
 
   };
@@ -158,36 +161,39 @@ class Worksheets extends Component {
     });
 
     return (
-      <VariableSizeGrid
-        ref={this.sheetContainerRef}
-        outerRef={this.outerRef}
-        columnCount={columnCount}
-        rowCount={rowCount}
-        width={this.excel.state.sheetWidth}
-        height={this.excel.state.sheetHeight}
-        rowHeight={rowHeight}
-        columnWidth={colWidth}
-        overscanRowCount={0}
-        overscanColumnCount={0}
-        estimatedColumnWidth={80}
-        estimatedRowHeight={24}
-        itemData={{
-          sheet,
-          onMouseDown: this.onMouseDown,
-          onMouseUp: this.onMouseUp,
-          onMouseOver: this.onMouseOver,
-          onMouseDoubleClick: this.onMouseDoubleClick,
-          onKeyDown: this.onKeyDown,
-          selections: this.selections,
-        }}
-        freezeRowCount={freezeRowCount + 1} // add one for header
-        freezeColumnCount={freezeColumnCount + 1} // add one for header
-        extraTopLeftElement={this.selections.renderTopLeft()}
-        extraTopRightElement={this.selections.renderTopRight()}
-        extraBottomLeftElement={this.selections.renderBottomLeft()}
-        extraBottomRightElement={this.selections.renderBottomRight()}>
-        {Cell}
-      </VariableSizeGrid>
+      <>
+        <VariableSizeGrid
+          ref={this.sheetContainerRef}
+          outerRef={this.outerRef}
+          columnCount={columnCount}
+          rowCount={rowCount}
+          width={this.excel.state.sheetWidth}
+          height={this.excel.state.sheetHeight}
+          rowHeight={rowHeight}
+          columnWidth={colWidth}
+          overscanRowCount={0}
+          overscanColumnCount={0}
+          estimatedColumnWidth={80}
+          estimatedRowHeight={24}
+          itemData={{
+            sheet,
+            onMouseDown: this.onMouseDown,
+            onMouseUp: this.onMouseUp,
+            onMouseOver: this.onMouseOver,
+            onMouseDoubleClick: this.onMouseDoubleClick,
+            onKeyDown: this.onKeyDown,
+            selections: this.selections,
+            onContextMenu: this.excel.onContextMenu,
+          }}
+          freezeRowCount={freezeRowCount + 1} // add one for header
+          freezeColumnCount={freezeColumnCount + 1} // add one for header
+          extraTopLeftElement={this.selections.renderTopLeft()}
+          extraTopRightElement={this.selections.renderTopRight()}
+          extraBottomLeftElement={this.selections.renderBottomLeft()}
+          extraBottomRightElement={this.selections.renderBottomRight()}>
+          {Cell}
+        </VariableSizeGrid>
+      </>
     )
   }
 }
