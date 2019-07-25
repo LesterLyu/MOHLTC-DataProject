@@ -15,6 +15,7 @@ const AttCatGroup = React.lazy(() => import('./views/AttCat/Group' /* webpackChu
 const Excel = React.lazy(() => import('./views/Excel/Excel'/* webpackChunkName: "excel" */));
 
 const SystemInfo = React.lazy(() => import('./views/System' /* webpackChunkName: "systemInfo" */));
+const ImportId = React.lazy(() => import('./views/Tools/Import' /* webpackChunkName: "importId" */));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -39,7 +40,9 @@ const routes = [
   {path: '/attribute/group', exact: true, name: 'Attribute Group', component: AttCatGroup, params: {mode: 'att'}},
   {path: '/category/group', exact: true, name: 'Category Group', component: AttCatGroup, params: {mode: 'cat'}},
 
-  {path: '/system', exact: true, name: 'System Info', component: SystemInfo}
+  {path: '/import/id', exact: true, name: 'Import ID', component: ImportId}
+  
+  
 ];
 
 export default routes;

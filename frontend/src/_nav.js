@@ -65,10 +65,11 @@ export default {
           icon: 'mdi mdi-checkbook',
         },
         {
-          name: 'Query',
-          url: '/5fghfgh',
-          icon: 'mdi mdi-magnify',
+          name: 'Import ID',
+          url: '/import/id',
+          icon: 'mdi mdi-application-import',
         },
+
       ]
     },
     {
