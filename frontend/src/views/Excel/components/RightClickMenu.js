@@ -52,7 +52,7 @@ export default function RightClickMenu(props) {
         anchorPosition={config}
         open={open}
         onClose={handleClose}
-        transitionDuration={0}
+        transitionDuration={200}
         // getContentAnchorEl={null}
 
         onContextMenu={e => {
