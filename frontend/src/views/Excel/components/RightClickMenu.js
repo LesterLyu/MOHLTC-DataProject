@@ -16,37 +16,55 @@ const StyledMenu = withStyles(theme => ({
   },
 }))(Menu);
 
-function renderItems(items, anchorEl) {
+function renderItems(items, config) {
   return Object.keys(items).map(key => {
-    if (items[key]) return <StyledMenuItem onContextMenu={e => e.preventDefault()} key={key}
-                                           onClick={() => items[key](anchorEl)}>{key}</StyledMenuItem>;
-    else return <Divider key={key}/>
+    if (items[key])
+      return (
+        <StyledMenuItem
+          key={key}
+          onClick={() => items[key](config.anchorEl)}
+          onMouseDown={e => {
+            if (e.button === 2) items[key](config.anchorEl);
+          }}
+        >
+          {key}
+        </StyledMenuItem>
+      );
+    else
+      return <Divider key={key}/>
   });
 }
 
 export default function RightClickMenu(props) {
-  const {handleClose, anchorEl, items} = props;
+  const {handleClose, items, config} = props;
 
-  const menuItems = useMemo(() => renderItems(items, anchorEl), [items, anchorEl]);
+  const menuItems = useMemo(() => renderItems(items, config), [items, config]);
 
-  return (
-    <StyledMenu
-      anchorEl={anchorEl}
-      open={Boolean(anchorEl)}
-      onClose={handleClose}
-      transitionDuration={0}
-      getContentAnchorEl={null}
-      anchorOrigin={{
-        vertical: 'bottom',
-        horizontal: 'center',
-      }}
-      onContextMenu={e => e.preventDefault()}
-      onMouseDown={e => {
-        if (e.button === 2) handleClose()
-      }}
-      container={anchorEl ? anchorEl.parent : null}
-    >
-      {menuItems}
-    </StyledMenu>
-  );
+  const open = Boolean(config);
+
+  if (open) {
+
+    const {anchorEl} = config;
+    return (
+      <StyledMenu
+        // anchorEl={anchorEl}
+        anchorReference="anchorPosition"
+        anchorPosition={config}
+        open={open}
+        onClose={handleClose}
+        transitionDuration={0}
+        // getContentAnchorEl={null}
+
+        onContextMenu={e => {
+          e.preventDefault()
+        }}
+        onMouseDown={e => {
+          if (e.button === 2 || e.button === 1) handleClose();
+        }}
+      >
+        {menuItems}
+      </StyledMenu>
+    );
+  }
+  return null;
 }

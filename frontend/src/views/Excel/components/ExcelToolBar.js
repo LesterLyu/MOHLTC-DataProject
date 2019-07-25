@@ -17,6 +17,7 @@ import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
+import {hooks} from '../helpers';
 
 
 export function ToolBarDivider() {
@@ -54,9 +55,9 @@ class ExcelToolBar extends Component {
       this.fontSizeOptions.push({value: fontSizeOptions[i], label: fontSizeOptions[i] + ''});
     }
 
-    this.excel.addHook('afterSelection', (row, col, row2, col2) => {
+    hooks.add('afterSelection', (row, col, row2, col2) => {
       if (this.history.current.row === row && this.history.current.col === col) return;
-      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row + 1, col + 1);
+      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row, col);
       const style = {
         fill: cell.style('fill'),
         fontColor: cell.style('fontColor'),

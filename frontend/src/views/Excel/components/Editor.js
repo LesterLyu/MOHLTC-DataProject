@@ -33,11 +33,16 @@ class CellEditor extends PureComponent {
     this.props.handleClose(value);
   };
 
-  prepare = (cell, style) => {
-    let value = cell ? cell.getValue() : undefined;
-    const type = getCellType(cell);
-    if (type === 'formula') {
-      value = '=' + cell.getFormula();
+  prepare = (cell, style, typed) => {
+    let value;
+    if (typed) {
+      value = '';
+    } else {
+      value = cell ? cell.getValue() : undefined;
+      const type = getCellType(cell);
+      if (type === 'formula') {
+        value = '=' + cell.getFormula();
+      }
     }
     this.style = style;
     this.setState({value})

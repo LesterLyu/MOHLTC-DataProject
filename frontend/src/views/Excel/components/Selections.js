@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {calculateRealSelections} from "../helpers";
+import {calculateRealSelections, hooks} from "../helpers";
 import Cell from './Cell';
 
 const DefaultStyle = {
@@ -33,6 +33,11 @@ export default class Selections {
    */
   get data() {
     return this._data;
+  }
+
+  contains(row, col) {
+    return this._data[0] <= row && row <= this._data[2]
+      && this._data[1] <= col && col <= this._data[3]
   }
 
   reset = () => {
@@ -72,6 +77,9 @@ export default class Selections {
     this.setSelectionsOnPane('topLeft', topLeft);
     this.setSelectionsOnPane('topRight', topRight);
     this.updateHeaders(selections);
+
+    // call hook
+    hooks.invoke('afterSelection', ...selections);
     return selections;
   };
 

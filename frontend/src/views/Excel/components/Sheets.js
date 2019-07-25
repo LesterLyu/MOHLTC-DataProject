@@ -6,7 +6,6 @@ import Selections from './Selections';
 import RightClickMenu from "./RightClickMenu";
 
 
-
 /**
  * @typedef {Object}
  * @property {Excel} excel
@@ -106,7 +105,7 @@ class Worksheets extends Component {
       this.startCell = [row, col, row, col];
       this.selections.setSelections(this.startCell);
     } else if (e.button === 2) {
-      this.selections.setSelections([row, col, row, col]);
+      // this.selections.setSelections([row, col, row, col]);
     }
 
   };
@@ -135,6 +134,11 @@ class Worksheets extends Component {
   };
 
   onKeyDown = (row, col, cellStyle, e) => {
+    const typed = !!String(e.key).match(/^\S$/);
+    if (typed)
+      this.excel.showEditor(row, col, cellStyle, e, typed);
+
+
     console.log(e.key);
   };
 
@@ -163,6 +167,7 @@ class Worksheets extends Component {
     return (
       <>
         <VariableSizeGrid
+          onContextMenu={e => console.log(e)}
           ref={this.sheetContainerRef}
           outerRef={this.outerRef}
           columnCount={columnCount}

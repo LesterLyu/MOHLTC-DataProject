@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 
 import helpers, {
-  init, generateTableData, generateTableStyle, createArray, getCellType,
+  init, generateTableData, generateTableStyle, createArray, getCellType, hooks
 } from './helpers';
 
 import './style.css';
@@ -83,7 +83,6 @@ class Excel extends Component {
     this.sheetContainerRef = React.createRef();
     this.sheetRef = React.createRef();
     this.editorRef = React.createRef();
-    this.hooks = [];
 
     // set ID dialog
     this.attOptions = [];
@@ -100,11 +99,19 @@ class Excel extends Component {
       },
       'div1': null,
       'Copy \t\t\t Ctrl+C': () => {
+        this.setState({contextMenu: null})
       },
-      'Paste \t\t\t Ctrl+V': () => {
+      'Paste \t\t\t Ctrl+V': async () => {
+        const result = await navigator.permissions.query({name: "clipboard-read"})
+        console.log('clipboard ' + result.state);
 
+        // console.log(await navigator.clipboard.read())
+        this.setState({contextMenu: null})
       },
     }
+
+    // request permission
+
   }
 
   get editor() {
@@ -153,10 +160,6 @@ class Excel extends Component {
   get selected() {
     return this.sheetRef.current.selections.data;
   }
-
-  addHook = (name, f) => {
-    this.hooks.push({name, f});
-  };
 
   getDefinedName = (definedName) => {
     const ref = this.workbook.definedName(definedName);
@@ -320,9 +323,9 @@ class Excel extends Component {
     this.setState({openDropdown: null, dropdownCell: null});
   };
 
-  showEditor = (rowIndex, columnIndex, style, e) => {
+  showEditor = (rowIndex, columnIndex, style, e, typed) => {
     const cell = this.sheet.getCell(rowIndex, columnIndex);
-    this.editor.prepare(cell, style);
+    this.editor.prepare(cell, style, typed);
     this.setState({openEditor: e.target, editorCell: cell});
   };
 
@@ -357,7 +360,12 @@ class Excel extends Component {
    */
   onContextMenu = (row, col, cellStyle, e) => {
     e.preventDefault();
-    this.setState({contextMenu: e.target})
+    const selections = this.sheetRef.current.selections;
+    const contain = selections.contains(row, col);
+    if (!contain) {
+      selections.setSelections([row, col, row, col])
+    }
+    this.setState({contextMenu: {selections, top: e.clientY, left: e.clientX, anchorEl: e.target}})
   };
 
   componentDidMount() {
@@ -464,7 +472,7 @@ class Excel extends Component {
         />
         <RightClickMenu
           handleClose={() => this.setState({contextMenu: null})}
-          anchorEl={this.state.contextMenu}
+          config={this.state.contextMenu}
           items={this.menu}
         />
       </>
