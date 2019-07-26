@@ -38,10 +38,10 @@ class Cell extends PureComponent {
   static colHeaders = [];
 
   /**
-   * @param {Sheet} sheet
    * @param {Cell} cell
    */
-  static getCellStyles(sheet, cell) {
+  static getCellStyles(cell) {
+    const sheet = cell.sheet();
     let style = {};
     let rowHeight = cell.row().height;
     rowHeight = rowHeight ? 24 : rowHeight / 0.6;
@@ -194,7 +194,7 @@ class Cell extends PureComponent {
       value = null;
       mergedStyle = Object.assign({}, initStyle);
     } else {
-      mergedStyle = Object.assign({}, defaultStyle, initStyle, Cell.getCellStyles(cell.sheet(), cell));
+      mergedStyle = Object.assign({}, defaultStyle, initStyle, Cell.getCellStyles(cell));
     }
     // text overflow
     if (value != null && value !== '') {
@@ -313,7 +313,7 @@ class Cell extends PureComponent {
     }
 
     // render normal cell
-    if (!dataValidation && !hyperlink) {
+    if (!(dataValidation && dataValidation.type === 'list') && !hyperlink) {
       innerContent = this.renderNormalCell(value);
     }
 

@@ -75,7 +75,7 @@ class Excel extends Component {
       ],
       current: {}
     };
-    this.initialFileName = null; // uploaded file name
+    this.initialFileName = 'Untitled workbook'; // uploaded file name
     this.excelManager = new ExcelManager(props);
     this.attCatManager = new AttCatManager(props);
 
@@ -323,10 +323,15 @@ class Excel extends Component {
     this.setState({openDropdown: null, dropdownCell: null});
   };
 
-  showEditor = (rowIndex, columnIndex, style, e, typed) => {
+  showEditor = (rowIndex, columnIndex, style, typed) => {
     const cell = this.sheet.getCell(rowIndex, columnIndex);
     this.editor.prepare(cell, style, typed);
-    this.setState({openEditor: e.target, editorCell: cell});
+    this.setState({
+      openEditor: {
+        top: this.outerRef.current.offsetTop + style.top,
+        left: this.outerRef.current.offsetLeft + style.left,
+      }, editorCell: cell
+    });
   };
 
   handleCloseEditor = input => {
@@ -458,7 +463,7 @@ class Excel extends Component {
         />
         <CellEditor
           ref={this.editorRef}
-          anchorEl={this.state.openEditor}
+          config={this.state.openEditor}
           cell={this.state.editorCell}
           handleClose={this.handleCloseEditor}
         />

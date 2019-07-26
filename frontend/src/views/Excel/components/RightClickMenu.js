@@ -43,8 +43,6 @@ export default function RightClickMenu(props) {
   const open = Boolean(config);
 
   if (open) {
-
-    const {anchorEl} = config;
     return (
       <StyledMenu
         // anchorEl={anchorEl}

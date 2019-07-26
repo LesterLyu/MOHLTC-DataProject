@@ -65,8 +65,8 @@ class CellEditor extends PureComponent {
   };
 
   render() {
-    const {anchorEl, classes} = this.props;
-    const open = Boolean(anchorEl);
+    const {config, classes} = this.props;
+    const open = Boolean(config);
     let style = {resize: 'none', overflow: 'hidden'};
     if (open) {
       Object.assign(style, this.style, {
@@ -80,11 +80,10 @@ class CellEditor extends PureComponent {
 
     return (
       <Popover
-        id="simple-popper"
         PaperProps={{square: true}}
         classes={{paper: classes.paper}}
+        anchorReference="anchorPosition"
         open={open}
-        anchorEl={anchorEl}
         onClose={this.onClose}
         anchorOrigin={{
           vertical: 'top',
@@ -94,6 +93,7 @@ class CellEditor extends PureComponent {
           vertical: 'top',
           horizontal: 'left',
         }}
+        anchorPosition={config}
         transitionDuration={0}>
         <textarea
           style={style}

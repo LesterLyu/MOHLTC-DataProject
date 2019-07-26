@@ -9,6 +9,7 @@ const DefaultStyle = {
   background: 'rgba(3, 169, 244, 0.05)',
   pointerEvents: 'none',
   display: 'none',
+  transition: 'all 0.1s',
 };
 
 /**
@@ -38,6 +39,25 @@ export default class Selections {
   contains(row, col) {
     return this._data[0] <= row && row <= this._data[2]
       && this._data[1] <= col && col <= this._data[3]
+  }
+
+  /**
+   * Iterate each index
+   * @param cb
+   */
+  forEach(cb) {
+    for (let i = this._data[0]; i <= this._data[2]; i++) {
+      for (let j = this._data[1]; j <= this._data[3]; j++) {
+        cb(i, j);
+      }
+    }
+  }
+
+  move(rowOffset, colOffset) {
+    let row = this.data[0] + rowOffset, col = this.data[1] + colOffset;
+    row = row < 1 ? 1 : row;
+    col = col < 1 ? 1 : col;
+    this.setSelections([row, col, row, col])
   }
 
   reset = () => {

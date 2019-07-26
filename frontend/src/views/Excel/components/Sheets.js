@@ -3,8 +3,6 @@ import React from "react";
 import {VariableSizeGrid} from 'react-window';
 import Cell from './Cell';
 import Selections from './Selections';
-import RightClickMenu from "./RightClickMenu";
-
 
 /**
  * @typedef {Object}
@@ -29,6 +27,8 @@ class Worksheets extends Component {
     this.isMouseDown = false;
     this.startCell = [];
     this.selections = null;
+    this.rowCount = null;
+    this.columnCount = null;
     window.Cell = Cell;
   }
 
@@ -43,7 +43,8 @@ class Worksheets extends Component {
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.history.currentSheetIdx !== this.props.context.currentSheetIdx) {
+    if (this.history.currentSheetIdx !== this.props.context.currentSheetIdx
+      || this.history.initialFileName !== this.props.context.initialFileName) {
       this.reset();
     }
     this.history.currentSheetIdx = this.props.context.currentSheetIdx;
@@ -51,7 +52,9 @@ class Worksheets extends Component {
   }
 
   componentDidMount() {
-
+    this.history.currentSheetIdx = this.props.context.currentSheetIdx;
+    this.history.initialFileName = this.props.context.initialFileName;
+    this.selections.setSelections([1, 1, 1, 1]);
   }
 
   reset() {
@@ -130,14 +133,51 @@ class Worksheets extends Component {
   };
 
   onMouseDoubleClick = (row, col, cellStyle, e) => {
-    this.excel.showEditor(row, col, cellStyle, e);
+    this.excel.showEditor(row, col, cellStyle);
   };
 
+  /**
+   *
+   * @param row
+   * @param col
+   * @param cellStyle
+   * @param {KeyboardEvent} e
+   */
   onKeyDown = (row, col, cellStyle, e) => {
-    const typed = !!String(e.key).match(/^\S$/);
-    if (typed)
-      this.excel.showEditor(row, col, cellStyle, e, typed);
-
+    // need to retrieve the index again, since the given index may be wrong.
+    row = this.selections.data[0];
+    col = this.selections.data[1];
+    const cell = this.excel.sheet.getCell(row, col);
+    cellStyle = Object.assign({}, this.sheetContainerRef.current._getItemStyle(row, col), Cell.getCellStyles(cell));
+    const typed = !!e.key.match(/^\S$/);
+    if (typed && !e.ctrlKey && !e.altKey)
+      this.excel.showEditor(row, col, cellStyle, typed);
+    else {
+      if (e.key === 'Delete') {
+        this.selections.forEach((row, col) => {
+          cell.clear();
+        });
+        this.excel.renderCurrentSheet();
+      } else if (e.key === 'Backspace') {
+        this.excel.showEditor(row, col, cellStyle, true);
+      } else if (e.key === 'ArrowUp') {
+        this.selections.move(-1, 0);
+        e.preventDefault();
+      } else if (e.key === 'ArrowDown') {
+        const merged = cell.merged();
+        if (merged) this.selections.move(merged.to.row + 1 - row, 0);
+        else this.selections.move(1, 0);
+        e.preventDefault();
+      } else if (e.key === 'ArrowLeft') {
+        this.selections.move(0, -1);
+        e.preventDefault();
+      } else if (e.key === 'ArrowRight') {
+        const merged = cell.merged();
+        if (merged) this.selections.move(0, merged.to.col + 1 - col);
+        else this.selections.move(0, 1);
+        e.preventDefault();
+      }
+    }
 
     console.log(e.key);
   };
@@ -145,8 +185,8 @@ class Worksheets extends Component {
   render() {
     const sheet = this.excel.sheet;
     const range = sheet.usedRange();
-    const columnCount = range ? range._maxColumnNumber + 5 : 30;
-    const rowCount = range ? range._maxRowNumber + 10 : 200;
+    const columnCount = this.columnCount = range ? range._maxColumnNumber + 5 : 30;
+    const rowCount = this.rowCount = range ? range._maxRowNumber + 10 : 200;
     const rowHeight = Worksheets.rowHeight(sheet);
     const colWidth = Worksheets.colWidth(sheet);
 
@@ -156,7 +196,7 @@ class Worksheets extends Component {
       freezeRowCount = panes.ySplit;
       freezeColumnCount = panes.xSplit;
     }
-
+    console.log('render sheets')
     this.selections = new Selections({
       freezeRowCount,
       freezeColumnCount,
@@ -165,40 +205,38 @@ class Worksheets extends Component {
     });
 
     return (
-      <>
-        <VariableSizeGrid
-          onContextMenu={e => console.log(e)}
-          ref={this.sheetContainerRef}
-          outerRef={this.outerRef}
-          columnCount={columnCount}
-          rowCount={rowCount}
-          width={this.excel.state.sheetWidth}
-          height={this.excel.state.sheetHeight}
-          rowHeight={rowHeight}
-          columnWidth={colWidth}
-          overscanRowCount={0}
-          overscanColumnCount={0}
-          estimatedColumnWidth={80}
-          estimatedRowHeight={24}
-          itemData={{
-            sheet,
-            onMouseDown: this.onMouseDown,
-            onMouseUp: this.onMouseUp,
-            onMouseOver: this.onMouseOver,
-            onMouseDoubleClick: this.onMouseDoubleClick,
-            onKeyDown: this.onKeyDown,
-            selections: this.selections,
-            onContextMenu: this.excel.onContextMenu,
-          }}
-          freezeRowCount={freezeRowCount + 1} // add one for header
-          freezeColumnCount={freezeColumnCount + 1} // add one for header
-          extraTopLeftElement={this.selections.renderTopLeft()}
-          extraTopRightElement={this.selections.renderTopRight()}
-          extraBottomLeftElement={this.selections.renderBottomLeft()}
-          extraBottomRightElement={this.selections.renderBottomRight()}>
-          {Cell}
-        </VariableSizeGrid>
-      </>
+      <VariableSizeGrid
+        onContextMenu={e => console.log(e)}
+        ref={this.sheetContainerRef}
+        outerRef={this.outerRef}
+        columnCount={columnCount}
+        rowCount={rowCount}
+        width={this.excel.state.sheetWidth}
+        height={this.excel.state.sheetHeight}
+        rowHeight={rowHeight}
+        columnWidth={colWidth}
+        overscanRowCount={0}
+        overscanColumnCount={0}
+        estimatedColumnWidth={80}
+        estimatedRowHeight={24}
+        itemData={{
+          sheet,
+          onMouseDown: this.onMouseDown,
+          onMouseUp: this.onMouseUp,
+          onMouseOver: this.onMouseOver,
+          onMouseDoubleClick: this.onMouseDoubleClick,
+          onKeyDown: this.onKeyDown,
+          selections: this.selections,
+          onContextMenu: this.excel.onContextMenu,
+        }}
+        freezeRowCount={freezeRowCount + 1} // add one for header
+        freezeColumnCount={freezeColumnCount + 1} // add one for header
+        extraTopLeftElement={this.selections.renderTopLeft()}
+        extraTopRightElement={this.selections.renderTopRight()}
+        extraBottomLeftElement={this.selections.renderBottomLeft()}
+        extraBottomRightElement={this.selections.renderBottomRight()}>
+        {Cell}
+      </VariableSizeGrid>
     )
   }
 }
