@@ -43,6 +43,16 @@ export default class AttCatManager {
       });
   }
 
+  batchAdd(isAttribute, data) {
+    const what = isAttribute ? 'attribute' : 'category';
+    return axios.post(config.server + '/api/v2/batch/' + what, {data}, axiosConfig)
+      .then(response => {
+        if (this.check(response)) {
+          return response.data;
+        }
+      });
+  }
+
   /**
    * Get attribute or category
    * @param isAttribute

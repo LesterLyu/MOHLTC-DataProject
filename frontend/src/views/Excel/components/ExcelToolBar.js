@@ -110,8 +110,6 @@ class ExcelToolBar extends Component {
 
   style = (name, value, ranges = this.getSelected()) => {
     const {excel} = this;
-    // const styles = excel.currentSheet.styles;
-    // const ranges = ranges || this.getSelected();
     if (!ranges) {
       return;
     }
@@ -122,16 +120,13 @@ class ExcelToolBar extends Component {
         for (let col = range[1]; col <= range[3]; col++) {
           const cell = excel.workbook.sheet(excel.currentSheetIdx).cell(row, col);
           if (this.booleanAttributes.includes(name)) {
-            // style[name] = !style[name];
             cell.style(name, !cell.style(name));
           } else if (this.otherAttributes.includes(name)) {
             if (typeof value === 'object') {
               const mergedValue = Object.assign(cell.style(name) || {}, value);
-              // style[name] = mergedValue;
               cell.style(name, mergedValue);
             } else {
               const valueCopy = (typeof value === 'object' && value) ? Object.assign({}, value) : value;
-              // style[name] = valueCopy;
               cell.style(name, valueCopy);
             }
           }
@@ -235,10 +230,11 @@ class ExcelToolBar extends Component {
     const merged = from.merged();
     if (merged) {
       // TODO: fix the bug (from.rangeTo(to).merged(false)) in excel library.
-      this.excel.sheet._mergeCells.delete(from.address() + ':' + to.address());
+      this.excel.sheet._mergeCells.delete(from.address());
     } else {
       from.rangeTo(to).merged(true);
     }
+    this.excel.renderCurrentSheet();
   };
 
   render() {

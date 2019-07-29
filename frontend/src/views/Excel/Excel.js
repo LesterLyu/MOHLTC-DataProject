@@ -34,7 +34,6 @@ function defaultSheet() {
     name: 'Sheet1',
     state: 'visible',
     views: [],
-    mergeCells: [],
     rowHeights: createArray(24, 200),
     colWidths: createArray(80, 26),
   };

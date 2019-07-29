@@ -11974,9 +11974,9 @@ ws@^6.0.0, ws@^6.1.2:
   dependencies:
     async-limiter "~1.0.0"
 
-"xlsx-populate@git+https://github.com/LesterLyu/xlsx-populate.git#formula-support":
+"xlsx-populate@https://github.com/LesterLyu/xlsx-populate.git":
   version "1.19.1"
-  resolved "git+https://github.com/LesterLyu/xlsx-populate.git#a9a8b838e0bc8876834a68ef77b2aabdb1ee3d63"
+  resolved "https://github.com/LesterLyu/xlsx-populate.git#3cd86666082843acb18646759e3f384bcf249731"
   dependencies:
     cfb "^1.1.0"
     fast-formula-parser "git+https://github.com/LesterLyu/fast-formula-parser.git"

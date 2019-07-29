@@ -38,7 +38,7 @@
     "reactstrap": "^7.1.0",
     "tinycolor2": "^1.4.1",
     "workerpool": "https://github.com/josdejong/workerpool.git",
-    "xlsx-populate": "git+https://github.com/LesterLyu/xlsx-populate.git#formula-support"
+    "xlsx-populate": "https://github.com/LesterLyu/xlsx-populate.git"
   },
   "devDependencies": {
     "@material-ui/types": "^4.1.1",
