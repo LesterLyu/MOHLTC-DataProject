@@ -3,12 +3,14 @@ const router = express.Router();
 const {attributeController} = require('../../controller/v2');
 const {
     addAttribute, getAttributes, generateAttributeId, deleteAttribute, modifyAttributeGroup, deleteAttributeGroup,
-    getAttributeGroup, attributeAssignGroups
+    getAttributeGroup, attributeAssignGroups, addManyAttributes
 } = attributeController;
 
 router.get('/api/v2/attribute', getAttributes);
 
 router.post('/api/v2/attribute', addAttribute);
+
+router.post('/api/v2/batch/attribute', addManyAttributes);
 
 router.delete('/api/v2/attribute', deleteAttribute);
 

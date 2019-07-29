@@ -61,6 +61,36 @@ module.exports = {
         }
     },
 
+    addManyCategories: async (req, res, next) => {
+        if (!checkPermission(req, Permission.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const data = req.body.data;
+
+        const operations = [];
+        for (let i = 0; i < data.length; i++) {
+            const cat = data[i];
+            operations.push({
+                updateOne: {
+                    upsert: true,
+                    filter: {id: cat.id, groupNumber},
+                    update: {groupNumber, ...cat}
+                }
+            });
+        }
+        try {
+            let result = await Category.bulkWrite(operations);
+            res.json({
+                success: true,
+                result,
+                message: `Added ${result.upsertedCount}, updated ${result.modifiedCount} category(s)`
+            })
+        } catch (e) {
+            next(e);
+        }
+    },
+
     deleteCategory: async (req, res, next) => {
         if (!checkPermission(req, Permission.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
             return next(error.api.NO_PERMISSION);

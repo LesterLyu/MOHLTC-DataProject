@@ -61,6 +61,36 @@ module.exports = {
         }
     },
 
+    addManyAttributes: async (req, res, next) => {
+        if (!checkPermission(req, Permission.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const data = req.body.data;
+
+        const operations = [];
+        for (let i = 0; i < data.length; i++) {
+            const att = data[i];
+            operations.push({
+                updateOne: {
+                    upsert: true,
+                    filter: {id: att.id, groupNumber},
+                    update: {groupNumber, ...att}
+                }
+            });
+        }
+        try {
+            let result = await Attribute.bulkWrite(operations);
+            res.json({
+                success: true,
+                result,
+                message: `Added ${result.upsertedCount}, updated ${result.modifiedCount} attribute(s)`
+            })
+        } catch (e) {
+            next(e);
+        }
+    },
+
     deleteAttribute: async (req, res, next) => {
         if (!checkPermission(req, Permission.ATTRIBUTE_CATEGORY_MANAGEMENT)) {
             return next(error.api.NO_PERMISSION);
