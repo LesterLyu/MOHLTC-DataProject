@@ -79,15 +79,19 @@
   },
   "scripts": {
     "start": "node app.js",
-    "prestart": "./node_modules/.bin/grunt",
-    "test": "./node_modules/.bin/mocha test/main.js test/ --recursive --exit --check-leaks -R mochawesome",
+    "prestart": "grunt",
+    "test": "mocha test/main.js test/ --recursive --exit --check-leaks -R mochawesome",
     "test:david": "nodemon --exec mocha --recursive --timeout 5000 -R min",
-    "build": "./node_modules/.bin/grunt",
+    "build": "grunt",
     "build:frontend": "cd ./frontend/ && npm run build:aws",
-    "watch": "./node_modules/.bin/grunt watch",
-    "prod": "./node_modules/.bin/grunt prod",
-    "aws": "NODE_ENV=production&& node app.js",
-    "preaws": "./node_modules/.bin/grunt aws"
+    "watch": "grunt watch",
+    "prod": "grunt prod",
+    "aws": "NODE_ENV=production && node app.js",
+    "preaws": "grunt aws",
+    "build:frontend-cf": "cross-env PUBLIC_URL=https://mohltc.cfapps.io/react && cd ./frontend/ && npm run build",
+    "pivotal:build": "grunt pivotal:build",
+    "pivotal:publish": "grunt pivotal:publish",
+    "pivotal": "grunt pivotal"
   },
   "repository": {
     "type": "git",
@@ -99,5 +103,8 @@
   "bugs": {
     "url": "https://github.com/LesterLyu/MOHLTC-DataProject/issues"
   },
-  "homepage": "https://github.com/LesterLyu/MOHLTC-DataProject#readme"
+  "homepage": "https://github.com/LesterLyu/MOHLTC-DataProject#readme",
+  "engines": {
+    "node": "12.x"
+  }
 }

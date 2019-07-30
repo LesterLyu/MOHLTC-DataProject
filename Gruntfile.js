@@ -37,8 +37,7 @@ module.exports = function (grunt) {
                 ]
             },
             excelFrontend: {
-                options: {
-                },
+                options: {},
                 src: ['build/excel-web.js'],
                 dest: 'public/dist/excel-web.js'
             }
@@ -93,7 +92,6 @@ module.exports = function (grunt) {
                             'mochawesome-report/**',
                             'app.js',
                             'Gruntfile.js',
-                            'Gruntfile.js',
                             'package.json',
                             'package-lock.json',
                         ],
@@ -103,7 +101,7 @@ module.exports = function (grunt) {
                         expand: true,
                         cwd: '../Data-Project-Config/',
                         src: [
-                            '.ebextensions/**',
+                            '.ebextensions/**', // amazon beanstalk configs
                             'config/**'
                         ],
                         dest: 'build/zip/'
@@ -140,13 +138,20 @@ module.exports = function (grunt) {
             },
             buildFrontend: {
                 exec: 'npm run build:frontend'
+            },
+
+            'buildFrontend-cf': {
+                exec: 'npm run build:frontend-cf'
+            },
+            pivotal: {
+                exec: 'cd ./build/zip && cf push mohltc -c "node app.js"'
             }
-        }
+        },
 
 
     };
 
-    grunt.registerTask("configureBabel", "configures babel options", function() {
+    grunt.registerTask("configureBabel", "configures babel options", function () {
         config.babel.excelFrontend.options.inputSourceMap = grunt.file.readJSON('build/excel-web.js.map');
     });
 
@@ -161,8 +166,14 @@ module.exports = function (grunt) {
 
 
     grunt.registerTask("default", ["clean", "concat", "configureBabel", "babel"]);
-    grunt.registerTask("prod", ["clean", "concat", "configureBabel", "babel", "run:report", "run:buildFrontend", "mkdir", "copy", "compress"]);
+    grunt.registerTask("prod", ["clean", "concat", "configureBabel", "babel", "run:report", "run:buildFrontend",
+        "mkdir", "copy:main", "compress"]);
     grunt.registerTask("aws", ["clean", "concat", "configureBabel", "babel", "run:report"]);
 
+    grunt.registerTask("pivotal:build", ["clean", "concat", "configureBabel", "babel", "run:buildFrontend-cf",
+        "mkdir", "copy:main"]);
+
+    grunt.registerTask("pivotal:publish", ["run:pivotal"]);
+    grunt.registerTask("pivotal", ["pivotal:build", "pivotal:publish"]);
 
 };
