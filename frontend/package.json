@@ -59,6 +59,7 @@
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
     "build:aws": "cross-env NODE_ENV=production PUBLIC_URL=http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com/react react-app-rewired build",
+    "build:pivotal": "cross-env NODE_ENV=production SERVER_URL=https://mohltc.cfapps.io PUBLIC_URL=https://mohltc.cfapps.io/react react-app-rewired build",
     "test": "react-app-rewired test",
     "test:cov": "react-app-rewired test --coverage",
     "test:debug": "react-app-rewired --inspect-brk test --runInBand",

@@ -140,8 +140,8 @@ module.exports = function (grunt) {
                 exec: 'npm run build:frontend'
             },
 
-            'buildFrontend-cf': {
-                exec: 'npm run build:frontend-cf'
+            'buildFrontend-pivotal': {
+                exec: 'npm run build:frontend-pivotal'
             },
             pivotal: {
                 exec: 'cd ./build/zip && cf push mohltc -c "node app.js"'
@@ -170,7 +170,7 @@ module.exports = function (grunt) {
         "mkdir", "copy:main", "compress"]);
     grunt.registerTask("aws", ["clean", "concat", "configureBabel", "babel", "run:report"]);
 
-    grunt.registerTask("pivotal:build", ["clean", "concat", "configureBabel", "babel", "run:buildFrontend-cf",
+    grunt.registerTask("pivotal:build", ["clean", "concat", "configureBabel", "babel", "run:buildFrontend-pivotal",
         "mkdir", "copy:main"]);
 
     grunt.registerTask("pivotal:publish", ["run:pivotal"]);

@@ -4,6 +4,7 @@ const allTokenNames = FormulaParser.allTokens.map(tokenType => tokenType.name);
 const TerserPlugin = require('terser-webpack-plugin');
 const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
 const {DuplicatesPlugin} = require("inspectpack/plugin");
+const webpack = require('webpack');
 
 module.exports = {
   webpack: function (config, env) {
@@ -11,6 +12,7 @@ module.exports = {
       reasons: true,
     };
     config.plugins.push(new WorkerPlugin());
+    config.plugins.push(new webpack.EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'SERVER_URL', 'PUBLIC_URL']));
     if (process.env.NODE_ENV === 'production') {
       config.plugins.push(new BundleAnalyzerPlugin({
         analyzerMode: 'static',

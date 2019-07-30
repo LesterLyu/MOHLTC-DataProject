@@ -88,7 +88,7 @@
     "prod": "grunt prod",
     "aws": "NODE_ENV=production && node app.js",
     "preaws": "grunt aws",
-    "build:frontend-cf": "cross-env PUBLIC_URL=https://mohltc.cfapps.io/react && cd ./frontend/ && npm run build",
+    "build:frontend-pivotal": "cd ./frontend/ && npm run build:pivotal",
     "pivotal:build": "grunt pivotal:build",
     "pivotal:publish": "grunt pivotal:publish",
     "pivotal": "grunt pivotal"
