@@ -93,7 +93,7 @@ module.exports = function (grunt) {
                             'app.js',
                             'Gruntfile.js',
                             'package.json',
-                            'package-lock.json',
+                            'yarn.lock',
                         ],
                         dest: 'build/zip/'
                     },
