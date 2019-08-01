@@ -6,7 +6,8 @@ import {
 } from "@material-ui/core";
 
 import helpers, {
-  init, generateTableData, generateTableStyle, createArray, getCellType
+  init, generateTableData, generateTableStyle, createArray, getCellType, generateNewSheetName, indexOfBySheetName,
+  getSheetNames,
 } from './helpers';
 
 import './style.css';
@@ -66,13 +67,6 @@ class Excel extends Component {
       fileName: 'Untitled workbook',
       contextMenu: null,
     };
-    this.global = {
-      sheetNames: ['Sheet1'],
-      sheets: [
-        defaultSheet(),
-      ],
-      current: {}
-    };
     this.initialFileName = 'Untitled workbook'; // uploaded file name
     this.excelManager = new ExcelManager(props);
     this.attCatManager = new AttCatManager(props);
@@ -128,16 +122,8 @@ class Excel extends Component {
     return this.workbook.sheet(this.currentSheetIdx);
   }
 
-  /**
-   * Get current sheet data
-   * @return {SheetStore}
-   */
-  get currentSheet() {
-    return this.global.sheets[this.state.currentSheetIdx];
-  }
-
-  get currDisplaySheetName() {
-    return this.global.sheetNames[this.state.currentSheetIdx];
+  get sheetNames() {
+    return getSheetNames(this.workbook);
   }
 
   get currentSheetIdx() {
@@ -165,14 +151,6 @@ class Excel extends Component {
       return ref.value();
     }
   };
-
-  getDataAtSheetAndCell(row, col, sheetNo, sheetName) {
-    sheetNo = sheetNo === null ? this.global.sheetNames.indexOf(sheetName) : sheetNo;
-    if (sheetNo === undefined) console.error('At least one of sheetNo or sheetName should be provides.');
-
-    const cell = this.workbook.sheet(sheetNo).getCell(row + 1, col + 1);
-    return cell == null ? undefined : cell.getValue();
-  }
 
   getCell(sheetNo, row, col) {
     if (sheetNo === undefined) console.error('getCell: sheetNo should be provides.');
@@ -209,7 +187,6 @@ class Excel extends Component {
         errorTitle: validation.dataValidation.errorTitle,
         errorStyle: validation.dataValidation.errorStyle,
       };
-      this.setState({openDataValidationDialog: true});
       return false;
     }
     // check if it is formula now
@@ -218,60 +195,31 @@ class Excel extends Component {
     } else {
       updates = cell.setValue(rawValue);
     }
-
-    console.log(`Updated ${updates.length + 1} cells.`)
+    console.log(`Updated ${updates.length + 1} cells.`);
+    return true;
   };
 
   /**
-   * Update a cell's data and render it.
-   * Cell's value and formula will be overrode.
-   * @param {number | null | undefined} sheetNo - null or undefined if uses current sheet number
-   * @param {number} row
-   * @param {number} col
-   * @param {string} rawValue - can be any excel data type
-   * @param {'internal'| 'edit'} source - 'internal' means internal update, i.e. formula updates
-   *                                      'edit' means edit by the user
+   * Save as setData() but calls renderCurrentSheet().
+   * @param params
    */
   setDataAndRender(...params) {
     this.setData(...params);
     this.renderCurrentSheet();
   }
 
-  getSheet(idx) {
-    return this.global.sheets[idx];
-  }
-
-  getSheetByName(sheetName) {
-    return this.getSheet(this.global.sheetNames.indexOf(sheetName))
-  }
-
   switchSheet(sheetNameOrIndex) {
     if (typeof sheetNameOrIndex === 'string') {
-      this.currentSheetName = sheetNameOrIndex;
-      this.currentSheetIdx = this.global.sheetNames.indexOf(sheetNameOrIndex);
+      this.currentSheetIdx = indexOfBySheetName(this.workbook, sheetNameOrIndex);
     } else if (typeof sheetNameOrIndex === 'number') {
-      this.currentSheetName = this.global.sheetNames[sheetNameOrIndex];
       this.currentSheetIdx = sheetNameOrIndex;
     }
   }
 
-  addSheet = () => {
-    // generate new name
-    let newSheetNumber = this.global.sheetNames.length + 1;
-    for (let i = 0; i < this.global.sheetNames.length; i++) {
-      const name = this.global.sheetNames[i];
-      const match = name.match(/^Sheet(\d+)$/);
-      if (match) {
-        if (newSheetNumber <= match[1]) {
-          newSheetNumber++;
-        }
-      }
-    }
-    const newSheetName = 'Sheet' + newSheetNumber;
-    const newSheet = Object.assign(defaultSheet(), {name: newSheetName});
-    this.global.sheets.push(newSheet);
-    this.global.sheetNames.push(newSheetName);
-    this.workbook.addSheet(newSheetName);
+  addSheet = async () => {
+    const newSheetName = generateNewSheetName(this.workbook);
+    const sheet = await this.workbook.addSheet(newSheetName);
+    sheet.row(200).cell(26).setValue('');
     this.switchSheet(newSheetName);
   };
 
@@ -313,8 +261,13 @@ class Excel extends Component {
      * @type {Cell|undefined}
      */
     const dropdownCell = this.state.dropdownCell;
-    this.setData(this.currentSheetIdx, dropdownCell.rowNumber() - 1, dropdownCell.columnNumber() - 1, selected.value);
-    this.handleCloseDropdown();
+    const success = this.setData(this.currentSheetIdx, dropdownCell.rowNumber() - 1, dropdownCell.columnNumber() - 1, selected.value);
+    if (success) {
+      this.handleCloseDropdown();
+      this.renderCurrentSheet();
+    } else {
+      this.showDataValidationDialog();
+    }
   };
 
   handleCloseDropdown = () => {
@@ -337,9 +290,14 @@ class Excel extends Component {
      * @type {Cell|undefined}
      */
     const cell = this.state.editorCell;
-    this.setData(this.currentSheetIdx, cell.rowNumber() - 1, cell.columnNumber() - 1, input);
-    this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
-    this.setState({openEditor: null, editorCell: null});
+    const success = this.setData(this.currentSheetIdx, cell.rowNumber() - 1, cell.columnNumber() - 1, input);
+
+    if (success) {
+      this.setState({openEditor: null, editorCell: null});
+      this.renderCurrentSheet();
+    } else {
+      this.showDataValidationDialog();
+    }
   };
 
   showDataValidationDialog = () => {
@@ -347,7 +305,8 @@ class Excel extends Component {
   };
 
   handleCloseDataValidationDialog = () => {
-    this.setState({openDataValidationDialog: false});
+    this.handleCloseDropdown();
+    this.setState({openDataValidationDialog: false, openEditor: null, editorCell: null});
   };
 
   handleRetryDataValidationDialog = () => {
@@ -382,7 +341,6 @@ class Excel extends Component {
       // create local workbook storage
       this.excelManager.createWorkbookLocal()
         .then(workbook => {
-          this.currentSheetName = 'Sheet1';
           this.workbook = workbook;
           this.setState({
             sheetWidth,
@@ -395,9 +353,7 @@ class Excel extends Component {
       this.excelManager.readWorkbookFromDatabase(name)
         .then(data => {
           if (!data) return;
-          const {sheets, sheetNames, workbook, fileName} = data;
-          this.global.sheetNames = sheetNames;
-          this.global.sheets = sheets;
+          const {workbook, fileName} = data;
           this.workbook = workbook;
           this.setState({
             fileName,
@@ -413,9 +369,7 @@ class Excel extends Component {
       this.excelManager.readWorkbookFromDatabase(name, false)
         .then(data => {
           if (!data) return;
-          const {sheets, sheetNames, workbook, fileName} = data;
-          this.global.sheetNames = sheetNames;
-          this.global.sheets = sheets;
+          const {workbook, fileName} = data;
           this.workbook = workbook;
           this.setState({
             fileName,

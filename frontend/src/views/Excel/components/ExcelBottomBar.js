@@ -77,7 +77,7 @@ class ExcelBottomBar extends Component {
     this.excel = props.context;
     this.state = {sheetToggleMenu: null};
     this.history = {
-      sheetNames: props.context.global.sheetNames,
+      sheetNames: props.context.sheetNames,
       currentSheetIdx: props.context.currentSheetIdx,
     }
   }
@@ -86,8 +86,8 @@ class ExcelBottomBar extends Component {
     const {currentSheetIdx, sheetNames} = this.history;
     return this.state !== nextState
       || currentSheetIdx !== nextProps.context.currentSheetIdx
-      || sheetNames.length !== nextProps.context.global.sheetNames.length
-      || sheetNames[currentSheetIdx] !== nextProps.context.global.sheetNames[currentSheetIdx];
+      || sheetNames.length !== nextProps.context.sheetNames.length
+      || sheetNames[currentSheetIdx] !== nextProps.context.sheetNames[currentSheetIdx];
   }
 
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -118,7 +118,7 @@ class ExcelBottomBar extends Component {
   workbookTabs() {
     const {classes} = this.props;
     const {excel} = this;
-    const {sheetNames} = excel.global;
+    const {sheetNames} = excel;
     const tabs = [];
     for (let i = 0; i < sheetNames.length; i++) {
       const rgb = tinycolor(colorToRgb(excel.workbook.sheet(i).tabColor()) || 'f5f5f5');

@@ -185,3 +185,40 @@ class Hooks {
 }
 
 export const hooks = new Hooks();
+
+/**
+ * Generate a new sheet name, used when creating new sheet.
+ * @param {Workbook} workbook
+ */
+export function generateNewSheetName(workbook) {
+  const sheets = workbook.sheets();
+  let newSheetNumber = sheets.length + 1;
+  for (let i = 0; i < sheets.length; i++) {
+    const name = sheets[i].name();
+    const match = name.match(/^Sheet(\d+)$/);
+    if (match) {
+      if (newSheetNumber <= match[1]) {
+        newSheetNumber++;
+      }
+    }
+  }
+  return 'Sheet' + newSheetNumber;
+}
+
+/**
+ * Returns the index of the sheet name.
+ * Otherwise, it returns -1, indicating that no element passed the test.
+ * @param {Workbook} workbook
+ * @param {string} sheetName
+ * @return {*}
+ */
+export function indexOfBySheetName(workbook, sheetName) {
+  if (!workbook) return -1;
+  const sheets = workbook.sheets();
+  return sheets.findIndex(sheet => sheet.name() === sheetName);
+}
+
+export function getSheetNames(workbook) {
+  if (!workbook) return [];
+  return workbook.sheets().map(sheet => sheet.name());
+}

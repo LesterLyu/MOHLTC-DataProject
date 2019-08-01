@@ -56,6 +56,7 @@ class WorkbookManager {
       const {populate, workbook} = response.data;
       const {file, name} = workbook;
       const wb = await XlsxPopulate.fromDataAsync(file, {base64: true});
+      // populate data
       for (let i in populate) {
         const sheet = wb.sheets()[i];
         const rows = populate[i];
@@ -93,20 +94,12 @@ class WorkbookManager {
   }
 
   _readWorkbook(workbook, cb, fileName) {
-    const sheets = [], sheetNames = [];
-
-    // read sheet names first for building calculation chain
-    workbook.sheets().forEach(sheet => {
-      sheetNames.push(sheet.name());
-    });
-    excelInstance.global.sheetNames = sheetNames;
-    excelInstance.currentSheetName = sheetNames[0];
     excelInstance.initialFileName = fileName;
     if (cb) {
-      cb(sheets, sheetNames, workbook);
+      cb(workbook);
       excelInstance.setState({fileName});
     } else {
-      return {sheets, sheetNames, workbook, fileName};
+      return { workbook, fileName};
     }
   }
 
