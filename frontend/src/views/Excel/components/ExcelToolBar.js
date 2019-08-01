@@ -17,7 +17,7 @@ import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
-import {hooks} from '../helpers';
+import {hooks} from '../utils';
 
 
 export function ToolBarDivider() {

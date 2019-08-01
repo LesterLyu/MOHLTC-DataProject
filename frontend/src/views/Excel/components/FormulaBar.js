@@ -3,7 +3,7 @@ import {AppBar, Grid, InputBase, withStyles} from "@material-ui/core";
 import React from "react";
 import {ToolBarDivider} from './ExcelToolBar';
 import PropTypes from "prop-types";
-import {RichText, hooks} from "../helpers";
+import {RichText, hooks} from "../utils";
 
 const styles = theme => ({
   input: {

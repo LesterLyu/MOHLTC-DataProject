@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {colorToRgb, RichText, SSF} from "../helpers";
+import {colorToRgb, RichText, SSF} from "../utils";
 import ac from "xlsx-populate/lib/addressConverter";
 import Worksheets from "./Sheets";
 

@@ -6,7 +6,7 @@ import {
   Tab, IconButton, Tabs, MenuItem, Divider, Menu,
 } from "@material-ui/core";
 import PropTypes from "prop-types";
-import {colorToRgb} from "../helpers";
+import {colorToRgb} from "../utils";
 import {Add as AddIcon, ArrowDropDown} from "@material-ui/icons";
 import tinycolor from 'tinycolor2';
 

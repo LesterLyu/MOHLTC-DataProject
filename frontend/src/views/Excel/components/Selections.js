@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {calculateRealSelections, hooks} from "../helpers";
+import {calculateRealSelections, hooks} from "../utils";
 import Cell from './Cell';
 
 const DefaultStyle = {

@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {Popover, withStyles} from "@material-ui/core";
-import {getCellType} from "../helpers";
+import {getCellType} from "../utils";
 import PropTypes from "prop-types";
 
 

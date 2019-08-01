@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {Card} from "@material-ui/core";
 
-import helpers, {
+import {
   init, getCellType, generateNewSheetName, indexOfBySheetName,
   getSheetNames,
-} from './helpers';
+} from './utils';
 
 import './style.css';
 import ExcelManager from "../../controller/excelManager";
@@ -30,7 +30,6 @@ class Excel extends Component {
     console.log('mode:', props.params.mode);
     // TODO: disable some cell editing for user (formula editing...)
     window.excel = this;
-    window.helpers = helpers;
     this.state = {
       completed: 5,
       sheetHeight: 0,

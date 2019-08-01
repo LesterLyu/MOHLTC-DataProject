@@ -1,4 +1,4 @@
-import {XlsxPopulate} from '../Excel/helpers'
+import {XlsxPopulate} from '../Excel/utils'
 import React from 'react';
 import {Button} from '@material-ui/core';
 import AttCatManager from "../../controller/attCatManager";

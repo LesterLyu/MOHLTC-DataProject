@@ -1,6 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
-import {excelInstance, RichText, XlsxPopulate} from "../views/Excel/helpers";
+import {excelInstance, RichText, XlsxPopulate} from "../views/Excel/utils";
 import {generateObjectId} from './common';
 
 const axiosConfig = {withCredentials: true};
@@ -99,7 +99,7 @@ class WorkbookManager {
       cb(workbook);
       excelInstance.setState({fileName});
     } else {
-      return { workbook, fileName};
+      return {workbook, fileName};
     }
   }
 
