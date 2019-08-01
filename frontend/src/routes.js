@@ -40,9 +40,10 @@ const routes = [
   {path: '/attribute/group', exact: true, name: 'Attribute Group', component: AttCatGroup, params: {mode: 'att'}},
   {path: '/category/group', exact: true, name: 'Category Group', component: AttCatGroup, params: {mode: 'cat'}},
 
+  {path: '/system', exact: true, name: 'System Info', component: SystemInfo},
   {path: '/import/id', exact: true, name: 'Import ID', component: ImportId}
-  
-  
+
+
 ];
 
 export default routes;

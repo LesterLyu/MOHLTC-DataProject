@@ -1,13 +1,7 @@
 import {XlsxPopulate} from '../Excel/helpers'
 import React from 'react';
 import {Button} from '@material-ui/core';
-import axios from "axios";
-import config from "../../config/config";
 import AttCatManager from "../../controller/attCatManager";
-
-const axiosConfig = {withCredentials: true};
-
-let workbook, data;
 
 const upload = (attCatManager, showMessage) => () => {
   const input = document.createElement('input');
@@ -18,8 +12,7 @@ const upload = (attCatManager, showMessage) => () => {
     console.log(file.name);
     XlsxPopulate.fromDataAsync(file)
       .then(async wb => {
-        workbook = wb;
-        data = {};
+        const data = {};
         const categories = [];
         const attributes = [];
         wb.sheets().forEach(sheet => {

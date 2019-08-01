@@ -3,11 +3,10 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import {
   Card,
-  LinearProgress,
 } from "@material-ui/core";
 
 import helpers, {
-  init, generateTableData, generateTableStyle, createArray, getCellType, hooks
+  init, generateTableData, generateTableStyle, createArray, getCellType
 } from './helpers';
 
 import './style.css';

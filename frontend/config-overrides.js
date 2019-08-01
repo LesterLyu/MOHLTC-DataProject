@@ -12,7 +12,12 @@ module.exports = {
       reasons: true,
     };
     config.plugins.push(new WorkerPlugin());
-    config.plugins.push(new webpack.EnvironmentPlugin(['NODE_ENV', 'DEBUG', 'SERVER_URL', 'PUBLIC_URL']));
+    config.plugins.push(new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development',
+      DEBUG: false,
+      SERVER_URL: 'http://localhost:3000',
+      PUBLIC_URL: 'http://localhost:3003',
+    }));
     if (process.env.NODE_ENV === 'production') {
       config.plugins.push(new BundleAnalyzerPlugin({
         analyzerMode: 'static',
