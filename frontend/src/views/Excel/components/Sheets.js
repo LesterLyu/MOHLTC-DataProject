@@ -101,12 +101,12 @@ class Worksheets extends Component {
    * @param {MouseEvent} e
    */
   onMouseDown = (row, col, cellStyle, e) => {
-    console.log(`Mouse down: ${row}, ${col}`);
+    console.log(`Mouse down: ${row}, ${col}, button: ${e.button}`);
     // 2 = right click; 1 = left click.
     if (e.button === 0) {
       this.isMouseDown = true;
       this.startCell = [row, col, row, col];
-      this.selections.setSelections(this.startCell);
+      this.selections.setSelections(this.startCell, [row, col]);
     } else if (e.button === 2) {
       // this.selections.setSelections([row, col, row, col]);
     }
@@ -145,8 +145,8 @@ class Worksheets extends Component {
    */
   onKeyDown = (row, col, cellStyle, e) => {
     // need to retrieve the index again, since the given index may be wrong.
-    row = this.selections.data[0];
-    col = this.selections.data[1];
+    row = this.selections.startCell[0];
+    col = this.selections.startCell[1];
     const cell = this.excel.sheet.getCell(row, col);
     cellStyle = Object.assign({}, this.sheetContainerRef.current._getItemStyle(row, col), Cell.getCellStyles(cell));
     const typed = !!e.key.match(/^\S$/);
@@ -155,7 +155,7 @@ class Worksheets extends Component {
     else {
       if (e.key === 'Delete') {
         this.selections.forEach((row, col) => {
-          cell.clear();
+          this.excel.sheet.getCell(row, col).clear();
         });
         this.excel.renderCurrentSheet();
       } else if (e.key === 'Backspace') {
@@ -196,7 +196,7 @@ class Worksheets extends Component {
       freezeRowCount = panes.ySplit;
       freezeColumnCount = panes.xSplit;
     }
-    console.log('render sheets')
+    console.log('render sheets');
     this.selections = new Selections({
       freezeRowCount,
       freezeColumnCount,

@@ -101,7 +101,7 @@ class Excel extends Component {
         this.setState({contextMenu: null})
       },
       'Paste \t\t\t Ctrl+V': async () => {
-        const result = await navigator.permissions.query({name: "clipboard-read"})
+        const result = await navigator.permissions.query({name: "clipboard-read"});
         console.log('clipboard ' + result.state);
 
         // console.log(await navigator.clipboard.read())

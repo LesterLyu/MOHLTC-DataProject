@@ -23,11 +23,11 @@ class FormulaBar extends Component {
     this.state = {formulaBarInput: '',};
     this.data = {row: null, col: null, sheetIdx: null};
     this.excel = props.context;
-    hooks.add('afterSelection', (row, col, row2, col2) => {
-      this.data.row = row;
-      this.data.col = col;
+    hooks.add('afterSelection', (row, col, row2, col2, startRow, startCol) => {
+      this.data.row = startRow;
+      this.data.col = startCol;
       this.data.sheetIdx = this.excel.currentSheetIdx;
-      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row, col);
+      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(startRow, startCol);
       let input = typeof cell.formula() === 'string' ? '=' + cell.formula() : cell.value();
       input = input === undefined || input === null ? '' : input;
       if (input instanceof RichText) {
@@ -63,7 +63,7 @@ class FormulaBar extends Component {
   focusout = () => {
     // console.log('focus out')
     if (this.orginalInput !== this.state.formulaBarInput) {
-      this.excel.setDataAndRender(this.excel.currentSheetIdx, this.data.row, this.data.col, this.state.formulaBarInput, 'edit')
+      this.excel.renderCurrentSheet();
     }
   };
 

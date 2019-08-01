@@ -26,6 +26,7 @@ export default class Selections {
     };
     // select first cell by default
     this._data = [1, 1, 1, 1];
+    this._startCell = [1, 1];
   }
 
   /**
@@ -34,6 +35,10 @@ export default class Selections {
    */
   get data() {
     return this._data;
+  }
+
+  get startCell() {
+    return this._startCell;
   }
 
   contains(row, col) {
@@ -65,7 +70,8 @@ export default class Selections {
     this._data = [1, 1, 1, 1];
   };
 
-  setSelections = (selections) => {
+  setSelections = (selections, startCell) => {
+    if (startCell) this._startCell = startCell;
     const {freezeRowCount, freezeColumnCount, sheet} = this.props;
     selections = calculateRealSelections(sheet, ...selections);
     this._data = selections;
@@ -99,7 +105,7 @@ export default class Selections {
     this.updateHeaders(selections);
 
     // call hook
-    hooks.invoke('afterSelection', ...selections);
+    hooks.invoke('afterSelection', ...selections.concat(this.startCell));
     return selections;
   };
 
