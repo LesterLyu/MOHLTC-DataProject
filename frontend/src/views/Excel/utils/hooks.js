@@ -1,3 +1,20 @@
+/**
+ * @typedef {'afterSelection'} Hooks~ExcelHooks
+ */
+
+/**
+ * @callback Hooks~afterSelectionCallback
+ * @param {number} row
+ * @param {number} col
+ * @param {number} row2
+ * @param {number} col2
+ * @param {number} startRow
+ * @param {number} startCol
+ */
+
+/**
+ * Excel Hooks.
+ */
 class Hooks {
   constructor() {
     this.hooks = {};
@@ -5,8 +22,8 @@ class Hooks {
 
   /**
    * Add a hook.
-   * @param {string} hookName
-   * @param {function[]|function} cbs - callback(s)
+   * @param {ExcelHooks|string} hookName
+   * @param {Hooks~afterSelectionCallback|function[]|function} cbs - callback(s)
    */
   add(hookName, cbs) {
     let hook = this.hooks[hookName];
@@ -22,7 +39,7 @@ class Hooks {
 
   /**
    * Call a hook.
-   * @param hookName
+   * @param {ExcelHooks} hookName
    * @param args
    */
   invoke(hookName, ...args) {

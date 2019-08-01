@@ -3,7 +3,7 @@ import {Card} from "@material-ui/core";
 
 import {
   init, getCellType, generateNewSheetName, indexOfBySheetName,
-  getSheetNames,
+  getSheetNames, hooks
 } from './utils';
 
 import './style.css';
@@ -80,10 +80,14 @@ class Excel extends Component {
         // console.log(await navigator.clipboard.read())
         this.setState({contextMenu: null})
       },
-    }
+    };
 
     // request permission
 
+    // add hooks
+    hooks.add("afterSelection", (row, col, row2, col2, startRow, startCol) => {
+      this.sheet.activeCell(startRow, startCol);
+    });
   }
 
   get editor() {

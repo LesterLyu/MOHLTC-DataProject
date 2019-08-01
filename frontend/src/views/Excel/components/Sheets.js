@@ -54,7 +54,7 @@ class Worksheets extends Component {
   componentDidMount() {
     this.history.currentSheetIdx = this.props.context.currentSheetIdx;
     this.history.initialFileName = this.props.context.initialFileName;
-    this.selections.setSelections([1, 1, 1, 1]);
+    this.selectActiveCell();
   }
 
   reset() {
@@ -64,7 +64,18 @@ class Worksheets extends Component {
     this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
     // reset scrolling position
     this.sheetContainerRef.current.scrollTo({scrollLeft: 0, scrollTop: 0});
-    this.selections.setSelections([1, 1, 1, 1]);
+   this.selectActiveCell();
+  }
+
+  selectActiveCell() {
+    try {
+      const activeCell = this.excel.sheet.activeCell();
+      const row = activeCell.rowNumber(), col = activeCell.columnNumber();
+      this.selections.setSelections([row, col, row, col]);
+    } catch (e) {
+      console.log(e);
+      this.selections.setSelections([1, 1, 1, 1], undefined, false);
+    }
   }
 
   /**
