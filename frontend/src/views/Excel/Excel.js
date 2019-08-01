@@ -1,12 +1,8 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import {
-  Card,
-} from "@material-ui/core";
+import {Card} from "@material-ui/core";
 
 import helpers, {
-  init, generateTableData, generateTableStyle, createArray, getCellType, generateNewSheetName, indexOfBySheetName,
+  init, getCellType, generateNewSheetName, indexOfBySheetName,
   getSheetNames,
 } from './helpers';
 
@@ -25,21 +21,6 @@ import DataValidationDialog from './components/DataValidationDialog';
 import CellEditor from './components/Editor';
 import Loading from "../components/Loading";
 import RightClickMenu from "./components/RightClickMenu";
-
-function defaultSheet() {
-  return {
-    tabColor: undefined,
-    data: generateTableData(200, 26),
-    styles: generateTableStyle(200, 26),
-    name: 'Sheet1',
-    state: 'visible',
-    views: [],
-    rowHeights: createArray(24, 200),
-    colWidths: createArray(80, 26),
-  };
-}
-
-const styles = theme => ({});
 
 class Excel extends Component {
 
@@ -482,8 +463,4 @@ class Excel extends Component {
   }
 }
 
-Excel.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(Excel);
+export default Excel;
