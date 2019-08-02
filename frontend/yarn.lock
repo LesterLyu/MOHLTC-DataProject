@@ -985,7 +985,7 @@
   resolved "https://registry.yarnpkg.com/@date-io/core/-/core-1.3.8.tgz#a20da7125f1444631dd96a6e8baa8982665aaa95"
   integrity sha512-XlvpzhipF/badZEJPAfgXRX9bFG2UpFl1T6O0hn1RzWJf3yexf9/M2wcEm6jh7RVyrlSayttkXtGPqVPdoJQ7Q==
 
-"@date-io/date-fns@^1.1.0":
+"@date-io/date-fns@^1.1.0", "@date-io/date-fns@^1.3.8":
   version "1.3.8"
   resolved "https://registry.yarnpkg.com/@date-io/date-fns/-/date-fns-1.3.8.tgz#820553ba0136027b20d3a696ab9b300f2fa23c5c"
   integrity sha512-vlMRbaCIC1NTjGXL8QWsc9v/7EJwtciUYWCYw1+PXkmpPr1W4GbckvLYvFhGSlQ8ibIh0JKB1yP4bozSb3Tu+w==
@@ -1286,7 +1286,7 @@
   dependencies:
     "@babel/runtime" "^7.2.0"
 
-"@material-ui/pickers@^3.0.0":
+"@material-ui/pickers@^3.0.0", "@material-ui/pickers@^3.2.1":
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/@material-ui/pickers/-/pickers-3.2.1.tgz#50a2a74be07db587d039b6da3c279086ae839eb1"
   integrity sha512-9dl7JLSIZQQx7j4UKU7Hnkxjok6gyz3KQMjza54dJgfJ8ZrMca2opGveerzVtAfqSef/aGzA8WrEw/ql/5r7RQ==
@@ -3660,7 +3660,7 @@ data-urls@^1.0.0, data-urls@^1.1.0:
     whatwg-mimetype "^2.2.0"
     whatwg-url "^7.0.0"
 
-date-fns@^2.0.0-alpha.27:
+date-fns@^2.0.0-alpha.27, date-fns@^2.0.0-beta.3:
   version "2.0.0-beta.3"
   resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-beta.3.tgz#2e28f5af945930f774ddd778e184d68227101d55"
   integrity sha512-z5O262BvHPhwUvA1weXH+AZodygnZUcORERw8hjwBUrRPGrAo2e/rjXfC8Ykf1OGJZGDuLnK/WXbEZBIc0exGQ==

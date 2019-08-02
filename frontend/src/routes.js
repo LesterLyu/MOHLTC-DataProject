@@ -17,6 +17,8 @@ const Excel = React.lazy(() => import('./views/Excel/Excel'/* webpackChunkName: 
 const SystemInfo = React.lazy(() => import('./views/System' /* webpackChunkName: "systemInfo" */));
 const ImportId = React.lazy(() => import('./views/Tools/Import' /* webpackChunkName: "importId" */));
 
+const CreatePackage = React.lazy(() => import('./views/Package/Create' /* webpackChunkName: "createPackage" */));
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   {path: '/', exact: true, name: 'Home', component: DefaultLayout},
@@ -41,9 +43,9 @@ const routes = [
   {path: '/category/group', exact: true, name: 'Category Group', component: AttCatGroup, params: {mode: 'cat'}},
 
   {path: '/system', exact: true, name: 'System Info', component: SystemInfo},
-  {path: '/import/id', exact: true, name: 'Import ID', component: ImportId}
+  {path: '/import/id', exact: true, name: 'Import ID', component: ImportId},
 
-
+  {path: '/package/create', exact: true, name: 'Create Package', component: CreatePackage},
 ];
 
 export default routes;

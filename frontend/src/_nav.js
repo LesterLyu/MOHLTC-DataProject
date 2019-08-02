@@ -94,6 +94,17 @@ export default {
       ]
     },
     {
+      name: 'Package',
+      icon: 'mdi mdi-package-variant',
+      children: [
+        {
+          name: 'Create Package',
+          url: '/package/create',
+          icon: 'mdi mdi-shape-square-plus',
+        },
+      ]
+    },
+    {
       name: 'Server',
       icon: 'mdi mdi-server',
       children: [
