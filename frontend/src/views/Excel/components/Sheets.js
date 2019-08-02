@@ -64,14 +64,21 @@ class Worksheets extends Component {
     this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
     // reset scrolling position
     this.sheetContainerRef.current.scrollTo({scrollLeft: 0, scrollTop: 0});
-   this.selectActiveCell();
+    this.selectActiveCell();
   }
 
   selectActiveCell() {
     try {
       const activeCell = this.excel.sheet.activeCell();
-      const row = activeCell.rowNumber(), col = activeCell.columnNumber();
-      this.selections.setSelections([row, col, row, col]);
+      if (activeCell.rowNumber) {
+        const row = activeCell.rowNumber(), col = activeCell.columnNumber();
+        this.selections.setSelections([row, col, row, col]);
+      } else {
+        this.selections.setSelections([activeCell.startCell().rowNumber(),
+          activeCell.startCell().columnNumber(), activeCell.endCell().rowNumber(),
+          activeCell.endCell().columnNumber()]);
+      }
+
     } catch (e) {
       console.log(e);
       this.selections.setSelections([1, 1, 1, 1], undefined, false);

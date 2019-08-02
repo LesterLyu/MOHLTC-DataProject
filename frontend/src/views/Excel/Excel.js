@@ -86,7 +86,11 @@ class Excel extends Component {
 
     // add hooks
     hooks.add("afterSelection", (row, col, row2, col2, startRow, startCol) => {
-      this.sheet.activeCell(startRow, startCol);
+      if (row !== row2 && col !== col2) {
+        this.sheet.activeCell(this.sheet.range(row, col, row2, col2));
+      } else {
+        this.sheet.activeCell(startRow, startCol);
+      }
     });
   }
 
@@ -158,7 +162,7 @@ class Excel extends Component {
     // I don't want you to update rich text.
     if (getCellType(cell) === 'richtext') {
       console.warn('setData: An update to rich text has been blocked.');
-      return;
+      return true;
     }
     const isFormula = typeof rawValue === 'string' && rawValue.charAt(0) === '=' && rawValue.length > 1;
     let formula;
@@ -263,8 +267,8 @@ class Excel extends Component {
     this.editor.prepare(cell, style, typed);
     this.setState({
       openEditor: {
-        top: this.outerRef.current.offsetTop + style.top,
-        left: this.outerRef.current.offsetLeft + style.left,
+        top: this.outerRef.current.offsetTop - this.sheetContainerRef.current.state.scrollTop + style.top,
+        left: this.outerRef.current.offsetLeft - this.sheetContainerRef.current.state.scrollLeft + style.left,
       }, editorCell: cell
     });
   };
