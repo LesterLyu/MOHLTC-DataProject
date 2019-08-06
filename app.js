@@ -58,9 +58,10 @@ app.use(express.static(path.join(__dirname, 'public/moh.css')));
 
 // MongoDB
 mongoose.connect(process.env.NODE_ENV === 'test' ? config.testDatabase : config.database, {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useFindAndModify: false,
+    useCreateIndex: true,
 });
-mongoose.set('useFindAndModify', false);
 let db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
@@ -142,6 +143,7 @@ app.use(function (err, req, res, next) {
     if (err === error.api.NO_PERMISSION) {
         res.status(403).json({success: false, message: error.api.NO_PERMISSION});
     } else {
+        console.error(err);
         res.status(err.status || 500).json({
             success: false,
             message: err.message,

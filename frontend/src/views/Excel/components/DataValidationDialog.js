@@ -25,13 +25,13 @@ class DataValidationDialog extends React.Component {
     return (
       <Dialog
         open={open}
-        onClose={handleClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
+        onClose={handleRetry}
+        aria-labelledby="data validation error"
+        aria-describedby={errorTitle}
       >
-        <DialogTitle id="alert-dialog-title">{errorTitle}</DialogTitle>
+        <DialogTitle>{errorTitle}</DialogTitle>
         <DialogContent>
-          <DialogContentText id="alert-dialog-description">
+          <DialogContentText>
             {errorMessage}
           </DialogContentText>
         </DialogContent>
@@ -39,7 +39,7 @@ class DataValidationDialog extends React.Component {
           <Button onClick={handleRetry} color="primary">
             Retry
           </Button>
-          <Button onClick={handleClose} color="primary" autoFocus>
+          <Button onClick={handleClose} color="primary">
             Cancel
           </Button>
         </DialogActions>

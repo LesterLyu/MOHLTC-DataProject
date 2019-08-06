@@ -7,7 +7,6 @@ const defaultToolbarSelectStyles = {
     top: "50%",
     display: "inline-block",
     position: "relative",
-    transform: "translateY(-50%)"
   },
   toolbar: {
     marginRight: 24,

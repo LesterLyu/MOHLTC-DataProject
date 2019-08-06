@@ -17,6 +17,7 @@ import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";
 import {SketchPicker} from 'react-color';
 import SelectField from './SelectField';
+import {hooks} from '../utils';
 
 
 export function ToolBarDivider() {
@@ -54,9 +55,9 @@ class ExcelToolBar extends Component {
       this.fontSizeOptions.push({value: fontSizeOptions[i], label: fontSizeOptions[i] + ''});
     }
 
-    this.excel.addHook('afterSelection', (row, col, row2, col2) => {
+    hooks.add('afterSelection', (row, col, row2, col2) => {
       if (this.history.current.row === row && this.history.current.col === col) return;
-      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row + 1, col + 1);
+      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row, col);
       const style = {
         fill: cell.style('fill'),
         fontColor: cell.style('fontColor'),
@@ -81,12 +82,8 @@ class ExcelToolBar extends Component {
   //   this.history.current = this.props.context.global.current;
   // }
 
-  get hotInstance() {
-    return this.excel.hotInstance;
-  }
-
   getSelected() {
-    return this.excel.hotInstance.getSelected();
+    return [this.excel.selected];
   }
 
   downloadWorkbook = () => {
@@ -97,13 +94,12 @@ class ExcelToolBar extends Component {
   };
 
   uploadWorkbook = () => {
-    this.excel.excelManager.readWorkbookLocal((sheets, sheetNames, workbook) => {
-      console.log(sheets, sheetNames, workbook);
-      this.excel.global.sheetNames = sheetNames;
-      this.excel.global.sheets = sheets;
+    this.excel.excelManager.readWorkbookLocal((workbook) => {
+      console.log(workbook);
       this.excel.workbook = workbook;
       this.excel.currentSheetIdx = 0;
       this.excel.forceUpdate();
+      this.excel.renderCurrentSheet();
     })
   };
   saveWorkbook = () => {
@@ -112,41 +108,23 @@ class ExcelToolBar extends Component {
 
   style = (name, value, ranges = this.getSelected()) => {
     const {excel} = this;
-    // const styles = excel.currentSheet.styles;
-    // const ranges = ranges || this.getSelected();
     if (!ranges) {
       return;
     }
     console.log(name, value);
     for (let i = 0; i < ranges.length; i++) {
       const range = ranges[i];
-      // render one extra row if exists
-      if (range[0] > 0) {
-        let col = range[1] > 0 ? range[1] - 1 : range[1];
-        for (col; col <= range[3]; col++) {
-          excel.renderer.cellNeedUpdate(excel.currentSheetIdx, range[0] - 1, col);
-        }
-      }
       for (let row = range[0]; row <= range[2]; row++) {
-        // render one extra cell if exists
-        if (range[1] > 0) {
-          excel.renderer.cellNeedUpdate(excel.currentSheetIdx, row, range[1] - 1);
-        }
         for (let col = range[1]; col <= range[3]; col++) {
-          // const style = styles[row][col];
-          excel.renderer.cellNeedUpdate(excel.currentSheetIdx, row, col);
-          const cell = excel.workbook.sheet(excel.currentSheetIdx).cell(row + 1, col + 1);
+          const cell = excel.workbook.sheet(excel.currentSheetIdx).cell(row, col);
           if (this.booleanAttributes.includes(name)) {
-            // style[name] = !style[name];
             cell.style(name, !cell.style(name));
           } else if (this.otherAttributes.includes(name)) {
             if (typeof value === 'object') {
               const mergedValue = Object.assign(cell.style(name) || {}, value);
-              // style[name] = mergedValue;
               cell.style(name, mergedValue);
             } else {
               const valueCopy = (typeof value === 'object' && value) ? Object.assign({}, value) : value;
-              // style[name] = valueCopy;
               cell.style(name, valueCopy);
             }
           }
@@ -241,7 +219,21 @@ class ExcelToolBar extends Component {
     }
   };
 
-  mergeCells = () => this.hotInstance.getPlugin('ContextMenu').executeCommand('mergeCells');
+  mergeCells = () => {
+    const selected = this.getSelected()[0];
+    // skip if only one cell selected
+    if (selected[0] === selected[1] && selected[2] === selected[3]) return;
+    const from = this.excel.sheet.getCell(selected[0], selected[1]);
+    const to = this.excel.sheet.getCell(selected[2], selected[3]);
+    const merged = from.merged();
+    if (merged) {
+      // TODO: fix the bug (from.rangeTo(to).merged(false)) in excel library.
+      this.excel.sheet._mergeCells.delete(from.address());
+    } else {
+      from.rangeTo(to).merged(true);
+    }
+    this.excel.renderCurrentSheet();
+  };
 
   render() {
     const {fillColorPopover, textColorPopover, selectedFontSize} = this.state;

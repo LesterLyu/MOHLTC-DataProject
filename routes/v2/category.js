@@ -3,12 +3,14 @@ const router = express.Router();
 const {categoryController} = require('../../controller/v2');
 const {
     addCategory, getCategories, generateCategoryId, deleteCategory, deleteCategoryGroup, getCategoryGroup,
-    modifyCategoryGroup, categoryAssignGroups
+    modifyCategoryGroup, categoryAssignGroups, addManyCategories
 } = categoryController;
 
 router.get('/api/v2/category', getCategories);
 
 router.post('/api/v2/category', addCategory);
+
+router.post('/api/v2/batch/category', addManyCategories);
 
 router.delete('/api/v2/category', deleteCategory);
 

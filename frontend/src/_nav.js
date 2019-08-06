@@ -3,15 +3,6 @@ import config from "./config/config";
 export default {
   items: [
     {
-      name: 'Dashboard',
-      url: '/dashboard',
-      icon: 'mdi mdi-view-dashboard',
-      badge: {
-        variant: 'info',
-        // text: 'NEW',
-      },
-    },
-    {
       title: true,
       name: 'User',
     },
@@ -74,10 +65,11 @@ export default {
           icon: 'mdi mdi-checkbook',
         },
         {
-          name: 'Query',
-          url: '/5fghfgh',
-          icon: 'mdi mdi-magnify',
+          name: 'Import ID',
+          url: '/import/id',
+          icon: 'mdi mdi-application-import',
         },
+
       ]
     },
     {
@@ -98,6 +90,17 @@ export default {
           name: 'Add Organization',
           url: '/addOrganization',
           icon: 'mdi mdi-playlist-check',
+        },
+      ]
+    },
+    {
+      name: 'Package',
+      icon: 'mdi mdi-package-variant',
+      children: [
+        {
+          name: 'Create Package',
+          url: '/package/create',
+          icon: 'mdi mdi-shape-square-plus',
         },
       ]
     },
@@ -133,7 +136,7 @@ export default {
       url: 'https://github.com/LesterLyu/MOHLTC-DataProject/blob/dev-lester/documents/update-history.md',
       icon: 'icon-cloud-download',
       class: 'mt-auto',
-      attributes: { target: '_blank', rel: "noopener" },
+      attributes: {target: '_blank', rel: "noopener"},
     },
   ],
 

@@ -1,5 +1,5 @@
 import React, {PureComponent} from "react";
-import {colorToRgb, RichText, SSF} from "../helpers";
+import {colorToRgb, RichText, SSF} from "../utils";
 import ac from "xlsx-populate/lib/addressConverter";
 import Worksheets from "./Sheets";
 
@@ -38,10 +38,10 @@ class Cell extends PureComponent {
   static colHeaders = [];
 
   /**
-   * @param {Sheet} sheet
    * @param {Cell} cell
    */
-  static getCellStyles(sheet, cell) {
+  static getCellStyles(cell) {
+    const sheet = cell.sheet();
     let style = {};
     let rowHeight = cell.row().height;
     rowHeight = rowHeight ? 24 : rowHeight / 0.6;
@@ -194,7 +194,7 @@ class Cell extends PureComponent {
       value = null;
       mergedStyle = Object.assign({}, initStyle);
     } else {
-      mergedStyle = Object.assign({}, defaultStyle, initStyle, Cell.getCellStyles(cell.sheet(), cell));
+      mergedStyle = Object.assign({}, defaultStyle, initStyle, Cell.getCellStyles(cell));
     }
     // text overflow
     if (value != null && value !== '') {
@@ -284,7 +284,7 @@ class Cell extends PureComponent {
 
   render() {
     const {data, rowIndex, columnIndex, style} = this.props;
-    const {sheet, onMouseDown, onMouseUp, onMouseOver, onMouseDoubleClick, onKeyDown} = data;
+    const {sheet, onMouseDown, onMouseUp, onMouseOver, onMouseDoubleClick, onKeyDown, onContextMenu} = data;
     let innerContent = null;
 
     // render row/column header
@@ -313,13 +313,14 @@ class Cell extends PureComponent {
     }
 
     // render normal cell
-    if (!dataValidation && !hyperlink) {
+    if (!(dataValidation && dataValidation.type === 'list') && !hyperlink) {
       innerContent = this.renderNormalCell(value);
     }
 
     return (
       <div style={mergedStyle} className={"not-selectable"}
            tabIndex={0}
+           onContextMenu={e => onContextMenu(rowIndex, columnIndex, mergedStyle, e)}
            onKeyDown={(e) => onKeyDown(rowIndex, columnIndex, mergedStyle, e)}
            onDoubleClick={(e) => onMouseDoubleClick(rowIndex, columnIndex, mergedStyle, e)}
            onMouseDown={(e) => onMouseDown(rowIndex, columnIndex, mergedStyle, e)}

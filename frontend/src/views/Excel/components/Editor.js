@@ -1,6 +1,6 @@
 import React, {PureComponent} from "react";
 import {Popover, withStyles} from "@material-ui/core";
-import {getCellType} from "../helpers";
+import {getCellType} from "../utils";
 import PropTypes from "prop-types";
 
 
@@ -33,11 +33,16 @@ class CellEditor extends PureComponent {
     this.props.handleClose(value);
   };
 
-  prepare = (cell, style) => {
-    let value = cell ? cell.getValue() : undefined;
-    const type = getCellType(cell);
-    if (type === 'formula') {
-      value = '=' + cell.getFormula();
+  prepare = (cell, style, typed) => {
+    let value;
+    if (typed) {
+      value = '';
+    } else {
+      value = cell ? cell.getValue() : undefined;
+      const type = getCellType(cell);
+      if (type === 'formula') {
+        value = '=' + cell.getFormula();
+      }
     }
     this.style = style;
     this.setState({value})
@@ -60,8 +65,8 @@ class CellEditor extends PureComponent {
   };
 
   render() {
-    const {anchorEl, classes} = this.props;
-    const open = Boolean(anchorEl);
+    const {config, classes} = this.props;
+    const open = Boolean(config);
     let style = {resize: 'none', overflow: 'hidden'};
     if (open) {
       Object.assign(style, this.style, {
@@ -75,11 +80,10 @@ class CellEditor extends PureComponent {
 
     return (
       <Popover
-        id="simple-popper"
         PaperProps={{square: true}}
         classes={{paper: classes.paper}}
+        anchorReference="anchorPosition"
         open={open}
-        anchorEl={anchorEl}
         onClose={this.onClose}
         anchorOrigin={{
           vertical: 'top',
@@ -89,6 +93,7 @@ class CellEditor extends PureComponent {
           vertical: 'top',
           horizontal: 'left',
         }}
+        anchorPosition={config}
         transitionDuration={0}>
         <textarea
           style={style}

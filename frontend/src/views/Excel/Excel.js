@@ -1,14 +1,10 @@
 import React, {Component} from 'react';
-import PropTypes from 'prop-types';
-import {withStyles} from '@material-ui/core/styles';
-import {
-  Card,
-  LinearProgress,
-} from "@material-ui/core";
+import {Card} from "@material-ui/core";
 
-import helpers, {
-  init, generateTableData, generateTableStyle, createArray, getCellType,
-} from './helpers';
+import {
+  init, getCellType, generateNewSheetName, indexOfBySheetName,
+  getSheetNames, hooks
+} from './utils';
 
 import './style.css';
 import ExcelManager from "../../controller/excelManager";
@@ -23,22 +19,8 @@ import SetIdDialog from "./components/SetIdDialog";
 import Dropdown from './components/Dropdown';
 import DataValidationDialog from './components/DataValidationDialog';
 import CellEditor from './components/Editor';
-
-function defaultSheet() {
-  return {
-    tabColor: undefined,
-    data: generateTableData(200, 26),
-    styles: generateTableStyle(200, 26),
-    name: 'Sheet1',
-    state: 'visible',
-    views: [],
-    mergeCells: [],
-    rowHeights: createArray(24, 200),
-    colWidths: createArray(80, 26),
-  };
-}
-
-const styles = theme => ({});
+import Loading from "../components/Loading";
+import RightClickMenu from "./components/RightClickMenu";
 
 class Excel extends Component {
 
@@ -48,12 +30,11 @@ class Excel extends Component {
     console.log('mode:', props.params.mode);
     // TODO: disable some cell editing for user (formula editing...)
     window.excel = this;
-    window.helpers = helpers;
     this.state = {
       completed: 5,
       sheetHeight: 0,
       sheetWidth: 0,
-      loadingMessage: 'Loading...',
+      loadingMessage: 'Loading Workbook...',
       loaded: false,
       currentSheetIdx: 0,
       openSetId: null,
@@ -63,16 +44,10 @@ class Excel extends Component {
       dropdownCell: null,
       setIdCell: null,
       editorCell: null,
-      fileName: 'Untitled workbook'
+      fileName: 'Untitled workbook',
+      contextMenu: null,
     };
-    this.global = {
-      sheetNames: ['Sheet1'],
-      sheets: [
-        defaultSheet(),
-      ],
-      current: {}
-    };
-    this.initialFileName = null; // uploaded file name
+    this.initialFileName = 'Untitled workbook'; // uploaded file name
     this.excelManager = new ExcelManager(props);
     this.attCatManager = new AttCatManager(props);
 
@@ -80,7 +55,6 @@ class Excel extends Component {
     this.sheetContainerRef = React.createRef();
     this.sheetRef = React.createRef();
     this.editorRef = React.createRef();
-    this.hooks = [];
 
     // set ID dialog
     this.attOptions = [];
@@ -88,6 +62,36 @@ class Excel extends Component {
 
     // error dialog
     this.errorDialog = {};
+
+    // right click menu
+    this.menu = {
+      'Set ID': (anchorEl) => {
+        console.log('SET ID');
+        this.setId(anchorEl);
+      },
+      'div1': null,
+      'Copy \t\t\t Ctrl+C': () => {
+        this.setState({contextMenu: null})
+      },
+      'Paste \t\t\t Ctrl+V': async () => {
+        const result = await navigator.permissions.query({name: "clipboard-read"});
+        console.log('clipboard ' + result.state);
+
+        // console.log(await navigator.clipboard.read())
+        this.setState({contextMenu: null})
+      },
+    };
+
+    // request permission
+
+    // add hooks
+    hooks.add("afterSelection", (row, col, row2, col2, startRow, startCol) => {
+      if (row !== row2 && col !== col2) {
+        this.sheet.activeCell(this.sheet.range(row, col, row2, col2));
+      } else {
+        this.sheet.activeCell(startRow, startCol);
+      }
+    });
   }
 
   get editor() {
@@ -106,16 +110,8 @@ class Excel extends Component {
     return this.workbook.sheet(this.currentSheetIdx);
   }
 
-  /**
-   * Get current sheet data
-   * @return {SheetStore}
-   */
-  get currentSheet() {
-    return this.global.sheets[this.state.currentSheetIdx];
-  }
-
-  get currDisplaySheetName() {
-    return this.global.sheetNames[this.state.currentSheetIdx];
+  get sheetNames() {
+    return getSheetNames(this.workbook);
   }
 
   get currentSheetIdx() {
@@ -131,26 +127,11 @@ class Excel extends Component {
   }
 
   /**
-   * @return {Handsontable}
-   */
-  get hotInstance() {
-    return this.sheetRef.current ? this.sheetRef.current.hotInstance : null;
-  }
-
-  /**
-   * @return {{cell: Cell, td: HTMLElement}}
+   * @return {*[]}
    */
   get selected() {
-    const selected = this.hotInstance.getSelected();
-    return {
-      cell: this.sheet.getCell(selected[0][0] + 1, selected[0][1] + 1),
-      td: this.hotInstance.getCell(selected[0][0], selected[0][1])
-    };
+    return this.sheetRef.current.selections.data;
   }
-
-  addHook = (name, f) => {
-    this.hooks.push({name, f});
-  };
 
   getDefinedName = (definedName) => {
     const ref = this.workbook.definedName(definedName);
@@ -158,14 +139,6 @@ class Excel extends Component {
       return ref.value();
     }
   };
-
-  getDataAtSheetAndCell(row, col, sheetNo, sheetName) {
-    sheetNo = sheetNo === null ? this.global.sheetNames.indexOf(sheetName) : sheetNo;
-    if (sheetNo === undefined) console.error('At least one of sheetNo or sheetName should be provides.');
-
-    const cell = this.workbook.sheet(sheetNo).getCell(row + 1, col + 1);
-    return cell == null ? undefined : cell.getValue();
-  }
 
   getCell(sheetNo, row, col) {
     if (sheetNo === undefined) console.error('getCell: sheetNo should be provides.');
@@ -189,7 +162,7 @@ class Excel extends Component {
     // I don't want you to update rich text.
     if (getCellType(cell) === 'richtext') {
       console.warn('setData: An update to rich text has been blocked.');
-      return;
+      return true;
     }
     const isFormula = typeof rawValue === 'string' && rawValue.charAt(0) === '=' && rawValue.length > 1;
     let formula;
@@ -202,7 +175,6 @@ class Excel extends Component {
         errorTitle: validation.dataValidation.errorTitle,
         errorStyle: validation.dataValidation.errorStyle,
       };
-      this.setState({openDataValidationDialog: true});
       return false;
     }
     // check if it is formula now
@@ -211,74 +183,37 @@ class Excel extends Component {
     } else {
       updates = cell.setValue(rawValue);
     }
-
-    // this.renderCell(row, col);
-    // // add to next render list
-    // updates.forEach(ref => {
-    //   if (ref.sheet === this.currentSheetName) {
-    //     this.renderCell(ref.row - 1, ref.col - 1);
-    //   }
-    // });
-    console.log(`Updated ${updates.length + 1} cells.`)
+    console.log(`Updated ${updates.length + 1} cells.`);
+    return true;
   };
 
   /**
-   * Update a cell's data and render it.
-   * Cell's value and formula will be overrode.
-   * @param {number | null | undefined} sheetNo - null or undefined if uses current sheet number
-   * @param {number} row
-   * @param {number} col
-   * @param {string} rawValue - can be any excel data type
-   * @param {'internal'| 'edit'} source - 'internal' means internal update, i.e. formula updates
-   *                                      'edit' means edit by the user
+   * Save as setData() but calls renderCurrentSheet().
+   * @param params
    */
   setDataAndRender(...params) {
     this.setData(...params);
     this.renderCurrentSheet();
   }
 
-  getSheet(idx) {
-    return this.global.sheets[idx];
-  }
-
-  getSheetByName(sheetName) {
-    return this.getSheet(this.global.sheetNames.indexOf(sheetName))
-  }
-
   switchSheet(sheetNameOrIndex) {
     if (typeof sheetNameOrIndex === 'string') {
-      this.currentSheetName = sheetNameOrIndex;
-      this.currentSheetIdx = this.global.sheetNames.indexOf(sheetNameOrIndex);
+      this.currentSheetIdx = indexOfBySheetName(this.workbook, sheetNameOrIndex);
     } else if (typeof sheetNameOrIndex === 'number') {
-      this.currentSheetName = this.global.sheetNames[sheetNameOrIndex];
       this.currentSheetIdx = sheetNameOrIndex;
     }
   }
 
-  addSheet = () => {
-    // generate new name
-    let newSheetNumber = this.global.sheetNames.length + 1;
-    for (let i = 0; i < this.global.sheetNames.length; i++) {
-      const name = this.global.sheetNames[i];
-      const match = name.match(/^Sheet(\d+)$/);
-      if (match) {
-        if (newSheetNumber <= match[1]) {
-          newSheetNumber++;
-        }
-      }
-    }
-    const newSheetName = 'Sheet' + newSheetNumber;
-    const newSheet = Object.assign(defaultSheet(), {name: newSheetName});
-    this.global.sheets.push(newSheet);
-    this.global.sheetNames.push(newSheetName);
-    this.workbook.addSheet(newSheetName);
+  addSheet = async () => {
+    const newSheetName = generateNewSheetName(this.workbook);
+    const sheet = await this.workbook.addSheet(newSheetName);
+    sheet.row(200).cell(26).setValue('');
     this.switchSheet(newSheetName);
   };
 
-  setId = () => {
-    const {td, cell} = this.selected;
-    console.log('td', td);
-    this.setState({openSetId: td, setIdCell: cell});
+  setId = (anchorEl) => {
+    const cell = this.selected;
+    this.setState({contextMenu: null, openSetId: anchorEl, setIdCell: cell});
   };
 
   handleSetId = (att = {}, cat = {}) => {
@@ -314,18 +249,28 @@ class Excel extends Component {
      * @type {Cell|undefined}
      */
     const dropdownCell = this.state.dropdownCell;
-    this.setData(this.currentSheetIdx, dropdownCell.rowNumber() - 1, dropdownCell.columnNumber() - 1, selected.value);
-    this.handleCloseDropdown();
+    const success = this.setData(this.currentSheetIdx, dropdownCell.rowNumber() - 1, dropdownCell.columnNumber() - 1, selected.value);
+    if (success) {
+      this.handleCloseDropdown();
+      this.renderCurrentSheet();
+    } else {
+      this.showDataValidationDialog();
+    }
   };
 
   handleCloseDropdown = () => {
     this.setState({openDropdown: null, dropdownCell: null});
   };
 
-  showEditor = (rowIndex, columnIndex, style, e) => {
+  showEditor = (rowIndex, columnIndex, style, typed) => {
     const cell = this.sheet.getCell(rowIndex, columnIndex);
-    this.editor.prepare(cell, style);
-    this.setState({openEditor: e.target, editorCell: cell});
+    this.editor.prepare(cell, style, typed);
+    this.setState({
+      openEditor: {
+        top: this.outerRef.current.offsetTop - this.sheetContainerRef.current.state.scrollTop + style.top,
+        left: this.outerRef.current.offsetLeft - this.sheetContainerRef.current.state.scrollLeft + style.left,
+      }, editorCell: cell
+    });
   };
 
   handleCloseEditor = input => {
@@ -333,9 +278,14 @@ class Excel extends Component {
      * @type {Cell|undefined}
      */
     const cell = this.state.editorCell;
-    this.setData(this.currentSheetIdx, cell.rowNumber() - 1, cell.columnNumber() - 1, input);
-    this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
-    this.setState({openEditor: null, editorCell: null});
+    const success = this.setData(this.currentSheetIdx, cell.rowNumber() - 1, cell.columnNumber() - 1, input);
+
+    if (success) {
+      this.setState({openEditor: null, editorCell: null});
+      this.renderCurrentSheet();
+    } else {
+      this.showDataValidationDialog();
+    }
   };
 
   showDataValidationDialog = () => {
@@ -343,11 +293,29 @@ class Excel extends Component {
   };
 
   handleCloseDataValidationDialog = () => {
-    this.setState({openDataValidationDialog: false});
+    this.handleCloseDropdown();
+    this.setState({openDataValidationDialog: false, openEditor: null, editorCell: null});
   };
 
   handleRetryDataValidationDialog = () => {
     this.setState({openDataValidationDialog: false});
+  };
+
+  /**
+   * Right click menu
+   * @param row
+   * @param col
+   * @param cellStyle
+   * @param e
+   */
+  onContextMenu = (row, col, cellStyle, e) => {
+    e.preventDefault();
+    const selections = this.sheetRef.current.selections;
+    const contain = selections.contains(row, col);
+    if (!contain) {
+      selections.setSelections([row, col, row, col])
+    }
+    this.setState({contextMenu: {selections, top: e.clientY, left: e.clientX, anchorEl: e.target}})
   };
 
   componentDidMount() {
@@ -361,7 +329,6 @@ class Excel extends Component {
       // create local workbook storage
       this.excelManager.createWorkbookLocal()
         .then(workbook => {
-          this.currentSheetName = 'Sheet1';
           this.workbook = workbook;
           this.setState({
             sheetWidth,
@@ -373,9 +340,8 @@ class Excel extends Component {
       const {name} = this.props.match.params;
       this.excelManager.readWorkbookFromDatabase(name)
         .then(data => {
-          const {sheets, sheetNames, workbook, fileName} = data;
-          this.global.sheetNames = sheetNames;
-          this.global.sheets = sheets;
+          if (!data) return;
+          const {workbook, fileName} = data;
           this.workbook = workbook;
           this.setState({
             fileName,
@@ -390,9 +356,8 @@ class Excel extends Component {
       const {name} = this.props.match.params;
       this.excelManager.readWorkbookFromDatabase(name, false)
         .then(data => {
-          const {sheets, sheetNames, workbook, fileName} = data;
-          this.global.sheetNames = sheetNames;
-          this.global.sheets = sheets;
+          if (!data) return;
+          const {workbook, fileName} = data;
           this.workbook = workbook;
           this.setState({
             fileName,
@@ -405,55 +370,13 @@ class Excel extends Component {
     }
   }
 
-  renderCell(row, col) {
-    const renderer = this.renderer.cellRendererNG;
-    const cellProperties = this.hotInstance.getCellMeta(row, col);
-    let cellElement;
-    // in test mode, handsontable is unable to get views.
-    try {
-      cellElement = this.hotInstance.getCell(row, col);
-    } catch (e) {
-    }
-    // this cell is not rendered into the dom.
-    if (!cellElement) return;
-
-    renderer(this.hotInstance, cellElement, row, col, null, null, cellProperties);
-  }
-
   renderCurrentSheet() {
-    const changes = this.renderer.changes;
-    for (let sheetId in changes) {
-      if (!changes.hasOwnProperty(sheetId)) continue;
-      const rows = changes[sheetId];
-      // go through rows
-      for (let rowNumber in rows) {
-        if (!rows.hasOwnProperty(rowNumber)) continue;
-        const row = rows[rowNumber];
-        // go through cell
-        for (let colNumber in row) {
-          if (!row.hasOwnProperty(colNumber)) continue;
-          if (row[colNumber]) {
-            this.renderCell(parseInt(rowNumber), parseInt(colNumber));
-            this.renderer.cellUpdated(sheetId, rowNumber, colNumber);
-          }
-        }
-      }
-    }
-    // this.sheetRef.current.hotInstance.render();
+    this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
   }
 
   onFileNameChange = (event) => {
     this.setState({fileName: event.target.value})
   };
-
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    if (this.state.loaded && this.sheetRef) {
-      this.hooks.forEach(hook => {
-        // HandsonTable: adding the same hook twice is now silently ignored, no need to check if hook is added.
-        // this.hotInstance.addHook(hook.name, hook.f);
-      });
-    }
-  }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
     return this.state.sheetWidth !== nextState.sheetWidth
@@ -466,6 +389,7 @@ class Excel extends Component {
       || this.state.fileName !== nextState.fileName
       || this.state.openDataValidationDialog !== nextState.openDataValidationDialog
       || this.state.openEditor !== nextState.openEditor
+      || this.state.contextMenu !== nextState.contextMenu
   }
 
   common() {
@@ -479,7 +403,7 @@ class Excel extends Component {
         />
         <CellEditor
           ref={this.editorRef}
-          anchorEl={this.state.openEditor}
+          config={this.state.openEditor}
           cell={this.state.editorCell}
           handleClose={this.handleCloseEditor}
         />
@@ -491,6 +415,11 @@ class Excel extends Component {
           handleRetry={this.handleRetryDataValidationDialog}
           handleClose={this.handleCloseDataValidationDialog}
         />
+        <RightClickMenu
+          handleClose={() => this.setState({contextMenu: null})}
+          config={this.state.contextMenu}
+          items={this.menu}
+        />
       </>
     )
   }
@@ -499,11 +428,9 @@ class Excel extends Component {
     console.log('render create excel');
     if (!this.isLoaded) {
       return (
-        <div className="animated fadeIn" style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px - 58px)'}}
+        <div style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px - 58px)'}}
              ref={this.sheetContainerRef}>
-          <h3>{this.state.loadingMessage}</h3><br/>
-
-          <LinearProgress variant="indeterminate"/>
+          <Loading message={this.state.loadingMessage}/>
         </div>
       );
     } else if (this.mode === 'admin create' || this.mode === 'admin edit') {
@@ -543,8 +470,4 @@ class Excel extends Component {
   }
 }
 
-Excel.propTypes = {
-  classes: PropTypes.object.isRequired,
-};
-
-export default withStyles(styles)(Excel);
+export default Excel;

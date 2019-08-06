@@ -1,9 +1,8 @@
 import React, {Component, Suspense} from 'react';
 import {Redirect, Route, Switch} from 'react-router-dom';
-import {Container} from 'reactstrap';
+import {Container} from '@material-ui/core'
 
 import {
-  AppBreadcrumb,
   AppHeader,
   AppSidebar,
   AppSidebarFooter,
@@ -19,8 +18,21 @@ import routes from '../../routes';
 import UserManager from "../../controller/userManager";
 import CustomSnackbarContent from "../../views/AttCat/components/CustomSnackbarContent";
 import {Snackbar} from "@material-ui/core";
+import {withStyles} from "@material-ui/core/styles";
+import AppBreadcrumb from '../AppBreadcrumb';
+import Loading from '../../views/components/Loading';
 
 const DefaultHeader = React.lazy(() => import('./DefaultHeader'));
+
+const styles = {
+  container: {
+    paddingLeft: 12,
+    paddingRight: 12,
+  },
+  main: {
+    backgroundColor: '#f3f4fd'
+  }
+};
 
 class DefaultLayout extends Component {
 
@@ -50,7 +62,16 @@ class DefaultLayout extends Component {
     }
   }
 
-  loading = () => <div className="animated fadeIn pt-1 text-center">Loading...</div>
+  // static getDerivedStateFromError(error) {
+  //   return this.state;
+  // }
+
+  // componentDidCatch(error, errorInfo) {
+  //   console.log('catch!' + error);
+  //   this.showMessage(error.toString() + errorInfo.componentStack.toString(), 'error');
+  // }
+
+  loading = () => <Loading/>;
 
   signOut(e) {
     e.preventDefault();
@@ -100,6 +121,10 @@ class DefaultLayout extends Component {
   };
 
   render() {
+    const {classes} = this.props;
+    if (this.state.hasError) {
+
+    }
     return (
       <div className="app">
         <AppHeader fixed>
@@ -117,9 +142,9 @@ class DefaultLayout extends Component {
             <AppSidebarFooter/>
             <AppSidebarMinimizer/>
           </AppSidebar>
-          <div className="main">
+          <div className={classes.main + ' main'}>
             <AppBreadcrumb appRoutes={routes}/>
-            <Container fluid>
+            <Container maxWidth="xl" className={classes.container}>
               <Suspense fallback={this.loading()}>
                 <Switch>
                   {routes.map((route, idx) => {
@@ -133,9 +158,9 @@ class DefaultLayout extends Component {
                           <route.component showMessage={this.showMessage}
                                            params={route.params ? route.params : {}} {...props} />
                         )}/>
-                    ) : (null);
+                    ) : null;
                   })}
-                  <Redirect from="/" to="/dashboard"/>
+                  <Redirect from="/" to="/profile"/>
                 </Switch>
               </Suspense>
             </Container>
@@ -162,4 +187,4 @@ class DefaultLayout extends Component {
   }
 }
 
-export default DefaultLayout;
+export default withStyles(styles)(DefaultLayout);

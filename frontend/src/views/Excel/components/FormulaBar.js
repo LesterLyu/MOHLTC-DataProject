@@ -3,7 +3,7 @@ import {AppBar, Grid, InputBase, withStyles} from "@material-ui/core";
 import React from "react";
 import {ToolBarDivider} from './ExcelToolBar';
 import PropTypes from "prop-types";
-import {RichText} from "../helpers";
+import {RichText, hooks} from "../utils";
 
 const styles = theme => ({
   input: {
@@ -23,11 +23,11 @@ class FormulaBar extends Component {
     this.state = {formulaBarInput: '',};
     this.data = {row: null, col: null, sheetIdx: null};
     this.excel = props.context;
-    this.excel.addHook('afterSelection', (row, col, row2, col2) => {
-      this.data.row = row;
-      this.data.col = col;
+    hooks.add('afterSelection', (row, col, row2, col2, startRow, startCol) => {
+      this.data.row = startRow;
+      this.data.col = startCol;
       this.data.sheetIdx = this.excel.currentSheetIdx;
-      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row + 1, col + 1);
+      const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(startRow, startCol);
       let input = typeof cell.formula() === 'string' ? '=' + cell.formula() : cell.value();
       input = input === undefined || input === null ? '' : input;
       if (input instanceof RichText) {
@@ -57,13 +57,13 @@ class FormulaBar extends Component {
 
   focusin = () => {
     console.log('focus in');
-    this.td = this.excel.hotInstance.rootElement.querySelector('td.current.highlight');
+    // this.td = this.excel.hotInstance.rootElement.querySelector('td.current.highlight');
   };
 
   focusout = () => {
     // console.log('focus out')
     if (this.orginalInput !== this.state.formulaBarInput) {
-      this.excel.setDataAndRender(this.excel.currentSheetIdx, this.data.row, this.data.col, this.state.formulaBarInput, 'edit')
+      this.excel.renderCurrentSheet();
     }
   };
 

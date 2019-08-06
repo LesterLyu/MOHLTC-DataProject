@@ -1,8 +1,6 @@
 import React from 'react';
 import DefaultLayout from './containers/DefaultLayout';
 
-const Dashboard = React.lazy(() => import('./views/Dashboard' /* webpackChunkName: "dashboard" */));
-
 const Profile = React.lazy(() => import('./views/Profile/Profile' /* webpackChunkName: "profile" */));
 
 const userRequest = React.lazy(() => import("./views/Users/RegistrationRequests" /* webpackChunkName: "registration-requests" */));
@@ -16,12 +14,14 @@ const AttCat = React.lazy(() => import('./views/AttCat/AttCat' /* webpackChunkNa
 const AttCatGroup = React.lazy(() => import('./views/AttCat/Group' /* webpackChunkName: "attCatGroup" */));
 const Excel = React.lazy(() => import('./views/Excel/Excel'/* webpackChunkName: "excel" */));
 
-const SysetmInfo = React.lazy(() => import('./views/System' /* webpackChunkName: "users" */));
+const SystemInfo = React.lazy(() => import('./views/System' /* webpackChunkName: "systemInfo" */));
+const ImportId = React.lazy(() => import('./views/Tools/Import' /* webpackChunkName: "importId" */));
+
+const CreatePackage = React.lazy(() => import('./views/Package/Create' /* webpackChunkName: "createPackage" */));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   {path: '/', exact: true, name: 'Home', component: DefaultLayout},
-  {path: '/dashboard', name: 'Dashboard', component: Dashboard},
 
   {path: "/profile", exact:true, name:"My Profile", component:Profile},
 
@@ -42,7 +42,10 @@ const routes = [
   {path: '/attribute/group', exact: true, name: 'Attribute Group', component: AttCatGroup, params: {mode: 'att'}},
   {path: '/category/group', exact: true, name: 'Category Group', component: AttCatGroup, params: {mode: 'cat'}},
 
-  {path: '/system', exact: true, name: 'System Info', component: SysetmInfo}
+  {path: '/system', exact: true, name: 'System Info', component: SystemInfo},
+  {path: '/import/id', exact: true, name: 'Import ID', component: ImportId},
+
+  {path: '/package/create', exact: true, name: 'Create Package', component: CreatePackage},
 ];
 
 export default routes;

@@ -233,6 +233,7 @@ class SetIdDialog extends Component {
           vertical: 'top',
           horizontal: 'center',
         }}
+        onContextMenu={e => e.preventDefault()}
       >
         {/*<DialogTitle id="form-dialog-title">Set ID</DialogTitle>*/}
         <DialogContent className={classes.dialogContent}>

@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import {calculateRealSelections} from "../helpers";
+import {calculateRealSelections, hooks} from "../utils";
 import Cell from './Cell';
 
 const DefaultStyle = {
@@ -9,8 +9,12 @@ const DefaultStyle = {
   background: 'rgba(3, 169, 244, 0.05)',
   pointerEvents: 'none',
   display: 'none',
+  transition: 'all 0.1s',
 };
 
+/**
+ * Four selections.
+ */
 export default class Selections {
   constructor(props) {
     this.props = props;
@@ -32,12 +36,42 @@ export default class Selections {
     return this._data;
   }
 
+  get startCell() {
+    return this._startCell;
+  }
+
+  contains(row, col) {
+    return this._data[0] <= row && row <= this._data[2]
+      && this._data[1] <= col && col <= this._data[3]
+  }
+
+  /**
+   * Iterate each index
+   * @param cb
+   */
+  forEach(cb) {
+    for (let i = this._data[0]; i <= this._data[2]; i++) {
+      for (let j = this._data[1]; j <= this._data[3]; j++) {
+        cb(i, j);
+      }
+    }
+  }
+
+  move(rowOffset, colOffset) {
+    let row = this.data[0] + rowOffset, col = this.data[1] + colOffset;
+    row = row < 1 ? 1 : row;
+    col = col < 1 ? 1 : col;
+    this.setSelections([row, col, row, col])
+  }
+
   reset = () => {
     Object.keys(this.ref).forEach(key => this.ref[key].current.reset());
     this._data = [1, 1, 1, 1];
   };
 
-  setSelections = (selections) => {
+  setSelections = (selections, startCell, runHooks = true) => {
+    if (startCell) this._startCell = startCell;
+    if (!this._startCell && !startCell) this._startCell = [selections[0], selections[1]];
     const {freezeRowCount, freezeColumnCount, sheet} = this.props;
     selections = calculateRealSelections(sheet, ...selections);
     this._data = selections;
@@ -69,6 +103,9 @@ export default class Selections {
     this.setSelectionsOnPane('topLeft', topLeft);
     this.setSelectionsOnPane('topRight', topRight);
     this.updateHeaders(selections);
+
+    // call hook
+    if (runHooks) hooks.invoke('afterSelection', ...selections.concat(this.startCell));
     return selections;
   };
 
