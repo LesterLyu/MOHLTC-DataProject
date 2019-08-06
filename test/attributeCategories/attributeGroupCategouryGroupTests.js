@@ -3,7 +3,7 @@ const expect = chai.expect;
 
 const {agent} = require('../config');
 
-describe('CRUD group', function () {
+describe.skip('CRUD group', function () {
 
     // before(done => {
     //     AttributeGroup.deleteMany({}, () => {
