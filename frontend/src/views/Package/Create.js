@@ -1,11 +1,13 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
-import {MenuItem, TextField, Paper, Grid} from '@material-ui/core';
+import {TextField, Paper, Grid} from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker
 } from '@material-ui/pickers';
+import Dropdown from "./components/Dropdown";
+import WorkbookManager from "../../controller/workbookManager";
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -23,14 +25,24 @@ const useStyles = makeStyles(theme => ({
 
 }));
 
-export default function CreatePackage() {
+export default function CreatePackage(props) {
+  const workbookManager = new WorkbookManager(props);
   const classes = useStyles();
   const [values, setValues] = React.useState({
     name: '',
     adminNotes: '',
     startDate: Date.now(),
     endDate: Date.now(),
+    workbooks: null,
   });
+
+  useEffect(async () => {
+    if (!values.workbooks) {
+      const data = await workbookManager.getAllWorkbooksForAdmin();
+      setValues({...values, workbooks: data});
+    }
+    return () => {};
+  }, [values, workbookManager]);
 
   const handleChange = name => event => {
     setValues({...values, [name]: event.target.value});
@@ -39,6 +51,11 @@ export default function CreatePackage() {
   const handleChangeDate = name => date => {
     setValues({...values, [name]: date});
   };
+
+  const users = [];
+  for (let i = 0; i < 50000; i++) {
+    users.push([i + ' val', i + ' label'])
+  }
 
   return (
     <Paper className={classes.container}>
@@ -82,7 +99,8 @@ export default function CreatePackage() {
           </Grid>
         </Grid>
       </MuiPickersUtilsProvider>
-
+      <Dropdown title="Users" options={users}/>
+      <Dropdown title="Workbooks" options={[]}/>
     </Paper>
   );
 }
