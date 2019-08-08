@@ -6,7 +6,7 @@ const {agent} = require('../config');
 const User = require('../../models/user');
 const Package = require('../../models/package/package');
 
-describe('CRUD workbook', function () {
+describe.skip('CRUD workbook', function () {
 
     before(done => {
         Package.remove({name: 'name did not exist'}, () => {
