@@ -4,74 +4,24 @@ const expect = chai.expect;
 const {agent} = require('../config');
 
 const User = require('../../models/user');
+const Package = require('../../models/package/package');
 
 describe('CRUD workbook', function () {
-    const oneId = 300001;
-    const oneAttribute = 'id-300001';
-    const oneGroupNumber = 1;
-    const oneDescription = 'description: id-300001';
-
-    const secondId = 300003;
-    const secondAttribute = 'id-300003';
-    const secondDescription = 'description: id-300003';
 
     before(done => {
-        User.remove({}, () => {
+        Package.remove({name: 'name did not exist'}, () => {
         });
 
-        // Sign up a new user
+        // Login
         agent
-            .post('/api/signup/local')
+            .post('/api/login/local')
             .send({
                 username: 'lester',
-                email: 'lester@le.com',
-                password: 'lester',
-                active: true,
-                groupNumber: oneGroupNumber,
-                permissions: [
-                    'CRUD-workbook-template',
-                    'system-management',
-                    'workbook-query',
-                    'create-delete-attribute-category',
-                    'user-management'
-                ]
+                password: 'lester'
             })
             .then(res => {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                // Login
-                agent
-                    .post('/api/login/local')
-                    .send({
-                        username: 'lester',
-                        password: 'lester'
-                    })
-                    .then(res => {
-                        expect(res).to.have.status(200);
-                        expect(res.body.success).to.be.true;
-                        done();
-                    })
-                    .catch(function (err) {
-                        throw err;
-                    });
-            })
-            .catch(function (err) {
-                throw err;
-            });
-
-
-    });
-
-    it('test - success', done => {
-        this.timeout(10000);
-        const fileName = 'HOSPQ_2018_Q3_HOSP_981_Royal Victoria Hospital_LHIN1-unprotected.xlsx';
-        const urlStr = '/api/workbook/' + fileName;
-        agent
-            .get(urlStr)
-            .then(function (res) {
-                expect(res).to.have.status(200);
-                expect(res.body.success).to.be.true;
-                expect(res.body.workbook).not.to.be.null;
                 done();
             })
             .catch(function (err) {
@@ -79,16 +29,17 @@ describe('CRUD workbook', function () {
             });
     });
 
-    xit('Get one workbook by filename - success', done => {
+    xit('test - success', done => {
         this.timeout(10000);
-        const fileName = 'HOSPQ_2018_Q3_HOSP_981_Royal Victoria Hospital_LHIN1-unprotected.xlsx';
-        const urlStr = '/api/workbook/' + fileName;
+        const urlStr = '/packages/test';
         agent
             .get(urlStr)
             .then(function (res) {
+                // return res.json({success: true, message: 'Hi, there!'});
+                console.log(res.body);
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                expect(res.body.workbook).not.to.be.null;
+                expect(res.body.message).include('Hi, there!');
                 done();
             })
             .catch(function (err) {
@@ -96,17 +47,33 @@ describe('CRUD workbook', function () {
             });
     });
 
-    xit('Get one workbook by filename - Workbook does not exist', done => {
+    xit('groupNumber - success', done => {
         this.timeout(10000);
-        const fileName = 'Workbook does not exist.xlsx';
-        const urlStr = '/api/workbook/' + fileName;
+        const urlStr = '/packages/groupNumber';
         agent
             .get(urlStr)
             .then(function (res) {
+                // return res.json({success: true, message: 'Hi, there!'});
+                console.log(res.body.user);
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
+    it('Post - no end Date', done => {
+        this.timeout(10000);
+        const urlStr = '/packages';
+        agent
+            .post(urlStr)
+            .then(function (res) {
+                console.log(res.body);
                 expect(res).to.have.status(400);
                 expect(res.body.success).to.be.false;
-                expect(res.body.workbook == null).to.be.true;
-                expect(res.body.message).include('does not exist.');
+                expect(res.body.message).include('endDate can not be empty.');
                 done();
             })
             .catch(function (err) {
@@ -114,14 +81,24 @@ describe('CRUD workbook', function () {
             });
     });
 
-    xit('Get one workbook by filename - Workbook is empty (no router suitable)', done => {
+
+    it('Post - package already exists', done => {
         this.timeout(10000);
-        const fileName = '                       ';
-        const urlStr = '/api/workbook/' + fileName;
+        const urlStr = '/packages';
         agent
-            .get(urlStr)
+            .post(urlStr)
+            .send({
+                name: 'already exists',
+                userIds: ['5d4ae3e5bf54622ca035fd62', '5d4ae3e5bf54622ca035fd61'],
+                workbookIds: ['5d499447d8586ddfbf06a031', '5d0cec736a9cb34624beaa5b'],
+                startDate: Date.now(),
+                endDate: Date.parse('2025/01/01'),
+            })
             .then(function (res) {
-                expect(res).to.have.status(404);
+                console.log(res.body);
+                expect(res).to.have.status(400);
+                expect(res.body.success).to.be.false;
+                expect(res.body.message).include('already exists');
                 done();
             })
             .catch(function (err) {
@@ -129,20 +106,27 @@ describe('CRUD workbook', function () {
             });
     });
 
-    xit('Get all unfilled workbook : success)', done => {
+    it('Post - success', done => {
+        // name did not exist
         this.timeout(10000);
-        const urlStr = '/api/workbooks' ;
+        const urlStr = '/packages';
         agent
-            .get(urlStr)
+            .post(urlStr)
+            .send({
+                name: 'name did not exist',
+                startDate: Date.now(),
+                endDate: Date.parse('2025/01/01'),
+                userIds: ['5d4ae3e5bf54622ca035fd62', '5d4ae3e5bf54622ca035fd61'],
+                workbookIds: ['5d499447d8586ddfbf06a031', '5d0cec736a9cb34624beaa5b'],
+            })
             .then(function (res) {
+                console.table(res.body);
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                expect(res.body.workbooks).not.to.be.null;
                 done();
             })
             .catch(function (err) {
                 throw err;
             });
     });
-
 });
