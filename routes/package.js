@@ -1,10 +1,7 @@
 const express = require('express');
 let router = express.Router();
-const AttributeGroup = require('../models/workbook/attributeGroup');
-const CategoryGroup = require('../models/workbook/categoryGroup');
 const User = require('../models/user');
 const Workbook = require('../models/workbook/workbook');
-const Sheet = require('../models/workbook/sheet');
 const Value = require('../models/workbook/value');
 const Package = require('../models/package/package');
 const {checkPermission, Permission} = require('../controller/v2/helpers');
@@ -13,17 +10,39 @@ const config = require('../config/config');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
-router.get('/packages/test', (req, res) => {
-    return res.json({success: true, message: 'Hi, there!'});
-});
+router.get('/:username?/packages/:packagename?', async (req, res, next) => {
+    if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
+        return next(error.api.NO_PERMISSION);
+    }
+    const queryGroupNumber = req.session.user.groupNumber;
 
-router.get('/packages/groupNumber', (req, res) => {
-    const groupNumber = req.session.user.groupNumber;
-    const user = req.session.user;
-    return res.json({success: true, user, groupNumber});
+    let queryUser = req.session.user;
+    if (req.params.username) {
+        queryUser = await User.findOne({username: req.params.username});
+        if(!queryUser){
+            return res.status(400).json({success: false, message: `User (${req.params.username}) does not exist.`});
+        }
+    }
+
+    let query = {groupNumber: queryGroupNumber, users : queryUser._id};
+    try {
+        if (req.params.packagename) {
+            query.name = req.params.packagename;
+        }
+        const dbPackages = await Package.find(query);
+        if (!dbPackages[0]) {
+            return res.status(400).json({success: false, message: `Packages do not exist.`});
+        }
+        return res.json({success: true, packages: dbPackages});
+    } catch (e) {
+        next(e);
+    }
 });
 
 router.post('/packages', async (req, res, next) => {
+    if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
+        return next(error.api.NO_PERMISSION);
+    }
     const groupNumber = req.session.user.groupNumber;
     const {name, published = false, userIds, workbookIds, startDate, endDate, adminNotes = '', adminFiles, userNotes = '', userFiles, histories} = req.body;
     // input items can not be empty
@@ -41,7 +60,9 @@ router.post('/packages', async (req, res, next) => {
     }
 
     // validate from database
-    let workbooks = [];
+    let dbWorkbooks = [];
+    let dbWorkbookIds = [];
+    let dbUserIds = [];
     try {
         const dbPackage = await Package.findOne({groupNumber, name});
         if (dbPackage) {
@@ -50,21 +71,31 @@ router.post('/packages', async (req, res, next) => {
             });
         }
 
+        // FIXME: if one of userIds does not exist, it can not throw error.
         const users = await User.find({'_id': {$in: userIds}});
         if (!users) {
             return res.status(400).json({success: false, message: 'user do not exist'});
+        }else{
+            for(let index in users){
+                dbUserIds.push(users[index]._id);
+            }
         }
 
-        workbooks = await Workbook.find({'_id': {$in: workbookIds}}).populate('sheets').exec();
-        if (!workbooks) {
-            return res.status(400).json({success: false, message: 'workbooks do not exist'});
+        // FIXME: if one of workbookIds does not exist, it can not throw error.
+        dbWorkbooks = await Workbook.find({'_id': {$in: workbookIds}}).populate('sheets').exec();
+        if (!dbWorkbooks) {
+            return res.status(400).json({success: false, message: 'dbWorkbooks do not exist'});
+        }else{
+            for(let index in dbWorkbooks){
+                dbWorkbookIds.push(dbWorkbooks[index]._id);
+            }
         }
     } catch (e) {
         next(e);
     }
 
     const rowIds = [];
-    workbooks.forEach((workbook) => {
+    dbWorkbooks.forEach((workbook) => {
         workbook.sheets.forEach((sheet) => {
             sheet.catIds.forEach(id => {
                 rowIds.push(id);
@@ -72,7 +103,7 @@ router.post('/packages', async (req, res, next) => {
         });
     });
     const columnIds = {};
-    workbooks.forEach((workbook) => {
+    dbWorkbooks.forEach((workbook) => {
         workbook.sheets.forEach((sheet) => {
             const columnIdsArr = [];
             sheet.attIds.forEach(id => {
@@ -112,8 +143,8 @@ router.post('/packages', async (req, res, next) => {
         const newPackage = new Package({
             name,
             published,
-            users: userIds,
-            workbooks: workbookIds,
+            users: dbUserIds,
+            workbooks: dbWorkbookIds,
             startDate,
             endDate,
             adminNotes,
