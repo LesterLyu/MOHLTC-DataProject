@@ -8,7 +8,7 @@ const axiosConfig = {withCredentials: true};
  * @param response
  * @returns {boolean}
  */
-function check(response) {
+export function check(response) {
   if (response.headers['content-type'].includes('html')) {
     window.location.hash = 'login';
     return false;

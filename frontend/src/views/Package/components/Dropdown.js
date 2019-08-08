@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useCallback} from "react";
 import {InputLabel, Select, Input, Chip, MenuItem, InputBase} from "@material-ui/core";
 import {makeStyles, useTheme} from '@material-ui/core/styles';
 import SearchIcon from '@material-ui/icons/Search';
@@ -20,6 +20,7 @@ const useStyles = makeStyles(theme => ({
   select: {
     whiteSpace: 'initial',
     minWidth: 200,
+    minHeight: 36,
   },
   search: {
     padding: theme.spacing(1),
@@ -54,34 +55,38 @@ export default function Dropdown(props) {
   const {options, title, defaultValues, onChange} = props;
   const [values, setValues] = React.useState({
     selected: defaultValues ? defaultValues : [],
-    filteredOptions: [...options],
+    filteredOptions: options ? [...options] : [],
   });
   const classes = useStyles();
   const theme = useTheme();
 
-  const handleChange = name => value => {
-    setValues({...values, [name]: value});
+  const handleChange = useCallback((name, value) => {
+    setValues(values => ({...values, [name]: value}));
     if (name === 'selected' && onChange)
       onChange(value);
-  };
+  }, [onChange]);
 
-  const handleChangeMultiple = (event) => {
-    handleChange('selected')(event.target.value);
-  };
+  useEffect(() => {
+    if (options) setValues(values => ({...values, filteredOptions: [...options]}));
+  }, [options]);
+
+  const handleChangeMultiple = useCallback((event) => {
+    handleChange('selected', event.target.value);
+  }, [handleChange]);
 
   const handleItemClick = (value) => () => {
     const index = values.selected.indexOf(value);
     if (index === -1)
-      handleChange('selected')([...values.selected, value]);
+      handleChange('selected', [...values.selected, value]);
     else
       handleDelete(value)();
   };
 
-  const handleDelete = removeValue => () => {
-    handleChange('selected')(values.selected.filter(value => value !== removeValue));
-  };
+  const handleDelete = useCallback(removeValue => () => {
+    handleChange('selected', values.selected.filter(value => value !== removeValue));
+  }, [handleChange, values.selected]);
 
-  const handleSearch = event => {
+  const handleSearch = useCallback(event => {
     let value = event.target.value || '';
     value = value.toLowerCase();
     const result = [];
@@ -91,18 +96,18 @@ export default function Dropdown(props) {
       if (option[1].toLowerCase().includes(value))
         result.push(option);
     }
-    handleChange('filteredOptions')(result);
-  };
+    handleChange('filteredOptions', result);
+  }, [handleChange, options]);
 
-  const renderValue = (selected) => {
+  const renderValue = useCallback((selected) => {
     const values = [];
-    options.forEach(([value, label], i) => {
+    options.forEach(([value, label]) => {
       if (selected.indexOf(value) !== -1)
         values.push(
           <Chip key={value} label={label} className={classes.chip} onDelete={handleDelete(value)}/>)
     });
     return values;
-  };
+  }, [classes.chip, handleDelete, options]);
 
   function Row(props) {
     const {index, style} = props;

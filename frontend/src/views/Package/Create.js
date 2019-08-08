@@ -1,6 +1,6 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect, useMemo} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
-import {TextField, Paper, Grid} from '@material-ui/core';
+import {TextField, Paper, Grid, Button, FormControlLabel, Checkbox} from '@material-ui/core';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
@@ -8,6 +8,8 @@ import {
 } from '@material-ui/pickers';
 import Dropdown from "./components/Dropdown";
 import WorkbookManager from "../../controller/workbookManager";
+import UserManager from "../../controller/userManager";
+import {createPackage} from "../../controller/package"
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -27,6 +29,7 @@ const useStyles = makeStyles(theme => ({
 
 export default function CreatePackage(props) {
   const workbookManager = new WorkbookManager(props);
+  const userManager = new UserManager(props);
   const classes = useStyles();
   const [values, setValues] = React.useState({
     name: '',
@@ -34,28 +37,94 @@ export default function CreatePackage(props) {
     startDate: Date.now(),
     endDate: Date.now(),
     workbooks: null,
+    users: null,
+    selectedWorkbooks: [],
+    selectedUsers: [],
+    published: false,
   });
 
-  useEffect(async () => {
+  useEffect(() => {
     if (!values.workbooks) {
-      const data = await workbookManager.getAllWorkbooksForAdmin();
-      setValues({...values, workbooks: data});
+      workbookManager.getAllWorkbooksForAdmin()
+        .then(data => {
+          const workbooks = [];
+          data.forEach(workbook => workbooks.push([workbook._id, workbook.name]));
+          setValues({...values, workbooks})
+        });
     }
-    return () => {};
   }, [values, workbookManager]);
 
-  const handleChange = name => event => {
-    setValues({...values, [name]: event.target.value});
-  };
+  useEffect(() => {
+    if (!values.users) {
+      userManager.getAllUsers()
+        .then(data => {
+          const users = [];
+          data.forEach(user => users.push([user._id, `${user.username} (${user.firstName}, ${user.lastName})`]));
+          setValues({...values, users})
+        });
+    }
+  }, [values, userManager]);
 
-  const handleChangeDate = name => date => {
-    setValues({...values, [name]: date});
-  };
+  const handleChange = useCallback((name, value) => {
+    setValues(values => ({...values, [name]: value}));
+  }, []);
 
-  const users = [];
-  for (let i = 0; i < 50000; i++) {
-    users.push([i + ' val', i + ' label'])
-  }
+  const handleChangeEvent = name => e => handleChange(name, e.target.value);
+
+  const handleChangeDate = useCallback(name => date => {
+    setValues(values => ({...values, [name]: date}));
+  }, []);
+
+  const handleSave = useCallback(async () => {
+    try {
+      const data = await createPackage({
+        name: values.name,
+        startDate: values.startDate,
+        endDate: values.endDate,
+        workbookIds: values.selectedWorkbooks,
+        userIds: values.selectedUsers,
+        adminNotes: values.adminNotes,
+        published: values.published,
+      });
+      props.showMessage(data.message, 'success')
+    } catch (e) {
+      props.showMessage(e.toString() + '\nDetails: ' + e.response.data.message, 'error')
+    }
+
+  }, [values, props]);
+
+  const renderDates = useMemo(() => (<MuiPickersUtilsProvider utils={DateFnsUtils}>
+    <Grid container justify={"flex-start"} spacing={4}>
+      <Grid item>
+        <KeyboardDateTimePicker
+          margin="normal"
+          label="Start Date"
+          value={values.startDate}
+          variant="inline"
+          format="yyyy/MM/dd HH:mm"
+          onChange={handleChangeDate('startDate')}
+        />
+      </Grid>
+      <Grid item>
+        <KeyboardDateTimePicker
+          margin="normal"
+          label="End Date"
+          value={values.endDate}
+          variant="inline"
+          format="yyyy/MM/dd HH:mm"
+          onChange={handleChangeDate('endDate')}
+        />
+      </Grid>
+    </Grid>
+  </MuiPickersUtilsProvider>), [handleChangeDate, values.startDate, values.endDate]);
+
+  const renderDropdown = useMemo(() => (
+    <>
+      <Dropdown title="Users" options={values.users} onChange={data => handleChange('selectedUsers', data)}/>
+      <Dropdown title="Workbooks" options={values.workbooks}
+                onChange={data => handleChange('selectedWorkbooks', data)}/>
+    </>
+  ), [values.users, values.workbooks, handleChange]);
 
   return (
     <Paper className={classes.container}>
@@ -63,44 +132,31 @@ export default function CreatePackage(props) {
         label="Package Name"
         className={classes.textField}
         value={values.name}
-        onChange={handleChange('name')}
+        onChange={handleChangeEvent('name')}
         margin="normal"
         autoFocus
+        required
       />
       <TextField
         label="Admin Notes"
         value={values.adminNotes}
-        onChange={handleChange('adminNotes')}
+        onChange={handleChangeEvent('adminNotes')}
         multiline
         margin="normal"
         fullWidth
       />
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <Grid container justify={"flex-start"} spacing={4}>
-          <Grid item>
-            <KeyboardDateTimePicker
-              margin="normal"
-              label="Start Date"
-              value={values.startDate}
-              variant="inline"
-              format="yyyy/MM/dd HH:mm"
-              onChange={handleChangeDate('startDate')}
-            />
-          </Grid>
-          <Grid item>
-            <KeyboardDateTimePicker
-              margin="normal"
-              label="End Date"
-              value={values.endDate}
-              variant="inline"
-              format="yyyy/MM/dd HH:mm"
-              onChange={handleChangeDate('endDate')}
-            />
-          </Grid>
-        </Grid>
-      </MuiPickersUtilsProvider>
-      <Dropdown title="Users" options={users}/>
-      <Dropdown title="Workbooks" options={[]}/>
+      {renderDates}
+      {renderDropdown}
+      <FormControlLabel style={{width: '100%'}}
+        control={
+          <Checkbox checked={values.published} color="primary"
+                    onChange={e => handleChange('published', e.target.checked)}/>
+        }
+        label="Publish"
+      />
+      <Button onClick={handleSave} color="primary" variant="contained">
+        Save
+      </Button>
     </Paper>
   );
 }
