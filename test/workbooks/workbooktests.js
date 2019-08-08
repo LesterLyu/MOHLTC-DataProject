@@ -130,5 +130,4 @@ describe.skip('CRUD workbook', function () {
             });
     });
 
-    //FIXME: delete one attribute that used in workbook
 });

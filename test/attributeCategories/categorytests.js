@@ -364,5 +364,4 @@ describe.skip('CRUD category', function () {
             });
     });
 
-    //FIXME: delete one category that used in workbook
 });

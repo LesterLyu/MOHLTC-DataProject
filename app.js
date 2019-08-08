@@ -34,6 +34,8 @@ const usersRouter = require('./routes/users');
 
 const workbookRouter = require('./routes/workbook');
 
+const packageRouter = require('./routes/package');
+
 const workbookQueryRouter = require('./routes/workbook-query');
 
 const LdapStrategy = require('passport-ldapauth');
@@ -126,6 +128,7 @@ app.use('/', usersRouter); // API or pages below this requires authentication
 
 app.use('/', attCatRouter);
 app.use('/', workbookRouter);
+app.use('/', packageRouter);
 app.use('/', workbookQueryRouter);
 app.use('/', userManagementRouter);
 app.use('/', systemManagementRouter);
