@@ -20,7 +20,10 @@ router.get('/api/packages/:packagename?', async (req, res, next) => {
     try {
         const dbPackages = await Package.find(query);
         if (!dbPackages[0]) {
-            return res.status(400).json({success: false, message: `Package(s) (${req.params.packagename})does not exist.`});
+            return res.status(400).json({
+                success: false,
+                message: `Package(s) (${req.params.packagename})does not exist.`
+            });
         }
         return res.json({success: true, packages: dbPackages});
     } catch (e) {
@@ -65,6 +68,9 @@ router.post('/api/admin/packages', async (req, res, next) => {
     // input items can not be empty
     if (!startDate || !endDate) {
         return res.status(400).json({success: false, message: 'startDate and endDate can not be empty.'});
+    }
+    if (startDate >= endDate) {
+        return res.status(400).json({success: false, message: 'startDate must be less than endDate.'});
     }
     if (!name) {
         return res.status(400).json({success: false, message: 'package must have a name.'});
@@ -193,7 +199,13 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     if (!dbPackage) {
         return res.status(400).json({success: false, message: `Package (${queryPackageName}) does not exist.`});
     }
+
     const {published, userIds, workbookIds, startDate, endDate, adminNotes = '', adminFiles, userNotes = '', userFiles, histories} = req.body;
+    if ((startDate && !endDate && startDate >= dbPackage.endDate)
+        ||(!startDate && endDate && dbPackage.startDate >= endDate)
+        ||(startDate && endDate && startDate >= endDate)) {
+        return res.status(400).json({success: false, message: 'startDate must be less than endDate.'});
+    }
 
 
     const dbUserIds = [];
@@ -321,7 +333,7 @@ router.delete('/api/admin/packages/:packagename', async (req, res, next) => {
         return res.status(400).json({success: false, message: 'package name can not be empty.'});
     }
 
-    try{
+    try {
 
         const dbPackage = await Package.findOne({name: queryPackageName, groupNumber: queryGroupNumber});
         if (!dbPackage) {
@@ -330,7 +342,7 @@ router.delete('/api/admin/packages/:packagename', async (req, res, next) => {
 
         await Package.findByIdAndDelete(dbPackage._id);
         return res.status(200).json({success: true, message: `package (${queryPackageName}) was deleted.`});
-    }catch (e) {
+    } catch (e) {
         next(e);
     }
 });

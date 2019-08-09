@@ -6,7 +6,7 @@ const {agent} = require('../config');
 const User = require('../../models/user');
 const Package = require('../../models/package/package');
 
-describe.skip('CRUD package', function () {
+describe('CRUD package', function () {
 
     before(done => {
         Package.remove({name: 'package02'}, () => {
@@ -136,6 +136,30 @@ describe.skip('CRUD package', function () {
                 throw err;
             });
     });
+    it('Post - start date less than end date', done => {
+        this.timeout(10000);
+        const urlStr = '/api/admin/packages';
+        agent
+            .post(urlStr)
+            .send({
+                // name: 'name did not exist',
+                name: 'package03',
+                startDate: Date.now(),
+                endDate: Date.parse('1988/01/01'),
+                userIds: ['5d4ae3e5bf54622ca035fd62', '5d4ae3e5bf54622ca035fd61'],
+                workbookIds: ['5d499447d8586ddfbf06a031', '5d0cec736a9cb34624beaa5b'],
+            })
+            .then(function (res) {
+                console.log(res.body);
+                expect(res).to.have.status(400);
+                expect(res.body.success).to.be.false;
+                expect(res.body.message).include('startDate must be less than endDate');
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
     it('Post - package already exists', done => {
         this.timeout(10000);
         const urlStr = '/api/admin/packages';
@@ -216,7 +240,7 @@ describe.skip('CRUD package', function () {
             .put(urlStr)
             .send({
                 // published: true,
-                endDate:Date.parse('2130/03/01'),
+                endDate:Date.parse('2020/03/01'),
                 workbookIds: [ '5d0cec736a9cb34624beaa5b'],
             })
             .then(function (res) {
@@ -224,6 +248,28 @@ describe.skip('CRUD package', function () {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
                 console.log(res.body.package);
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
+    it('Put  - error end date', done => {
+        // name did not exist
+        this.timeout(10000);
+        const urlStr = '/api/admin/packages/package02';
+        agent
+            .put(urlStr)
+            .send({
+                // start:Date.parse('1980/03/01'),
+                endDate:Date.parse('1980/02/01'),
+                workbookIds: [ '5d0cec736a9cb34624beaa5b'],
+            })
+            .then(function (res) {
+                console.table(res.body);
+                expect(res).to.have.status(400);
+                expect(res.body.success).to.be.false;
                 done();
             })
             .catch(function (err) {
