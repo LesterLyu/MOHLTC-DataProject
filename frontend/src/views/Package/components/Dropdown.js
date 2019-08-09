@@ -24,6 +24,7 @@ const useStyles = makeStyles(theme => ({
   },
   search: {
     padding: theme.spacing(1),
+    width: '80%'
   },
   searchIcon: {
     marginLeft: 16,
@@ -56,6 +57,7 @@ export default function Dropdown(props) {
   const [values, setValues] = React.useState({
     selected: defaultValues ? defaultValues : [],
     filteredOptions: options ? [...options] : [],
+    searchValue: '',
   });
   const classes = useStyles();
   const theme = useTheme();
@@ -70,10 +72,6 @@ export default function Dropdown(props) {
     if (options) setValues(values => ({...values, filteredOptions: [...options]}));
   }, [options]);
 
-  const handleChangeMultiple = useCallback((event) => {
-    handleChange('selected', event.target.value);
-  }, [handleChange]);
-
   const handleItemClick = (value) => () => {
     const index = values.selected.indexOf(value);
     if (index === -1)
@@ -87,6 +85,7 @@ export default function Dropdown(props) {
   }, [handleChange, values.selected]);
 
   const handleSearch = useCallback(event => {
+    handleChange('searchValue', event.target.value);
     let value = event.target.value || '';
     value = value.toLowerCase();
     const result = [];
@@ -121,18 +120,19 @@ export default function Dropdown(props) {
   }
 
   const renderMenu = () => {
-    return ([
-        <SearchIcon key="1" className={classes.searchIcon}/>,
+    return (
+      <div>
+        <SearchIcon className={classes.searchIcon}/>
         <InputBase
-          key="2"
           className={classes.search}
           placeholder="Search"
+          value={values.searchValue}
           onChange={handleSearch}
-        />,
-        <FixedSizeList key="3" height={400} width={360} itemSize={48} itemCount={values.filteredOptions.length}>
+        />
+        <FixedSizeList height={400} width={360} itemSize={48} itemCount={values.filteredOptions.length}>
           {Row}
         </FixedSizeList>
-      ]
+      </div>
     )
   };
 
@@ -142,7 +142,6 @@ export default function Dropdown(props) {
       <Select
         multiple
         value={values.selected}
-        onChange={handleChangeMultiple}
         input={<Input id="select-multiple-chip"/>}
         renderValue={renderValue}
         MenuProps={MenuProps}
