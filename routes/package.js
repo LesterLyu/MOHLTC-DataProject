@@ -38,7 +38,7 @@ router.get('/api/admin/:username?/packages/:packagename?', async (req, res, next
 
     let query = {groupNumber: req.session.user.groupNumber};
     if (req.params.username) {
-        dbUser = await User.findOne({username: req.params.username});
+        const dbUser = await User.findOne({username: req.params.username});
         if (!dbUser) {
             return res.status(400).json({success: false, message: `User (${req.params.username}) does not exist.`});
         }
