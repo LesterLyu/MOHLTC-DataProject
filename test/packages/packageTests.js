@@ -14,15 +14,13 @@ describe('CRUD package', function () {
 
     before(async () => {
         await Package.deleteOne({name: newPackageName});
-
-
         try {
             // Login
             await agent
                 .post('/api/login/local')
                 .send({
-                    username: 'lester',
-                    password: 'lester'
+                    username: 'test',
+                    password: 'test'
                 })
                 .then(res => {
                     expect(res).to.have.status(200);
@@ -36,6 +34,8 @@ describe('CRUD package', function () {
                     oneUserName = res.body.user.username;
                 }
             });
+
+            const result = await agent.post('/api/v2/test/admin/workbook').send(require('../workbooks/workbook.json'));
             // Retrieve workbook
             const workbooks = await Workbook.find();
             for (let i = 0; i < 3 && i < workbooks.length; i++) {
@@ -43,19 +43,25 @@ describe('CRUD package', function () {
                     workbookIds.push(workbooks[i]._id);
                 }
             }
+
+            await agent.post('/api/admin/packages')
+                .send({
+                    name: 'firstPackageName',
+                    published: true,
+                    startDate: Date.now(),
+                    endDate: Date.parse('2020/01/01'),
+                    userIds: [oneUserId],
+                    workbookIds: workbookIds,
+                });
             // Retrieve existed package
             const dbPackages = await Package.find();
-            if (dbPackages[1]) {
-                onePackageName = dbPackages[1].name;
+            if (dbPackages[0]) {
+                onePackageName = dbPackages[0].name;
             }
 
         } catch (e) {
             throw e;
         }
-
-
-        //
-
     });
 
     it('GET by user name and package name - success', done => {
@@ -149,7 +155,7 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('Post - no end Date', done => {
+    it('Post - no end Date - failed', done => {
         this.timeout(10000);
 
         console.log(oneUserId);
@@ -171,7 +177,7 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('Post - start date less than end date', done => {
+    it('Post - start date less than end date - failed', done => {
         this.timeout(10000);
         const urlStr = '/api/admin/packages';
         agent
@@ -195,7 +201,7 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('Post - package already exists', done => {
+    it('Post - package already exists - failed', done => {
         this.timeout(10000);
         const urlStr = '/api/admin/packages';
         agent
@@ -241,13 +247,13 @@ describe('CRUD package', function () {
     it('Put update the status of published - success', done => {
         // name did not exist
         this.timeout(10000);
-        const urlStr = '/api/admin/packages/package02';
+        const urlStr = '/api/admin/packages/' + onePackageName;
         agent
             .put(urlStr)
             .send({
                 // published: true,
                 endDate: Date.parse('2020/03/01'),
-                workbookIds: ['5d0cec736a9cb34624beaa5b'],
+                workbookIds: workbookIds,
             })
             .then(function (res) {
                 console.table(res.body);
@@ -260,7 +266,6 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-
     it('Put  - error end date', done => {
         // name did not exist
         this.timeout(10000);

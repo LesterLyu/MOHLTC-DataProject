@@ -2,12 +2,13 @@ const chai = require('chai');
 const expect = chai.expect;
 
 const config = require('../config');
+const globalConfig = require('../../config/config');
 
 const requester = config.requester;
 
 const User = require('../../models/user');
 
-describe.skip('Local Authentication', function () {
+describe('Local Authentication', function () {
     before((done) => {
         // remove all users
         User.remove({}, () => {
@@ -16,6 +17,7 @@ describe.skip('Local Authentication', function () {
     });
     it('register an account to local server', (done) => {
 		this.timeout(10000);
+
         requester.post('/api/signup/local')
             .send({
                 username: 'test',
@@ -24,7 +26,8 @@ describe.skip('Local Authentication', function () {
                 firstName: 'firstname',
                 lastName: 'lastName',
                 phoneNumber: '1212122',
-                password: 'test'
+                password: 'test',
+                permissions: Object.values(globalConfig.permissions)
             })
             .then((res) => {
                 expect(res).to.have.status(200);
