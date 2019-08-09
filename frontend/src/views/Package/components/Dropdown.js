@@ -34,6 +34,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const MenuProps = {
+  getContentAnchorEl: null,
+  anchorOrigin: {
+    vertical: "bottom",
+    horizontal: "left",
+  },
   PaperProps: {
     style: {
       maxHeight: null,
