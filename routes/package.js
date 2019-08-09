@@ -56,7 +56,7 @@ router.get('/api/admin/:username?/packages/:packagename?', async (req, res, next
     }
 });
 
-router.post('/packages', async (req, res, next) => {
+router.post('/api/admin/packages', async (req, res, next) => {
     if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
         return next(error.api.NO_PERMISSION);
     }
@@ -180,7 +180,7 @@ router.post('/packages', async (req, res, next) => {
 
 });
 
-router.put('/packages/:packagename', async (req, res, next) => {
+router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
         return next(error.api.NO_PERMISSION);
     }
@@ -309,6 +309,30 @@ router.put('/packages/:packagename', async (req, res, next) => {
         next(e);
     }
 
+});
+
+router.delete('/api/admin/packages/:packagename', async (req, res, next) => {
+    if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
+        return next(error.api.NO_PERMISSION);
+    }
+    const queryGroupNumber = req.session.user.groupNumber;
+    const queryPackageName = req.params.packagename;
+    if (!queryPackageName) {
+        return res.status(400).json({success: false, message: 'package name can not be empty.'});
+    }
+
+    try{
+
+        const dbPackage = await Package.findOne({name: queryPackageName, groupNumber: queryGroupNumber});
+        if (!dbPackage) {
+            return res.status(400).json({success: false, message: `Package (${queryPackageName}) does not exist.`});
+        }
+
+        await Package.findByIdAndDelete(dbPackage._id);
+        return res.status(200).json({success: true, message: `package (${queryPackageName}) was deleted.`});
+    }catch (e) {
+        next(e);
+    }
 });
 
 module.exports = router;
