@@ -80,7 +80,7 @@
   "scripts": {
     "start": "node app.js",
     "prestart": "grunt",
-    "test": "mocha test/main.js test/ --recursive --exit --check-leaks -R mochawesome",
+    "test": "mocha test/main.js test/users test/ --recursive --exit --check-leaks -R mochawesome",
     "test:david": "nodemon --exec mocha --recursive --timeout 5000 -R min",
     "build": "grunt",
     "build:frontend": "cd ./frontend/ && npm run build:aws",

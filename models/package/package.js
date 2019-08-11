@@ -8,7 +8,7 @@ const packageSchema = new mongoose.Schema({
     name: {type: String, required: true},
 
     // If this package is published to the users.
-    published: {type: Boolean, required: true},
+    published: {type: Boolean, required: true, default: false},
 
     /**
      * The values that included in this package.
