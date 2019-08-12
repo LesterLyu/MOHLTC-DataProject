@@ -1,5 +1,3 @@
-const async = require("async");
-
 const User = require('../models/user');
 const Workbook = require('../models/workbook');
 const FilledWorkbook = require('../models/filledWorkbook');
@@ -7,9 +5,6 @@ const Attribute = require('../models/attribute');
 const Category = require('../models/category');
 const error = require('../config/error');
 const config = require('../config/config');
-const {gzip, ungzip} = require('node-gzip');
-const pako = require('pako');
-const ExcelWorkbook = require('./excel/workbook');
 const {processQuery, processQueryS, splitQuery} = require('./workers/processQueries2');
 
 function checkPermission(req) {
@@ -31,103 +26,8 @@ async function getAllUsersAtGroup(groupNumber) {
     return users; // [{username: '...'}, ...]
 }
 
-async function getDataAtLocation(includeAttCatId, onlyFilled, groupNumber, wbName, queryData) {
-    let attMap, catMap, wbData, wsName2SheetNo;
-    let result = {};
-    await Workbook.findOne({name: wbName, groupNumber: groupNumber},
-        {name: 1, data: 1, attMap: 1, catMap: 1}).then((workbook) => {
-        if (!workbook) {
-            console.log('workbook not found.');
-        } else {
-            attMap = workbook.attMap;
-            catMap = workbook.catMap;
-            wbData = workbook.data;
-            wsName2SheetNo = Object.entries(workbook.data).reduce((map, obj) => {
-                map[obj[1].name] = obj[0];
-                return map;
-            }, {});
-        }
-    });
-
-    const projector = {username: 1, name: 1};
-    for (let wsName in queryData) {
-        const currSheet = queryData[wsName];
-        for (let i = 0; i < currSheet.length; i++) {
-            const sheetNo = wsName2SheetNo[wsName];
-            const catId = currSheet[i][0];
-            const attId = currSheet[i][1];
-            const row = catMap[sheetNo][catId], col = attMap[sheetNo][attId];
-            const dataKey = ['data', sheetNo, row, col].join('.');
-            projector[dataKey] = 1;
-        }
-    }
-
-    await FilledWorkbook.find({name: wbName, groupNumber: groupNumber}, projector).then((filledWorkbooks) => {
-
-        // add users who does not fill the workbook
-        if (!onlyFilled) {
-            let users = getAllUsersAtGroup(groupNumber);
-            for (let i = 0; i < users.length; i++) {
-                // TO-DO
-            }
-        }
-
-        for (let wsName in queryData) {
-            const currSheet = queryData[wsName];
-            result[wsName] = [];
-            for (let i = 0; i < currSheet.length; i++) {
-                const sheetNo = wsName2SheetNo[wsName];
-                const catId = currSheet[i][0], attId = currSheet[i][1];
-                const row = catMap[sheetNo][catId], col = attMap[sheetNo][attId];
-                const currCatAtt = [];
-                for (let i = 0; i < filledWorkbooks.length; i++) {
-                    let data;
-                    if (filledWorkbooks[i].data[sheetNo][row] && filledWorkbooks[i].data[sheetNo][row][col] !== undefined) {
-                        data = filledWorkbooks[i].data[sheetNo][row][col];
-                        if (data !== null && typeof data === "object" && 'result' in data) {
-                            data = data.result;
-                        }
-                    } else {
-                        data = '';
-                    }
-                    if (includeAttCatId) {
-                        currCatAtt.push({
-                            username: filledWorkbooks[i].username,
-                            catId: catId,
-                            attId: attId,
-                            data: data,
-                        });
-                    } else {
-                        currCatAtt.push({
-                            username: filledWorkbooks[i].username,
-                            data: data,
-                        });
-                    }
-
-                }
-                result[wsName].push(currCatAtt);
-            }
-        }
-    });
-    return result;
-}
-
 module.exports = {
     checkPermission: checkPermission,
-
-    workbook_query: async (req, res, next) => {
-        if (!checkPermission(req)) {
-            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        }
-        const groupNumber = req.session.user.groupNumber;
-        const wbName = req.body.wbName;
-        const onlyFilled = req.body.onlyFilled === undefined; // default true
-        const queryData = req.body.queryData;
-        const includeAttCatId = req.body.includeAttCatId || false; // default false
-
-        const data = await getDataAtLocation(includeAttCatId, onlyFilled, groupNumber, wbName, queryData);
-        res.json({success: true, result: data});
-    },
 
     get_workbook_names: (req, res, next) => {
         if (!checkPermission(req)) {
