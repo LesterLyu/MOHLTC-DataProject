@@ -13,13 +13,9 @@ export default {
       icon: 'mdi mdi-account-card-details-outline',
     },
     {
-      name: 'Fill Workbook',
-      url: '/workbooks/fill',
+      name: 'My Packages',
+      url: '/packages',
       icon: 'mdi mdi-pen',
-      badge: {
-        variant: 'info',
-        text: '✓',
-      },
     },
 
     {
@@ -98,8 +94,13 @@ export default {
       icon: 'mdi mdi-package-variant',
       children: [
         {
+          name: 'All Packages',
+          url: '/admin/packages',
+          icon: 'mdi mdi-package',
+        },
+        {
           name: 'Create Package',
-          url: '/package/create',
+          url: '/admin/packages/create',
           icon: 'mdi mdi-shape-square-plus',
         },
       ]

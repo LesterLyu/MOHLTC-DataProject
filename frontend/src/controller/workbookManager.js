@@ -47,7 +47,7 @@ class WorkbookManager {
   }
 
   getAllWorkbooksForAdmin() {
-    return axios.get(config.server + '/api/admin/workbooks', axiosConfig)
+    return axios.get(config.server + '/api/v2/admin/workbooks', axiosConfig)
       .then(response => {
         if (this.check(response)) {
           return response.data.workbooks;
@@ -65,15 +65,8 @@ class WorkbookManager {
     return admin ? this.deleteWorkbookForAdmin(fileName) : this.deleteWorkbookForUser(fileName);
   }
 
-  // David
   deleteWorkbookForAdmin(fileName) {
-    return axios.delete(config.server + '/api/admin/workbook/',
-      {
-        data: {
-          name: fileName,
-        },
-        withCredentials: axiosConfig.withCredentials,
-      })
+    return axios.delete(config.server + '/api/v2/admin/workbooks/' + fileName, axiosConfig)
       .then(response => {
         if (this.check(response)) {
           return response.data;
