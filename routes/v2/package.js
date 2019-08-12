@@ -1,12 +1,12 @@
 const express = require('express');
 let router = express.Router();
-const User = require('../models/user');
-const Workbook = require('../models/workbook/workbook');
-const Value = require('../models/workbook/value');
-const Package = require('../models/package/package');
-const {checkPermission, Permission} = require('../controller/v2/helpers');
-const error = require('../config/error');
-const config = require('../config/config');
+const User = require('../../models/user');
+const Workbook = require('../../models/workbook/workbook');
+const Value = require('../../models/workbook/value');
+const Package = require('../../models/package/package');
+const {checkPermission, Permission} = require('../../controller/v2/helpers');
+const error = require('../../config/error');
+const config = require('../../config/config');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
