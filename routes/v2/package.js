@@ -37,9 +37,12 @@ router.get('/api/packages/:packagename?', async (req, res, next) => {
                         }
                     }
                 }
-                return res.status(400).json({success:false, message: `no related attribute and category: (${attributeId}, ${categoryId})`})
+                return res.status(400).json({
+                    success: false,
+                    message: `no related attribute and category: (${attributeId}, ${categoryId})`
+                })
             });
-        }else{
+        } else {
             return res.json({success: true, packages: dbPackages});
         }
     } catch (e) {
@@ -85,9 +88,12 @@ router.get('/api/admin/:username?/packages/:packagename?', async (req, res, next
                         }
                     }
                 }
-                return res.status(400).json({success:false, message: `no related attribute and category: (${attributeId}, ${categoryId})`})
+                return res.status(400).json({
+                    success: false,
+                    message: `no related attribute and category: (${attributeId}, ${categoryId})`
+                })
             });
-        }else{
+        } else {
             return res.json({success: true, packages: dbPackages});
         }
     } catch (e) {
@@ -352,6 +358,9 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     } catch (e) {
         next(e);
     }
+});
+
+router.put('/api/admin/packages/values', async (req, res, next) => {
 });
 
 router.delete('/api/admin/packages/:packagename', async (req, res, next) => {
