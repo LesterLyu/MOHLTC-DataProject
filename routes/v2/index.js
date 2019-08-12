@@ -4,4 +4,5 @@ module.exports = [
     require('./category'),
     require('./system'),
     require('./workbook'),
+    require('./package'),
 ];
