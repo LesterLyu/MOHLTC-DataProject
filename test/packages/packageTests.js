@@ -139,7 +139,7 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('GET by package name - does not exist', done => {
+    it('GET by package name - Not Found', done => {
         this.timeout(10000);
         const urlStr = '/api/packages/1x1x1';
         agent
@@ -148,7 +148,23 @@ describe('CRUD package', function () {
                 console.table(res.body);
                 expect(res).to.have.status(400);
                 expect(res.body.success).to.be.false;
-                expect(res.body.message).include('not exist');
+                expect(res.body.message).include('Not Found');
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+    it('GET by package name - admin - Not Found', done => {
+        this.timeout(10000);
+        const urlStr = '/api/admin/packages/1x1x1';
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                console.table(res.body);
+                expect(res).to.have.status(400);
+                expect(res.body.success).to.be.false;
+                expect(res.body.message).include('Not Found');
                 done();
             })
             .catch(function (err) {
@@ -157,12 +173,6 @@ describe('CRUD package', function () {
     });
     it('Post - no end Date - failed', done => {
         this.timeout(10000);
-
-        console.log(oneUserId);
-        console.log(oneUserName);
-        console.log(workbookIds);
-        console.log(onePackageName);
-
         const urlStr = '/api/admin/packages';
         agent
             .post(urlStr)
@@ -238,6 +248,7 @@ describe('CRUD package', function () {
             })
             .then(function (res) {
                 console.table(res.body);
+                expect(res.body.success).to.be.true;
                 done();
             })
             .catch(function (err) {

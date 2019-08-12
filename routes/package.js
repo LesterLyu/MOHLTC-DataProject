@@ -10,7 +10,6 @@ const config = require('../config/config');
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
-
 // regular user only retrieve the packages belonging to himself
 router.get('/api/packages/:packagename?', async (req, res, next) => {
     let query = {groupNumber: req.session.user.groupNumber, users: req.session.user._id};
@@ -22,7 +21,7 @@ router.get('/api/packages/:packagename?', async (req, res, next) => {
         if (!dbPackages[0]) {
             return res.status(400).json({
                 success: false,
-                message: `Package(s) (${req.params.packagename})does not exist.`
+                message: `Package(s) (${req.params.packagename}) Not Found.`
             });
         }
         return res.json({success: true, packages: dbPackages});
@@ -51,7 +50,7 @@ router.get('/api/admin/:username?/packages/:packagename?', async (req, res, next
     try {
         const dbPackages = await Package.find(query);
         if (!dbPackages[0]) {
-            return res.status(400).json({success: false, message: `Packages (${req.params.packagename})do not exist.`});
+            return res.status(400).json({success: false, message: `Packages (${req.params.packagename}) Not Found.`});
         }
         return res.json({success: true, packages: dbPackages});
     } catch (e) {
@@ -63,7 +62,7 @@ router.post('/api/admin/packages', async (req, res, next) => {
     if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
         return next(error.api.NO_PERMISSION);
     }
-    const groupNumber = req.session.user.groupNumber;
+    const queryGroupNumber = req.session.user.groupNumber;
     const {name, published = false, userIds, workbookIds, startDate, endDate, adminNotes = '', adminFiles, userNotes = '', userFiles, histories} = req.body;
     // input items can not be empty
     if (!startDate || !endDate) {
@@ -87,7 +86,7 @@ router.post('/api/admin/packages', async (req, res, next) => {
     let dbWorkbookIds = [];
     let dbUserIds = [];
     try {
-        const dbPackage = await Package.findOne({groupNumber, name});
+        const dbPackage = await Package.findOne({groupNumber: queryGroupNumber, name});
         if (dbPackage) {
             return res.status(400).json({
                 success: false, message: `Package (${name}) already exists.`, document: dbPackage
@@ -95,7 +94,7 @@ router.post('/api/admin/packages', async (req, res, next) => {
         }
 
         // FIXME: if one of userIds does not exist, it can not throw error.
-        const users = await User.find({'_id': {$in: userIds}});
+        const users = await User.find({_id: {$in: userIds}});
         if (!users) {
             return res.status(400).json({success: false, message: 'user do not exist'});
         } else {
@@ -138,7 +137,7 @@ router.post('/api/admin/packages', async (req, res, next) => {
         });
     });
 
-    const dbValues = await Value.findOne({groupNumber: 1});
+    const dbValues = await Value.findOne({groupNumber: queryGroupNumber});
     if (!dbValues) {
         return res.status(400).json({success: false, message: 'values do not exist'});
     }
@@ -159,7 +158,7 @@ router.post('/api/admin/packages', async (req, res, next) => {
             }
         }
     }
-    const values = {groupNumber, data};
+    const values = {groupNumber: queryGroupNumber, data};
 
     // Create new package
     try {
@@ -175,7 +174,7 @@ router.post('/api/admin/packages', async (req, res, next) => {
             userNotes,
             userFiles,
             histories,
-            groupNumber,
+            groupNumber: queryGroupNumber,
             values
         });
         await newPackage.save();
@@ -183,7 +182,6 @@ router.post('/api/admin/packages', async (req, res, next) => {
     } catch (e) {
         next(e);
     }
-
 });
 
 router.put('/api/admin/packages/:packagename', async (req, res, next) => {
@@ -202,11 +200,10 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
 
     const {published, userIds, workbookIds, startDate, endDate, adminNotes = '', adminFiles, userNotes = '', userFiles, histories} = req.body;
     if ((startDate && !endDate && startDate >= dbPackage.endDate)
-        ||(!startDate && endDate && dbPackage.startDate >= endDate)
-        ||(startDate && endDate && startDate >= endDate)) {
+        || (!startDate && endDate && dbPackage.startDate >= endDate)
+        || (startDate && endDate && startDate >= endDate)) {
         return res.status(400).json({success: false, message: 'startDate must be less than endDate.'});
     }
-
 
     const dbUserIds = [];
     if (userIds) {
@@ -214,7 +211,7 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
         try {
             // FIXME: if one of userIds does not exist, it can not throw error.
             if (userIds) {
-                const dbUsers = await User.find({'_id': {$in: userIds}});
+                const dbUsers = await User.find({_id: {$in: userIds}});
                 if (!dbUsers[0]) {
                     return res.status(400).json({success: false, message: 'user do not exist'});
                 } else {
@@ -244,7 +241,6 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
                     }
                 }
             }
-
         } catch (e) {
             next(e);
         }
@@ -254,15 +250,15 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     let columnIds = {};
     let values = {};
     if (dbWorkbooks[0] && dbWorkbookIds[0]) {
-        dbWorkbooks.forEach((workbook) => {
-            workbook.sheets.forEach((sheet) => {
+        dbWorkbooks.forEach(workbook => {
+            workbook.sheets.forEach(sheet => {
                 sheet.catIds.forEach(id => {
                     rowIds.push(id);
                 });
             });
         });
-        dbWorkbooks.forEach((workbook) => {
-            workbook.sheets.forEach((sheet) => {
+        dbWorkbooks.forEach(workbook => {
+            workbook.sheets.forEach(sheet => {
                 const columnIdsArr = [];
                 sheet.attIds.forEach(id => {
                     columnIdsArr.push(id);
@@ -273,11 +269,10 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
             });
         });
 
-        const dbValues = await Value.findOne({groupNumber: 1});
+        const dbValues = await Value.findOne({groupNumber: queryGroupNumber});
         if (!dbValues) {
             return res.status(400).json({success: false, message: 'values do not exist'});
         }
-
 
         if (rowIds[0] && columnIds) {
             const data = {};
@@ -320,7 +315,6 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     } catch (e) {
         next(e);
     }
-
 });
 
 router.delete('/api/admin/packages/:packagename', async (req, res, next) => {
