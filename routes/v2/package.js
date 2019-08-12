@@ -12,19 +12,36 @@ const ObjectId = mongoose.Schema.Types.ObjectId;
 
 // regular user only retrieve the packages belonging to himself
 router.get('/api/packages/:packagename?', async (req, res, next) => {
-    let query = {groupNumber: req.session.user.groupNumber, users: req.session.user._id};
+    let packageQuery = {groupNumber: req.session.user.groupNumber, users: req.session.user._id};
     if (req.params.packagename) {
-        query.name = req.params.packagename;
+        packageQuery.name = req.params.packagename;
     }
+
     try {
-        const dbPackages = await Package.find(query);
+        const dbPackages = await Package.find(packageQuery);
         if (!dbPackages[0]) {
-            return res.status(400).json({
-                success: false,
-                message: `Package(s) (${req.params.packagename}) Not Found.`
-            });
+            return res.status(400).json({success: false, message: `Packages (${req.params.packagename}) Not Found.`});
         }
-        return res.json({success: true, packages: dbPackages});
+
+        const {attributeId, categoryId} = req.query;
+        if (attributeId && categoryId) {
+            dbPackages.forEach(package => {
+                for (let rowKey in package.values.data) {
+                    if (rowKey === categoryId) {
+                        const rowValue = package.values.data[rowKey];
+                        for (let columnKey in rowValue) {
+                            if (columnKey === attributeId) {
+                                const cellValue = rowValue[columnKey];
+                                return res.json({success: true, value: cellValue});
+                            }
+                        }
+                    }
+                }
+                return res.status(400).json({success:false, message: `no related attribute and category: (${attributeId}, ${categoryId})`})
+            });
+        }else{
+            return res.json({success: true, packages: dbPackages});
+        }
     } catch (e) {
         next(e);
     }
@@ -35,24 +52,44 @@ router.get('/api/admin/:username?/packages/:packagename?', async (req, res, next
         return next(error.api.NO_PERMISSION);
     }
 
-    let query = {groupNumber: req.session.user.groupNumber};
+    let packageQuery = {groupNumber: req.session.user.groupNumber};
     if (req.params.username) {
         const dbUser = await User.findOne({username: req.params.username});
         if (!dbUser) {
             return res.status(400).json({success: false, message: `User (${req.params.username}) does not exist.`});
         }
-        query.users = dbUser._id;
+        packageQuery.users = dbUser._id;
     }
     if (req.params.packagename) {
-        query.name = req.params.packagename;
+        packageQuery.name = req.params.packagename;
     }
 
+
     try {
-        const dbPackages = await Package.find(query);
+        const dbPackages = await Package.find(packageQuery);
         if (!dbPackages[0]) {
             return res.status(400).json({success: false, message: `Packages (${req.params.packagename}) Not Found.`});
         }
-        return res.json({success: true, packages: dbPackages});
+
+        const {attributeId, categoryId} = req.query;
+        if (attributeId && categoryId) {
+            dbPackages.forEach(package => {
+                for (let rowKey in package.values.data) {
+                    if (rowKey === categoryId) {
+                        const rowValue = package.values.data[rowKey];
+                        for (let columnKey in rowValue) {
+                            if (columnKey === attributeId) {
+                                const cellValue = rowValue[columnKey];
+                                return res.json({success: true, value: cellValue});
+                            }
+                        }
+                    }
+                }
+                return res.status(400).json({success:false, message: `no related attribute and category: (${attributeId}, ${categoryId})`})
+            });
+        }else{
+            return res.json({success: true, packages: dbPackages});
+        }
     } catch (e) {
         next(e);
     }

@@ -79,7 +79,7 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('GET by  package name /packages/package02 - success', done => {
+    it('GET by  package name /packages/packageName - success', done => {
         this.timeout(10000);
         const urlStr = '/api/admin/packages/' + onePackageName;
         agent
@@ -88,6 +88,38 @@ describe('CRUD package', function () {
                 console.table(res.body.packages);
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+    it('GET by  query attributeId and categroyId - success', done => {
+        this.timeout(10000);
+        const queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
+        const urlStr = '/api/admin/packages/' + onePackageName + queryString;
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                console.log(res.body);
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+    it('GET by  query attributeId and categroyId - failed', done => {
+        this.timeout(10000);
+        const queryString = '?categoryId=' + 100679515666 + '&attributeId=' + 100045567666;
+        const urlStr = '/api/admin/packages/' + onePackageName + queryString;
+        agent
+            .get(urlStr)
+            .then(function (res) {
+                console.log(res.body);
+                expect(res).to.have.status(400);
+                expect(res.body.success).to.be.false;
                 done();
             })
             .catch(function (err) {
@@ -270,7 +302,6 @@ describe('CRUD package', function () {
                 console.table(res.body);
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                console.log(res.body.package);
                 done();
             })
             .catch(function (err) {
