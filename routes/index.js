@@ -3,21 +3,21 @@ let router = express.Router();
 const config = require('../config/config'); // get our config file
 const setupController = require('../controller/setup');
 
+router.post('/api/setup', setupController.firstTimeSetup);
 
 router.get('/', function (req, res) {
     if (config.firstTimeRun) {
-        return res.redirect('/setup')
+        if (process.env.NODE_ENV === 'production') {
+            return res.redirect('/react/#/setup');
+        } else {
+            return res.redirect('http://localhost:3003/#/setup');
+        }
     }
-    if (req.isAuthenticated()) {
-        return res.render('index.ejs', {user: req.session.user});
+    if (process.env.NODE_ENV === 'production') {
+        return res.redirect('/react');
+    } else {
+        return res.redirect('http://localhost:3003/');
     }
-    res.render('index.ejs');
 });
-
-router.get('/setup', function (req, res) {
-    res.render('setup.ejs')
-});
-
-router.post('/api/setup', setupController.signup_admin);
 
 module.exports = router;

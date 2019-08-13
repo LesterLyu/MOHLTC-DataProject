@@ -1,7 +1,9 @@
 const config = require('../../config/config');
+const error = require('../../config/error');
 
 module.exports = {
     Permission: config.permissions,
+    error,
     checkPermission: (req, permission) => {
         return req.session.user.permissions.includes(permission);
     },

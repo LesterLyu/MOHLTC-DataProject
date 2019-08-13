@@ -51,11 +51,9 @@ Clone github repos and install dependencies
      cd ./MOHLTC-DataProject/frontend
      # Install dependencies
      yarn install
-     # Run, this takes at least 60 minutes. It will open your default browser and navigate to http://localhost:3003
+     # Run, this takes at least 1 minute. It will open your default browser and navigate to http://localhost:3003
      yarn start
      ```
-    This command will build front-end ```.js``` files and start the server
-    in ```http://localhost:3000```
 
 ## Step 4 Registration
 Go to [`http://localhost:3000`](http://localhost:3000), You will be redirect to a setup page. Note that this page only shows up when there are no user registered in this system.

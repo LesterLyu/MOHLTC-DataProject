@@ -40,6 +40,7 @@ class UserManager {
         return response;
       }))
   }
+
   /**
    * Check if the user is logged in, result will go to call back function.
    * Available to use right after the web page refreshes, to check if there is a user logged in.
@@ -78,6 +79,7 @@ class UserManager {
 
   /**
    * This will also sign in the created user
+   * @param setup - is this called for system setup
    * @param username
    * @param firstName
    * @param lastName
@@ -86,11 +88,11 @@ class UserManager {
    * @param password
    * @param phoneNumber
    * @param groupNumber
-   * @returns {Promise<firebase.User | never>}
+   * @returns {Promise}
    */
-  signUpLocal(username, password, firstName, lastName, organization, email, phoneNumber, groupNumber) {
+  signUpLocal(setup, username, password, firstName, lastName, organization, email, phoneNumber, groupNumber) {
     //log(username,email,password);
-    return axios.post(config.server + '/api/signup/local', {
+    return axios.post(config.server + (setup ? '/api/setup' : '/api/signup/local'), {
       username: username,
       password: password,
       firstName: firstName,

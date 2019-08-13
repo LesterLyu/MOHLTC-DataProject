@@ -343,10 +343,6 @@ module.exports = {
                     // set user info in the session
                     req.session.user = user;
                     let redirectUrl = '/profile';
-                    if (req.session.originalUrl) {
-                        redirectUrl = req.session.originalUrl;
-                        delete req.session.originalUrl;
-                    }
                     return res.json({success: true, username: user.username, redirect: redirectUrl});
                 });
             })(req, res, next);
@@ -360,7 +356,7 @@ module.exports = {
         req.logout();
         // clear user info in the session
         req.session.user = {};
-        return res.redirect('/')
+        return res.json({success: true});
     },
 
     user_reset_password: (req, res, next) => {

@@ -20,8 +20,6 @@ const logger = require('morgan'); //Note logger = morgan~!
 
 const cookieSession = require('cookie-session');
 
-const fileUpload = require('express-fileupload');
-
 const cors = require('cors');
 
 const config = require('./config/config');
@@ -32,19 +30,13 @@ const indexRouter = require('./routes/index');
 
 const usersRouter = require('./routes/users');
 
-const workbookRouter = require('./routes/workbook');
-
 const packageRouter = require('./routes/v2/package02');
 
 const workbookQueryRouter = require('./routes/workbook-query');
 
 const LdapStrategy = require('passport-ldapauth');
 
-const attCatRouter = require('./routes/attCat');
-
 const userManagementRouter = require('./routes/userManagement');
-
-const systemManagementRouter = require('./routes/systemManagement');
 
 const RouterV2 = require('./routes/v2');
 
@@ -114,10 +106,6 @@ passport.deserializeUser(User.deserializeUser());
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(fileUpload({
-    limits: {fileSize: 50 * 1024 * 1024},
-}));
-
 setup.setup();
 
 // home page
@@ -126,12 +114,9 @@ app.use('/', indexRouter);
 app.use('/', usersRouter); // API or pages below this requires authentication
 // api endpoints that need authentication
 
-app.use('/', attCatRouter);
-app.use('/', workbookRouter);
 app.use('/', packageRouter);
 app.use('/', workbookQueryRouter);
 app.use('/', userManagementRouter);
-app.use('/', systemManagementRouter);
 app.use('/', ...RouterV2);
 
 // catch 404 and forward to error handler

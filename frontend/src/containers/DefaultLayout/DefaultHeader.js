@@ -31,7 +31,7 @@ class DefaultHeader extends Component {
                 <DropdownToggle nav>
                   <i className="mdi mdi-account mdi-36px"/>
                 </DropdownToggle>
-                <DropdownMenu right style={{right: 'auto'}}>
+                <DropdownMenu right>
                   <DropdownItem header tag="div" className="text-center"><strong>Account</strong></DropdownItem>
                   <DropdownItem onClick={e => this.props.onLogout(e)}><i className="fa fa-lock"/> Logout</DropdownItem>
                 </DropdownMenu>

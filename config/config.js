@@ -29,7 +29,8 @@ module.exports = {
         ATTRIBUTE_CATEGORY_MANAGEMENT: 'create-delete-attribute-category',
         USER_MANAGEMENT: 'user-management',
         SYSTEM_MANAGEMENT: 'system-management',
-        WORKBOOK_QUERY: 'workbook-query'
+        WORKBOOK_QUERY: 'workbook-query',
+        PACKAGE_MANAGEMENT: 'package-management'
     },
     constants: {
         categoryIdStartFrom: 1000000,

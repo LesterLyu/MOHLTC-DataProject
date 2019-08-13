@@ -20,7 +20,7 @@ class Register extends Component {
   constructor(props) {
     super(props);
     this.user = new UserManager(props);
-
+    this.setup = props.params.mode === 'setup';
     this.state = {
       username: '',
       email: '@ontario.ca',
@@ -49,7 +49,7 @@ class Register extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    this.user.signUpLocal(this.state.username, this.state.password,
+    this.user.signUpLocal(this.setup, this.state.username, this.state.password,
       this.state.firstName, this.state.lastName, null, this.state.email, this.state.phoneNumber, this.state.groupNumber)
       .then(response => {
         this.props.history.push(response.data.redirect);
@@ -63,25 +63,26 @@ class Register extends Component {
               isUsernameError: true,
               usernameErrorMessage: serverErrorMessage,
             });
-          }
-          if (serverErrorMessage.toLowerCase().includes('email')) {
+          } else if (serverErrorMessage.toLowerCase().includes('email')) {
             this.setState({
               isEmailError: true,
               emailErrorMessage: serverErrorMessage,
             });
-          }
-          if (serverErrorMessage.toLowerCase().includes('group number')) {
+          } else if (serverErrorMessage.toLowerCase().includes('group number')) {
             this.setState({
               isGroupNumberError: true,
               ServerErrormessage: serverErrorMessage,
             });
+          } else {
+            this.setState({
+              isServerErrormessage: true,
+              ServerErrormessage: serverErrorMessage,
+            })
           }
         } else {
-          const serverErrorMessage = err.response.data.message.message;
-          console.log(serverErrorMessage);
           this.setState({
-            isServerErrormessage: false,
-            ServerErrormessage: serverErrorMessage,
+            isServerErrormessage: true,
+            ServerErrormessage: err.toString(),
           })
         }
       })
@@ -259,7 +260,7 @@ class Register extends Component {
               <Card className="mx-4">
                 <CardBody className="p-4">
                   <Form onSubmit={this.handleSubmit}>
-                    <h1>Register</h1>
+                    <h1>{this.setup ? 'Setup' : 'Register'}</h1>
                     <p className="text-muted">Create your account</p>
 
                     <TextField
@@ -370,16 +371,13 @@ class Register extends Component {
                       Create Account
                     </Button>
 
-                    <Paper elevation={1}>
-                      <Typography component="p">
-                        {/* FIXME: modify the color to red */}
-                        {this.state.ServerErrormessage}
-                      </Typography>
-                    </Paper>
-
-                    <Link to="/login">
+                    <Typography component="p" color="error">
+                      {this.state.ServerErrormessage}
+                    </Typography>
+                    {this.setup ? null : <Link to="/login">
                       <Button color="link"><span>Already have an account?</span></Button>
-                    </Link>
+                    </Link>}
+
                   </Form>
                 </CardBody>
               </Card>

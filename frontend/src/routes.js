@@ -18,6 +18,7 @@ const SystemInfo = React.lazy(() => import('./views/System' /* webpackChunkName:
 const ImportId = React.lazy(() => import('./views/Tools/Import' /* webpackChunkName: "importId" */));
 
 const CreatePackage = React.lazy(() => import('./views/Package/Create' /* webpackChunkName: "createPackage" */));
+const Packages = React.lazy(() => import('./views/Package/Packages' /* webpackChunkName: "Packages" */));
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -45,7 +46,9 @@ const routes = [
   {path: '/system', exact: true, name: 'System Info', component: SystemInfo},
   {path: '/import/id', exact: true, name: 'Import ID', component: ImportId},
 
-  {path: '/package/create', exact: true, name: 'Create Package', component: CreatePackage},
+  {path: '/admin/packages/create', exact: true, name: 'Create Package', component: CreatePackage},
+  {path: '/admin/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'admin'}},
+  {path: '/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'user'}},
 ];
 
 export default routes;

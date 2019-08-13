@@ -6,6 +6,35 @@ const error = require('../../config/error');
 const mongoose = require('mongoose');
 
 module.exports = {
+
+    adminGetAllWorkbooks: (req, res, next) => {
+        if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        Workbook.find({groupNumber: groupNumber}, 'name', (err, workbooks) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).json({success: false, message: err});
+            }
+            return res.json({success: true, workbooks: workbooks});
+        })
+    },
+
+    adminDeleteWorkbook: async (req, res, next) => {
+        if (!checkPermission(req, Permission.PACKAGE_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const name = req.params.name;
+        const groupNumber = req.session.user.groupNumber;
+        try {
+            await Workbook.deleteOne({name, groupNumber});
+            return res.json({success: true, message: `Workbook (${name}) deleted.`});
+        } catch (e) {
+            next(e);
+        }
+    },
+
     /**
      * Save workbook template, for admin (form designer).
      * TODO: Since large JSON is parsed here, it will block the event loop eventually, move this function to a sub thread/process to improve performance.
@@ -102,6 +131,5 @@ module.exports = {
         } catch (e) {
             next(e);
         }
-
     },
 };
