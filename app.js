@@ -34,7 +34,7 @@ const usersRouter = require('./routes/users');
 
 const workbookRouter = require('./routes/workbook');
 
-const packageRouter = require('./routes/v2/package');
+const packageRouter = require('./routes/v2/package02');
 
 const workbookQueryRouter = require('./routes/workbook-query');
 

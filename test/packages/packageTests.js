@@ -8,12 +8,15 @@ const Package = require('../../models/package/package');
 const Workbook = require('../../models/workbook/workbook');
 
 describe('CRUD package', function () {
-    let oneUserName, oneUserId, onePackageName;
+    let oneUserName, oneUserId;
     let workbookIds = [];
     let newPackageName = 'new package';
+    let secondPackageName = 'second package';
 
+    // create a new package
     before(async () => {
         await Package.deleteOne({name: newPackageName});
+        await Package.deleteOne({name: secondPackageName});
         try {
             // Login
             await agent
@@ -36,6 +39,8 @@ describe('CRUD package', function () {
             });
 
             const result = await agent.post('/api/v2/test/admin/workbook').send(require('../workbooks/workbook.json'));
+            const result02 = await agent.post('/api/v2/test/admin/workbook').send(require('../workbooks/workbook02.json'));
+            const result03 = await agent.post('/api/v2/test/admin/workbook').send(require('../workbooks/workbook03.json'));
             // Retrieve workbook
             const workbooks = await Workbook.find();
             for (let i = 0; i < 3 && i < workbooks.length; i++) {
@@ -46,18 +51,44 @@ describe('CRUD package', function () {
 
             await agent.post('/api/admin/packages')
                 .send({
-                    name: 'firstPackageName',
+                    name: newPackageName,
                     published: true,
                     startDate: Date.now(),
-                    endDate: Date.parse('2020/01/01'),
+                    endDate: Date.parse('2021/01/01'),
                     userIds: [oneUserId],
-                    workbookIds: workbookIds,
+                    workbookIds: [workbookIds[0], workbookIds[1]]
                 });
-            // Retrieve existed package
-            const dbPackages = await Package.find();
-            if (dbPackages[0]) {
-                onePackageName = dbPackages[0].name;
-            }
+
+            await agent.post('/api/admin/packages')
+                .send({
+                    name: workbookIds[0],
+                    published: false,
+                    startDate: Date.now(),
+                    endDate: Date.parse('2030/03/01'),
+                    userIds: [oneUserId],
+                    workbookIds: [workbookIds[0]]
+                });
+
+            await agent.post('/api/admin/packages')
+                .send({
+                    name: workbookIds[1],
+                    published: false,
+                    startDate: Date.now(),
+                    endDate: Date.parse('2030/03/02'),
+                    userIds: [oneUserId],
+                    workbookIds: [workbookIds[1]]
+                });
+
+            await agent.post('/api/admin/packages')
+                .send({
+                    name: workbookIds[2],
+                    published: false,
+                    startDate: Date.now(),
+                    endDate: Date.parse('2030/03/03'),
+                    userIds: [oneUserId],
+                    workbookIds: [workbookIds[2]]
+                });
+
 
         } catch (e) {
             throw e;
@@ -66,7 +97,7 @@ describe('CRUD package', function () {
 
     it('GET by user name and package name - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/admin/' + oneUserName + '/packages/' + onePackageName;
+        const urlStr = '/api/admin/' + oneUserName + '/packages/' + newPackageName;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -81,7 +112,7 @@ describe('CRUD package', function () {
     });
     it('GET by  package name /packages/packageName - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/admin/packages/' + onePackageName;
+        const urlStr = '/api/admin/packages/' + newPackageName;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -97,7 +128,7 @@ describe('CRUD package', function () {
     it('GET by  query attributeId and categroyId - success', done => {
         this.timeout(10000);
         const queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
-        const urlStr = '/api/admin/packages/' + onePackageName + queryString;
+        const urlStr = '/api/admin/packages/' + newPackageName + queryString;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -113,7 +144,7 @@ describe('CRUD package', function () {
     it('GET by  query attributeId and categroyId - failed', done => {
         this.timeout(10000);
         const queryString = '?categoryId=' + 100679515666 + '&attributeId=' + 100045567666;
-        const urlStr = '/api/admin/packages/' + onePackageName + queryString;
+        const urlStr = '/api/admin/packages/' + newPackageName + queryString;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -229,8 +260,6 @@ describe('CRUD package', function () {
                 name: 'package03',
                 startDate: Date.now(),
                 endDate: Date.parse('1988/01/01'),
-                userIds: ['5d4ae3e5bf54622ca035fd62', '5d4ae3e5bf54622ca035fd61'],
-                workbookIds: ['5d499447d8586ddfbf06a031', '5d0cec736a9cb34624beaa5b'],
             })
             .then(function (res) {
                 console.log(res.body);
@@ -249,9 +278,7 @@ describe('CRUD package', function () {
         agent
             .post(urlStr)
             .send({
-                name: onePackageName,
-                userIds: ['5d4ae3e5bf54622ca035fd62', '5d4ae3e5bf54622ca035fd61'],
-                workbookIds: ['5d499447d8586ddfbf06a031', '5d0cec736a9cb34624beaa5b'],
+                name: newPackageName,
                 startDate: Date.now(),
                 endDate: Date.parse('2025/01/01'),
             })
@@ -263,7 +290,7 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('Post create newPackage - success', done => {
+    it('Post create second Package - success', done => {
         // name did not exist
         this.timeout(10000);
         const urlStr = '/api/admin/packages';
@@ -271,12 +298,12 @@ describe('CRUD package', function () {
             .post(urlStr)
             .send({
                 // name: 'name did not exist',
-                name: newPackageName,
+                name: secondPackageName,
                 published: true,
                 startDate: Date.now(),
                 endDate: Date.parse('2025/01/01'),
                 userIds: [oneUserId],
-                workbookIds: workbookIds,
+                workbookIds: workbookIds[2],
             })
             .then(function (res) {
                 console.table(res.body);
@@ -287,28 +314,88 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('Put update the status of published - success', done => {
+    it('Put update the workbookIds - success', async () => {
         // name did not exist
         this.timeout(10000);
-        const urlStr = '/api/admin/packages/' + onePackageName;
-        agent
+        let queryString, urlStr;
+        // before
+        try {
+            queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
+            urlStr = '/api/admin/packages/' + newPackageName + queryString;
+            await agent
+                .get(urlStr)
+                .then(function (res) {
+                    console.log('before ----- 01 -- ' + res.body.value);
+                    expect(res).to.have.status(200);
+                })
+                .catch(function (err) {
+                    throw err;
+                });
+
+            queryString = '?categoryId=' + 100722811 + '&attributeId=' + 100049519;
+            urlStr = '/api/admin/packages/' + newPackageName + queryString;
+            await agent
+                .get(urlStr)
+                .then(function (res) {
+                    console.log('before ----- 02 -- ' + res.body.message);
+                    expect(res).to.have.status(400);
+                })
+                .catch(function (err) {
+                    throw err;
+                });
+        } catch (e) {
+            console.log(e);
+        }
+
+        // PUT
+        urlStr = '/api/admin/packages/' + newPackageName;
+        await agent
             .put(urlStr)
             .send({
-                // published: true,
-                endDate: Date.parse('2020/03/01'),
-                workbookIds: workbookIds,
+                published: false,
+                endDate: Date.parse('2020/02/02'),
+                workbookIds: [workbookIds[1], workbookIds[2]],
             })
             .then(function (res) {
                 console.table(res.body);
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                done();
             })
             .catch(function (err) {
                 throw err;
             });
+
+        // after
+        try {
+            queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
+            urlStr = '/api/admin/packages/' + newPackageName + queryString;
+            await agent
+                .get(urlStr)
+                .then(function (res) {
+                    console.log('after ----- 01 -- ' + res.body.value);
+                    expect(res).to.have.status(200);
+                    expect(res.body.success).to.be.true;
+                })
+                .catch(function (err) {
+                    throw err;
+                });
+
+            queryString = '?categoryId=' + 100722811 + '&attributeId=' + 100049519;
+            urlStr = '/api/admin/packages/' + newPackageName + queryString;
+            await agent
+                .get(urlStr)
+                .then(function (res) {
+                    console.log('after ----- 02 -- ' + res.body.message);
+                    expect(res).to.have.status(400);
+                })
+                .catch(function (err) {
+                    throw err;
+                });
+        } catch (e) {
+            console.log(e);
+        }
     });
-    it('Put  - error end date', done => {
+    it('Put  - error end date - failed', done => {
         // name did not exist
         this.timeout(10000);
         const urlStr = '/api/admin/packages/' + newPackageName;
@@ -329,10 +416,70 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('Delete package03... - success', done => {
+
+    it('Put  - no attributeId - failed', done => {
         // name did not exist
         this.timeout(10000);
-        const urlStr = '/api/admin/packages/' + onePackageName;
+        const urlStr = '/api/admin/packagevalues';
+        agent
+            .put(urlStr)
+            .send({
+                categoryId: 100679515,
+                attributeId: 100045567,
+            })
+            .then(function (res) {
+                console.table(res.body);
+                expect(res).to.have.status(400);
+                expect(res.body.success).to.be.false;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
+    it('Put  - /api/admin/packagevalues - success', async () => {
+        // name did not exist
+        this.timeout(10000);
+        let urlStr = '/api/admin/packagevalues';
+        const newValue = 'new 100045568'
+        await agent
+            .put(urlStr)
+            .send({
+                packageName: newPackageName,
+                categoryId: 100679515,
+                attributeId: 100045567,
+                value: newValue,
+            })
+            .then(function (res) {
+                console.table(res.body);
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+            })
+            .catch(function (err) {
+                throw err;
+            });
+
+        const queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
+        urlStr = '/api/admin/packages/' + newPackageName + queryString;
+        await agent
+            .get(urlStr)
+            .then(function (res) {
+                console.log(res.body);
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                expect(res.body.value).equals(newValue);
+            })
+            .catch(function (err) {
+                throw err;
+            });
+
+
+    });
+    xit('Delete package... - success', done => {
+        // name did not exist
+        this.timeout(10000);
+        const urlStr = '/api/admin/packages/' + newPackageName;
         agent
             .delete(urlStr)
             .then(function (res) {
