@@ -10,12 +10,12 @@ const Workbook = require('../../models/workbook/workbook');
 describe('CRUD package', function () {
     let oneUserName, oneUserId;
     let workbookIds = [];
-    let newPackageName = 'new package';
-    let secondPackageName = 'second package';
+    let initialPackageName = 'create it in before';
+    let secondPackageName = 'create it by post';
 
     // create a new package
     before(async () => {
-        await Package.deleteOne({name: newPackageName});
+        await Package.deleteOne({name: initialPackageName});
         await Package.deleteOne({name: secondPackageName});
         try {
             // Login
@@ -51,8 +51,8 @@ describe('CRUD package', function () {
 
             await agent.post('/api/admin/packages')
                 .send({
-                    name: newPackageName,
-                    published: true,
+                    name: initialPackageName,
+                    published: false,
                     startDate: Date.now(),
                     endDate: Date.parse('2021/01/01'),
                     userIds: [oneUserId],
@@ -97,7 +97,7 @@ describe('CRUD package', function () {
 
     it('GET by user name and package name - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/admin/' + oneUserName + '/packages/' + newPackageName;
+        const urlStr = '/api/admin/' + oneUserName + '/packages/' + initialPackageName;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -112,7 +112,7 @@ describe('CRUD package', function () {
     });
     it('GET by  package name /packages/packageName - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/admin/packages/' + newPackageName;
+        const urlStr = '/api/admin/packages/' + initialPackageName;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -128,7 +128,7 @@ describe('CRUD package', function () {
     it('GET by  query attributeId and categroyId - success', done => {
         this.timeout(10000);
         const queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
-        const urlStr = '/api/admin/packages/' + newPackageName + queryString;
+        const urlStr = '/api/admin/packages/' + initialPackageName + queryString;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -144,7 +144,7 @@ describe('CRUD package', function () {
     it('GET by  query attributeId and categroyId - failed', done => {
         this.timeout(10000);
         const queryString = '?categoryId=' + 100679515666 + '&attributeId=' + 100045567666;
-        const urlStr = '/api/admin/packages/' + newPackageName + queryString;
+        const urlStr = '/api/admin/packages/' + initialPackageName + queryString;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -278,7 +278,7 @@ describe('CRUD package', function () {
         agent
             .post(urlStr)
             .send({
-                name: newPackageName,
+                name: initialPackageName,
                 startDate: Date.now(),
                 endDate: Date.parse('2025/01/01'),
             })
@@ -303,7 +303,7 @@ describe('CRUD package', function () {
                 startDate: Date.now(),
                 endDate: Date.parse('2025/01/01'),
                 userIds: [oneUserId],
-                workbookIds: workbookIds[2],
+                workbookIds: [workbookIds[1], workbookIds[2]]
             })
             .then(function (res) {
                 console.table(res.body);
@@ -314,14 +314,15 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('Put update the workbookIds - success', async () => {
+
+    it('Put - update the workbookIds - success', async () => {
         // name did not exist
         this.timeout(10000);
         let queryString, urlStr;
         // before
         try {
             queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
-            urlStr = '/api/admin/packages/' + newPackageName + queryString;
+            urlStr = '/api/admin/packages/' + initialPackageName + queryString;
             await agent
                 .get(urlStr)
                 .then(function (res) {
@@ -332,8 +333,8 @@ describe('CRUD package', function () {
                     throw err;
                 });
 
-            queryString = '?categoryId=' + 100722811 + '&attributeId=' + 100049519;
-            urlStr = '/api/admin/packages/' + newPackageName + queryString;
+            queryString = '?categoryId=' + 100722492 + '&attributeId=' + 100049447;
+            urlStr = '/api/admin/packages/' + initialPackageName + queryString;
             await agent
                 .get(urlStr)
                 .then(function (res) {
@@ -348,13 +349,13 @@ describe('CRUD package', function () {
         }
 
         // PUT
-        urlStr = '/api/admin/packages/' + newPackageName;
+        urlStr = '/api/admin/packages/' + initialPackageName;
         await agent
             .put(urlStr)
             .send({
                 published: false,
                 endDate: Date.parse('2020/02/02'),
-                workbookIds: [workbookIds[1], workbookIds[2]],
+                workbookIds: [workbookIds[1], workbookIds[2]]
             })
             .then(function (res) {
                 console.table(res.body);
@@ -368,25 +369,24 @@ describe('CRUD package', function () {
         // after
         try {
             queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
-            urlStr = '/api/admin/packages/' + newPackageName + queryString;
+            urlStr = '/api/admin/packages/' + initialPackageName + queryString;
             await agent
                 .get(urlStr)
                 .then(function (res) {
-                    console.log('after ----- 01 -- ' + res.body.value);
-                    expect(res).to.have.status(200);
-                    expect(res.body.success).to.be.true;
+                    console.log('after ----- 01 -- ' + res.body.message);
+                    expect(res).to.have.status(400);
                 })
                 .catch(function (err) {
                     throw err;
                 });
 
-            queryString = '?categoryId=' + 100722811 + '&attributeId=' + 100049519;
-            urlStr = '/api/admin/packages/' + newPackageName + queryString;
+            queryString = '?categoryId=' + 100722492 + '&attributeId=' + 100049447;
+            urlStr = '/api/admin/packages/' + initialPackageName + queryString;
             await agent
                 .get(urlStr)
                 .then(function (res) {
-                    console.log('after ----- 02 -- ' + res.body.message);
-                    expect(res).to.have.status(400);
+                    console.log('after ----- 03 -- ' + res.body.value);
+                    expect(res).to.have.status(200);
                 })
                 .catch(function (err) {
                     throw err;
@@ -398,7 +398,7 @@ describe('CRUD package', function () {
     it('Put  - error end date - failed', done => {
         // name did not exist
         this.timeout(10000);
-        const urlStr = '/api/admin/packages/' + newPackageName;
+        const urlStr = '/api/admin/packages/' + initialPackageName;
         agent
             .put(urlStr)
             .send({
@@ -442,13 +442,13 @@ describe('CRUD package', function () {
         // name did not exist
         this.timeout(10000);
         let urlStr = '/api/admin/packagevalues';
-        const newValue = 'new 100045568'
+        const newValue = 'new 100045568';
         await agent
             .put(urlStr)
             .send({
-                packageName: newPackageName,
-                categoryId: 100679515,
-                attributeId: 100045567,
+                packageName: initialPackageName,
+                categoryId: 100722492,
+                attributeId: 100049445,
                 value: newValue,
             })
             .then(function (res) {
@@ -460,8 +460,8 @@ describe('CRUD package', function () {
                 throw err;
             });
 
-        const queryString = '?categoryId=' + 100679515 + '&attributeId=' + 100045567;
-        urlStr = '/api/admin/packages/' + newPackageName + queryString;
+        const queryString = '?categoryId=' + 100722492 + '&attributeId=' + 100049445;
+        urlStr = '/api/admin/packages/' + initialPackageName + queryString;
         await agent
             .get(urlStr)
             .then(function (res) {
@@ -479,7 +479,7 @@ describe('CRUD package', function () {
     xit('Delete package... - success', done => {
         // name did not exist
         this.timeout(10000);
-        const urlStr = '/api/admin/packages/' + newPackageName;
+        const urlStr = '/api/admin/packages/' + initialPackageName;
         agent
             .delete(urlStr)
             .then(function (res) {

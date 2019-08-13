@@ -231,12 +231,12 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
         return next(error.api.NO_PERMISSION);
     }
-    const queryGroupNumber = req.session.user.groupNumber;
+    const groupNumber = req.session.user.groupNumber;
     const queryPackageName = req.params.packagename;
     if (!queryPackageName) {
         return res.status(400).json({success: false, message: 'package name can not be empty.'});
     }
-    const dbPackage = await Package.findOne({name: queryPackageName, groupNumber: queryGroupNumber});
+    const dbPackage = await Package.findOne({name: queryPackageName, groupNumber});
     if (!dbPackage) {
         return res.status(400).json({success: false, message: `Package (${queryPackageName}) does not exist.`});
     }
@@ -250,7 +250,6 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
 
     const dbUserIds = [];
     if (userIds) {
-        // validate from database
         try {
             // FIXME: if one of userIds does not exist, it can not throw error.
             if (userIds) {
@@ -267,9 +266,6 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
             next(e);
         }
     }
-
-    //
-
 
     let dbWorkbooks = [];
     let queryDbWorkbookIds = [];
@@ -293,16 +289,37 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     }
 
     const dbWorkbookIds = dbPackage.workbooks;
-    let newWorkbookIds = queryDbWorkbookIds.slice();
-    let deleteWorkbookIds = queryDbWorkbookIds.slice();
+
+    let newWorkbookIds = [];
+    let deleteWorkbookIds = [];
+
     for (let queryWorkbookIdKey in queryDbWorkbookIds) {
+        let isDuplicate = false;
         for (let dbWorkbookIdKey in dbWorkbookIds) {
             const newId = queryDbWorkbookIds[queryWorkbookIdKey].toString();
-            const id = dbWorkbookIds[dbWorkbookIdKey].toString();
-            if (newId === id) {
-                newWorkbookIds = newWorkbookIds.splice(queryWorkbookIdKey, 1);
-                deleteWorkbookIds = deleteWorkbookIds.splice(dbWorkbookIdKey, 1);
+            const oldId = dbWorkbookIds[dbWorkbookIdKey].toString();
+            if (newId === oldId) {
+                isDuplicate = true;
+                break;
             }
+        }
+        if (!isDuplicate) {
+            newWorkbookIds.push(queryDbWorkbookIds[queryWorkbookIdKey]);
+        }
+    }
+
+    for (let dbWorkbookIdKey in dbWorkbookIds) {
+        let isDuplicate = false;
+        for (let queryWorkbookIdKey in queryDbWorkbookIds) {
+            const newId = queryDbWorkbookIds[queryWorkbookIdKey].toString();
+            const oldId = dbWorkbookIds[dbWorkbookIdKey].toString();
+            if (newId === oldId) {
+                isDuplicate = true;
+                break;
+            }
+        }
+        if (!isDuplicate) {
+            deleteWorkbookIds.push(dbWorkbookIds[dbWorkbookIdKey]);
         }
     }
 
@@ -333,7 +350,7 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
                 });
             });
 
-            const newDbValues = await Value.findOne({groupNumber: queryGroupNumber});
+            const newDbValues = await Value.findOne({groupNumber: groupNumber});
             if (!newDbValues) {
                 return res.status(400).json({success: false, message: 'values do not exist'});
             }
@@ -341,18 +358,19 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
             if (rowIds[0] && columnIds) {
                 for (let rowKey in newDbValues.data) {
                     const rowValue = newDbValues.data[rowKey];
+                    let newValues = {};
                     for (let i = 0; i < rowIds.length; i++) {
                         if (rowIds[i].toString() === rowKey) {
                             for (let columnKey in rowValue) {
                                 for (let j = 0; j < columnIds[rowKey].length; j++) {
                                     if (columnIds[rowKey][j].toString() === columnKey) {
-                                        dbPackage.values.data[rowKey][columnKey] = rowValue[columnKey];
-                                        // newValue[columnKey] = rowValue[columnKey];
+                                        newValues[columnKey] = rowValue[columnKey];
                                     }
                                 }
                             }
                         }
                     }
+                    dbPackage.values.data[rowKey] = newValues;
                 }
             }
         }
@@ -387,17 +405,11 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
             // remove the deleted item
             if (rowIds[0] && columnIds) {
                 for (let rowKey in dbPackage.values.data) {
-                    const rowValue = dbPackage.values.data[rowKey];
                     for (let i = 0; i < rowIds.length; i++) {
-                        if (rowIds[i].toString() === rowKey) {
-                            let newValue = {};
-                            for (let columnKey in rowValue) {
-                                for (let j = 0; j < columnIds[rowKey].length; j++) {
-                                    if (columnIds[rowKey][j].toString() === columnKey) {
-                                        delete dbPackage.values.data[rowKey][columnKey];
-                                    }
-                                }
-                            }
+                        const first = rowIds[i].toString();
+                        const second = rowKey.toString();
+                        if (first === second) {
+                            delete dbPackage.values.data[rowKey];
                         }
                     }
                 }
@@ -406,8 +418,8 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     }
 
 
-
-    // update the package in database
+// update the package in database
+    dbPackage.markModified('values.data');
     try {
         if (published !== undefined) {
             dbPackage.published = published;
@@ -421,13 +433,13 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
         dbPackage.userNotes = userNotes || dbPackage.userNotes;
         dbPackage.userFiles = userFiles || dbPackage.userFiles;
         dbPackage.histories = histories || dbPackage.histories;
-        // dbPackage.values = values.data ? values : dbPackage.values;
         await dbPackage.save();
         return res.json({success: true, message: `package (${dbPackage.name}) updated.`, package: dbPackage});
     } catch (e) {
         next(e);
     }
-});
+})
+;
 
 router.put('/api/admin/packagevalues', async (req, res, next) => {
 
@@ -463,8 +475,7 @@ router.put('/api/admin/packagevalues', async (req, res, next) => {
                         if (columnKey === queryAttributeId.toString()) {
                             dbPackage.values.data[queryCategoryId][queryAttributeId] = newValue;
                             dbPackage.markModified('values.data');
-                            const result = await dbPackage.save();
-                            console.log(result.values.data[queryCategoryId][queryAttributeId]);
+                            await dbPackage.save();
                             return res.json({
                                 success: true,
                                 message: `package (${dbPackage.name}) updated.`,
@@ -513,5 +524,6 @@ router.delete('/api/admin/packages/:packagename', async (req, res, next) => {
         next(e);
     }
 });
+
 
 module.exports = router;
