@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 
 const {agent} = require('../config');
-const Category = require('../../models/category');
+const Category = require('../../models/workbook/category');
 const User = require('../../models/user');
 
 describe.skip('CRUD category', function () {

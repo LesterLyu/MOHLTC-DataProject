@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 
 const {agent} = require('../config');
-const Attribute = require('../../models/attribute');
+const Attribute = require('../../models/workbook/attribute');
 const User = require('../../models/user');
 
 describe.skip('CRUD attribute', function () {
