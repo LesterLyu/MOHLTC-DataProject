@@ -462,7 +462,7 @@ router.put('/api/admin/packagevalues', async (req, res, next) => {
                     for (let columnKey in PackageValues.data[rowKey]) {
                         if (columnKey === queryAttributeId.toString()) {
                             dbPackage.values.data[queryCategoryId][queryAttributeId] = newValue;
-                            // FIXME: can not save to database
+                            dbPackage.markModified('values.data');
                             const result = await dbPackage.save();
                             console.log(result.values.data[queryCategoryId][queryAttributeId]);
                             return res.json({
