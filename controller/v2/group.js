@@ -11,13 +11,13 @@ module.exports = {
         const name = req.body.name;
         try {
             await Group.replaceOne({groupNumber}, {groupNumber, name}, {upsert: true});
-            return res.json({message: 'Group name is updated.'})
+            return res.json({message: `Current Group name is updated to ${name}`});
         } catch (e) {
             next(e);
         }
     },
 
-    // no login required
+    // no login required, used for registration
     getGroups: async (req, res, next) => {
         try {
             const groups = await Group.find({});
@@ -27,6 +27,7 @@ module.exports = {
         }
     },
 
+    // no login required, used for registration
     getOrganizationsInGroup: async (req, res, next) => {
         const groupNumber = req.params.number;
         try {
