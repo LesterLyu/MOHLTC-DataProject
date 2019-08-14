@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function GroupName(props) {
-  const [name, setName] = useState(null);
+  const [name, setName] = useState('');
   const classes = useStyles();
 
   useEffect(() => {

@@ -4,6 +4,19 @@ const {checkPermission, Permission, error, removeNil} = require('./helpers');
 
 
 module.exports = {
+    getOrganizations: async (req, res, next) => {
+        if (!checkPermission(req, Permission.SYSTEM_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        try {
+            const organizations = await Organization.find({groupNumber}).populate('users managers types');
+            return res.json({organizations});
+        } catch (e) {
+            next(e);
+        }
+    },
+
     // Add or update an organization for current group
     updateOrganization: async (req, res, next) => {
         if (!checkPermission(req, Permission.SYSTEM_MANAGEMENT)) {
@@ -11,7 +24,9 @@ module.exports = {
         }
         const groupNumber = req.session.user.groupNumber;
 
-        const {name, users, managers, types} = res.body;
+        const {name, users, managers, types} = req.body;
+        if (!name || name.length === 0) return next({status: 400, message: 'Package name is required.'});
+
         const data = removeNil({users, managers, types});
         try {
             // TODO: validate the given data (users, managers, types)
@@ -39,7 +54,7 @@ module.exports = {
                     }
                 })
             });
-            await OrganizationType.bulkWrite(ops);
+            if (ops.length > 0) await OrganizationType.bulkWrite(ops);
             return res.json({message});
         } catch (e) {
             next(e);
@@ -66,8 +81,21 @@ module.exports = {
                     })
                 });
             }
-            await OrganizationType.bulkWrite(ops);
+            if (ops.length > 0) await OrganizationType.bulkWrite(ops);
             return res.json({message: `Organization ${name} is deleted.`});
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    getOrganizationTypes: async (req, res, next) => {
+        if (!checkPermission(req, Permission.SYSTEM_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        try {
+            const types = await OrganizationType.find({groupNumber});
+            return res.json({types});
         } catch (e) {
             next(e);
         }
@@ -79,7 +107,7 @@ module.exports = {
             return next(error.api.NO_PERMISSION);
         }
         const groupNumber = req.session.user.groupNumber;
-        const {name, organizations} = res.body;
+        const {name, organizations} = req.body;
         const data = removeNil({organizations});
         try {
             const oldDoc = await OrganizationType.findOne({groupNumber, name});
@@ -108,7 +136,7 @@ module.exports = {
                     }
                 })
             });
-            await Organization.bulkWrite(ops);
+            if (ops.length > 0) await Organization.bulkWrite(ops);
             return res.json({message});
         } catch (e) {
             next(e);
@@ -134,7 +162,7 @@ module.exports = {
                     })
                 });
             }
-            await Organization.bulkWrite(ops);
+            if (ops.length > 0) await Organization.bulkWrite(ops);
             return res.json({message: `Organization type ${name} is deleted.`});
         } catch (e) {
             next(e);

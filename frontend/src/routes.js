@@ -21,6 +21,8 @@ const CreatePackage = React.lazy(() => import('./views/Package/Create' /* webpac
 const Packages = React.lazy(() => import('./views/Package/Packages' /* webpackChunkName: "Packages" */));
 
 const GroupName = React.lazy(() => import('./views/System/GroupName' /* webpackChunkName: "GroupName" */));
+const Organizations = React.lazy(() => import('./views/System/Organizations' /* webpackChunkName: "Organizations" */));
+
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
@@ -53,6 +55,7 @@ const routes = [
   {path: '/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'user'}},
 
   {path: '/admin/group', exact: true, name: 'Set Group Name', component: GroupName},
+  {path: '/admin/organizations', exact: true, name: 'Organizations', component: Organizations},
 ];
 
 export default routes;

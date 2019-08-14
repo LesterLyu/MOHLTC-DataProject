@@ -1,14 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const {organizationController} = require('../../controller/v2');
-const {deleteOrganization, updateOrganization, deleteOrganizationType, updateOrganizationType} = organizationController;
+const {
+    deleteOrganization, updateOrganization, deleteOrganizationType, updateOrganizationType, getOrganizations,
+    getOrganizationTypes
+} = organizationController;
 
-router.post('/api/v2/organization', updateOrganization);
+router.get('/api/v2/organizations', getOrganizations);
 
-router.delete('/api/v2/organization/:name', deleteOrganization);
+router.post('/api/v2/organizations', updateOrganization);
 
-router.post('/api/v2/orgtype', updateOrganizationType);
+router.delete('/api/v2/organizations/:name', deleteOrganization);
 
-router.delete('/api/v2/orgtype/:name', deleteOrganizationType);
+router.get('/api/v2/orgtypes', getOrganizationTypes);
+
+router.post('/api/v2/orgtypes', updateOrganizationType);
+
+router.delete('/api/v2/orgtypes/:name', deleteOrganizationType);
 
 module.exports = router;
