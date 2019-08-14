@@ -441,7 +441,22 @@ describe('CRUD package', function () {
     it('Put  - /api/admin/packagevalues - success', async () => {
         // name did not exist
         this.timeout(10000);
-        let urlStr = '/api/admin/packagevalues';
+
+
+        const queryString = '?categoryId=' + 100722492 + '&attributeId=' + 100049445;
+        let urlStr = '/api/admin/packages/' + initialPackageName + queryString;
+        await agent
+            .get(urlStr)
+            .then(function (res) {
+                console.log('-- before -- ' + res.body.value);
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+            })
+            .catch(function (err) {
+                throw err;
+            });
+
+        urlStr = '/api/admin/packagevalues';
         const newValue = 'new 100045568';
         await agent
             .put(urlStr)
@@ -460,12 +475,11 @@ describe('CRUD package', function () {
                 throw err;
             });
 
-        const queryString = '?categoryId=' + 100722492 + '&attributeId=' + 100049445;
         urlStr = '/api/admin/packages/' + initialPackageName + queryString;
         await agent
             .get(urlStr)
             .then(function (res) {
-                console.log(res.body);
+                console.log('-- after -- ' + res.body.value);
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
                 expect(res.body.value).equals(newValue);
@@ -490,5 +504,4 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-})
-;
+});
