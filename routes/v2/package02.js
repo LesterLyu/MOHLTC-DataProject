@@ -32,7 +32,12 @@ router.get('/api/packages/:packagename?', async (req, res, next) => {
                         for (let columnKey in rowValue) {
                             if (columnKey === attributeId) {
                                 const cellValue = rowValue[columnKey];
-                                return res.json({success: true, value: cellValue});
+                                return res.json({
+                                    success: true,
+                                    category: categoryId,
+                                    attribute: attributeId,
+                                    value: cellValue
+                                });
                             }
                         }
                     }
@@ -42,9 +47,9 @@ router.get('/api/packages/:packagename?', async (req, res, next) => {
                     message: `no related attribute and category: (${attributeId}, ${categoryId})`
                 })
             });
-        } else {
-            return res.json({success: true, packages: dbPackages});
         }
+        return res.json({success: true, packages: dbPackages});
+
     } catch (e) {
         next(e);
     }
@@ -83,7 +88,12 @@ router.get('/api/admin/:username?/packages/:packagename?', async (req, res, next
                         for (let columnKey in rowValue) {
                             if (columnKey === attributeId) {
                                 const cellValue = rowValue[columnKey];
-                                return res.json({success: true, value: cellValue});
+                                return res.json({
+                                    success: true,
+                                    category: categoryId,
+                                    attribute: attributeId,
+                                    value: cellValue
+                                });
                             }
                         }
                     }
@@ -291,8 +301,6 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     const dbWorkbookIds = dbPackage.workbooks;
 
     let newWorkbookIds = [];
-    let deleteWorkbookIds = [];
-
     for (let queryWorkbookIdKey in queryDbWorkbookIds) {
         let isDuplicate = false;
         for (let dbWorkbookIdKey in dbWorkbookIds) {
@@ -308,6 +316,7 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
         }
     }
 
+    let deleteWorkbookIds = [];
     for (let dbWorkbookIdKey in dbWorkbookIds) {
         let isDuplicate = false;
         for (let queryWorkbookIdKey in queryDbWorkbookIds) {
@@ -406,9 +415,7 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
             if (rowIds[0] && columnIds) {
                 for (let rowKey in dbPackage.values.data) {
                     for (let i = 0; i < rowIds.length; i++) {
-                        const first = rowIds[i].toString();
-                        const second = rowKey.toString();
-                        if (first === second) {
+                        if (rowIds[i].toString() === rowKey.toString()) {
                             delete dbPackage.values.data[rowKey];
                         }
                     }
@@ -438,8 +445,7 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     } catch (e) {
         next(e);
     }
-})
-;
+});
 
 router.put('/api/admin/packagevalues', async (req, res, next) => {
 
@@ -524,6 +530,5 @@ router.delete('/api/admin/packages/:packagename', async (req, res, next) => {
         next(e);
     }
 });
-
 
 module.exports = router;

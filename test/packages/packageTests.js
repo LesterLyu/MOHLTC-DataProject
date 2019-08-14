@@ -9,15 +9,34 @@ const Workbook = require('../../models/workbook/workbook');
 
 describe('CRUD package', function () {
     let oneUserName, oneUserId;
+    let secondUserName = 'second', secondUserId;
     let workbookIds = [];
     let initialPackageName = 'create it in before';
     let secondPackageName = 'create it by post';
 
     // create a new package
     before(async () => {
-        await Package.deleteOne({name: initialPackageName});
-        await Package.deleteOne({name: secondPackageName});
+        await Package.deleteMany();
         try {
+            // singup second user
+            await agent.post('/api/signup/local')
+                .send({
+                    username: secondUserName,
+                    email: 'second@mail.com',
+                    groupNumber: 1, // can also be string
+                    firstName: 'firstname',
+                    lastName: 'lastName',
+                    phoneNumber: '1212122',
+                    password: secondUserName,
+                })
+                .then((res) => {
+                    expect(res).to.have.status(200);
+                    expect(res.body.success).to.be.true;
+                })
+                .catch(function (err) {
+                    throw err;
+                });
+
             // Login
             await agent
                 .post('/api/login/local')
@@ -37,6 +56,10 @@ describe('CRUD package', function () {
                     oneUserName = res.body.user.username;
                 }
             });
+            const secondUser = await User.findOne({username: secondUserName});
+            if (secondUser) {
+                secondUserId = secondUser._id;
+            }
 
             const result = await agent.post('/api/v2/test/admin/workbook').send(require('../workbooks/workbook.json'));
             const result02 = await agent.post('/api/v2/test/admin/workbook').send(require('../workbooks/workbook02.json'));
@@ -55,7 +78,7 @@ describe('CRUD package', function () {
                     published: false,
                     startDate: Date.now(),
                     endDate: Date.parse('2021/01/01'),
-                    userIds: [oneUserId],
+                    userIds: [oneUserId, secondUserId],
                     workbookIds: [workbookIds[0], workbookIds[1]]
                 });
 
@@ -75,7 +98,7 @@ describe('CRUD package', function () {
                     published: false,
                     startDate: Date.now(),
                     endDate: Date.parse('2030/03/02'),
-                    userIds: [oneUserId],
+                    userIds: [secondUserId],
                     workbookIds: [workbookIds[1]]
                 });
 
@@ -85,7 +108,7 @@ describe('CRUD package', function () {
                     published: false,
                     startDate: Date.now(),
                     endDate: Date.parse('2030/03/03'),
-                    userIds: [oneUserId],
+                    userIds: [secondUserId],
                     workbookIds: [workbookIds[2]]
                 });
 
@@ -97,7 +120,7 @@ describe('CRUD package', function () {
 
     it('GET by user name and package name - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/admin/' + oneUserName + '/packages/' + initialPackageName;
+        const urlStr = '/api/admin/' + secondUserName + '/packages/' + initialPackageName;
         agent
             .get(urlStr)
             .then(function (res) {
@@ -110,9 +133,9 @@ describe('CRUD package', function () {
                 throw err;
             });
     });
-    it('GET by  package name /packages/packageName - success', done => {
+    it('GET by  package name - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/admin/packages/' + initialPackageName;
+        const urlStr = '/api/admin/packages/' + workbookIds[2];
         agent
             .get(urlStr)
             .then(function (res) {
@@ -174,7 +197,7 @@ describe('CRUD package', function () {
     });
     it('GET by user name - success', done => {
         this.timeout(10000);
-        const urlStr = '/api/admin/' + oneUserName + '/packages';
+        const urlStr = '/api/admin/' + secondUserName + '/packages';
         agent
             .get(urlStr)
             .then(function (res) {
@@ -353,8 +376,9 @@ describe('CRUD package', function () {
         await agent
             .put(urlStr)
             .send({
-                published: false,
+                published: true,
                 endDate: Date.parse('2020/02/02'),
+                // userIds: [oneUserId, secondUserId],
                 workbookIds: [workbookIds[1], workbookIds[2]]
             })
             .then(function (res) {
@@ -441,10 +465,11 @@ describe('CRUD package', function () {
     it('Put  - /api/admin/packagevalues - success', async () => {
         // name did not exist
         this.timeout(10000);
-
-
-        const queryString = '?categoryId=' + 100722492 + '&attributeId=' + 100049445;
-        let urlStr = '/api/admin/packages/' + initialPackageName + queryString;
+        const packageName = '5d4dd3409d0df184815fe739';
+        const catId = 100679515;
+        const attId = 100045567;
+        const queryString = '?categoryId=' + catId + '&attributeId=' + attId;
+        let urlStr = '/api/admin/packages/' + packageName + queryString;
         await agent
             .get(urlStr)
             .then(function (res) {
@@ -461,9 +486,9 @@ describe('CRUD package', function () {
         await agent
             .put(urlStr)
             .send({
-                packageName: initialPackageName,
-                categoryId: 100722492,
-                attributeId: 100049445,
+                packageName: packageName,
+                categoryId: catId,
+                attributeId: attId,
                 value: newValue,
             })
             .then(function (res) {
@@ -475,7 +500,7 @@ describe('CRUD package', function () {
                 throw err;
             });
 
-        urlStr = '/api/admin/packages/' + initialPackageName + queryString;
+        urlStr = '/api/admin/packages/' + packageName + queryString;
         await agent
             .get(urlStr)
             .then(function (res) {
