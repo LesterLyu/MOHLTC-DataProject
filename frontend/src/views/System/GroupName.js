@@ -37,8 +37,8 @@ export default function GroupName(props) {
       <TextField
         label="Group Name"
         value={name}
-        onChange={e => setName(e.target.value)} a
-        utoFocus
+        onChange={e => setName(e.target.value)}
+        autoFocus
         helperText={'This helps others to identify this group when register.'}
         InputLabelProps={{shrink: true}}/>
       <br/><br/>
