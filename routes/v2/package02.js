@@ -55,6 +55,7 @@ router.get('/api/packages/:packagename?', async (req, res, next) => {
     }
 });
 
+// admin can retrieve the packages based on the user name
 router.get('/api/admin/:username?/packages/:packagename?', async (req, res, next) => {
     if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
         return next(error.api.NO_PERMISSION);
@@ -242,6 +243,8 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
         return next(error.api.NO_PERMISSION);
     }
     const groupNumber = req.session.user.groupNumber;
+    const {published, userIds, workbookIds, startDate, endDate, adminNotes = '', adminFiles, userNotes = '', userFiles, histories} = req.body;
+
     const queryPackageName = req.params.packagename;
     if (!queryPackageName) {
         return res.status(400).json({success: false, message: 'package name can not be empty.'});
@@ -251,7 +254,7 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
         return res.status(400).json({success: false, message: `Package (${queryPackageName}) does not exist.`});
     }
 
-    const {published, userIds, workbookIds, startDate, endDate, adminNotes = '', adminFiles, userNotes = '', userFiles, histories} = req.body;
+
     if ((startDate && !endDate && startDate >= dbPackage.endDate)
         || (!startDate && endDate && dbPackage.startDate >= endDate)
         || (startDate && endDate && startDate >= endDate)) {
@@ -447,6 +450,7 @@ router.put('/api/admin/packages/:packagename', async (req, res, next) => {
     }
 });
 
+// update the value inside one package
 router.put('/api/admin/packagevalues', async (req, res, next) => {
 
     if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
