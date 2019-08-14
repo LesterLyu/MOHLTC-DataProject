@@ -3,6 +3,19 @@ const {Organization} = require('../../models/organization');
 const {checkPermission, Permission, error} = require('./helpers');
 
 module.exports = {
+    getGroupName: async (req, res, next) => {
+        if (!checkPermission(req, Permission.SYSTEM_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        try {
+            const group = await Group.findOne({groupNumber});
+            return res.json({name: group ? group.name: null});
+        } catch (e) {
+            next(e);
+        }
+    },
+
     setGroupName: async (req, res, next) => {
         if (!checkPermission(req, Permission.SYSTEM_MANAGEMENT)) {
             return next(error.api.NO_PERMISSION);

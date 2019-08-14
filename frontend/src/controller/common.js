@@ -1,7 +1,12 @@
 import axios from "axios";
 import config from "../config/config";
 
-const axiosConfig = {withCredentials: true};
+export const axiosConfig = {withCredentials: true};
+export {config};
+
+export function buildErrorParams(e) {
+  return [e.toString() + '\nDetails: ' + e.response.data.message, 'error'];
+}
 
 /**
  * check if login needed
@@ -9,7 +14,7 @@ const axiosConfig = {withCredentials: true};
  * @returns {boolean}
  */
 export function check(response) {
-  if (response.headers['content-type'].includes('html')) {
+  if (response.data.loginRequired) {
     window.location.hash = 'login';
     return false;
   }

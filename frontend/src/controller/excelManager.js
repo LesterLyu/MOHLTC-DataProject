@@ -1,9 +1,7 @@
 import axios from "axios";
 import config from "./../config/config";
 import {excelInstance, RichText, XlsxPopulate} from "../views/Excel/utils";
-import {generateObjectId} from './common';
-
-const axiosConfig = {withCredentials: true};
+import {generateObjectId, check, axiosConfig} from './common';
 
 /**
  * Singleton Pattern
@@ -21,25 +19,12 @@ class WorkbookManager {
     return instance;
   }
 
-  /**
-   * check if login needed
-   * @param response
-   * @returns {boolean}
-   */
-  check(response) {
-    if (response.headers['content-type'].includes('html')) {
-      this.props.history.push('/login');
-      return false;
-    }
-    return true;
-  };
-
   getWorkbook(name, admin) {
     const url = admin ? '/api/v2/workbook/' : '/api/v2/user/filled/';
     return axios.get(config.server + url + name, axiosConfig)
       .then(response => {
         console.log(response);
-        if (this.check(response)) {
+        if (check(response)) {
           return response;
         }
       })

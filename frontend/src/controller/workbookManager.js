@@ -1,7 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
-
-const axiosConfig = {withCredentials: true};
+import {check, axiosConfig} from "./common";
 
 /**
  * Singleton Pattern
@@ -19,19 +18,6 @@ class WorkbookManager {
     return instance;
   }
 
-  /**
-   * check if login needed
-   * @param response
-   * @returns {boolean}
-   */
-  check(response) {
-    if (response.headers['content-type'].includes('html')) {
-      this.props.history.push('/login');
-      return false;
-    }
-    return true;
-  };
-
   getAllWorkbooksForUser() {
     const arr = [];
     arr.push(
@@ -39,7 +25,7 @@ class WorkbookManager {
       axios.get(config.server + '/api/workbooks', axiosConfig));
     return Promise.all(arr)
       .then(response => {
-        if (this.check(response[0]) && this.check(response[1])) {
+        if (check(response[0]) && this.check(response[1])) {
           // [filled workbook, unfilled workbook]
           return [response[0].data.filledWorkbooks, response[1].data.workbooks];
         }
@@ -49,7 +35,7 @@ class WorkbookManager {
   getAllWorkbooksForAdmin() {
     return axios.get(config.server + '/api/v2/admin/workbooks', axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data.workbooks;
         }
       })
@@ -68,7 +54,7 @@ class WorkbookManager {
   deleteWorkbookForAdmin(fileName) {
     return axios.delete(config.server + '/api/v2/admin/workbooks/' + fileName, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       })
@@ -86,7 +72,7 @@ class WorkbookManager {
         withCredentials: axiosConfig.withCredentials,
       })
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       })
