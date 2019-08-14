@@ -89,7 +89,6 @@ module.exports = function (grunt) {
         grunt.file.mkdir('build/zip/public/react');
     });
 
-    grunt.registerTask("default", ["clean"]);
     grunt.registerTask("prod", ["clean", "run:report", "run:buildFrontend",
         "mkdir", "copy:main", "compress"]);
     grunt.registerTask("aws", ["clean"]);
