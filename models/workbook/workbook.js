@@ -15,4 +15,5 @@ module.exports = mongoose.model('Workbook',
         name: {type: String, required: true, unique: true},
         sheets: [{type: ObjectId, ref: 'Sheet'}], // Sheet._id
         file: {type: String, required: true}, // base64 encoding
+        values: {}, // {cat: {att: value}}
     }));

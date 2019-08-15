@@ -172,7 +172,6 @@ module.exports = {
                 console.log(err);
                 return res.status(500).json({success: false, message: err});
             }
-            console.log(users);
             return res.json({success: true, users: users});
         });
     },

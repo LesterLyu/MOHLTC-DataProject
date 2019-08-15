@@ -122,7 +122,7 @@ export default function OrganizationTypes(props) {
   const renderTable = useMemo(() =>
     <MuiThemeProvider theme={getMuiTheme()}>
       <MUIDataTable
-        title="Organizations"
+        title="Organization Types"
         data={types}
         columns={columns}
         options={options}

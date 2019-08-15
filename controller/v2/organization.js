@@ -150,7 +150,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         const {name} = req.params;
         try {
-            const doc = await Organization.findOneAndDelete({name, groupNumber});
+            const doc = await OrganizationType.findOneAndDelete({name, groupNumber});
             const ops = [];
             if (doc) {
                 doc.organizations.forEach(type => {
