@@ -15,7 +15,7 @@ import {
 import navigation from '../../_nav';
 // routes config
 import routes from '../../routes';
-import UserManager from "../../controller/userManager";
+import {lastUrl, setLastUrl, isLoggedIn, logout} from "../../controller/userManager";
 import CustomSnackbarContent from "../../views/AttCat/components/CustomSnackbarContent";
 import {Snackbar} from "@material-ui/core";
 import {withStyles} from "@material-ui/core/styles";
@@ -38,11 +38,10 @@ class DefaultLayout extends Component {
 
   constructor(props) {
     super(props);
-    this.user = new UserManager(props, this.showMessage);
-    this.user.isLoggedIn()
+    isLoggedIn()
       .then(IsSignedIn => {
         if (!IsSignedIn) {
-          this.user.lastUrl = window.location.hash.replace('#', '');
+          setLastUrl(window.location.hash.replace('#', ''));
           props.history.push('/login');
         }
       })
@@ -56,27 +55,13 @@ class DefaultLayout extends Component {
 
   componentDidMount() {
     // go to the page before login
-    if (this.user.lastUrl) {
-      this.props.history.push(this.user.lastUrl);
-      this.user.lastUrl = null;
+    if (lastUrl) {
+      this.props.history.push(lastUrl);
+      setLastUrl(null);
     }
   }
 
-  // static getDerivedStateFromError(error) {
-  //   return this.state;
-  // }
-
-  // componentDidCatch(error, errorInfo) {
-  //   console.log('catch!' + error);
-  //   this.showMessage(error.toString() + errorInfo.componentStack.toString(), 'error');
-  // }
-
   loading = () => <Loading/>;
-
-  signOut(e) {
-    e.preventDefault();
-    this.user.logout();
-  }
 
   /**
    * Snackbar methods
@@ -129,7 +114,7 @@ class DefaultLayout extends Component {
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)}/>
+            <DefaultHeader onLogout={() => logout()}/>
           </Suspense>
         </AppHeader>
         <div className="app-body">

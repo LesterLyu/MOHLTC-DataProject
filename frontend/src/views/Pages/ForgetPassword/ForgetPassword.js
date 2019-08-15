@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import UserManager from "../../../controller/userManager";
+import {sendPasswordResetEmail} from "../../../controller/userManager";
 import {
   Button,
   Card,
@@ -21,8 +21,6 @@ class ForgetPassword extends Component {
 
   constructor(props) {
     super(props);
-    this.user = new UserManager(props);
-
     this.state = {
       email: '',
       message: '',
@@ -42,7 +40,7 @@ class ForgetPassword extends Component {
   handleSubmit = event => {
     event.preventDefault();
 
-    this.user.sendPasswordResetEmail(this.state.email)
+    sendPasswordResetEmail(this.state.email)
       .then(() => {
         this.setState({message: 'Email sent, please check your email for further action.'});
       })

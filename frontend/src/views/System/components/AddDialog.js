@@ -4,20 +4,10 @@ import {
   DialogActions,
   DialogContent, DialogContentText,
   DialogTitle,
-  Paper,
   TextField
 } from "@material-ui/core";
-import React, {useMemo, useState} from "react";
-import Draggable from "react-draggable";
+import React, {useMemo} from "react";
 import Dropdown from "../../Package/components/Dropdown";
-
-function PaperComponent(props) {
-  return (
-    <Draggable cancel={'[class*="MuiDialogContent-root"]'}>
-      <Paper {...props} />
-    </Draggable>
-  );
-}
 
 export default function AddDialog(props) {
   const {open, onClose, onAdd, title, onChange, values, users} = props;
@@ -31,7 +21,7 @@ export default function AddDialog(props) {
     return managers;
   }, [values.users, users]);
   return (
-    <Dialog open={open} aria-labelledby={title} PaperComponent={PaperComponent} fullWidth>
+    <Dialog open={open} aria-labelledby={title} fullWidth>
       <DialogTitle style={{cursor: 'move'}}>{title}</DialogTitle>
 
       <DialogContent>

@@ -47,7 +47,7 @@
     "mochawesome": "^4.0.0"
   },
   "scripts": {
-    "start": "node app.js",
+    "start": "cross-env NODE_ENV=development node app.js",
     "test": "mocha test/main.js test/users test/ --recursive --exit --check-leaks -R mochawesome",
     "test:david": "nodemon --exec mocha --recursive --timeout 5000 -R min",
     "build": "grunt",

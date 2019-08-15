@@ -4,7 +4,6 @@ import DefaultLayout from './containers/DefaultLayout';
 const Profile = React.lazy(() => import('./views/Profile/Profile' /* webpackChunkName: "profile" */));
 
 const userRequest = React.lazy(() => import("./views/Users/RegistrationRequests" /* webpackChunkName: "registration-requests" */));
-const addOrganization = React.lazy(() => import("./views/Users/AddOrganization" /* webpackChunkName: "add-organization" */));
 
 const Users = React.lazy(() => import('./views/Users/Users' /* webpackChunkName: "users" */));
 const Workbooks = React.lazy(() => import('./views/Workbooks/Workbooks' /* webpackChunkName: "workbooks" */));
@@ -31,7 +30,6 @@ const routes = [
   {path: "/profile", exact:true, name:"My Profile", component:Profile},
 
   {path: "/registrationRequest", exact:true, name:"Registration Request", component:userRequest},
-  {path: "/addOrganization", exact:true, name:"Add Organization", component:addOrganization},
 
   {path: '/users', exact: true, name: 'Users', component: Users},
   {path: '/workbooks/fill', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'user'}},

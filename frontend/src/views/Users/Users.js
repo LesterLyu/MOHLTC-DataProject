@@ -1,6 +1,6 @@
 import React, {Component, Suspense} from 'react';
 import {Badge} from 'reactstrap';
-import UserManager from "../../controller/userManager";
+import {getAllUsers, getAllPermissions, updatePermission} from "../../controller/userManager";
 import {FormControl, InputLabel, Select, Input, Checkbox, MenuItem, ListItemText} from "@material-ui/core";
 
 const MaterialTable = React.lazy(() => import('material-table' /* webpackChunkName: "material-table" */));
@@ -32,7 +32,6 @@ function PermissionSelect(props) {
 class Users extends Component {
   constructor(props) {
     super(props);
-    this.user = new UserManager(props);
     window.users = this;
     /*
      active: true
@@ -50,13 +49,13 @@ class Users extends Component {
       userList: []
     };
 
-    this.user.getAllPermissions()
+    getAllPermissions()
       .then(permissions => {
         this.permissions = permissions;
         //log("get all permissions")
       });
 
-    this.user.getAllUsers()
+    getAllUsers()
       .then(users => {
         this.setState({userList: users});
         console.log(this.state.userList)
@@ -78,7 +77,7 @@ class Users extends Component {
       }
     }
     this.setState({userList});
-    this.user.updatePermission(username, userToUpdate.permissions, userToUpdate.active)
+    updatePermission(username, userToUpdate.permissions, userToUpdate.active)
       .then(response => {
         this.props.showMessage(response.data.message, response.data.success ? 'success' : 'error');
       })

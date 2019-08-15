@@ -1,5 +1,4 @@
 import {
-  makeStyles,
   MuiThemeProvider,
   createMuiTheme
 } from "@material-ui/core";
@@ -9,9 +8,7 @@ import {buildErrorParams} from '../../controller/common';
 import MUIDataTable from "mui-datatables";
 import CustomToolbar from "../AttCat/components/CustomToolbar";
 import AddDialog from './components/AddDialog';
-import UserManager from "../../controller/userManager";
-
-const useStyles = makeStyles(theme => ({}));
+import {getAllUsers} from "../../controller/userManager";
 
 const getMuiTheme = () => createMuiTheme({
   overrides: {
@@ -28,14 +25,12 @@ export default function Organizations(props) {
   const [dialog, setDialog] = useState(false);
   const [dialogData, setDialogData] = useState({name: '', users: [], managers: [], types: []});
   const [users, setUsers] = useState([]);
-  const classes = useStyles();
-  const userManager = new UserManager(props);
 
   useEffect(() => {
     getOrganizations().then(organizations => {
       setOrganizations(organizations)
     });
-    userManager.getAllUsers()
+    getAllUsers()
       .then(data => {
         const users = [];
         data.forEach(user => users.push([user._id, `${user.username} (${user.firstName}, ${user.lastName})`]));
@@ -125,7 +120,7 @@ export default function Organizations(props) {
         <CustomToolbar addClick={openDialog}/>
       );
     },
-  }), [organizations]);
+  }), [organizations, props]);
 
   const renderTable = useMemo(() =>
     <MuiThemeProvider theme={getMuiTheme()}>
