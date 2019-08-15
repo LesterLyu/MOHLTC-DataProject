@@ -14,9 +14,9 @@ before_script:
 services:
   - mongodb
 install:
-  - npm install
-  - cd ./frontend && npm install
+  - yarn install
+  - cd ./frontend && yarn install
   - cd ../
 script:
-  - npm test
-  - cd ./frontend && npm test
+  - yarn test
+  - cd ./frontend && yarn test
