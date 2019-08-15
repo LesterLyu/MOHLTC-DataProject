@@ -1,15 +1,12 @@
 module.exports = function (grunt) {
-    require("load-grunt-tasks")(grunt); // npm install --save-dev load-grunt-tasks
-    grunt.loadNpmTasks('grunt-contrib-watch');
-    grunt.loadNpmTasks('grunt-contrib-concat');
-    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-run');
 
-    let config = {
+    grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+
         copy: {
             main: {
                 files: [
@@ -83,10 +80,7 @@ module.exports = function (grunt) {
             }
         },
 
-
-    };
-
-    grunt.initConfig(config);
+    });
 
     // mkdir for zip archive
     grunt.registerTask("mkdir", function () {
@@ -95,8 +89,6 @@ module.exports = function (grunt) {
         grunt.file.mkdir('build/zip/public/react');
     });
 
-
-    grunt.registerTask("default", ["clean"]);
     grunt.registerTask("prod", ["clean", "run:report", "run:buildFrontend",
         "mkdir", "copy:main", "compress"]);
     grunt.registerTask("aws", ["clean"]);
@@ -106,5 +98,4 @@ module.exports = function (grunt) {
 
     grunt.registerTask("pivotal:publish", ["run:pivotal"]);
     grunt.registerTask("pivotal", ["pivotal:build", "pivotal:publish"]);
-
 };

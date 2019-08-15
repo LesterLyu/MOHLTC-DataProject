@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import UserManager from "../../controller/userManager";
-// import LibraryLoader from "../../controller/LibraryLoader";
 
 const MaterialTable = React.lazy(() =>import('material-table' /* webpackChunkName: "material-table" */));
 
@@ -8,14 +6,9 @@ class RegistrationRequests extends Component {
 
   constructor(props) {
     super(props);
-    this.user = new UserManager(props);  // new object
     this.state = {
       userList: [{username: 'lester1', email: '123123', permissions:"permission1"}]
     };
-
-    this.user.getAllUsers()
-      .then(users => {
-        this.setState({userList: users})});
   }
 
   render() {

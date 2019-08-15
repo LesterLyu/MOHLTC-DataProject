@@ -1,8 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
-import {generateObjectId} from './common';
-
-const axiosConfig = {withCredentials: true};
+import {generateObjectId, check, axiosConfig} from './common';
 
 /**
  * Singleton Pattern
@@ -20,24 +18,11 @@ export default class AttCatManager {
     return instance;
   }
 
-  /**
-   * check if login needed
-   * @param response
-   * @returns {boolean}
-   */
-  check(response) {
-    if (response.headers['content-type'].includes('html')) {
-      this.props.history.push('/login');
-      return false;
-    }
-    return true;
-  };
-
   add(isAttribute, id, name, description) {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.post(config.server + '/api/v2/' + what, {id, name, description}, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       });
@@ -47,7 +32,7 @@ export default class AttCatManager {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.post(config.server + '/api/v2/batch/' + what, {data}, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       });
@@ -62,7 +47,7 @@ export default class AttCatManager {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.get(config.server + '/api/v2/' + what, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           const data = response.data.data;
           const res = [];
           for (let i = 0; i < data.length; i++) {
@@ -81,7 +66,7 @@ export default class AttCatManager {
       withCredentials: axiosConfig.withCredentials
     })
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       })
@@ -91,7 +76,7 @@ export default class AttCatManager {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.post(`${config.server}/api/v2/${what}/assign/group`, data, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       })
@@ -101,7 +86,7 @@ export default class AttCatManager {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.get(`${config.server}/api/v2/${what}/generate/id`, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data.id;
         }
       })
@@ -116,7 +101,7 @@ export default class AttCatManager {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.get(`${config.server}/api/v2/${what}/group`, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       })
@@ -133,7 +118,7 @@ export default class AttCatManager {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.post(`${config.server}/api/v2/${what}/group`, {documents: this._flatTree(tree)}, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       });
@@ -147,7 +132,7 @@ export default class AttCatManager {
     const what = isAttribute ? 'attribute' : 'category';
     return axios.delete(`${config.server}/api/v2/${what}/group/${_id}`, axiosConfig)
       .then(response => {
-        if (this.check(response)) {
+        if (check(response)) {
           return response.data;
         }
       });

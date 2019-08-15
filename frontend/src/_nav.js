@@ -20,7 +20,7 @@ export default {
 
     {
       title: true,
-      name: 'System',
+      name: 'Admin',
     },
     {
       name: 'Workbooks',
@@ -102,6 +102,27 @@ export default {
           name: 'Create Package',
           url: '/admin/packages/create',
           icon: 'mdi mdi-shape-square-plus',
+        },
+      ]
+    },
+    {
+      name: 'System',
+      icon: 'mdi mdi-package-variant',
+      children: [
+        {
+          name: 'Organizations',
+          url: '/admin/organizations',
+          icon: 'mdi mdi-package',
+        },
+        {
+          name: 'Org Types',
+          url: '/admin/orgtypes',
+          icon: 'mdi mdi-shape-square-plus',
+        },
+        {
+          name: 'Group Name',
+          url: '/admin/group',
+          icon: 'mdi mdi-package',
         },
       ]
     },

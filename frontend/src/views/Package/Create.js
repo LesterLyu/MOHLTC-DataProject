@@ -8,7 +8,7 @@ import {
 } from '@material-ui/pickers';
 import Dropdown from "./components/Dropdown";
 import WorkbookManager from "../../controller/workbookManager";
-import UserManager from "../../controller/userManager";
+import {getAllUsers} from "../../controller/userManager";
 import {createPackage} from "../../controller/package"
 
 const useStyles = makeStyles(theme => ({
@@ -29,7 +29,6 @@ const useStyles = makeStyles(theme => ({
 
 export default function CreatePackage(props) {
   const workbookManager = new WorkbookManager(props);
-  const userManager = new UserManager(props);
   const classes = useStyles();
   const [values, setValues] = React.useState({
     name: '',
@@ -56,14 +55,14 @@ export default function CreatePackage(props) {
 
   useEffect(() => {
     if (!values.users) {
-      userManager.getAllUsers()
+      getAllUsers()
         .then(data => {
           const users = [];
           data.forEach(user => users.push([user._id, `${user.username} (${user.firstName}, ${user.lastName})`]));
           setValues({...values, users})
         });
     }
-  }, [values, userManager]);
+  }, [values]);
 
   const handleChange = useCallback((name, value) => {
     setValues(values => ({...values, [name]: value}));

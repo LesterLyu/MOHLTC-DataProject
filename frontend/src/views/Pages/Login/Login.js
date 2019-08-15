@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Link} from 'react-router-dom';
-import UserManager from "../../../controller/userManager";
+import {loginLocal} from "../../../controller/userManager";
 import {TextField, Button, Grid, Card, withStyles, Container} from "@material-ui/core";
 
 const styles = theme => ({
@@ -19,8 +19,6 @@ const styles = theme => ({
 class Login extends Component {
   constructor(props) {
     super(props);
-
-    this.user = new UserManager(props);
 
     this.state = {
       username: '',
@@ -98,7 +96,7 @@ class Login extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    this.user.loginLocal(this.state.username, this.state.password)
+    loginLocal(this.state.username, this.state.password)
       .then(response => {
         console.log('login successfully');
         this.props.history.push('/');

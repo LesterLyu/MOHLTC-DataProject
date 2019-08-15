@@ -5,4 +5,6 @@ module.exports = [
     require('./system'),
     require('./workbook'),
     require('./package'),
+    require('./group'),
+    require('./organization'),
 ];

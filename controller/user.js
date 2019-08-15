@@ -5,9 +5,7 @@ const passport = require('passport');
 const config = require('../config/config'); // get our config file
 const sendMail = require('./sendmail');
 const jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
-const Attribute = require('../models/attribute');
 const passwordValidator = require('password-validator');
-const Category = require('../models/category');
 
 var schema = new passwordValidator();
 

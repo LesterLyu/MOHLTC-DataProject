@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import SystemManager from '../../controller/system'
+import SystemManager from '../../controller/serverInfo'
 import {Grid, Typography, Card, CardContent} from '@material-ui/core';
 import ReactApexChart from 'react-apexcharts';
 import {withStyles} from "@material-ui/core/es";

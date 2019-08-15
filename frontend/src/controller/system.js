@@ -1,52 +1,60 @@
 import axios from "axios";
-import config from "./../config/config";
+import {check, axiosConfig, config} from "./common";
 
-const axiosConfig = {withCredentials: true};
-
-/**
- * Singleton Pattern
- */
-let instance = null;
-
-export default class AttCatManager {
-
-  constructor(props) {
-    if (!instance) {
-      instance = this;
-      // init
-      this.props = props;
-    }
-    return instance;
+export async function getGroupName() {
+  const response = await axios.get(config.server + '/api/v2/group', axiosConfig);
+  if (check(response)) {
+    return response.data.name;
   }
+}
 
-  /**
-   * check if login needed
-   * @param response
-   * @returns {boolean}
-   */
-  check(response) {
-    if (response.headers['content-type'].includes('html')) {
-      this.props.history.push('/login');
-      return false;
-    }
-    return true;
-  };
-
-  systemInfo() {
-    return axios.get(config.server + '/api/v2/system', axiosConfig)
-      .then(response => {
-        if (this.check(response)) {
-          return response.data;
-        }
-      })
+export async function setGroupName(name) {
+  const response = await axios.post(config.server + '/api/v2/group', {name}, axiosConfig);
+  if (check(response)) {
+    return response.data;
   }
+}
 
-  staticSystemInfo() {
-    return axios.get(config.server + '/api/v2/system/static', axiosConfig)
-      .then(response => {
-        if (this.check(response)) {
-          return response.data;
-        }
-      })
+export async function getOrganizations() {
+  const response = await axios.get(config.server + '/api/v2/organizations', axiosConfig);
+  if (check(response)) {
+    return response.data.organizations;
+  }
+}
+
+export async function updateOrganization({name, users, managers, types}) {
+  const response = await axios.post(config.server + '/api/v2/organizations',
+    {name, users, managers, types}, axiosConfig);
+  if (check(response)) {
+    return response.data;
+  }
+}
+
+export async function deleteOrganization(name) {
+  const response = await axios.delete(config.server + '/api/v2/organizations/' + name, axiosConfig);
+  if (check(response)) {
+    return response.data;
+  }
+}
+
+export async function getOrganizationTypes() {
+  const response = await axios.get(config.server + '/api/v2/orgtypes', axiosConfig);
+  if (check(response)) {
+    return response.data.types;
+  }
+}
+
+export async function updateOrganizationTypes({name, organizations}) {
+  const response = await axios.post(config.server + '/api/v2/orgtypes',
+    {name, organizations}, axiosConfig);
+  if (check(response)) {
+    return response.data;
+  }
+}
+
+export async function deleteOrganizationTypes(name) {
+  const response = await axios.delete(config.server + '/api/v2/orgtypes/' + name, axiosConfig);
+  if (check(response)) {
+    return response.data;
   }
 }

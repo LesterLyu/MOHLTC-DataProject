@@ -1,19 +1,16 @@
 language: node_js
 node_js:
-  - "11.10.1"
+  - "stable"
+  - "11"
   - "10"
-  - "9"
-  - "8"
 before_script:
   - export CI=true
 services:
   - mongodb
 install:
-  - npm install
-  - cd ./frontend && npm install
+  - yarn install
+  - cd ./frontend && yarn install
   - cd ../
 script:
-  - npm test
-  - cd ./frontend && npm test
-  - export CI=false
-#  - cd ../ && npm run prod
+  - yarn test
+  - cd ./frontend && yarn test

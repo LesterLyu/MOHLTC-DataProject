@@ -1,8 +1,6 @@
 import axios from "axios";
 import config from "./../config/config";
-import {check} from "./common";
-
-const axiosConfig = {withCredentials: true};
+import {check, axiosConfig} from "./common";
 
 /**
  * @param name

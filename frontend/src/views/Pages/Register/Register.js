@@ -1,7 +1,6 @@
-import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import React, {Component} from 'react';
-import UserManager from "../../../controller/userManager";
+import {signUpLocal} from "../../../controller/userManager";
 
 import {
   Button,
@@ -19,7 +18,6 @@ class Register extends Component {
 
   constructor(props) {
     super(props);
-    this.user = new UserManager(props);
     this.setup = props.params.mode === 'setup';
     this.state = {
       username: '',
@@ -49,7 +47,7 @@ class Register extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    this.user.signUpLocal(this.setup, this.state.username, this.state.password,
+    signUpLocal(this.setup, this.state.username, this.state.password,
       this.state.firstName, this.state.lastName, null, this.state.email, this.state.phoneNumber, this.state.groupNumber)
       .then(response => {
         this.props.history.push(response.data.redirect);

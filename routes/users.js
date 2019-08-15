@@ -5,9 +5,14 @@ const config = require('../config/config');
 const user_controller = require('../controller/user');
 const registration_local_controller = require('../controller/registration/local');
 const registration_ldap_controller = require('../controller/registration/ldap');
+const {groupController} = require('../controller/v2');
 let router = express.Router();
 
 passport.use(new LdapStrategy(config.OPTS));
+
+// registrations related
+router.get('api/v2/groups', groupController.getGroups);
+router.get('api/v2/groups/:number', groupController.getOrganizationsInGroup);
 
 router.get('/api/check/email/:email', user_controller.check_email);
 router.get('/api/check/username/:username', user_controller.check_username);
@@ -63,29 +68,6 @@ router.get('/api/logout', user_controller.user_log_out);
 
 // GET send account verification email
 router.get('/api/send-validation-email', user_controller.user_send_validation_email);
-
-// validate page (ask you to check your email)
-router.get('/validate-now', function (req, res, next) {
-    // check if the user is validated
-    user_controller.get_user(req.session.user.username, (err, user) => {
-        if (err) {
-            return next(err);
-        }
-        if (user.validated) {
-            user_controller.logout(req);
-            return res.redirect('/login');
-        }
-        res.render('tobevalidated.ejs', {user: req.session.user});
-    })
-});
-
-// check account validation middleware
-router.use((req, res, next) => {
-    if (!req.session.user.validated) {
-        return res.redirect('/validate-now');
-    }
-    next();
-});
 
 router.get('/api/profile', user_controller.get_profile);
 

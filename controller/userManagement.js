@@ -1,7 +1,5 @@
 const User = require('../models/user');
-const Organization = require('../models/organization');
 const RegisterRequest = require('../models/registerRequest');
-const passport = require('passport');
 const sendMail = require('./sendmail');
 const jwt = require('jsonwebtoken');
 const registration_ldap_controller = require('./registration/ldap');
@@ -29,23 +27,6 @@ function generateToken(username, expireTime) {
         expiresIn: expireTime * 60
     });
 }
-
-function update_organization() {
-    Organization.find({}, function(err, organizations){
-        if (err)
-            console.log(err);
-
-        if (organizations) {
-            for (var i = 0; i < organizations.length; i++) {
-                config.organizations.push(organizations[i].name);
-                if (organizations[i].groupNumber > config.maxGroupNumber) {
-                    config.maxGroupNumber = organizations[i].groupNumber;
-                }
-            }
-        }
-    });
-}
-update_organization();
 
 module.exports = {
     checkPermission: checkPermission,
@@ -174,44 +155,7 @@ module.exports = {
                     });
                 });
             });
-
-
-
-
-
-
         }
-    },
-
-
-
-    create_organization: (req, res, next)=> {
-        if (!checkPermission(req)) {
-            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        }
-
-        const organization = req.body.organization;
-        if (organization === '') {
-            return res.status(400).json({success: false, message: 'Organization cannot be empty.'});
-        } else if (organization in config.organizations) {
-            return res.status(400).json({success: false, message: 'Organization ' + organization.name + ' exists.'});
-        } else {
-            var groupNum = config.maxGroupNumber + 1;
-            let newOrganization = new Organization({
-                groupNumber: groupNum,
-                name: req.body.organization,
-            });
-            newOrganization.save((err, updatedOrganization) => {
-                if (err) {
-                    console.log(err);
-                    return next(err);
-                }
-                config.maxGroupNumber += 1;
-                config.organizations.push(organization);
-                return res.json({success: true, message: 'Organization ' + updatedOrganization.name + ' has been added'})
-            });
-        }
-
     },
 
     admin_get_all_users_with_details: (req, res, next) => {

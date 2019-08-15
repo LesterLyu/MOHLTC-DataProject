@@ -2,8 +2,6 @@ const express = require('express');
 const user_management_controller = require('../controller/userManagement');
 let router = express.Router();
 
-const error = require('../config/error');
-
 // Add permission
 /**
  * Request:
@@ -50,32 +48,7 @@ router.get('/api/user/registerInfo', user_management_controller.user_register_de
 
 router.get('/api/permissions', user_management_controller.admin_get_all_permissions);
 
-router.get('/user/management', (req, res, next) => {
-    if (user_management_controller.checkPermission(req)) {
-        res.render('sidebar/userManagement.ejs', {user: req.session.user});
-    }
-    else {
-        res.status(403).render('error.ejs', error.NO_PERMISSION)
-    }
-});
-
-router.post('/api/create-organization', user_management_controller.create_organization);
-
 router.post('/api/user/register_management', user_management_controller.register_management);
-
-router.get('/user/create_organization', (req, res, next) => {
-    res.render('sidebar/createOrganization.ejs');
-});
-
-
-router.get('/user/register_management', (req, res, next) => {
-    if (user_management_controller.checkPermission(req)) {
-        res.render('sidebar/registerManagement.ejs', {user: req.session.user});
-    }
-    else {
-        res.status(403).render('error.ejs', error.NO_PERMISSION)
-    }
-});
 
 module.exports = router;
 
