@@ -94,7 +94,7 @@ module.exports = {
         }
         const groupNumber = req.session.user.groupNumber;
         try {
-            const types = await OrganizationType.find({groupNumber});
+            const types = await OrganizationType.find({groupNumber}).populate('organizations');
             return res.json({types});
         } catch (e) {
             next(e);

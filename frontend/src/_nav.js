@@ -116,7 +116,7 @@ export default {
         },
         {
           name: 'Org Types',
-          url: '/admin/organizations/add',
+          url: '/admin/orgtypes',
           icon: 'mdi mdi-shape-square-plus',
         },
         {

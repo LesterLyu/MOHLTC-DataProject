@@ -1,13 +1,10 @@
-import {
-  MuiThemeProvider,
-  createMuiTheme
-} from "@material-ui/core";
+import {MuiThemeProvider, createMuiTheme, makeStyles, Typography} from "@material-ui/core";
 import React, {useEffect, useState, useMemo} from "react";
-import {getOrganizations, updateOrganization, deleteOrganization} from '../../controller/system';
+import {getOrganizations, updateOrganization, deleteOrganization, getOrganizationTypes} from '../../controller/system';
 import {buildErrorParams} from '../../controller/common';
 import MUIDataTable from "mui-datatables";
 import CustomToolbar from "../AttCat/components/CustomToolbar";
-import AddDialog from './components/AddDialog';
+import OrgAddDialog from './components/OrgAddDialog';
 import {getAllUsers} from "../../controller/userManager";
 
 const getMuiTheme = () => createMuiTheme({
@@ -20,16 +17,33 @@ const getMuiTheme = () => createMuiTheme({
   }
 });
 
+
+const useStyles = makeStyles(theme => ({
+  name: {
+    color: theme.palette.primary.dark,
+    fontWeight: 500,
+    '&:hover': {
+      textDecoration: 'underline',
+      cursor: 'pointer',
+      color: theme.palette.primary.A200,
+    }
+  },
+}));
+
+
 export default function Organizations(props) {
   const [organizations, setOrganizations] = useState([]);
+  const [types, setTypes] = useState([]);
   const [dialog, setDialog] = useState(false);
-  const [dialogData, setDialogData] = useState({name: '', users: [], managers: [], types: []});
+  const [dialogData, setDialogData] = useState({name: '', users: [], managers: [], types: [], edit: false});
   const [users, setUsers] = useState([]);
+  const classes = useStyles();
 
   useEffect(() => {
     getOrganizations().then(organizations => {
       setOrganizations(organizations)
     });
+    getOrganizationTypes().then(types => setTypes(types.map(type => [type._id, type.name])));
     getAllUsers()
       .then(data => {
         const users = [];
@@ -39,7 +53,18 @@ export default function Organizations(props) {
   }, []);
 
   const closeDialog = () => setDialog(false);
-  const openDialog = () => setDialog(true);
+  const openDialog = () => {
+    setDialogData({name: '', users: [], managers: [], types: [], edit: false});
+    setDialog(true);
+  };
+  const openEditDialog = (name, tableMeta) => () => {
+    let [name, users, managers, types] = tableMeta.rowData;
+    users = users.map(user => user._id);
+    managers = managers.map(manager => manager._id);
+    types = types.map(type => type._id);
+    setDialogData({name, users, managers, types, edit: true});
+    setDialog(true);
+  };
   const onChangeDialog = name => e => {
     if (name === 'name') {
       setDialogData({...dialogData, name: e.target.value});
@@ -74,6 +99,11 @@ export default function Organizations(props) {
     {
       name: 'name',
       label: 'Organizations',
+      options: {
+        customBodyRender: (name, tableMeta, updateValue) => {
+          return <Typography className={classes.name} onClick={openEditDialog(name, tableMeta)}>{name}</Typography>
+        }
+      }
     },
     {
       name: 'users',
@@ -99,8 +129,15 @@ export default function Organizations(props) {
     },
     {
       name: 'types',
-      label: 'Types'
-    }], []);
+      label: 'Organization Types',
+      options: {
+        customBodyRender: (types, tableMeta, updateValue) => {
+          const names = [];
+          if (Array.isArray(types)) types.forEach(type => names.push(type.name));
+          return names.join(', ');
+        },
+      }
+    }], [classes]);
 
   const options = useMemo(() => ({
     print: false,
@@ -135,14 +172,14 @@ export default function Organizations(props) {
   return (
     <>
       {renderTable}
-      <AddDialog
-        title="Add Organization"
+      <OrgAddDialog
         open={dialog}
         values={dialogData}
         onChange={onChangeDialog}
         onClose={closeDialog}
         onAdd={handleAdd}
         users={users}
+        types={types}
       />
     </>
   )
