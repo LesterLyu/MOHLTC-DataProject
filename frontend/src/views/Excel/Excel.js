@@ -264,12 +264,32 @@ class Excel extends Component {
 
   showEditor = (rowIndex, columnIndex, style, typed) => {
     const cell = this.sheet.getCell(rowIndex, columnIndex);
+    const panes = cell.sheet().panes();
+    let freezeRowCount = 0, freezeColumnCount = 0,
+      top = this.outerRef.current.offsetTop - this.sheetContainerRef.current.state.scrollTop + style.top,
+      left = this.outerRef.current.offsetLeft - this.sheetContainerRef.current.state.scrollLeft + style.left;
+    if (panes && panes.state === 'frozen') {
+      // fix positions.
+      freezeRowCount = panes.ySplit;
+      freezeColumnCount = panes.xSplit;
+
+      if (rowIndex <= freezeRowCount && columnIndex <= freezeColumnCount) {
+        // top-left
+        left += this.sheetContainerRef.current.state.scrollLeft;
+        top += this.sheetContainerRef.current.state.scrollTop;
+      } else if (rowIndex <= freezeRowCount && columnIndex > freezeColumnCount) {
+        // top-right
+        top += this.sheetContainerRef.current.state.scrollTop;
+      } else if (rowIndex > freezeRowCount && columnIndex <= freezeColumnCount) {
+        // bottom-left
+        top += parseFloat(this.outerRef.current.previousSibling.style.height);
+        left += this.sheetContainerRef.current.state.scrollLeft;
+      }
+    }
+
     this.editor.prepare(cell, style, typed);
     this.setState({
-      openEditor: {
-        top: this.outerRef.current.offsetTop - this.sheetContainerRef.current.state.scrollTop + style.top,
-        left: this.outerRef.current.offsetLeft - this.sheetContainerRef.current.state.scrollLeft + style.left,
-      }, editorCell: cell
+      openEditor: {top, left}, editorCell: cell
     });
   };
 
