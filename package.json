@@ -26,9 +26,6 @@
     "worker-threads-pool": "^2.0.0",
     "workerpool": "^3.1.2"
   },
-  "engine": {
-    "node": "12"
-  },
   "devDependencies": {
     "@types/chai": "^4.1.7",
     "@types/express": "^4.17.0",
@@ -70,8 +67,5 @@
   "bugs": {
     "url": "https://github.com/LesterLyu/MOHLTC-DataProject/issues"
   },
-  "homepage": "https://github.com/LesterLyu/MOHLTC-DataProject#readme",
-  "engines": {
-    "node": "12.x"
-  }
+  "homepage": "https://github.com/LesterLyu/MOHLTC-DataProject#readme"
 }
