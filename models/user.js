@@ -9,7 +9,7 @@ let userSchema = new mongoose.Schema({
     createDate: {type: Date, default: Date.now},
     phoneNumber: String,
     organization: String,
-    validated: Boolean,
+    validated: {type: Boolean, default: false},
     // type: {type: Number, required: true}, // system admin=0, form manager=1, user=2
     email: {type: String, unique: true},
     groupNumber: Number,
