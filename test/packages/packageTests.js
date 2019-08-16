@@ -7,7 +7,7 @@ const User = require('../../models/user');
 const Package = require('../../models/package/package');
 const Workbook = require('../../models/workbook/workbook');
 
-describe('CRUD package', function () {
+describe.skip('CRUD package', function () {
     let oneUserName, oneUserId, onePackageName;
     let workbookIds = [];
     let newPackageName = 'new package';
