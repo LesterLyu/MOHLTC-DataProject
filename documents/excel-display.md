@@ -1,8 +1,10 @@
 # Excel Display
 ### Libraries
- - Table: [HandsonTable CE](https://handsontable.com/)
- - Tabs: Bootstrap native [nav-tab](https://getbootstrap.com/docs/4.1/components/navs/#tabs)
- - [Formula Parser](https://github.com/Subtletree/formula-parser) (buggy, needs highly customization)
+ - Table: Handbuild with Material-UI & [react-window](https://github.com/LesterLyu/react-window)
+ - Tabs: Material-UI Tabs
+ - Formula Parser: [fast-formula-parser (handbuild)](https://github.com/LesterLyu/fast-formula-parser)
+ - Excel Library: [xlsx-populate  (handbuild)](https://github.com/LesterLyu/xlsx-populate)
+ - [Spreadsheet Formatting](https://github.com/LesterLyu/fast-formula-parser/blob/master/ssf/ssf.js)
 
 ## Colors
 Colors in font, border, tabs, etc...
@@ -24,7 +26,7 @@ Colors in font, border, tabs, etc...
     - top, middle, bottom, left, center, right
  - [X] Fonts
  - [X] Font size
- - [X] Almost other font styles...
+ - [X] Almost all other font styles...
 
 ## Borders
 #### Supported
@@ -38,26 +40,15 @@ Colors in font, border, tabs, etc...
  - [ ] All other styles
  
 ## Formulas
-A buggy library.
-#### Native Library Support
-  * Any numbers, negative and positive as float or integer;
-  * Arithmetic operations like `+`, `-`, `/`, `*`, `%`, `^`;
-  * Logical operations like `AND()`, `OR()`, `NOT()`, `XOR()`;
-  * Comparison operations like `=`, `>`, `>=`, `<`, `<=`, `<>`;
-  * All JavaScript Math constants like `PI()`, `E()`, `LN10()`, `LN2()`, `LOG10E()`, `LOG2E()`, `SQRT1_2()`, `SQRT2()`;
-  * String operations like `&` (concatenation eq. `parser.parse('-(2&5)');` will return `-25`);
-  * All excel formulas defined in [These formulas](https://github.com/Subtletree/formula-parser/blob/develop/src/supported-formulas.js) 
-  * Relative and absolute cell coordinates like `A1`, `$A1`, `A$1`, `$A$1`;
-  * Build-in variables like `TRUE`, `FALSE`, `NULL`
-  * Custom variables;
-  
+A handbuild library.
+
 #### Supported
   - [X] Cell, sheet reference
   - [X] re-evaluate upon other value changes
   
 ## Richtext
-  - [X] fully supported
+  - [X] fully supported (readonly)
 
 ## Data validation
-  - [X] list data validation
+  - [X] list data validation (readonly)
 
