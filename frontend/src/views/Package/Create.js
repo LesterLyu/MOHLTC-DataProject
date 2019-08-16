@@ -7,9 +7,9 @@ import {
   KeyboardDateTimePicker
 } from '@material-ui/pickers';
 import Dropdown from "./components/Dropdown";
-import WorkbookManager from "../../controller/workbookManager";
-import {getAllUsers} from "../../controller/userManager";
+import {getAllWorkbooksForAdmin} from "../../controller/workbookManager";
 import {createPackage} from "../../controller/package"
+import {getOrganizationTypes} from "../../controller/system"
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -28,7 +28,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function CreatePackage(props) {
-  const workbookManager = new WorkbookManager(props);
   const classes = useStyles();
   const [values, setValues] = React.useState({
     name: '',
@@ -36,33 +35,27 @@ export default function CreatePackage(props) {
     startDate: Date.now(),
     endDate: Date.now(),
     workbooks: null,
-    users: null,
+    orgTypes: null,
+    originalTypes: null,
     selectedWorkbooks: [],
-    selectedUsers: [],
+    selectedOrgTypes: [],
     published: false,
   });
 
   useEffect(() => {
-    if (!values.workbooks) {
-      workbookManager.getAllWorkbooksForAdmin()
-        .then(data => {
-          const workbooks = [];
-          data.forEach(workbook => workbooks.push([workbook._id, workbook.name]));
-          setValues({...values, workbooks})
-        });
-    }
-  }, [values, workbookManager]);
-
-  useEffect(() => {
-    if (!values.users) {
-      getAllUsers()
-        .then(data => {
-          const users = [];
-          data.forEach(user => users.push([user._id, `${user.username} (${user.firstName}, ${user.lastName})`]));
-          setValues({...values, users})
-        });
-    }
-  }, [values]);
+    getAllWorkbooksForAdmin()
+      .then(data => {
+        const workbooks = [];
+        data.forEach(workbook => workbooks.push([workbook._id, workbook.name]));
+        setValues(values => ({...values, workbooks}))
+      });
+    getOrganizationTypes()
+      .then(data => {
+        const types = [];
+        data.forEach(type => types.push([type._id, type.name]));
+        setValues(values => ({...values, orgTypes: types, originalTypes: data}))
+      });
+  }, []);
 
   const handleChange = useCallback((name, value) => {
     setValues(values => ({...values, [name]: value}));
@@ -75,13 +68,23 @@ export default function CreatePackage(props) {
   }, []);
 
   const handleSave = useCallback(async () => {
+    const orgIds = new Set();
+    for (const selectedTypeId of values.selectedOrgTypes) {
+      for (const type of values.originalTypes) {
+        if (type._id === selectedTypeId) {
+          for (const org of type.organizations) {
+            orgIds.add(org._id);
+          }
+        }
+      }
+    }
     try {
       const data = await createPackage({
         name: values.name,
         startDate: values.startDate,
         endDate: values.endDate,
         workbookIds: values.selectedWorkbooks,
-        userIds: values.selectedUsers,
+        orgIds: [...orgIds],
         adminNotes: values.adminNotes,
         published: values.published,
       });
@@ -119,11 +122,12 @@ export default function CreatePackage(props) {
 
   const renderDropdown = useMemo(() => (
     <>
-      <Dropdown title="Users" options={values.users} onChange={data => handleChange('selectedUsers', data)}/>
+      <Dropdown title="Organization Types" options={values.orgTypes}
+                onChange={data => handleChange('selectedOrgTypes', data)}/>
       <Dropdown title="Workbooks" options={values.workbooks}
                 onChange={data => handleChange('selectedWorkbooks', data)}/>
     </>
-  ), [values.users, values.workbooks, handleChange]);
+  ), [values.orgTypes, values.workbooks, handleChange]);
 
   return (
     <Paper className={classes.container}>
@@ -147,11 +151,11 @@ export default function CreatePackage(props) {
       {renderDates}
       {renderDropdown}
       <FormControlLabel style={{width: '100%'}}
-        control={
-          <Checkbox checked={values.published} color="primary"
-                    onChange={e => handleChange('published', e.target.checked)}/>
-        }
-        label="Publish"
+                        control={
+                          <Checkbox checked={values.published} color="primary"
+                                    onChange={e => handleChange('published', e.target.checked)}/>
+                        }
+                        label="Publish"
       />
       <Button onClick={handleSave} color="primary" variant="contained">
         Save

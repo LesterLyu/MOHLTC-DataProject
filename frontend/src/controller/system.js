@@ -15,8 +15,9 @@ export async function setGroupName(name) {
   }
 }
 
-export async function getOrganizations() {
-  const response = await axios.get(config.server + '/api/v2/organizations', axiosConfig);
+export async function getOrganizations(simplified) {
+  const response = await axios.get(config.server + '/api/v2/organizations' + (simplified ? '/simplified' : ''),
+    axiosConfig);
   if (check(response)) {
     return response.data.organizations;
   }

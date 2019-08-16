@@ -12,10 +12,10 @@ import {check, axiosConfig} from "./common";
  * @param published
  * @return {Promise}
  */
-export async function createPackage({name, userIds, workbookIds, startDate, endDate, adminNotes, published}) {
+export async function createPackage({name, orgIds, workbookIds, startDate, endDate, adminNotes, published}) {
   const response = await axios.post(config.server + '/api/v2/admin/packages', {
     name,
-    userIds,
+    orgIds,
     workbookIds,
     startDate,
     endDate,
