@@ -43,7 +43,9 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         const currentUserId = req.session.user._id;
         try {
-            const packages = await Package.find({groupNumber, users: currentUserId});
+            let organizations = await Organization.find({users: currentUserId}, '_id');
+            organizations = organizations.map(org => org._id);
+            const packages = await Package.find({groupNumber, organizations: {$in: organizations}});
             return res.json({success: true, packages});
         } catch (e) {
             next(e);
