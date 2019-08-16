@@ -183,7 +183,7 @@ class AttCat extends Component {
 
     const options = {
       filter: false,
-      selectableRows: true,
+      selectableRows: 'multiple',
       responsive: "scroll",
       rowsPerPage: 10,
       customToolbar: () => {

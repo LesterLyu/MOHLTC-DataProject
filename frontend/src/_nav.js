@@ -23,32 +23,34 @@ export default {
       name: 'Admin',
     },
     {
-      name: 'Workbooks',
-      icon: 'mdi mdi-checkbook',
+      name: 'Template',
+      icon: 'mdi mdi-note-multiple',
       children: [
         {
-          name: 'All Workbooks',
+          name: 'All Templates',
           url: '/workbooks/template',
-          icon: 'mdi mdi-book-multiple',
-          badge: {
-            variant: 'info',
-            text: '✓',
-          },
+          icon: 'mdi mdi-table-large',
         },
         {
-          name: 'Create Workbook',
+          name: 'Create Template',
           url: '/workbooks/create',
-          icon: 'mdi mdi-folder-plus-outline',
+          icon: 'mdi mdi-table-large-plus',
         },
+      ]
+    },
+    {
+      name: 'Att & Cat',
+      icon: 'mdi mdi-buffer',
+      children: [
         {
           name: 'Attributes',
           url: '/workbooks/attributes',
-          icon: 'mdi mdi-checkbook',
+          icon: 'mdi mdi-table-column',
         },
         {
           name: 'Categories',
           url: '/workbooks/categories',
-          icon: 'mdi mdi-checkbook',
+          icon: 'mdi mdi-table-row',
         },
         {
           name: 'Attribute Group',
@@ -65,7 +67,6 @@ export default {
           url: '/import/id',
           icon: 'mdi mdi-application-import',
         },
-
       ]
     },
     {
@@ -83,9 +84,14 @@ export default {
           icon: 'mdi mdi-account',
         },
         {
-          name: 'Add Organization',
-          url: '/addOrganization',
-          icon: 'mdi mdi-playlist-check',
+          name: 'Organizations',
+          url: '/admin/organizations',
+          icon: 'mdi mdi-account-group',
+        },
+        {
+          name: 'Org Types',
+          url: '/admin/orgtypes',
+          icon: 'mdi mdi-account-network',
         },
       ]
     },
@@ -107,58 +113,26 @@ export default {
     },
     {
       name: 'System',
-      icon: 'mdi mdi-package-variant',
+      icon: 'mdi mdi-settings',
       children: [
-        {
-          name: 'Organizations',
-          url: '/admin/organizations',
-          icon: 'mdi mdi-package',
-        },
-        {
-          name: 'Org Types',
-          url: '/admin/orgtypes',
-          icon: 'mdi mdi-shape-square-plus',
-        },
         {
           name: 'Group Name',
           url: '/admin/group',
-          icon: 'mdi mdi-package',
+          icon: 'mdi mdi-rename-box',
         },
-      ]
-    },
-    {
-      name: 'Server',
-      icon: 'mdi mdi-server',
-      children: [
         {
           name: 'Server Info',
           url: '/system',
           icon: 'mdi mdi-information',
         },
         {
-          name: 'Configuration',
-          url: '/rergr3',
-          icon: 'mdi mdi-account',
-        },
-        {
           name: 'Last Auto-test Report',
           url: config.server + '/test/mochawesome.html',
           icon: 'mdi mdi-alert-octagon',
+          variant: 'success',
           attributes: {target: '_blank'}
         },
       ]
-    },
-    {
-      name: 'Test',
-      url: '/workbooks/template2/2018-19%20CAPS%20LHIN%20Managed%20BLANK%20V1.xlsm',
-      icon: 'mdi mdi-account',
-    },
-    {
-      name: 'Update History',
-      url: 'https://github.com/LesterLyu/MOHLTC-DataProject/blob/dev-lester/documents/update-history.md',
-      icon: 'icon-cloud-download',
-      class: 'mt-auto',
-      attributes: {target: '_blank', rel: "noopener"},
     },
   ],
 
