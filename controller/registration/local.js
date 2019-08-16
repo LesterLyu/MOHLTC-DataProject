@@ -56,6 +56,7 @@ module.exports = {
                     lastName: req.body.lastName,
                     groupNumber: req.body.groupNumber,
                     phoneNumber: req.body.phoneNumber,
+                    organization: req.body.organization,
                     // FIXME: delete permissions when deploying
                     permissions: req.body.permissions,
                     validated: req.body.validated || false,

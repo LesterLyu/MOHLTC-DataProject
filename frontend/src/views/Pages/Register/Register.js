@@ -31,7 +31,8 @@ class Register extends Component {
       phoneNumber: "",
       groupNumber: 1,
       groups: [{groupNumber: 1, name: 'xxxx'}],
-      oragnization: {},
+      organization: 'organization01',
+      organizations: ['organization01', 'organization02'],
 
       isServerErrormessage: false,
       ServerErrormessage: null,
@@ -53,8 +54,8 @@ class Register extends Component {
 
   }
 
-  initialGroups =  () => {
-    getAllGroups().then( (dbGroups) =>{
+  initialGroups = () => {
+    getAllGroups().then((dbGroups) => {
       this.setState({
         groups: dbGroups
       });
@@ -65,7 +66,7 @@ class Register extends Component {
   handleSubmit = event => {
     event.preventDefault();
     signUpLocal(this.setup, this.state.username, this.state.password,
-      this.state.firstName, this.state.lastName, null, this.state.email, this.state.phoneNumber, this.state.groupNumber)
+      this.state.firstName, this.state.lastName,  this.state.organization, this.state.email, this.state.phoneNumber, this.state.groupNumber)
       .then(response => {
         this.props.history.push(response.data.redirect);
       })
@@ -104,7 +105,6 @@ class Register extends Component {
   };
 
   validateUsername = () => {
-
 
 
     // local validate
@@ -391,6 +391,21 @@ class Register extends Component {
                       ))}
                     </TextField>
 
+                    <TextField
+                      select
+                      label="Organization"
+                      value={this.state.organization}
+                      onChange={this.handleChange('organization')}
+                      margin="normal"
+                      fullWidth
+                    >
+                      {this.state.organizations.map(option => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
 
                     <br/>
                     <Button
@@ -418,6 +433,7 @@ class Register extends Component {
         </Container>
       </div>
     );
-  }}
+  }
+}
 
 export default Register;
