@@ -40,6 +40,17 @@ module.exports = {
         }
     },
 
+    createGroup: async (req, res, next) => {
+        const {groupNumber, name} =req.body;
+        try {
+            const group = new Group({groupNumber, name});
+            const result = await  group.save();
+            return res.json({result})
+        } catch (e) {
+            next(e);
+        }
+    },
+
     // no login required, used for registration
     getOrganizationsInGroup: async (req, res, next) => {
         const groupNumber = req.params.number;
