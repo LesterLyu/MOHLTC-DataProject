@@ -24,6 +24,19 @@ export async function checkEmail(email) {
 }
 
 /**
+ * Get all groups from database.
+ */
+export async function getAllGroups() {
+  const urlStr = config.server + '/api/v2/groups';
+  try {
+    const result = await axios.get(urlStr);
+    return result.data.groups;
+  } catch (e) {
+    return {groupNumber: -1, name: 'wrong', err: e};
+  }
+}
+
+/**
  * Check if the user is logged in, result will go to call back function.
  * Available to use right after the web page refreshes, to check if there is a user logged in.
  */
