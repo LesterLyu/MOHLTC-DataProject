@@ -91,7 +91,7 @@ npm install passport-ldapauth
  "lastName":"will",
  "groupNumber":1,
  "phoneNumber":"1111111",
- "validated":true,
+ "validated":false,
  "email":"767089351@qq.com",
  "createDate":"2018-12-03T22:30:47.164Z",
  "salt":"802b625022571c1f2d77692ea16a3460690372d896ddd38c4dbdf0a698b8b5c1",

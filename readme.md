@@ -31,7 +31,7 @@ let userSchema = new mongoose.Schema({
     lastName: String,
     createDate: {type: Date, default: Date.now},
     phoneNumber: String,
-    validated: Boolean,  // once the user verified the account, validated->true
+    validated: {type: Boolean, default: false},  // If the administrator approve the account, validated->true otherwise false
     type: {type: Number, required: true}, // system admin=0, form manager=1, user=2
     email: {type: String, unique: true}, // has to be unique
     groupNumber: Number,  // group number represents different organizations, each organization does not share any data with others

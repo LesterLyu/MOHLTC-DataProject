@@ -58,13 +58,13 @@ module.exports = {
                     phoneNumber: req.body.phoneNumber,
                     // FIXME: delete permissions when deploying
                     permissions: req.body.permissions,
-                    validated: false,
+                    validated: req.body.validated || false,
                     type: 2, // system admin=0, form manager=1, user=2
                     email: req.body.email,
                 });
-                if (config.disableEmailValidation) {
-                    newUser.validated = true;
-                }
+                // if (config.disableEmailValidation) {
+                //     newUser.validated = true;
+                // }
                 User.register(newUser, req.body.password, (err, user) => {
                     if (err) {
                         console.log(err);

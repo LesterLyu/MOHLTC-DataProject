@@ -122,7 +122,7 @@ module.exports = {
                     groupNumber: user.groupNumber,
                     organization: user.organization,
                     phoneNumber: user.phoneNumber,
-                    validated: true,
+                    validated: req.body.validated || false,
                     type: 2, // system admin=0, form manager=1, user=2
                     email: user.email,
                     permissions: permissions
