@@ -5,69 +5,53 @@ const {agent} = require('../config');
 
 const User = require('../../models/user');
 
-describe.skip("Update a user's status. Used to disable or enable an account.", function() {
-    const oneUsername = 'lester';
+describe("Update a user's status. Used to disable or enable an account.", function () {
+    const oneUsername = 'test';
     const oneEmail = 'lester@mail.com';
-    const onePassword = 'lester';
+    const onePassword = 'test';
     const oneActiveValue = true;
 
     const secondUsername = 'lester02';
     const secondEmail = 'lester02@mail.com';
 
-    before(done => {
-        User.remove({}, () => {});
-        // Sign up a new user
-        agent
-            .post('/api/signup/local')
+    before(async () => {
+        await User.remove({name: secondUsername}, () => {
+        });
+        await agent
+            .post('/api/login/local')
             .send({
                 username: oneUsername,
-                email: oneEmail,
-                password: onePassword,
-                active: oneActiveValue,
-                permissions: [
-                    'CRUD-workbook-template',
-                    'system-management',
-                    'workbook-query',
-                    'create-delete-attribute-category',
-                    'user-management'
-                ]
+                password: onePassword
             })
             .then(res => {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                // Login
-                agent
-                    .post('/api/login/local')
-                    .send({
-                        username: oneUsername,
-                        password: onePassword
-                    })
-                    .then(res => {
-                        expect(res).to.have.status(200);
-                        expect(res.body.success).to.be.true;
-                        done();
-                    })
-                    .catch(function(err) {
-                        throw err;
-                    });
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 throw err;
             });
         // Sing up the second user
-        agent
+        await agent
             .post('/api/signup/local')
             .send({
                 username: secondUsername,
                 email: secondEmail,
                 password: onePassword,
-                active: true
+                active: false,
+                validated: false,
+                permissions: [
+                    'CRUD-workbook-template',
+                    'system-management',
+                    'workbook-query',
+                    'create-delete-attribute-category',
+                    'user-management',
+                    'package-management'],
             })
             .then(res => {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 throw err;
             });
     });
@@ -77,7 +61,8 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
         const urlStr = '/api/users/' + secondUsername + '/active/';
         agent
             .get(urlStr)
-            .then(function(res) {
+            .then(function (res) {
+                console.log(res);
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
                 expect(res.body.message).to.deep.include(
@@ -85,9 +70,17 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
                 );
                 done();
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 throw err;
             });
+    });
+
+    it('Put - set validated as true', async () => {
+        this.timeout(10000);
+        const res = await agent.put('/api/users/validated/' + secondUsername);
+        expect(res).to.have.status(200);
+        expect(res.body.success).to.be.true;
+        console.log(res.body);
     });
 
     it("Update a user's status: active - true ", done => {
@@ -97,7 +90,7 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
         agent
             .put(urlStr)
             .send({active: activeValue})
-            .then(function(res) {
+            .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
                 expect(res.body.message).to.deep.include(
@@ -105,7 +98,7 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
                 );
                 done();
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 throw err;
             });
     });
@@ -117,7 +110,7 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
         agent
             .put(urlStr)
             .send({active: activeValue})
-            .then(function(res) {
+            .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
                 expect(res.body.message).to.deep.include(
@@ -125,7 +118,7 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
                 );
                 done();
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 throw err;
             });
     });
@@ -138,7 +131,7 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
         agent
             .put(urlStr)
             .send({active: activeValue})
-            .then(function(res) {
+            .then(function (res) {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
                 expect(res.body.message).to.deep.include(
@@ -146,7 +139,7 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
                 );
                 done();
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 throw err;
             });
     });
@@ -159,13 +152,13 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
         agent
             .put(urlStr)
             .send({active: activeValue})
-            .then(function(res) {
+            .then(function (res) {
                 expect(res).to.have.status(400);
                 expect(res.body.success).to.be.false;
                 expect(res.body.message.errors).not.to.be.null;
                 done();
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 throw err;
             });
     });
@@ -179,14 +172,15 @@ describe.skip("Update a user's status. Used to disable or enable an account.", f
         agent
             .put(urlStr)
             .send({active: activeValue})
-            .then(function(res) {
+            .then(function (res) {
                 expect(res).to.have.status(500);
                 expect(res.body.success).to.be.false;
                 expect(res.body.message.errors).not.to.be.null;
                 done();
             })
-            .catch(function(err) {
+            .catch(function (err) {
                 throw err;
             });
     });
-});
+})
+;

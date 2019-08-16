@@ -2,6 +2,8 @@ const express = require('express');
 const user_management_controller = require('../controller/userManagement');
 let router = express.Router();
 
+const User = require('../models/user');
+
 // Add permission
 /**
  * Request:
@@ -49,6 +51,8 @@ router.get('/api/user/registerInfo', user_management_controller.user_register_de
 router.get('/api/permissions', user_management_controller.admin_get_all_permissions);
 
 router.post('/api/user/register_management', user_management_controller.register_management);
+
+router.put('/api/users/validated/:username', user_management_controller.set_validated_is_true);
 
 module.exports = router;
 

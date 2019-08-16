@@ -1,5 +1,5 @@
 import axios from "axios";
-import {config, check, axiosConfig} from "./common";
+import {axiosConfig, check, config} from "./common";
 
 export let lastUrl = null;
 
@@ -34,6 +34,21 @@ export async function getAllGroups() {
   } catch (e) {
     return {groupNumber: -1, name: 'wrong', err: e};
   }
+}
+
+export async function getAllRequestUsers() {
+  let results = [];
+  try {
+    const users = await getAllUsers();
+    results = users.filter((u) => u.validated === false);
+  } catch (e) {
+    throw e;
+  }
+  return results;
+}
+
+export async function switcheUserValidate(user) {
+  await axios.put('/api/users/validated/' + user.username);
 }
 
 /**

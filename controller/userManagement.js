@@ -55,8 +55,10 @@ module.exports = {
 
             // add to promise chain
             promiseArr.push(new Promise((resolve, reject) => {
-                User.findOneAndUpdate({username: username}, {permissions: filteredPermissions,
-                    active: permission[i].active})
+                User.findOneAndUpdate({username: username}, {
+                    permissions: filteredPermissions,
+                    active: permission[i].active
+                })
                     .then(result => resolve())
                     .catch(err => {
                         console.log(err);
@@ -127,7 +129,7 @@ module.exports = {
                     email: user.email,
                     permissions: permissions
                 });
-             //   var temporaryPassword = Math.random().toString(36).slice(-8);
+                //   var temporaryPassword = Math.random().toString(36).slice(-8);
                 User.register(newUser, user.password, (err, user) => {
                     if (err) {
                         console.log(err);
@@ -135,7 +137,7 @@ module.exports = {
                     }
                     console.log('success register');
                     sendMail.sendRegisterSuccessEmail(user.email, user.password, (info) => {
-                        RegisterRequest.findOneAndDelete({username: username}, function(err) {
+                        RegisterRequest.findOneAndDelete({username: username}, function (err) {
                             if (err) {
                                 return res.status(501).json({success: false, message: err});
                             }
@@ -147,7 +149,7 @@ module.exports = {
         } else {
             RegisterRequest.findOne({username: username}, (err, user) => {
                 sendMail.sendRegisterFailEmail(user.email, (info) => {
-                    RegisterRequest.findOneAndDelete({username: username}, function(err) {
+                    RegisterRequest.findOneAndDelete({username: username}, function (err) {
                         if (err) {
                             return res.status(501).json({success: false, message: err});
                         }
@@ -157,6 +159,30 @@ module.exports = {
             });
         }
     },
+
+    set_validated_is_true: async (req, res, next) => {
+        if (!checkPermission(req)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        if (!req.params.username) {
+            return res.status(4000).json({success: false, message: 'user name can not be empty!'})
+        }
+        try {
+            const filter = {
+                username: req.params.username,
+                groupNumber: req.session.user.groupNumber
+            };
+            const update = {validated: true};
+            const result = await User.findOneAndUpdate(filter, update, {
+                new: true
+            });
+            return res.status(200).json({success: true, message: 'updated!', user: result});
+        } catch (e) {
+            next(e);
+        }
+
+    },
+
 
     admin_get_all_users_with_details: (req, res, next) => {
         if (!checkPermission(req)) {
@@ -188,12 +214,12 @@ module.exports = {
         if (!checkPermission(req)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-        User.deleteOne({username:req.body.username}, (err) => {
+        User.deleteOne({username: req.body.username}, (err) => {
             if (err) {
                 return res.status(500).json({success: false, message: err});
             }
             return res.json({success: true, message: "The user " + req.body.username + " has been deleted!"});
         });
-},
+    },
 
 };

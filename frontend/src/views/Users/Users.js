@@ -129,7 +129,7 @@ class Users extends Component {
                   render: rowData => {
                     return (<Badge
                       // color={rowData.validated === true ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
-                      color={rowData.active === true ? 'success' : 'danger'}>{rowData.active ? 'active' : 'not active'}</Badge>)
+                      color={rowData.active === true ? 'success' : 'danger'}>{rowData.active ? 'active' : 'inactive'}</Badge>)
                   }
                 }
               ]}
