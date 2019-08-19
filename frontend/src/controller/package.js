@@ -37,7 +37,7 @@ export async function adminGetPackages() {
 export async function adminGetPackage(packageName) {
   const response = await axios.get(config.server + '/api/v2/admin/packages/' + packageName, axiosConfig);
   if (check(response)) {
-    return response.data;
+    return response.data.package;
   }
 }
 
@@ -58,6 +58,13 @@ export async function userGetPackages() {
 export async function userGetPackage(packageName) {
   const response = await axios.get(config.server + '/api/v2/packages/' + packageName, axiosConfig);
   if (check(response)) {
-    return response.data;
+    return response.data.package;
+  }
+}
+
+export async function userSaveWorkbook(packageName, workbookName, data) {
+  const response = await axios.put(config.server + `/api/v2/packages/${packageName}/${workbookName}`, data, axiosConfig);
+  if (check(response)) {
+    return response;
   }
 }

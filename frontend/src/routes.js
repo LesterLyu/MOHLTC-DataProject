@@ -18,6 +18,7 @@ const ImportId = React.lazy(() => import('./views/Tools/Import' /* webpackChunkN
 
 const CreatePackage = React.lazy(() => import('./views/Package/Create' /* webpackChunkName: "createPackage" */));
 const Packages = React.lazy(() => import('./views/Package/Packages' /* webpackChunkName: "Packages" */));
+const PackageView = React.lazy(() => import('./views/Package/PackageView' /* webpackChunkName: "PackageView" */));
 
 const GroupName = React.lazy(() => import('./views/System/GroupName' /* webpackChunkName: "GroupName" */));
 const Organizations = React.lazy(() => import('./views/System/Organizations' /* webpackChunkName: "Organizations" */));
@@ -51,6 +52,11 @@ const routes = [
   {path: '/admin/packages/create', exact: true, name: 'Create Package', component: CreatePackage},
   {path: '/admin/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'admin'}},
   {path: '/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'user'}},
+
+  {path: '/admin/packages/:name', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'admin'}},
+  {path: '/packages/:name', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'user'}},
+
+  {path: '/packages/:packageName/:name', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'user'}},
 
   {path: '/admin/group', exact: true, name: 'Set Group Name', component: GroupName},
   {path: '/admin/organizations', exact: true, name: 'Organizations', component: Organizations},

@@ -371,10 +371,9 @@ class Excel extends Component {
             loadingMessage: '', loaded: true
           });
         })
-    }
-    if (this.mode === 'user edit') {
-      const {name} = this.props.match.params;
-      this.excelManager.readWorkbookFromDatabase(name, false)
+    } else if (this.mode === 'user') {
+      const {name, packageName} = this.props.match.params;
+      this.excelManager.readWorkbookFromDatabase(name, packageName, false)
         .then(data => {
           if (!data) return;
           const {workbook, fileName} = data;
@@ -475,7 +474,7 @@ class Excel extends Component {
           {this.common()}
         </div>
       );
-    } else if (this.mode === 'user edit') {
+    } else if (this.mode === 'user') {
       return (
         <div className="animated fadeIn">
           <Card xs={12}>

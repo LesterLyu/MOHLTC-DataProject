@@ -1,6 +1,5 @@
 const Workbook = require('../../models/workbook/workbook');
 const Sheet = require('../../models/workbook/sheet');
-const Value = require('../../models/workbook/value');
 const {checkPermission, Permission} = require('./helpers');
 const error = require('../../config/error');
 const mongoose = require('mongoose');
@@ -112,36 +111,6 @@ module.exports = {
             const workbook = await Workbook.findOne({name, groupNumber}, 'name file');
             if (!workbook) return next({status: 400, message: 'Workbook does not exist.'});
             return res.json({success: true, workbook});
-        } catch (e) {
-            next(e);
-        }
-    },
-
-    getWorkbook: async (req, res, next) => {
-        const name = req.params.name;
-        const groupNumber = req.session.user.groupNumber;
-        try {
-            const workbook = await Workbook.findOne({name, groupNumber}).populate('sheets').exec();
-            if (!workbook) return res.status(400).json({success: false, message: 'Workbook does not exist.'});
-            const populate = [];
-            let values = (await Value.findOne({groupNumber}));
-            values = values ? values.data : {};
-            workbook.sheets.forEach((sheet, idx) => {
-                if (!sheet.row2Cat || !sheet.col2Att) return;
-                const rows = populate[idx] = {};
-                for (let row in sheet.row2Cat) {
-                    const catId = sheet.row2Cat[row];
-                    if (!values[catId]) continue;
-                    if (!rows[row]) rows[row] = {};
-                    for (let col in sheet.col2Att) {
-                        const attId = sheet.col2Att[col];
-                        if (values[catId][attId] == null) continue;
-                        rows[row][col] = values[catId][attId];
-                    }
-                }
-            });
-            workbook.sheets = undefined;
-            return res.json({success: true, workbook, populate});
         } catch (e) {
             next(e);
         }

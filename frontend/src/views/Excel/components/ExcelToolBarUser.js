@@ -44,6 +44,7 @@ class ExcelToolBar extends Component {
   };
 
   uploadWorkbook = () => {
+    // TODO: validate uploaded workbook
     this.excel.excelManager.readWorkbookLocal((workbook) => {
       console.log(workbook);
       this.excel.workbook = workbook;
@@ -52,6 +53,7 @@ class ExcelToolBar extends Component {
       this.excel.renderCurrentSheet();
     })
   };
+
   saveWorkbook = () => {
     this.excel.excelManager.saveWorkbookUser(this.excel.workbook);
   };
