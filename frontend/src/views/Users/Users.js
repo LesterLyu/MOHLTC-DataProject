@@ -1,6 +1,12 @@
 import React, {Component, Suspense} from 'react';
 import {Badge} from 'reactstrap';
-import {getAllUsers, getAllPermissions, updatePermission} from "../../controller/userManager";
+import {
+  getAllUsers,
+  getAllPermissions,
+  updatePermission,
+  switchUserValidate,
+  switchUserActive
+} from "../../controller/userManager";
 import {FormControl, InputLabel, Select, Input, Checkbox, MenuItem, ListItemText} from "@material-ui/core";
 
 const MaterialTable = React.lazy(() => import('material-table' /* webpackChunkName: "material-table" */));
@@ -63,6 +69,8 @@ class Users extends Component {
       .catch(err => {
         this.props.showMessage(err.response.data.message, 'error');
       })
+
+
   }
 
   onPermissionChange = username => (event) => {
@@ -85,6 +93,42 @@ class Users extends Component {
         this.props.showMessage(err.response.data.message, 'error');
       })
   };
+
+
+  //FIXME: delete this function when developing
+  clickActiveButton = async (username, active) => {
+    try {
+      switchUserActive(username, !active)
+        .then((res) => {
+          getAllUsers()
+            .then(users => {
+              this.setState({userList: users});
+              this.props.showMessage(username + '\'s active is changed.', 'success');
+            })
+            .catch(err => {
+              this.props.showMessage(err.response.data.message, 'error');
+            })
+        });
+    } catch (e) {
+      this.props.showMessage(e.response.data.message, 'error');
+    }
+  };
+
+  //FIXME: delete this function when developing
+  clickValidatedButton = async (username, validated) => {
+    switchUserValidate(username, !validated)
+      .then((res) => {
+        getAllUsers()
+          .then(users => {
+            this.setState({userList: users});
+            this.props.showMessage(username + '\'s validated is changed.', 'success');
+          })
+          .catch(err => {
+            this.props.showMessage(err.response.data.message, 'error');
+          })
+      });
+  };
+
 
   render() {
 
@@ -124,10 +168,23 @@ class Users extends Component {
                   }
                 },
                 {
-                  title: 'status', field: 'disabled',
+                  // title: 'status', field: 'disabled',
+                  title: 'active', field: 'active',
                   render: rowData => {
                     return (<Badge
-                      color={rowData.validated === true ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
+                      // color={rowData.validated === true ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
+                      onClick={() => this.clickActiveButton(rowData.username, rowData.active)}
+                      color={rowData.active === true ? 'success' : 'danger'}>{rowData.active ? 'active' : 'inactive'}</Badge>)
+                  }
+                },
+                {
+                  // title: 'status', field: 'disabled',
+                  title: 'validated', field: 'validated',
+                  render: rowData => {
+                    return (<Badge
+                      // color={rowData.validated === true ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
+                      onClick={() => this.clickValidatedButton(rowData.username, rowData.validated)}
+                      color={rowData.validated === true ? 'success' : 'danger'}>{rowData.validated ? 'validated' : 'Invalidated'}</Badge>)
                   }
                 }
               ]}

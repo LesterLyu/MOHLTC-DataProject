@@ -7,6 +7,13 @@ import {check, axiosConfig} from "./common";
  */
 let instance = null;
 
+export async function getAllWorkbooksForAdmin() {
+  const response = await axios.get(config.server + '/api/v2/admin/workbooks', axiosConfig);
+  if (check(response)) {
+    return response.data.workbooks;
+  }
+}
+
 class WorkbookManager {
 
   constructor(props) {

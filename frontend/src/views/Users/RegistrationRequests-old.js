@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
 import {Badge} from "reactstrap";
 import Button from "@material-ui/core/Button";
+import DialogActions from "@material-ui/core/DialogActions";
+import {checkEmail, getAllGroups} from "../../controller/userManager";
 
-import {getAllRequestUsers, switchUserValidate} from "../../controller/userManager.js";
+import {getAllRequestUsers, switcheUserValidate} from "../../controller/userManager.js";
 
 const MaterialTable = React.lazy(() => import('material-table' /* webpackChunkName: "material-table" */));
 
@@ -28,28 +30,27 @@ class RegistrationRequests extends Component {
       this.setState({
         userList: dbUsers
       });
+      console.log('inside initial request users');
       console.table(dbUsers);
     })
   };
 
-
   clickApproveButton = (username) => {
-    console.log('inside clickApproveButton -----' + username);
-    switchUserValidate(username, true)
+    console.log('inside onclick approve button');
+    switcheUserValidate(null)
       .then(() => {
         this.initialRequestUsers();
       });
   };
 
   render() {
+
     const userList = this.state.userList;
 
     return (
       <div className="animated fadeIn">
         <div style={{maxWidth: '100%'}}>
           <MaterialTable
-            data={userList}
-            title="Registration Request"
             columns={[
               {title: 'username', field: 'username'},
               {title: 'email', field: 'email'},
@@ -65,10 +66,18 @@ class RegistrationRequests extends Component {
               {
                 title: 'Execute',
                 render: rowData => {
-                  return (<Button onClick={ () => this.clickApproveButton(rowData.username)}>Approve</Button>)
+                  return (<Button
+                    color="primary"
+                    variant="outlined"
+                    onClick={this.clickApproveButton(rowData.username)}
+                    block
+                  >{rowData.validated ? 'Disapprove' : 'Approve'}</Button>)
                 }
               },
             ]}
+
+            data={userList}
+            title="Registration Request"
           />
         </div>
       </div>

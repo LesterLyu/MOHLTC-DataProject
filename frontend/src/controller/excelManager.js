@@ -20,7 +20,7 @@ class WorkbookManager {
   }
 
   getWorkbook(name, admin) {
-    const url = admin ? '/api/v2/workbook/' : '/api/v2/user/filled/';
+    const url = admin ? '/api/v2/admin/workbook/' : '/api/v2/user/filled/';
     return axios.get(config.server + url + name, axiosConfig)
       .then(response => {
         console.log(response);
@@ -38,22 +38,24 @@ class WorkbookManager {
   async readWorkbookFromDatabase(fileName, admin = true) {
     try {
       const response = await this.getWorkbook(fileName, admin);
-      const {populate, workbook} = response.data;
+      const {workbook, populate = {}} = response.data;
       const {file, name} = workbook;
       const wb = await XlsxPopulate.fromDataAsync(file, {base64: true});
-      // populate data
-      for (let i in populate) {
-        const sheet = wb.sheets()[i];
-        const rows = populate[i];
-        for (let rowNum in rows) {
-          rowNum = Number(rowNum);
-          const cols = rows[rowNum];
-          const row = sheet.row(rowNum + 1);
-          for (let colNum in cols) {
-            colNum = Number(colNum);
-            const cell = row.cell(colNum + 1);
-            // only populate the basic values (not formula nor rich text)
-            if (!(cell instanceof RichText)) cell._value = cols[colNum];
+      if (!admin) {
+        // populate data
+        for (let i in populate) {
+          const sheet = wb.sheets()[i];
+          const rows = populate[i];
+          for (let rowNum in rows) {
+            rowNum = Number(rowNum);
+            const cols = rows[rowNum];
+            const row = sheet.row(rowNum + 1);
+            for (let colNum in cols) {
+              colNum = Number(colNum);
+              const cell = row.cell(colNum + 1);
+              // only populate the basic values (not formula nor rich text)
+              if (!(cell instanceof RichText)) cell._value = cols[colNum];
+            }
           }
         }
       }
@@ -115,53 +117,7 @@ class WorkbookManager {
     const fileName = excelInstance.state.fileName;
     workbook.outputAsync('base64')
       .then(base64 => {
-        this.testSave(workbook, fileName, base64);
-        const workbookData = {}, attMap = {}, catMap = {};
-        workbook.sheets().forEach((sheet, sheetNo) => {
-          workbookData[sheetNo] = {};
-          attMap[sheetNo] = {};
-          catMap[sheetNo] = {};
-          sheet._rows.forEach((row, rowNumber) => {
-            // check attribute
-            if (admin && rowNumber === 1) {
-              row._cells.forEach((cell, colNumber) => {
-                if (/^[0-9]*$/.test(cell.value())) {
-                  attMap[sheetNo][cell.value()] = colNumber - 1;
-                }
-              })
-            }
-            // process each row
-            workbookData[sheetNo][rowNumber - 1] = {};
-            row._cells.forEach((cell, colNumber) => {
-              // check category
-              if (admin && colNumber === 1) {
-                if (/^[0-9]*$/.test(cell.value())) {
-                  catMap[sheetNo][cell.value()] = rowNumber - 1;
-                }
-              }
-              // skip empty cell, rich text,
-              if (cell.value() === undefined || cell.value() === null || cell.value() instanceof XlsxPopulate.RichText) {
-                return;
-              }
-              workbookData[sheetNo][rowNumber - 1][colNumber - 1] = cell.value();
-            });
-            // after each row
-            if (Object.keys(workbookData[sheetNo][rowNumber - 1]).length === 0) {
-              delete workbookData[sheetNo][rowNumber - 1];
-            }
-          });
-        });
-
-        console.log(workbookData, attMap, catMap, fileName);
-        if (admin) {
-          return axios.post(config.server + '/api/v2/admin/workbook', {
-            attMap, catMap, base64, name: fileName
-          }, axiosConfig);
-        } else {
-          return axios.post(config.server + '/api/v2/user/workbook', {
-            data: workbookData, base64, name: fileName
-          }, axiosConfig);
-        }
+        return this.testSave(workbook, fileName, base64);
       })
       .then(response => {
         this.props.showMessage(response.data.message, response.data.success ? 'success' : 'error');
@@ -223,7 +179,7 @@ class WorkbookManager {
       sheetData.catIds = Object.values(row2Cat);
     });
     console.log(data);
-    await axios.post(config.server + '/api/v2/test/admin/workbook', data, axiosConfig);
+    return await axios.post(config.server + '/api/v2/admin/workbook', data, axiosConfig);
   }
 }
 

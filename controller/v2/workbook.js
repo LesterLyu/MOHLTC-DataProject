@@ -50,6 +50,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         const {workbook, values, sheets} = req.body;
         workbook.sheets = [];
+        workbook.values = values;
         for (let i = 0; i < sheets.length; i++) {
             const objectId = mongoose.Types.ObjectId();
             workbook.sheets.push(objectId);
@@ -77,27 +78,40 @@ module.exports = {
             });
             const sheetResult = await Sheet.bulkWrite(sheetOp);
 
-            let doc = await Value.findOne({groupNumber});
-            if (!doc)
-                doc = new Value({groupNumber, data: {}});
-            if (!doc.data)
-                doc.data = {};
-            const data = doc.data;
-            for (let catId in values) {
-                const atts = values[catId];
-                if (Object.keys(atts).length === 0) continue;
-                if (!data[catId]) data[catId] = {};
-                for (let attId in atts) {
-                    data[catId][attId] = atts[attId];
-                }
-            }
-            doc.markModified('data');
-            await doc.save();
+            // let doc = await Value.findOne({groupNumber});
+            // if (!doc)
+            //     doc = new Value({groupNumber, data: {}});
+            // if (!doc.data)
+            //     doc.data = {};
+            // const data = doc.data;
+            // for (let catId in values) {
+            //     const atts = values[catId];
+            //     if (Object.keys(atts).length === 0) continue;
+            //     if (!data[catId]) data[catId] = {};
+            //     for (let attId in atts) {
+            //         data[catId][attId] = atts[attId];
+            //     }
+            // }
+            // doc.markModified('data');
+            // await doc.save();
 
             return res.json({
-                success: true, message: oldWorkbook ? 'Workbook updated.' : 'Workbook created',
+                success: true, message: oldWorkbook ? `Workbook (${workbook.name}) updated.`
+                    : `Workbook (${workbook.name}) created.`,
                 sheet: sheetResult
             });
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    adminGetWorkbook: async (req, res, next) => {
+        const name = req.params.name;
+        const groupNumber = req.session.user.groupNumber;
+        try {
+            const workbook = await Workbook.findOne({name, groupNumber}, 'name file');
+            if (!workbook) return next({status: 400, message: 'Workbook does not exist.'});
+            return res.json({success: true, workbook});
         } catch (e) {
             next(e);
         }

@@ -18,7 +18,7 @@ export default function OrgAddDialog(props) {
     <Dialog open={open} aria-labelledby={title} fullWidth>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <InputLabel>Organization Name</InputLabel>
+        <InputLabel>Organization Type</InputLabel>
         <TextField
           type="text" value={values.name} onChange={onChange('name')} fullWidth
           InputLabelProps={{shrink: true}} autoFocus style={{paddingBottom: 10}}/>

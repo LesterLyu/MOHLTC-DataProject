@@ -8,14 +8,6 @@ module.exports = mongoose.model('Sheet',
         catIds: [Number], // Category.id
 
         /**
-         {
-             id: option,
-             id: option,
-         }
-         */
-        headers: {},
-
-        /**
          * {
          *     attId: column number, // attribute ID to column number
          *     ...

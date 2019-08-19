@@ -10,7 +10,12 @@ module.exports = {
         }
         const groupNumber = req.session.user.groupNumber;
         try {
-            const organizations = await Organization.find({groupNumber}).populate('users managers types');
+            let organizations;
+            if (req.params.mode === 'simplified') {
+                organizations = await Organization.find({groupNumber}, 'name')
+            } else {
+                organizations = await Organization.find({groupNumber}).populate('users managers types');
+            }
             return res.json({organizations});
         } catch (e) {
             next(e);
@@ -150,7 +155,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         const {name} = req.params;
         try {
-            const doc = await Organization.findOneAndDelete({name, groupNumber});
+            const doc = await OrganizationType.findOneAndDelete({name, groupNumber});
             const ops = [];
             if (doc) {
                 doc.organizations.forEach(type => {

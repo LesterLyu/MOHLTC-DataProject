@@ -9,6 +9,7 @@ const requester = config.requester;
 const User = require('../../models/user');
 
 describe('Local Authentication', function () {
+    this.timeout(10000);
     before((done) => {
         // remove all users
         User.remove({}, () => {
@@ -16,8 +17,6 @@ describe('Local Authentication', function () {
         })
     });
     it('register an account to local server', (done) => {
-		this.timeout(10000);
-
         requester.post('/api/signup/local')
             .send({
                 username: 'test',

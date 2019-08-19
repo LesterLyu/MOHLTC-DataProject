@@ -1,6 +1,7 @@
 import Typography from '@material-ui/core/Typography';
 import React, {Component} from 'react';
 import {signUpLocal} from "../../../controller/userManager";
+import {checkUsername, checkEmail, getAllGroups} from "../../../controller/userManager.js";
 
 import {
   Button,
@@ -12,9 +13,10 @@ import {
   Row
 } from 'reactstrap';
 import {Link} from "react-router-dom";
-import {TextField} from '@material-ui/core';
+import {TextField, MenuItem} from '@material-ui/core';
 
 class Register extends Component {
+
 
   constructor(props) {
     super(props);
@@ -28,6 +30,9 @@ class Register extends Component {
       repeatPassword: '',
       phoneNumber: "",
       groupNumber: 1,
+      groups: [{groupNumber: 1, name: 'xxxx'}],
+      organization: 'organization01',
+      organizations: ['organization01', 'organization02'],
 
       isServerErrormessage: false,
       ServerErrormessage: null,
@@ -43,12 +48,25 @@ class Register extends Component {
       isGroupNumberError: false,
       groupNumberErrorMessage: '',
     };
+
+
+    this.initialGroups();
+
   }
+
+  initialGroups = () => {
+    getAllGroups().then((dbGroups) => {
+      this.setState({
+        groups: dbGroups
+      });
+      console.table(dbGroups);
+    })
+  };
 
   handleSubmit = event => {
     event.preventDefault();
     signUpLocal(this.setup, this.state.username, this.state.password,
-      this.state.firstName, this.state.lastName, null, this.state.email, this.state.phoneNumber, this.state.groupNumber)
+      this.state.firstName, this.state.lastName,  this.state.organization, this.state.email, this.state.phoneNumber, this.state.groupNumber)
       .then(response => {
         this.props.history.push(response.data.redirect);
       })
@@ -86,13 +104,15 @@ class Register extends Component {
       })
   };
 
-
   validateUsername = () => {
+
+
     // local validate
     const username = this.state.username;
     if (username.length >= 1 && username.length <= 20) {
       // validate in back-end
-      this.user.checkUsername(username).then((response) => {
+      console.log('checking username');
+      checkUsername(username).then((response) => {
         const serverMessage = response.data.message;
         if (serverMessage) {
           this.setState({
@@ -122,7 +142,7 @@ class Register extends Component {
     const email = this.state.email;
     if (email !== '@ontario.ca' && email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)) {
       // validate in back-end
-      this.user.checkEmail(email).then((response) => {
+      checkEmail(email).then((response) => {
         const serverMessage = response.data.message;
         if (serverMessage) {
           this.setState({
@@ -168,6 +188,7 @@ class Register extends Component {
     }
 
   };
+
   validateRepeatPassword = () => {
     if (this.state.password === this.state.repeatPassword) {
       this.setState({
@@ -211,7 +232,6 @@ class Register extends Component {
       this.state.isGroupNumberError
   }
 
-
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value
@@ -247,7 +267,6 @@ class Register extends Component {
       });
     }
   };
-
 
   render() {
     return (
@@ -356,6 +375,36 @@ class Register extends Component {
                       error={this.state.isGroupNumberError}
                       helperText={this.state.groupNumberErrorMessage}
                     />
+
+                    <TextField
+                      select
+                      label="Group Name"
+                      value={this.state.groupNumber}
+                      onChange={this.handleChange('groupNumber')}
+                      margin="normal"
+                      fullWidth
+                    >
+                      {this.state.groups.map(option => (
+                        <MenuItem key={option.groupNumber} value={option.groupNumber}>
+                          {option.name}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+
+                    <TextField
+                      select
+                      label="Organization"
+                      value={this.state.organization}
+                      onChange={this.handleChange('organization')}
+                      margin="normal"
+                      fullWidth
+                    >
+                      {this.state.organizations.map(option => (
+                        <MenuItem key={option} value={option}>
+                          {option}
+                        </MenuItem>
+                      ))}
+                    </TextField>
 
 
                     <br/>
