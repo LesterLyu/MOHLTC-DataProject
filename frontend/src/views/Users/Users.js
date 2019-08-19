@@ -8,6 +8,7 @@ import {
   switchUserActive
 } from "../../controller/userManager";
 import {FormControl, InputLabel, Select, Input, Checkbox, MenuItem, ListItemText} from "@material-ui/core";
+import {buildErrorParams} from "../../controller/common";
 
 const MaterialTable = React.lazy(() => import('material-table' /* webpackChunkName: "material-table" */));
 
@@ -118,15 +119,13 @@ class Users extends Component {
   clickValidatedButton = async (username, validated) => {
     switchUserValidate(username, !validated)
       .then((res) => {
-        getAllUsers()
+        return getAllUsers()
           .then(users => {
             this.setState({userList: users});
             this.props.showMessage(username + '\'s validated is changed.', 'success');
           })
-          .catch(err => {
-            this.props.showMessage(err.response.data.message, 'error');
-          })
-      });
+      })
+      .catch(e => this.props.showMessage(...buildErrorParams(e)))
   };
 
 
