@@ -28,12 +28,14 @@ export async function checkEmail(email) {
  */
 export async function getAllGroups() {
   const urlStr = config.server + '/api/v2/groups';
-  try {
-    const result = await axios.get(urlStr);
-    return result.data.groups;
-  } catch (e) {
-    return {groupNumber: -1, name: 'wrong', err: e};
-  }
+  const result = await axios.get(urlStr);
+  return result.data.groups;
+}
+
+export async function getAllOrganizations(groupNumber) {
+  const urlStr = config.server + '/api/v2/groups/' + groupNumber;
+  const result = await axios.get(urlStr);
+  return result.data.organizations;
 }
 
 export async function getAllRequestUsers() {
