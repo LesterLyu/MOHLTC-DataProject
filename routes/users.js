@@ -60,9 +60,12 @@ router.use((req, res, next) => {
 });
 
 // Update a user's status. Used to disable or enable an account.
-router.get('/api/users/:username/active/', user_controller.check_user_active);
+router.get('/api/users/:username/active', user_controller.check_user_active);
 // Update a user's status. Used to disable or enable an account.
-router.put('/api/users/:username/active/', user_controller.edit_user_active);
+router.put('/api/users/:username/active', user_controller.edit_user_active);
+router.put('/api/users/active/:username', user_controller.edit_user_active);
+
+router.put('/api/users/validated/:username', user_controller.edit_validated);
 
 // GET log out current account
 router.get('/api/logout', user_controller.user_log_out);
