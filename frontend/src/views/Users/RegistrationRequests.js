@@ -4,7 +4,10 @@ import Button from "@material-ui/core/Button";
 
 import {getAllRequestUsers, switchUserValidate} from "../../controller/userManager.js";
 
+import {buildErrorParams} from "../../controller/common";
+
 const MaterialTable = React.lazy(() => import('material-table' /* webpackChunkName: "material-table" */));
+
 
 class RegistrationRequests extends Component {
 
@@ -33,12 +36,13 @@ class RegistrationRequests extends Component {
   };
 
 
-  clickApproveButton = (username) => {
-    console.log('inside clickApproveButton -----' + username);
-    switchUserValidate(username, true)
+  clickApproveButton = (user) => {
+    console.log('inside clickApproveButton -----' + user);
+    switchUserValidate(user, true)
       .then(() => {
         this.initialRequestUsers();
-      });
+      })
+      .catch(e => this.props.showMessage(...buildErrorParams(e)))
   };
 
   render() {
@@ -65,7 +69,7 @@ class RegistrationRequests extends Component {
               {
                 title: 'Execute',
                 render: rowData => {
-                  return (<Button onClick={ () => this.clickApproveButton(rowData.username)}>Approve</Button>)
+                  return (<Button onClick={() => this.clickApproveButton(rowData)}>Approve</Button>)
                 }
               },
             ]}

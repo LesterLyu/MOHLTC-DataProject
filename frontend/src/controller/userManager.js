@@ -56,12 +56,9 @@ export async function switchUserActive(username, activeValue) {
   }
 }
 
-export async function switchUserValidate(username, validatedValue) {
-  try {
-    return await axios.put(config.server + '/api/users/validated/' + username, {validated: validatedValue}, axiosConfig);
-  } catch (e) {
-    throw e;
-  }
+export async function switchUserValidate(user, validatedValue) {
+  await axios.post(config.server + '/api/v2/organization/' + user.organization + '/' + user._id, {}, axiosConfig);
+  await axios.put(config.server + '/api/users/validated/' + user.username, {validated: validatedValue}, axiosConfig);
 }
 
 /**

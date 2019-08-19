@@ -93,6 +93,23 @@ module.exports = {
         }
     },
 
+    // Delete an organization for current group
+    OrgAddOneUser: async (req, res, next) => {
+        if (!checkPermission(req, Permission.SYSTEM_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const {name, userId} = req.params;
+        try {
+            const doc = await Organization.findOne({name, groupNumber});
+            doc.users.push(userId);
+            await doc.save();
+            return res.json({message: `User added to ${name}`});
+        } catch (e) {
+            next(e);
+        }
+    },
+
     getOrganizationTypes: async (req, res, next) => {
         if (!checkPermission(req, Permission.SYSTEM_MANAGEMENT)) {
             return next(error.api.NO_PERMISSION);
