@@ -43,7 +43,7 @@ export default function CreatePackage(props) {
       list.push(
         <Grid key={i} item>
           <PackageCard type="package" fileName={name} deleteCb={params.mode === 'admin' ? openDialog : undefined}
-                       editHref={'/packages/admin/' + name}/>
+                       editHref={params.mode === 'admin' ? '/admin/packages/' + name : '/packages/' + name}/>
         </Grid>
       )
     }

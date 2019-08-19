@@ -7,6 +7,23 @@ const {Organization} = require('../../models/organization');
 const Workbook = require('../../models/workbook/workbook');
 const mongoose = require('mongoose');
 
+async function userGetPackageAndWorkbook(next, currentUserId, groupNumber, packageName, name) {
+    // find package
+    let organizations = await Organization.find({users: currentUserId}, '_id');
+    organizations = organizations.map(org => org._id);
+    const pack = await Package.findOne({
+        groupNumber, name: packageName, organizations: {$in: organizations},
+    }).populate({path: 'workbooks', select: 'name'});
+    if (!pack) return next({status: 400, message: `Package (${packageName}) does not exist.`});
+    let workbook;
+    if (name) {
+        // find workbook that matches the name
+        workbook = pack.workbooks.find(wb => wb.name === name);
+        if (!workbook) return next({status: 400, message: 'Workbook does not exist.'});
+    }
+    return {workbook, pack, organizations};
+}
+
 module.exports = {
     /**
      * Admin gets a single package.
@@ -18,9 +35,25 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         const name = req.params.name; // package name
         try {
-            const pack = await Package.findOne({groupNumber, name}).populate('workbooks');
+            const pack = await Package.findOne({groupNumber, name}).populate({
+                path: 'workbooks',
+                select: 'name'
+            });
             if (!pack) return next({status: 400, message: `Package (${name}) does not exist.`});
             res.json({success: true, package: pack})
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    userGetPackage: async (req, res, next) => {
+        const groupNumber = req.session.user.groupNumber;
+        const currentUserId = req.session.user._id;
+        const name = req.params.name; // package name
+        try {
+            const result = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, name);
+            if (!result) return;
+            res.json({success: true, package: result.pack})
         } catch (e) {
             next(e);
         }
@@ -159,5 +192,75 @@ module.exports = {
         } catch (e) {
             next(e);
         }
+    },
+
+    userGetWorkbook: async (req, res, next) => {
+        const {packageName, name} = req.params;
+        const groupNumber = req.session.user.groupNumber;
+        const currentUserId = req.session.user._id;
+        try {
+            const result = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, packageName, name);
+            if (!result) return;
+            let {workbook, organizations} = result;
+            workbook = await Workbook.findById(workbook._id, 'file name roAtts roCats').populate('sheets');
+            const populate = [];
+            let values = await PackageValue.findOne({groupNumber, organization: organizations[0]});
+            values = values ? values.values : {};
+            workbook.sheets.forEach((sheet, idx) => {
+                if (!sheet.row2Cat || !sheet.col2Att) return;
+                const rows = populate[idx] = {};
+                for (let row in sheet.row2Cat) {
+                    const catId = sheet.row2Cat[row];
+                    if (!values[catId]) continue;
+                    if (!rows[row]) rows[row] = {};
+                    for (let col in sheet.col2Att) {
+                        const attId = sheet.col2Att[col];
+                        if (values[catId][attId] == null) continue;
+                        rows[row][col] = values[catId][attId];
+                    }
+                }
+            });
+            workbook.sheets = undefined;
+            return res.json({success: true, workbook, populate});
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    userSaveWorkbook: async (req, res, next) => {
+        const {packageName, name} = req.params;
+        const groupNumber = req.session.user.groupNumber;
+        const currentUserId = req.session.user._id;
+        const {values} = req.body;
+        try {
+            const result = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, packageName, name);
+            if (!result) return;
+            let {workbook, pack, organizations} = result;
+            workbook = await Workbook.findById(workbook._id).populate('sheets');
+            let doc = await PackageValue.findOne({groupNumber, organization: organizations[0]});
+            if (!doc)
+                doc = new PackageValue({
+                    groupNumber, package: pack._id, organization: organizations[0], values: {}
+                });
+            const data = doc.values;
+            for (let catId in values) {
+                const atts = values[catId];
+                if (Object.keys(atts).length === 0) continue;
+                if (!data[catId]) data[catId] = {};
+                for (let attId in atts) {
+                    data[catId][attId] = atts[attId];
+                }
+            }
+            doc.markModified('values');
+            await doc.save();
+            return res.json({success: true, message: `Workbook (${workbook.name}) updated.`});
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    userSubmitPackage: async (req, res, next) => {
+        const {packageName} = req.params;
+
     },
 };

@@ -1,7 +1,6 @@
 import Typography from '@material-ui/core/Typography';
 import React, {Component} from 'react';
-import {signUpLocal} from "../../../controller/userManager";
-import {checkUsername, checkEmail, getAllGroups} from "../../../controller/userManager.js";
+import {signUpLocal, checkUsername, checkEmail, getAllGroups, getAllOrganizations} from "../../../controller/userManager";
 
 import {
   Button,
@@ -17,7 +16,6 @@ import {TextField, MenuItem} from '@material-ui/core';
 
 class Register extends Component {
 
-
   constructor(props) {
     super(props);
     this.setup = props.params.mode === 'setup';
@@ -30,9 +28,9 @@ class Register extends Component {
       repeatPassword: '',
       phoneNumber: "",
       groupNumber: 1,
-      groups: [{groupNumber: 1, name: 'xxxx'}],
-      organization: 'organization01',
-      organizations: ['organization01', 'organization02'],
+      groups: [],
+      organization: null,
+      organizations: [],
 
       isServerErrormessage: false,
       ServerErrormessage: null,
@@ -48,25 +46,27 @@ class Register extends Component {
       isGroupNumberError: false,
       groupNumberErrorMessage: '',
     };
-
-
     this.initialGroups();
-
   }
 
   initialGroups = () => {
     getAllGroups().then((dbGroups) => {
-      this.setState({
-        groups: dbGroups
+      const groupNumber = dbGroups[0].groupNumber;
+      getAllOrganizations(groupNumber).then(organizations => {
+        this.setState({
+          groups: dbGroups,
+          groupNumber: dbGroups[0].groupNumber,
+          organizations,
+          organization: organizations[0].name
+        });
       });
-      console.table(dbGroups);
     })
   };
 
   handleSubmit = event => {
     event.preventDefault();
     signUpLocal(this.setup, this.state.username, this.state.password,
-      this.state.firstName, this.state.lastName,  this.state.organization, this.state.email, this.state.phoneNumber, this.state.groupNumber)
+      this.state.firstName, this.state.lastName, this.state.organization, this.state.email, this.state.phoneNumber, this.state.groupNumber)
       .then(response => {
         this.props.history.push(response.data.redirect);
       })
@@ -233,8 +233,9 @@ class Register extends Component {
   }
 
   handleChange = name => event => {
+    const value = event.target.value;
     this.setState({
-      [name]: event.target.value
+      [name]: value
     });
 
     if (name === 'username') {
@@ -261,9 +262,13 @@ class Register extends Component {
         repeatPasswordErrorMessage: '',
       });
     } else if (name === 'groupNumber') {
-      this.setState({
-        isGroupNumberError: false,
-        groupNumberErrorMessage: '',
+      getAllOrganizations(value).then(organizations => {
+        this.setState({
+          organizations,
+          organization: organizations[0].name,
+          isGroupNumberError: false,
+          groupNumberErrorMessage: '',
+        });
       });
     }
   };
@@ -364,19 +369,6 @@ class Register extends Component {
                     />
 
                     <TextField
-                      label="Group Number"
-                      type="number"
-                      required={true}
-                      value={this.state.groupNumber}
-                      onChange={this.handleChange('groupNumber')}
-                      onBlur={this.validateGroupNumber}
-                      margin="normal"
-                      fullWidth
-                      error={this.state.isGroupNumberError}
-                      helperText={this.state.groupNumberErrorMessage}
-                    />
-
-                    <TextField
                       select
                       label="Group Name"
                       value={this.state.groupNumber}
@@ -393,6 +385,7 @@ class Register extends Component {
 
                     <TextField
                       select
+                      InputLabelProps={{ shrink: true }}
                       label="Organization"
                       value={this.state.organization}
                       onChange={this.handleChange('organization')}
@@ -400,8 +393,8 @@ class Register extends Component {
                       fullWidth
                     >
                       {this.state.organizations.map(option => (
-                        <MenuItem key={option} value={option}>
-                          {option}
+                        <MenuItem key={option._id} value={option.name}>
+                          {option.name}
                         </MenuItem>
                       ))}
                     </TextField>

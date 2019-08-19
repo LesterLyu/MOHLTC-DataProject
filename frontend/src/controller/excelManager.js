@@ -1,7 +1,8 @@
 import axios from "axios";
 import config from "./../config/config";
 import {excelInstance, RichText, XlsxPopulate} from "../views/Excel/utils";
-import {generateObjectId, check, axiosConfig} from './common';
+import {check, axiosConfig, buildErrorParams} from './common';
+import {userSaveWorkbook} from '../controller/package';
 
 /**
  * Singleton Pattern
@@ -19,9 +20,9 @@ class WorkbookManager {
     return instance;
   }
 
-  getWorkbook(name, admin) {
-    const url = admin ? '/api/v2/admin/workbook/' : '/api/v2/user/filled/';
-    return axios.get(config.server + url + name, axiosConfig)
+  getWorkbook(name, packageName, admin) {
+    const url = admin ? '/api/v2/admin/workbook/' + name : '/api/v2/packages/' + packageName + '/' + name;
+    return axios.get(config.server + url, axiosConfig)
       .then(response => {
         console.log(response);
         if (check(response)) {
@@ -35,9 +36,9 @@ class WorkbookManager {
     return XlsxPopulate.fromBlankAsync()
   }
 
-  async readWorkbookFromDatabase(fileName, admin = true) {
+  async readWorkbookFromDatabase(fileName, packageName, admin = true) {
     try {
-      const response = await this.getWorkbook(fileName, admin);
+      const response = await this.getWorkbook(fileName, packageName, admin);
       const {workbook, populate = {}} = response.data;
       const {file, name} = workbook;
       const wb = await XlsxPopulate.fromDataAsync(file, {base64: true});
@@ -62,7 +63,7 @@ class WorkbookManager {
       return this._readWorkbook(wb, null, name);
     } catch (err) {
       console.error(err);
-      this.props.showMessage(err.stack, 'error');
+      this.props.showMessage(...buildErrorParams(err));
     }
   }
 
@@ -117,28 +118,26 @@ class WorkbookManager {
     const fileName = excelInstance.state.fileName;
     workbook.outputAsync('base64')
       .then(base64 => {
-        return this.testSave(workbook, fileName, base64);
+        return this.testSave(workbook, fileName, base64, admin);
       })
       .then(response => {
         this.props.showMessage(response.data.message, response.data.success ? 'success' : 'error');
       })
   }
 
-  async testSave(workbook, fileName, base64) {
+  async testSave(workbook, fileName, base64, admin) {
     const data = {};
     const sheets = workbook.sheets();
-    const ids = await generateObjectId(sheets.length);
     data.workbook = {
       name: fileName,
       file: base64,
-      sheetIds: ids,
     };
     data.sheets = [];
     data.values = {};
     sheets.forEach((sheet, sheetNo) => {
       const col2Att = {}, row2Cat = {};
       const sheetData = {
-        col2Att, row2Cat, name: sheet.name(), _id: ids[sheetNo]
+        col2Att, row2Cat, name: sheet.name(),
       };
       data.sheets.push(sheetData);
       sheet._rows.forEach((row, rowNumber) => {
@@ -179,7 +178,14 @@ class WorkbookManager {
       sheetData.catIds = Object.values(row2Cat);
     });
     console.log(data);
-    return await axios.post(config.server + '/api/v2/admin/workbook', data, axiosConfig);
+    if (admin)
+      return await axios.post(config.server + '/api/v2/admin/workbook', data, axiosConfig);
+    else {
+      const {packageName} = excelInstance;
+      data.sheets = undefined;
+      return await userSaveWorkbook(packageName, fileName, data);
+    }
+
   }
 }
 
