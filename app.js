@@ -30,7 +30,7 @@ const indexRouter = require('./routes/index');
 
 const usersRouter = require('./routes/users');
 
-const packageRouter = require('./routes/package');
+const packageRouter = require('./routes/v2/package02');
 
 const LdapStrategy = require('passport-ldapauth');
 

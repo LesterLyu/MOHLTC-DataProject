@@ -1,5 +1,5 @@
 import axios from "axios";
-import {config, check, axiosConfig} from "./common";
+import {axiosConfig, check, config} from "./common";
 
 export let lastUrl = null;
 
@@ -21,6 +21,47 @@ export async function checkUsername(username) {
 export async function checkEmail(email) {
   const urlStr = config.server + '/api/check/email/' + email;
   return await axios.get(urlStr, axiosConfig);
+}
+
+/**
+ * Get all groups from database.
+ */
+export async function getAllGroups() {
+  const urlStr = config.server + '/api/v2/groups';
+  try {
+    const result = await axios.get(urlStr);
+    return result.data.groups;
+  } catch (e) {
+    return {groupNumber: -1, name: 'wrong', err: e};
+  }
+}
+
+export async function getAllRequestUsers() {
+  let results = [];
+  try {
+    const users = await getAllUsers();
+    results = users.filter((u) => u.validated === false);
+  } catch (e) {
+    throw e;
+  }
+  return results;
+}
+
+
+export async function switchUserActive(username, activeValue) {
+  try {
+    return await axios.put(config.server + '/api/users/active/' + username, {active: activeValue}, axiosConfig);
+  } catch (e) {
+    throw e;
+  }
+}
+
+export async function switchUserValidate(username, validatedValue) {
+  try {
+    return await axios.put(config.server + '/api/users/validated/' + username, {validated: validatedValue}, axiosConfig);
+  } catch (e) {
+    throw e;
+  }
 }
 
 /**

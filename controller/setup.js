@@ -31,9 +31,11 @@ module.exports = {
             username: req.body.username,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
-            groupNumber: 1,
+            organization: req.body.organization,
+            // groupNumber: 1,
+            groupNumber: req.body.groupNumber || 1,
             phoneNumber: req.body.phoneNumber,
-            validated: true,
+            validated: req.body.validated || false,
             email: req.body.email,
             permissions: Object.values(config.permissions),   // all permissions
         });
