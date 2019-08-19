@@ -51,8 +51,9 @@ module.exports = {
         const currentUserId = req.session.user._id;
         const name = req.params.name; // package name
         try {
-            const {pack} = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, name);
-            res.json({success: true, package: pack})
+            const result = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, name);
+            if (!result) return;
+            res.json({success: true, package: result.pack})
         } catch (e) {
             next(e);
         }
@@ -198,7 +199,9 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         const currentUserId = req.session.user._id;
         try {
-            let {workbook, organizations} = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, packageName, name);
+            const result = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, packageName, name);
+            if (!result) return;
+            let {workbook, organizations} = result;
             workbook = await Workbook.findById(workbook._id, 'file name roAtts roCats').populate('sheets');
             const populate = [];
             let values = await PackageValue.findOne({groupNumber, organization: organizations[0]});
@@ -230,7 +233,9 @@ module.exports = {
         const currentUserId = req.session.user._id;
         const {values} = req.body;
         try {
-            let {workbook, pack, organizations} = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, packageName, name);
+            const result = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, packageName, name);
+            if (!result) return;
+            let {workbook, pack, organizations} = result;
             workbook = await Workbook.findById(workbook._id).populate('sheets');
             let doc = await PackageValue.findOne({groupNumber, organization: organizations[0]});
             if (!doc)

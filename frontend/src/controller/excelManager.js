@@ -181,7 +181,7 @@ class WorkbookManager {
     if (admin)
       return await axios.post(config.server + '/api/v2/admin/workbook', data, axiosConfig);
     else {
-      const {packageName} = this.props.match.params;
+      const {packageName} = excelInstance;
       data.sheets = undefined;
       return await userSaveWorkbook(packageName, fileName, data);
     }

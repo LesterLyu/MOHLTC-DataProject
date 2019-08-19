@@ -1,7 +1,7 @@
-import React, {useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {
-  Paper, Grid, Typography, Button
+  Paper, Grid, Typography, Button, TextField
 } from '@material-ui/core';
 import {adminGetPackage, userGetPackage} from "../../controller/package";
 import PackageCard from './components/Card';
@@ -14,6 +14,9 @@ const useStyles = makeStyles(theme => ({
     paddingLeft: theme.spacing(4),
     paddingRight: theme.spacing(4),
   },
+  note: {
+    paddingBottom: 10,
+  }
 }));
 
 export default function PackageView(props) {
@@ -23,6 +26,7 @@ export default function PackageView(props) {
   const classes = useStyles();
   const [values, setValues] = React.useState({
     data: null,
+    userNotes: ''
   });
 
   useEffect(() => {
@@ -47,6 +51,29 @@ export default function PackageView(props) {
     return list;
   };
 
+  const handleChange = useCallback((name, value) => {
+    setValues(values => ({...values, [name]: value}));
+  }, []);
+
+  const handleChangeEvent = name => e => handleChange(name, e.target.value);
+
+  const renderUserContents = () => {
+    return (
+      <>
+        <TextField
+          label="User Notes"
+          value={values.userNotes}
+          className={classes.note}
+          onChange={handleChangeEvent('userNotes')}
+          multiline
+          margin="normal"
+          fullWidth
+        />
+        <Button variant="contained" color="primary">Submit</Button>
+      </>
+    )
+  };
+
   return (
     <Paper className={classes.container}>
       <Grid container spacing={2}>
@@ -61,6 +88,6 @@ export default function PackageView(props) {
         {allWorkbooks()}
       </Grid>
       <br/>
-      {admin ? null : <Button variant="contained" color="primary">Submit</Button>}
+      {admin ? null : renderUserContents()}
     </Paper>)
 }

@@ -27,6 +27,7 @@ class Excel extends Component {
   constructor(props) {
     super(props);
     this.mode = props.params.mode;
+    this.packageName = this.props.match.params.packageName;
     console.log('mode:', props.params.mode);
     // TODO: disable some cell editing for user (formula editing...)
     window.excel = this;
@@ -445,9 +446,11 @@ class Excel extends Component {
 
   render() {
     console.log('render create excel');
+    const height = this.mode === 'user' ? 'calc(100vh - 55px - 45.8px - 50px - 100px)'
+      : 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px - 58px)';
     if (!this.isLoaded) {
       return (
-        <div style={{height: 'calc(100vh - 55px - 45.8px - 50px - 35px - 50px - 58px)'}}
+        <div style={{height}}
              ref={this.sheetContainerRef}>
           <Loading message={this.state.loadingMessage}/>
         </div>
