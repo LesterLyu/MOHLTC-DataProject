@@ -160,28 +160,7 @@ module.exports = {
         }
     },
 
-    set_validated_is_true: async (req, res, next) => {
-        if (!checkPermission(req)) {
-            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
-        }
-        if (!req.params.username) {
-            return res.status(4000).json({success: false, message: 'user name can not be empty!'})
-        }
-        try {
-            const filter = {
-                username: req.params.username,
-                groupNumber: req.session.user.groupNumber
-            };
-            const update = {validated: true};
-            const result = await User.findOneAndUpdate(filter, update, {
-                new: true
-            });
-            return res.status(200).json({success: true, message: 'updated!', user: result});
-        } catch (e) {
-            next(e);
-        }
 
-    },
 
 
     admin_get_all_users_with_details: (req, res, next) => {

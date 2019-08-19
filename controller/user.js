@@ -127,7 +127,9 @@ module.exports = {
         if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-
+        if (req.params.username === req.session.user.username) {
+            return res.status(400).json({success: false, message: 'Can not set the active value by yourself'});
+        }
         const updatingUsername = req.params.username;
         const updatingActive = req.body.active;
         User.findOne({username: updatingUsername}, (err, dbUser) => {
@@ -153,6 +155,31 @@ module.exports = {
             }
 
         });
+    },
+
+    edit_validated: async (req, res, next) => {
+        if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
+            return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+        }
+        if (!req.params.username && req.body.validated) {
+            return res.status(400).json({success: false, message: 'user name and validated value can not be empty!'})
+        }
+        if (req.params.username === req.session.user.username) {
+            return res.status(400).json({success: false, message: 'Can not set the active value by yourself'});
+        }
+        try {
+            const filter = {
+                username: req.params.username,
+                groupNumber: req.session.user.groupNumber
+            };
+            const update = {validated: req.body.validated};
+            const result = await User.findOneAndUpdate(filter, update, {
+                new: true
+            });
+            return res.status(200).json({success: true, message: 'updated!', user: result});
+        } catch (e) {
+            next(e);
+        }
     },
 
     change_password: (req, res, next) => {
@@ -287,13 +314,13 @@ module.exports = {
                     return res.status(400).json({success: false, message: 'Password is not valid.'});
                 }
                 console.log(req.body.phoneNumber);
-                var groupNumber = config.organizations[req.body.organization];
+                let groupNumber = config.organizations[req.body.organization];
                 let newRequest = new RegisterRequest({
                     username: req.body.username,
                     password: req.body.password,
                     firstName: req.body.firstName,
                     lastName: req.body.lastName,
-                    groupNumber: groupNumber,
+                    groupNumber: groupNumber || 1,
                     phoneNumber: req.body.phoneNumber,
                     organization: req.body.organization,
                     email: req.body.email,
