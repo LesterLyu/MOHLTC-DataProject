@@ -27,9 +27,8 @@ class Worksheets extends Component {
     this.isMouseDown = false;
     this.startCell = [];
     this.selections = null;
-    this.rowCount = null;
-    this.columnCount = null;
     window.Cell = Cell;
+    this.openedSheetIds = [];
   }
 
   get grid() {
@@ -95,7 +94,7 @@ class Worksheets extends Component {
     const row = sheet.row(index);
     if (row.hidden()) return 0;
     const height = row.height();
-    return height === undefined ? 24 : height / 0.6;
+    return height === undefined ? 24 : height * 1.666;
   };
 
   /**
@@ -108,7 +107,7 @@ class Worksheets extends Component {
     const col = sheet.column(index);
     if (col.hidden()) return 0;
     const height = col.width();
-    return height === undefined ? 80 : height / 0.11;
+    return height === undefined ? 80 : height * 9.69;
   };
 
   /**
@@ -203,8 +202,14 @@ class Worksheets extends Component {
   render() {
     const sheet = this.excel.sheet;
     const range = sheet.usedRange();
-    const columnCount = this.columnCount = range ? range._maxColumnNumber + 5 : 30;
-    const rowCount = this.rowCount = range ? range._maxRowNumber + 10 : 200;
+    let columnCount = range ? range._maxColumnNumber : 30;
+    let rowCount = range ? range._maxRowNumber : 200;
+    if (!this.openedSheetIds.includes(this.excel.currentSheetIdx)) {
+      columnCount += 5;
+      rowCount += 10;
+      this.openedSheetIds.push(this.excel.currentSheetIdx);
+    }
+
     const rowHeight = Worksheets.rowHeight(sheet);
     const colWidth = Worksheets.colWidth(sheet);
 
@@ -233,8 +238,8 @@ class Worksheets extends Component {
         height={this.excel.state.sheetHeight}
         rowHeight={rowHeight}
         columnWidth={colWidth}
-        overscanRowCount={0}
-        overscanColumnCount={0}
+        overscanRowCount={30}
+        overscanColumnCount={5}
         estimatedColumnWidth={80}
         estimatedRowHeight={24}
         itemData={{
