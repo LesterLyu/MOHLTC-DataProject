@@ -855,24 +855,12 @@
   resolved "https://registry.yarnpkg.com/@csstools/normalize.css/-/normalize.css-9.0.1.tgz#c27b391d8457d1e893f1eddeaf5e5412d12ffbb5"
   integrity sha512-6It2EVfGskxZCQhuykrfnALg7oVeiI6KclWSmGDqB0AiInVrTGB9Jp9i4/Ad21u9Jde/voVQz6eFX/eSg/UsPA==
 
-"@date-io/core@^1.3.8":
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/@date-io/core/-/core-1.3.8.tgz#a20da7125f1444631dd96a6e8baa8982665aaa95"
-  integrity sha512-XlvpzhipF/badZEJPAfgXRX9bFG2UpFl1T6O0hn1RzWJf3yexf9/M2wcEm6jh7RVyrlSayttkXtGPqVPdoJQ7Q==
-
 "@date-io/core@^1.3.9":
   version "1.3.9"
   resolved "https://registry.yarnpkg.com/@date-io/core/-/core-1.3.9.tgz#c8483399782ab6cff776b50a0c05edecf9744219"
   integrity sha512-pGZK4DJcXUKHFDWws/smJXgmeHyaVyOFPQqDsYXoxg6rYTU/S+NEVTQnoYOFgrlJ8dkgjZ89D9d3Qx1V925OGw==
 
-"@date-io/date-fns@^1.1.0":
-  version "1.3.8"
-  resolved "https://registry.yarnpkg.com/@date-io/date-fns/-/date-fns-1.3.8.tgz#820553ba0136027b20d3a696ab9b300f2fa23c5c"
-  integrity sha512-vlMRbaCIC1NTjGXL8QWsc9v/7EJwtciUYWCYw1+PXkmpPr1W4GbckvLYvFhGSlQ8ibIh0JKB1yP4bozSb3Tu+w==
-  dependencies:
-    "@date-io/core" "^1.3.8"
-
-"@date-io/date-fns@^1.3.9":
+"@date-io/date-fns@^1.1.0", "@date-io/date-fns@^1.3.9":
   version "1.3.9"
   resolved "https://registry.yarnpkg.com/@date-io/date-fns/-/date-fns-1.3.9.tgz#b71cc18a8d289227731aebca9c860138e80a0809"
   integrity sha512-beAqMd9csIQFOQeLu6noOXAcKdjpDjnIql1wyDOkkRop9o1G+b1HdDhzXAis88ADai7GcsCSvOp3VpB6UmCRqg==
@@ -1927,9 +1915,9 @@
     "@babel/runtime" "^7.2.0"
 
 "@material-ui/pickers@^3.2.2":
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/@material-ui/pickers/-/pickers-3.2.2.tgz#9b7a67f5a8f21f8183853ebc1848e5d8dd680d4c"
-  integrity sha512-on/J1yyKeJ4CkLnItpf/jPDKMZVWvHDklkh5FS7wkZ0s1OPoqTsPubLWfA7eND6xREnVRyLFzVTlE3VlWYdQWw==
+  version "3.2.3"
+  resolved "https://registry.yarnpkg.com/@material-ui/pickers/-/pickers-3.2.3.tgz#84ef0262f15d882d36bcee3b16d1ac480fb53c04"
+  integrity sha512-qtFmEyP6vKUSAbpBkgKlZkeCZgll0YEQZu351k/Ates57UYLeoJyM2CNCsRxif1w91qVoYB7CPskIdUrCpcMmg==
   dependencies:
     "@babel/runtime" "^7.2.0"
     "@types/styled-jsx" "^2.2.8"
@@ -2308,9 +2296,9 @@
     "@types/react" "*"
 
 "@types/react@*":
-  version "16.8.24"
-  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.8.24.tgz#8d1ea1fcbfa214220da3d3c04e506f1077b0deac"
-  integrity sha512-VpFHUoD37YNY2+lr/+c7qL/tZsIU/bKuskUF3tmGUArbxIcQdb5j3zvo4cuuzu2A6UaVmVn7sJ4PgWYNFEBGzg==
+  version "16.9.2"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-16.9.2.tgz#6d1765431a1ad1877979013906731aae373de268"
+  integrity sha512-jYP2LWwlh+FTqGd9v7ynUKZzjj98T8x7Yclz479QdRhHfuW9yQ+0jjnD31eXSXutmBpppj5PYNLYLRfnZJvcfg==
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
@@ -3668,9 +3656,9 @@ caseless@~0.12.0:
   integrity sha1-G2gcIf+EAzyCZUMJBolCDRhxUdw=
 
 cfb@^1.1.0:
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/cfb/-/cfb-1.1.2.tgz#5dfff9813eb37757597272dae3da3b37b3edcc44"
-  integrity sha512-FAEjGHtrAF027TFkhDmTDNbRf97C33jBXRa9ODeabZRqYDglsq/F5uRpJfV5BitCH4yiyplHNBKx2xOhQb12PA==
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/cfb/-/cfb-1.1.3.tgz#05de6816259c8e8bc32713aba905608ee385df66"
+  integrity sha512-joXBW0nMuwV9no7UTMiyVJnQL6XIU3ThXVjFUDHgl9MpILPOomyfaGqC290VELZ48bbQKZXnQ81UT5HouTxHsw==
   dependencies:
     adler-32 "~1.2.0"
     commander "^2.16.0"
@@ -4624,15 +4612,10 @@ data-urls@^1.0.0, data-urls@^1.1.0:
     whatwg-mimetype "^2.2.0"
     whatwg-url "^7.0.0"
 
-date-fns@^2.0.0-alpha.27:
-  version "2.0.0-beta.3"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-beta.3.tgz#2e28f5af945930f774ddd778e184d68227101d55"
-  integrity sha512-z5O262BvHPhwUvA1weXH+AZodygnZUcORERw8hjwBUrRPGrAo2e/rjXfC8Ykf1OGJZGDuLnK/WXbEZBIc0exGQ==
-
-date-fns@^2.0.0-beta.4:
-  version "2.0.0-beta.4"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0-beta.4.tgz#3e1bf33a15da69481f81972c4a50aad762a81f2c"
-  integrity sha512-xekjYm7ZDBuzePM/GBodhi3hW3P8dd2RbuIOLBjet2E6EGFR82wHTTXCSGuDEoapqlDvsx88ymRsq85lbM7dDw==
+date-fns@^2.0.0-alpha.27, date-fns@^2.0.0-beta.4:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.0.0.tgz#52f05c6ae1fe0e395670082c72b690ab781682d0"
+  integrity sha512-nGZDA64Ktq5uTWV4LEH3qX+foV4AguT5qxwRlJDzJtf57d4xLNwtwrfb7SzKCoikoae8Bvxf0zdaEG/xWssp/w==
 
 date-now@^0.1.4:
   version "0.1.4"
@@ -8537,9 +8520,9 @@ material-colors@^1.2.1:
   integrity sha512-6qE4B9deFBIa9YSpOc9O0Sgc43zTeVYbgDT5veRKSlB2+ZuHNoVVxA1L/ckMUayV9Ay9y7Z/SZCLcGteW9i7bg==
 
 material-table@^1.48.0:
-  version "1.48.0"
-  resolved "https://registry.yarnpkg.com/material-table/-/material-table-1.48.0.tgz#3a4baffc915ffd700caf26cb3b272e238cc9cfe1"
-  integrity sha512-OXI8gotPGtFtcSLLXkFzrmPMO8DK5irUd24vq+siTwYPp+kInOM1T5Vrb/pqbR6wQOA2bgWTmwxKGe4GZ1xVcw==
+  version "1.50.0"
+  resolved "https://registry.yarnpkg.com/material-table/-/material-table-1.50.0.tgz#16afabae311f768382b5884d34a230984a687933"
+  integrity sha512-N7JH/YkAUHHddqIP/t3vtRLtbK5zsnyzCvjdwaVO8KbtzKA9kYgjxpuNZ/waHwdL4Fa55rZgP7fYYbMioByi9g==
   dependencies:
     "@date-io/date-fns" "^1.1.0"
     "@material-ui/pickers" "^3.2.2"
@@ -8561,9 +8544,9 @@ md5.js@^1.3.4:
     safe-buffer "^5.1.2"
 
 mdi-material-ui@^6.3.0:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/mdi-material-ui/-/mdi-material-ui-6.3.0.tgz#03aadd3994732be2d446788a5ad416fbbb827e7f"
-  integrity sha512-agNBr/2GUbS213sJ+lyoELAk6Js7BFKOjH2UFHvCcnbF2DYZWALGpb6uY3fOtV8T0iRl+c1KOysmM8/m6nWyNQ==
+  version "6.4.1"
+  resolved "https://registry.yarnpkg.com/mdi-material-ui/-/mdi-material-ui-6.4.1.tgz#779aea07b65993b6ebb334497295bf6f648f4be2"
+  integrity sha512-NtGdokhKWAk70IFBlV2oEuRLLN7ZdlTmmfV7ooZlF7q5Ob/B7NZnUd+fkzk9+YZd+vDr9MDknRZxV9dmKqq7SA==
 
 mdn-data@2.0.4:
   version "2.0.4"
@@ -8589,10 +8572,15 @@ mem@^4.0.0:
     mimic-fn "^2.0.0"
     p-is-promise "^2.0.0"
 
-"memoize-one@>=3.1.1 <6", memoize-one@^5.0.0, memoize-one@^5.0.4:
+"memoize-one@>=3.1.1 <6", memoize-one@^5.0.0:
   version "5.0.5"
   resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-5.0.5.tgz#8cd3809555723a07684afafcd6f756072ac75d7e"
   integrity sha512-ey6EpYv0tEaIbM/nTDOpHciXUvd+ackQrJgEzBwemhZZIWZjcyodqEcrmqDy2BKRTM3a65kKBV4WtLXJDt26SQ==
+
+memoize-one@^5.0.4:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-5.1.0.tgz#ce7af291c0e2fe041b709cac5e8c7b198c994286"
+  integrity sha512-p3tPVJNrjOkJ0vk0FRn6yv898qlQZct1rsQAXuwK9X5brNVajPv/y13ytrUByzSS8olyzeqCLX8BKEWmTmXa1A==
 
 memory-fs@^0.4.0, memory-fs@^0.4.1:
   version "0.4.1"
@@ -11106,12 +11094,12 @@ react-input-autosize@^2.2.1:
   dependencies:
     prop-types "^15.5.8"
 
-react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.6:
+react-is@^16.6.0:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.8.6.tgz#5bbc1e2d29141c9fbdfed456343fe2bc430a6a16"
   integrity sha512-aUk3bHfZ2bRSVFFbbeVS4i+lNPZr3/WM5jT2J5omUVV1zzcs1nAaf3l51ctA5FFvCRbhrH0bdAsRRQddFJZPtA==
 
-react-is@^16.8.1, react-is@^16.8.4:
+react-is@^16.7.0, react-is@^16.8.1, react-is@^16.8.4, react-is@^16.8.6:
   version "16.9.0"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.9.0.tgz#21ca9561399aad0ff1a7701c01683e8ca981edcb"
   integrity sha512-tJBzzzIgnnRfEm046qRcURvwQnZVXmuCbscxUO5RWrGTXpon2d4c8mI0D8WE6ydVIm29JiLB6+RslkIvym9Rjw==
@@ -11306,9 +11294,9 @@ react-transition-group@^2.2.1, react-transition-group@^2.3.1:
     react-lifecycles-compat "^3.0.4"
 
 react-transition-group@^4.0.0:
-  version "4.2.1"
-  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.2.1.tgz#61fc9e36568bff9a1fe4e60fae323c8a6dbc0680"
-  integrity sha512-IXrPr93VzCPupwm2O6n6C2kJIofJ/Rp5Ltihhm9UfE8lkuVX2ng/SUUl/oWjblybK9Fq2Io7LGa6maVqPB762Q==
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.2.2.tgz#8b5252410180c27fd7eebf50b185256b41799b16"
+  integrity sha512-uP0tjqewtvjb7kGZFpZYPoD/NlVZmIgts9eTt1w35pAaEApPxQGv94lD3VkqyXf2aMqrSGwhs6EV/DLaoKbLSw==
   dependencies:
     "@babel/runtime" "^7.4.5"
     dom-helpers "^3.4.0"
@@ -13997,7 +13985,7 @@ ws@^6.0.0, ws@^6.1.2:
 
 "xlsx-populate@https://github.com/LesterLyu/xlsx-populate.git":
   version "1.19.1"
-  resolved "https://github.com/LesterLyu/xlsx-populate.git#0749cfaa507342f54fcc1b22fa71106d853906a6"
+  resolved "https://github.com/LesterLyu/xlsx-populate.git#fd01f9ca37af7ab25aeaf53a150bcea2dbd201b9"
   dependencies:
     cfb "^1.1.0"
     fast-formula-parser "git+https://github.com/LesterLyu/fast-formula-parser.git"

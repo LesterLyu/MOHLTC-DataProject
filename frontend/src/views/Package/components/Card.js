@@ -37,7 +37,7 @@ export default function FileCard(props) {
       : <FileOutline className={classes.packageIcon}/>;
 
   return (
-    <Card className={classes.card}>
+    <Card className={classes.card} elevation={2}>
       <Tooltip title={fileName} placement="bottom" enterDelay={300}>
         <Link to={editHref}>
           <CardActionArea>
