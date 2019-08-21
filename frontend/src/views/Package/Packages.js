@@ -1,7 +1,7 @@
 import React, {useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {
-  Paper, Grid, Button, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
+  Paper, Grid, Button, Typography, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Fade
 } from '@material-ui/core';
 import {adminGetPackages, userGetPackages, adminDeletePackage} from "../../controller/package";
 import PackageCard from './components/Card';
@@ -21,6 +21,7 @@ export default function CreatePackage(props) {
   const [values, setValues] = React.useState({
     packages: null,
     dialog: false,
+    chooseDialog: false,
     selectedName: null,
   });
 
@@ -51,7 +52,7 @@ export default function CreatePackage(props) {
   };
 
   const closeDialog = () => setValues(values => ({...values, dialog: false, selectedName: null}));
-
+  const closeChooseDialog = () => setValues(values => ({...values, chooseDialog: false}));
   const openDialog = name => setValues(values => ({...values, dialog: true, selectedName: name}));
 
   const handleConfirmDelete = () => {
@@ -96,17 +97,44 @@ export default function CreatePackage(props) {
     )
   };
 
+  const chooseOrganizationDialog = () => {
+    return (
+      <Dialog
+        open={values.chooseDialog}
+        keepMounted
+        onClose={closeChooseDialog}
+      >
+        <DialogTitle>
+          {"Choose One"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Choose one organization:
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeChooseDialog} color="primary">
+            Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+    )
+  };
+
   return (
-    <Paper className={classes.container}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="h6" gutterBottom>
-            All Packages
-          </Typography>
+    <Fade in>
+      <Paper className={classes.container}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom>
+              All Packages
+            </Typography>
+          </Grid>
+          {allPackages()}
         </Grid>
-        {allPackages()}
-      </Grid>
-      <br/>
-      {dialog()}
-    </Paper>)
+        <br/>
+        {dialog()}
+        {chooseOrganizationDialog()}
+      </Paper>
+    </Fade>)
 }

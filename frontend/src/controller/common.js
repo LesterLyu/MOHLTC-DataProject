@@ -5,7 +5,10 @@ export const axiosConfig = {withCredentials: true};
 export {config};
 
 export function buildErrorParams(e) {
-  return [e.toString() + '\nDetails: ' + e.response.data.message, 'error'];
+  if (e.response && e.response.data &&  e.response.data.message)
+    return [e.toString() + '\nDetails: ' + e.response.data.message, 'error'];
+  else
+    return [e.stack, 'error'];
 }
 
 /**

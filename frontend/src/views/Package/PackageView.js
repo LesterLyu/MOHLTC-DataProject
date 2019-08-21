@@ -1,9 +1,9 @@
 import React, {useCallback, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {
-  Paper, Grid, Typography, Button, TextField
+  Paper, Grid, Typography, Button, TextField, Fade, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
 } from '@material-ui/core';
-import {adminGetPackage, userGetPackage} from "../../controller/package";
+import {adminGetPackage, userGetPackage, userSubmitPackage} from "../../controller/package";
 import PackageCard from './components/Card';
 import Loading from "../components/Loading";
 import {buildErrorParams} from "../../controller/common";
@@ -57,6 +57,15 @@ export default function PackageView(props) {
 
   const handleChangeEvent = name => e => handleChange(name, e.target.value);
 
+  const submit = async () => {
+    try {
+      const response = await userSubmitPackage(packageName, {userNotes: values.userNotes})
+      props.showMessage(response.message, 'success');
+    } catch (e) {
+      props.showMessage(...buildErrorParams(e));
+    }
+  };
+
   const renderUserContents = () => {
     return (
       <>
@@ -69,25 +78,27 @@ export default function PackageView(props) {
           margin="normal"
           fullWidth
         />
-        <Button variant="contained" color="primary">Submit</Button>
+        <Button variant="contained" color="primary" onClick={submit}>Submit</Button>
       </>
     )
   };
 
   return (
-    <Paper className={classes.container}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="h6" gutterBottom>
-            {packageName}
-          </Typography>
-          <Typography variant="subtitle1" gutterBottom>
-            {values.data ? ('Note: ' + values.data.adminNotes) : ''}
-          </Typography>
+    <Fade in>
+      <Paper className={classes.container}>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom>
+              {packageName}
+            </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+              {values.data ? ('Note: ' + values.data.adminNotes) : ''}
+            </Typography>
+          </Grid>
+          {allWorkbooks()}
         </Grid>
-        {allWorkbooks()}
-      </Grid>
-      <br/>
-      {admin ? null : renderUserContents()}
-    </Paper>)
+        <br/>
+        {admin ? null : renderUserContents()}
+      </Paper>
+    </Fade>)
 }

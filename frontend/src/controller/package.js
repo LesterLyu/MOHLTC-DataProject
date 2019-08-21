@@ -68,3 +68,10 @@ export async function userSaveWorkbook(packageName, workbookName, data) {
     return response;
   }
 }
+
+export async function userSubmitPackage(packageName, {userNotes}) {
+  const response = await axios.post(config.server + `/api/v2/packages/${packageName}`, {userNotes}, axiosConfig);
+  if (check(response)) {
+    return response.data;
+  }
+}

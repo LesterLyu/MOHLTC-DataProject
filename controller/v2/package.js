@@ -260,7 +260,37 @@ module.exports = {
     },
 
     userSubmitPackage: async (req, res, next) => {
-        const {packageName} = req.params;
-
+        const currentUserId = req.session.user._id;
+        const groupNumber = req.session.user.groupNumber;
+        const packageName = req.params.name;
+        const {userNotes} = req.body;
+        const {pack, organizations} = await userGetPackageAndWorkbook(next, currentUserId, groupNumber, packageName);
+        const organization = organizations[0];
+        const packageValue = await PackageValue.findOne({groupNumber, organization});
+        const packageValues = packageValue.values;
+        let valueDoc = await Value.findOne({groupNumber, organization});
+        const values = valueDoc && valueDoc.values ? valueDoc.values : {};
+        if (!valueDoc) {
+            valueDoc = new Value({groupNumber, organization, values});
+        }
+        for (let catId in packageValues) {
+            const atts = packageValues[catId];
+            if (Object.keys(atts).length === 0) continue;
+            if (!values[catId]) values[catId] = {};
+            for (let attId in atts) {
+                values[catId][attId] = atts[attId];
+            }
+        }
+        await valueDoc.save();
+        packageValue.histories.push({
+            userNotes: userNotes,
+            // userFiles: packageValue.userFiles,
+            workbooks: pack.workbooks,
+            // values: packageValue.values,
+            submittedBy: currentUserId,
+            date: Date.now(),
+        });
+        await packageValue.save();
+        return res.json({success: true, message: `Package (${packageName}) submitted.`})
     },
 };
