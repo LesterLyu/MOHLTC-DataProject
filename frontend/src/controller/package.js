@@ -34,10 +34,17 @@ export async function adminGetPackages() {
   }
 }
 
-export async function adminGetPackage(packageName) {
-  const response = await axios.get(config.server + '/api/v2/admin/packages/' + packageName, axiosConfig);
+export async function adminGetPackage(packageName, organizationName) {
+  const response = await axios.get(config.server + '/api/v2/admin/packages/' + packageName + '/' + organizationName, axiosConfig);
   if (check(response)) {
     return response.data.package;
+  }
+}
+
+export async function adminGetPackageOrganizations(packageName) {
+  const response = await axios.get(config.server + '/api/v2/admin/packages/' + packageName + '/organizations', axiosConfig);
+  if (check(response)) {
+    return response.data.organizations;
   }
 }
 

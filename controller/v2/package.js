@@ -33,14 +33,54 @@ module.exports = {
             return next(error.api.NO_PERMISSION);
         }
         const groupNumber = req.session.user.groupNumber;
-        const name = req.params.name; // package name
+        const {name, organization} = req.params; // package name, organization name
         try {
             const pack = await Package.findOne({groupNumber, name}).populate({
                 path: 'workbooks',
                 select: 'name'
             });
             if (!pack) return next({status: 400, message: `Package (${name}) does not exist.`});
-            res.json({success: true, package: pack})
+
+            const orgDoc = await Organization.findOne({groupNumber, name: organization});
+            if (!orgDoc) return next({status: 400, message: `Organizations (${organization}) does not exist.`});
+
+            // if the package is submitted, then the admin will get the package value.
+            const packageValue = await PackageValue.findOne({groupNumber, package: pack._id, organization: orgDoc._id});
+            if (packageValue.histories.length > 0) {
+                const {userNotes, submittedBy, date} = packageValue.histories[packageValue.histories.length - 1];
+                const {workbooks, startDate, endDate, adminNotes, adminFiles, name} = pack;
+                const submittedUser = await User.findById(submittedBy, 'username firstName lastName email');
+                return res.json({
+                    success: true,
+                    package: {
+                        userNotes, submittedUser, date, workbooks, startDate, endDate, adminNotes, organization,
+                        adminFiles, name
+                    }
+                })
+            } else {
+                return next({
+                    status: 400,
+                    message: `The organization (${organization}) has not submitted this package (${name}).`
+                });
+            }
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    adminGetPackageOrganizations: async (req, res, next) => {
+        if (!checkPermission(req, Permission.PACKAGE_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const name = req.params.name; // package name
+        try {
+            const pack = await Package.findOne({groupNumber, name}, 'organizations').populate({
+                path: 'organizations',
+                select: 'name'
+            });
+            if (!pack) return next({status: 400, message: `Package (${name}) does not exist.`});
+            res.json({success: true, organizations: pack.organizations})
         } catch (e) {
             next(e);
         }
@@ -65,7 +105,7 @@ module.exports = {
         }
         const groupNumber = req.session.user.groupNumber;
         try {
-            const packages = await Package.find({groupNumber});
+            const packages = await Package.find({groupNumber}).populate({path: 'organizations', select: 'name'});
             res.json({success: true, packages})
         } catch (e) {
             next(e);
@@ -78,7 +118,7 @@ module.exports = {
         try {
             let organizations = await Organization.find({users: currentUserId}, '_id');
             organizations = organizations.map(org => org._id);
-            const packages = await Package.find({groupNumber, organizations: {$in: organizations}});
+            const packages = await Package.find({groupNumber, organizations: {$in: organizations}, published: true});
             return res.json({success: true, packages});
         } catch (e) {
             next(e);
@@ -203,8 +243,57 @@ module.exports = {
             if (!result) return;
             let {workbook, organizations} = result;
             workbook = await Workbook.findById(workbook._id, 'file name roAtts roCats').populate('sheets');
+
+            const pack = await Package.findOne({groupNumber, name: packageName}, '_id');
+            if (!pack) return next({status: 400, message: `Package (${packageName}) does not exist.`});
+
             const populate = [];
-            let values = await PackageValue.findOne({groupNumber, organization: organizations[0]});
+            let values = await PackageValue.findOne({package: pack._id, groupNumber, organization: organizations[0]});
+            values = values ? values.values : {};
+            workbook.sheets.forEach((sheet, idx) => {
+                if (!sheet.row2Cat || !sheet.col2Att) return;
+                const rows = populate[idx] = {};
+                for (let row in sheet.row2Cat) {
+                    const catId = sheet.row2Cat[row];
+                    if (!values[catId]) continue;
+                    if (!rows[row]) rows[row] = {};
+                    for (let col in sheet.col2Att) {
+                        const attId = sheet.col2Att[col];
+                        if (values[catId][attId] == null) continue;
+                        rows[row][col] = values[catId][attId];
+                    }
+                }
+            });
+            workbook.sheets = undefined;
+            return res.json({success: true, workbook, populate});
+        } catch (e) {
+            next(e);
+        }
+    },
+
+    adminGetUserWorkbook: async (req, res, next) => {
+        const {packageName, organizationName, workbookName} = req.params;
+        const groupNumber = req.session.user.groupNumber;
+        try {
+            const organization = await Organization.findOne({name: organizationName}, '_id');
+            if (!organization) return next({
+                status: 400,
+                message: `Organization (${organizationName}) does not exist.`
+            });
+            const orgId = organization._id;
+
+            const pack = await Package.findOne({
+                groupNumber, name: packageName, organizations: orgId,
+            }).populate({path: 'workbooks', select: 'name'});
+            if (!pack) return next({status: 400, message: `Package (${packageName}) does not exist.`});
+
+            if (!pack.workbooks.find(wb => wb.name === workbookName))
+                return next({status: 400, message: `Workbook (${workbookName}) does not exist.`});
+
+            const workbook = await Workbook.findOne({name: workbookName}, 'file name roAtts roCats').populate('sheets');
+
+            const populate = [];
+            let values = await Value.findOne({groupNumber, organization: orgId});
             values = values ? values.values : {};
             workbook.sheets.forEach((sheet, idx) => {
                 if (!sheet.row2Cat || !sheet.col2Att) return;

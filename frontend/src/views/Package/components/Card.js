@@ -3,7 +3,6 @@ import {
   Button, Card, CardActionArea, CardActions, CardContent, Grid, makeStyles, Tooltip, Typography
 } from "@material-ui/core";
 import {FileTableOutline, FileOutline, FolderOpen} from "mdi-material-ui";
-import {Link} from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   card: {
@@ -30,7 +29,7 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function FileCard(props) {
-  const {fileName, editHref, deleteCb, type} = props;
+  const {fileName, deleteCb, type, onOpen, openParams = []} = props;
   const classes = useStyles();
   const Icon = type === 'excel' ? <FileTableOutline className={classes.excelIcon}/>
     : type === 'package' ? <FolderOpen className={classes.packageIcon}/>
@@ -39,30 +38,26 @@ export default function FileCard(props) {
   return (
     <Card className={classes.card} elevation={2}>
       <Tooltip title={fileName} placement="bottom" enterDelay={300}>
-        <Link to={editHref}>
-          <CardActionArea>
-            <CardContent className={classes.cardContent}>
-              <Grid container alignItems="center" justify="center" spacing={2}>
-                <Grid item xs={12} style={{textAlign: 'center'}}>
-                  {Icon}
-                </Grid>
-                <Grid item xs={12}>
-                  <Typography variant="subtitle1" noWrap style={{color: 'rgba(0,0,0,0.87)'}}>
-                    {fileName}
-                  </Typography>
-                </Grid>
+        <CardActionArea onClick={onOpen(fileName, ...openParams)}>
+          <CardContent className={classes.cardContent}>
+            <Grid container alignItems="center" justify="center" spacing={2}>
+              <Grid item xs={12} style={{textAlign: 'center'}}>
+                {Icon}
               </Grid>
-            </CardContent>
-          </CardActionArea>
-        </Link>
+              <Grid item xs={12}>
+                <Typography variant="subtitle1" noWrap style={{color: 'rgba(0,0,0,0.87)'}}>
+                  {fileName}
+                </Typography>
+              </Grid>
+            </Grid>
+          </CardContent>
+        </CardActionArea>
 
       </Tooltip>
       <CardActions className={classes.cardActions}>
-        <Link to={editHref}>
-          <Button size="small" color="primary">
-            open
-          </Button>
-        </Link>
+        <Button size="small" color="primary" onClick={onOpen(fileName, ...openParams)}>
+          open
+        </Button>
         {deleteCb ? <Button size="small" color="primary" onClick={() => deleteCb(fileName)}>
           Delete
         </Button> : ''}

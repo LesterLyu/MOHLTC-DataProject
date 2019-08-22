@@ -3,14 +3,18 @@ const router = express.Router();
 const {packageController} = require('../../controller/v2');
 const {
     userGetWorkbook, userGetPackage, adminGetPackage, adminCreatePackage, adminGetAllPackages, userGetAllPackages,
-    adminDeletePackage, userSaveWorkbook, userSubmitPackage
+    adminDeletePackage, userSaveWorkbook, userSubmitPackage, adminGetPackageOrganizations, adminGetUserWorkbook
 } = packageController;
 
-router.get('/api/v2/admin/packages/:name', adminGetPackage);
+router.get('/api/v2/admin/packages/:name/:organization', adminGetPackage);
+
+router.get('/api/v2/admin/packages/:name/organizations', adminGetPackageOrganizations);
 
 router.get('/api/v2/packages/:name', userGetPackage);
 
 router.get('/api/v2/packages/:packageName/:name', userGetWorkbook);
+
+router.get('/api/v2/admin/packages/:packageName/:organizationName/:workbookName', adminGetUserWorkbook);
 
 router.put('/api/v2/packages/:packageName/:name', userSaveWorkbook);
 

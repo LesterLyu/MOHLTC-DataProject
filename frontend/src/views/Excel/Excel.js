@@ -374,7 +374,22 @@ class Excel extends Component {
         })
     } else if (this.mode === 'user') {
       const {name, packageName} = this.props.match.params;
-      this.excelManager.readWorkbookFromDatabase(name, packageName, false)
+      this.excelManager.readWorkbookFromDatabase(name, packageName)
+        .then(data => {
+          if (!data) return;
+          const {workbook, fileName} = data;
+          this.workbook = workbook;
+          this.setState({
+            fileName,
+            currentSheetIdx: 0,
+            sheetWidth,
+            sheetHeight,
+            loadingMessage: '', loaded: true
+          });
+        })
+    } else if (this.mode === 'admin view') {
+      const {workbookName, packageName, organizationName} = this.props.match.params;
+      this.excelManager.readWorkbookFromDatabase(workbookName, packageName, organizationName)
         .then(data => {
           if (!data) return;
           const {workbook, fileName} = data;
@@ -488,6 +503,17 @@ class Excel extends Component {
           </Card>
           {this.common()}
         </div>)
+    } else {
+      return (
+        <div className="animated fadeIn">
+          <Card xs={12}>
+            <ExcelAppBar fileName={this.state.fileName} onFileNameChange={this.onFileNameChange} context={this}/>
+            <FormulaBar context={this}/>
+            <Sheets ref={this.sheetRef} context={this}/>
+            <ExcelBottomBar context={this}/>
+          </Card>
+          {this.common()}
+        </div>);
     }
   }
 }

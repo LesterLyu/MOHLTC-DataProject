@@ -16,6 +16,9 @@ const useStyles = makeStyles(theme => ({
   },
   note: {
     paddingBottom: 10,
+  },
+  adminNotes: {
+    whiteSpace: 'pre'
   }
 }));
 
@@ -23,6 +26,7 @@ export default function PackageView(props) {
   const {params, showMessage} = props;
   const admin = params.mode === 'admin';
   const packageName = props.match.params.name;
+  const organization = props.match.params.organization;
   const classes = useStyles();
   const [values, setValues] = React.useState({
     data: null,
@@ -30,8 +34,8 @@ export default function PackageView(props) {
   });
 
   useEffect(() => {
-    (admin ? adminGetPackage : userGetPackage)(packageName)
-      .then(data => setValues(values => ({...values, data})))
+    (admin ? adminGetPackage : userGetPackage)(packageName, organization)
+      .then(data => setValues(values => ({...values, data, userNotes: data.userNotes})))
       .catch(e => showMessage(...buildErrorParams(e)))
 
   }, [packageName, admin, showMessage]);
@@ -44,11 +48,19 @@ export default function PackageView(props) {
       const name = workbooks[i].name;
       list.push(
         <Grid key={i} item>
-          <PackageCard type="excel" fileName={name} editHref={'/packages/' + packageName + '/' + name}/>
+          <PackageCard type="excel" fileName={name} onOpen={onOpen}/>
         </Grid>
       )
     }
     return list;
+  };
+
+  const onOpen = name => e => {
+    if (admin) {
+      props.history.push('/admin/packages/' + packageName + '/' + organization + '/' + name);
+    } else {
+      props.history.push('/packages/' + packageName + '/' + name);
+    }
   };
 
   const handleChange = useCallback((name, value) => {
@@ -59,7 +71,7 @@ export default function PackageView(props) {
 
   const submit = async () => {
     try {
-      const response = await userSubmitPackage(packageName, {userNotes: values.userNotes})
+      const response = await userSubmitPackage(packageName, {userNotes: values.userNotes});
       props.showMessage(response.message, 'success');
     } catch (e) {
       props.showMessage(...buildErrorParams(e));
@@ -83,6 +95,23 @@ export default function PackageView(props) {
     )
   };
 
+  const renderAdminContents = () => {
+    return (
+      <>
+        <TextField
+          disabled
+          label="User Notes"
+          value={values.userNotes}
+          className={classes.note}
+          onChange={handleChangeEvent('userNotes')}
+          multiline
+          margin="normal"
+          fullWidth
+        />
+      </>
+    )
+  };
+
   return (
     <Fade in>
       <Paper className={classes.container}>
@@ -91,14 +120,14 @@ export default function PackageView(props) {
             <Typography variant="h6" gutterBottom>
               {packageName}
             </Typography>
-            <Typography variant="subtitle1" gutterBottom>
+            <Typography variant="subtitle1" gutterBottom className={classes.adminNotes}>
               {values.data ? ('Note: ' + values.data.adminNotes) : ''}
             </Typography>
           </Grid>
           {allWorkbooks()}
         </Grid>
         <br/>
-        {admin ? null : renderUserContents()}
+        {admin ? renderAdminContents() : renderUserContents()}
       </Paper>
     </Fade>)
 }

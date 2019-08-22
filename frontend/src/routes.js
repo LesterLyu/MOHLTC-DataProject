@@ -39,6 +39,7 @@ const routes = [
 
   {path: '/workbooks/template/:name/', exact: true, name: 'Edit Workbook', component: Excel, params: {mode: 'admin edit'}},
   {path: '/workbooks/create', exact: true, name: 'Create Workbook', component: Excel, params: {mode: 'admin create'}},
+  {path: '/admin/packages/:packageName/:organizationName/:workbookName', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'admin view'}},
 
   {path: '/workbooks/attributes', exact: true, name: 'Attributes', component: AttCat, params: {mode: 'att'}},
   {path: '/workbooks/categories', exact: true, name: 'Categories', component: AttCat, params: {mode: 'cat'}},
@@ -51,9 +52,9 @@ const routes = [
 
   {path: '/admin/packages/create', exact: true, name: 'Create Package', component: CreatePackage},
   {path: '/admin/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'admin'}},
-  {path: '/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'user'}},
+  {path: '/packages', exact: true, name: 'My Packages', component: Packages,  params: {mode: 'user'}},
 
-  {path: '/admin/packages/:name', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'admin'}},
+  {path: '/admin/packages/:name/:organization', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'admin'}},
   {path: '/packages/:name', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'user'}},
 
   {path: '/packages/:packageName/:name', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'user'}},
