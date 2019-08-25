@@ -21,8 +21,8 @@ class WorkbookManager {
   }
 
   getWorkbook(name, packageName, organizationName) {
-    const url = arguments.length === 1 ? '/api/v2/admin/workbook/' + name
-      : (arguments.length === 2 ? '/api/v2/packages/' + packageName + '/' + name
+    const url = packageName === undefined ? '/api/v2/admin/workbook/' + name
+      : (organizationName === undefined ? '/api/v2/packages/' + packageName + '/' + name
         : `/api/v2/admin/packages/${packageName}/${organizationName}/${name}`);
     return axios.get(config.server + url, axiosConfig)
       .then(response => {

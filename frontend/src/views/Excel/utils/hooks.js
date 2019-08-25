@@ -39,7 +39,7 @@ class Hooks {
 
   /**
    * Call a hook.
-   * @param {ExcelHooks} hookName
+   * @param {ExcelHooks|string} hookName
    * @param args
    */
   invoke(hookName, ...args) {
