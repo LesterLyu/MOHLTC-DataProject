@@ -80,7 +80,7 @@ module.exports = {
 
     config.optimization.splitChunks.cacheGroups = {
       excel: {
-        test: /[\\/]node_modules[\\/](xlsx-populate|chevrotain|fast-formula-parser|jstat|pako|jszip|lodash|elliptic|bn.js|cfb|readable-stream|asn1.js|saxes|buffer|hash.js|sha.js|diffie-hellman|des.js|parse-san1|md5.js|lie|bessel|regexp-to-ast|browserify-aes|browserify-rsa|parse-asn1|xmlchars|)[\\/]/,
+        test: /[\\/]node_modules[\\/](xlsx-populate|chevrotain|fast-formula-parser|jstat|object-hash|pako|jszip|elliptic|bn.js|cfb|readable-stream|asn1.js|saxes|buffer|hash.js|sha.js|diffie-hellman|des.js|parse-san1|md5.js|lie|bessel|regexp-to-ast|browserify-aes|browserify-rsa|parse-asn1|xmlchars|)[\\/]/,
         name: 'excel-lib',
         chunks: 'all',
       }

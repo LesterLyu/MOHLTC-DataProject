@@ -15,7 +15,7 @@ import {
 } from "@material-ui/icons";
 import {TableMergeCells} from "mdi-material-ui";
 import PropTypes from "prop-types";
-import {SketchPicker} from 'react-color';
+import SketchPicker from 'react-color/lib/Sketch';
 import SelectField from './SelectField';
 import {hooks} from '../utils';
 
