@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {
-  Paper, Grid, Typography, Button, TextField, Fade, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions
+  Paper, Grid, Typography, Button, TextField, Fade
 } from '@material-ui/core';
 import {adminGetPackage, userGetPackage, userSubmitPackage} from "../../controller/package";
 import PackageCard from './components/Card';
@@ -38,7 +38,7 @@ export default function PackageView(props) {
       .then(data => setValues(values => ({...values, data, userNotes: data.userNotes})))
       .catch(e => showMessage(...buildErrorParams(e)))
 
-  }, [packageName, admin, showMessage]);
+  }, [packageName, organization, admin, showMessage]);
 
   const allWorkbooks = () => {
     const list = [];

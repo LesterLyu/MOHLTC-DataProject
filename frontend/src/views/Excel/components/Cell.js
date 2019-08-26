@@ -35,16 +35,6 @@ const supported = {
   }
 };
 
-const defaultStyle = {
-  borderRight: '1px solid #ccc',
-  borderBottom: '1px solid #ccc',
-  padding: '0 4px 0 4px',
-  lineHeight: 'normal',
-  textAlign: 'left',
-  whiteSpace: 'pre',
-  overflow: 'visible',
-};
-
 let excel;
 
 class Cell extends PureComponent {

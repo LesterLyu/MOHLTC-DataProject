@@ -73,7 +73,7 @@
   "browserslist": [
     ">0.2%",
     "not dead",
-    "not ie <= 9",
+    "not IE > 0",
     "not op_mini all"
   ],
   "jest": {

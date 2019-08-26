@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import {
   Paper,
@@ -45,7 +45,7 @@ export default function CreatePackage(props) {
     } else if (params.mode === 'user') {
       userGetPackages().then(packages => setValues(values => ({...values, packages})));
     }
-  }, []);
+  }, [params.mode]);
 
   const allPackages = () => {
     const list = [];
