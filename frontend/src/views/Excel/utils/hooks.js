@@ -37,6 +37,12 @@ class Hooks {
     }
   }
 
+  remove(hookName, cb) {
+    let hook = this.hooks[hookName];
+    if (!hook) return;
+    this.hooks[hookName] = hook.filter(oldCb => oldCb !== cb);
+  }
+
   /**
    * Call a hook.
    * @param {ExcelHooks|string} hookName
