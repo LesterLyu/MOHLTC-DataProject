@@ -1,5 +1,5 @@
 # DataProject  [![Build Status](https://travis-ci.com/LesterLyu/MOHLTC-DataProject.svg?branch=dev-lester)](https://travis-ci.com/LesterLyu/MOHLTC-DataProject)
-## Live on http://ec2-3-16-106-158.us-east-2.compute.amazonaws.com/react
+## Live on http://ec2-3-13-195-83.us-east-2.compute.amazonaws.com/react
 
 ## Documents
 > Please ignore the documents that is not listed here.
