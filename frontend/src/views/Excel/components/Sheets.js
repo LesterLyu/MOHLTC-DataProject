@@ -1,7 +1,7 @@
 import {Component} from "react";
 import React from "react";
 import {VariableSizeGrid} from 'react-window';
-import Cell from './Cell';
+import Cell, {mouse} from './Cell';
 import Selections from './Selections';
 
 /**
@@ -106,8 +106,8 @@ class Worksheets extends Component {
     if (index === 0) return 40;
     const col = sheet.column(index);
     if (col.hidden()) return 0;
-    const height = col.width();
-    return height === undefined ? 80 : height * 9.69;
+    const width = col.width();
+    return width === undefined ? 80 : width * 9.69;
   };
 
   /**
@@ -135,6 +135,7 @@ class Worksheets extends Component {
     if (e.button === 0) {
       this.isMouseDown = false;
     }
+    mouse.mouseDown = false;
   };
 
   onMouseOver = (row, col, cellStyle) => {

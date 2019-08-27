@@ -407,6 +407,7 @@ class Excel extends Component {
 
   renderCurrentSheet() {
     this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
+    this.sheetRef.current.selections.recalculateStyle();
   }
 
   onFileNameChange = (event) => {

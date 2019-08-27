@@ -13,6 +13,7 @@ const styles = {
     textAlign: 'left',
     whiteSpace: 'pre',
     overflow: 'visible',
+    // transition: 'all 0.1s',
   },
   notSelectable: {
     '-webkit-user-select': 'none',
@@ -21,6 +22,29 @@ const styles = {
     '-ms-user-select': 'none',
     '-o-user-select': 'none',
     'user-select': 'none',
+  },
+  columnResize: {
+    borderRight: '1px solid #b9b9b9',
+    height: '100%',
+    width: 5,
+    float: 'right',
+    cursor: 'ew-resize',
+    '&:hover': {
+      borderRight: '2px solid #6e6e6e',
+    }
+  },
+  rowResize: {
+    borderBottom: '1px solid #b9b9b9',
+    width: '100%',
+    position: 'absolute',
+    verticalAlign: 'bottom',
+    left: 0,
+    bottom: 0,
+    cursor: 'ns-resize',
+    height: 5,
+    '&:hover': {
+      borderBottom: '2px solid #6e6e6e',
+    },
   }
 };
 
@@ -47,11 +71,18 @@ const defaultStyle = {
 
 let excel;
 
+const mouse = {
+  mouseDown: false, movement: null, movementTarget: null
+};
+
+export {mouse};
+
 class Cell extends PureComponent {
 
   constructor(props) {
     super(props);
     excel = window.excel;
+    this.mouseDown = false;
   }
 
   static rowHeaders = [];
@@ -249,38 +280,104 @@ class Cell extends PureComponent {
     return {mergedStyle, value};
   }
 
+  onMouseDownX = index => () => {
+    mouse.mouseDown = true;
+    mouse.movement = 0;
+    mouse.movementTarget = ['x', index];
+  };
+
+  onMouseDownY = index => () => {
+    mouse.mouseDown = true;
+    mouse.movement = 0;
+    mouse.movementTarget = ['y', index];
+  };
+
+  onMouseUp = () => {
+    if (mouse.mouseDown) {
+      const {data} = this.props;
+      const {sheet} = data;
+      mouse.mouseDown = false;
+      console.log(mouse.movement, mouse.movementTarget);
+      if (mouse.movementTarget[0] === 'x' && mouse.movementTarget[1] > 0 && mouse.movement != null) {
+        // const col = sheet.column(movementTarget[1]);
+        // const width = movement / 9.69 + (col.width() == null ? 80 / 9.69 : col.width());
+        // col.width((width >= 0) ? width : 0);
+        // excel.renderCurrentSheet();
+      } else if (mouse.movementTarget[0] === 'y' && mouse.movementTarget[1] > 0 &&mouse.movement != null) {
+        // const row = sheet.row(movementTarget[1]);
+        // const height = movement / 1.666 + (row.height() == null ? 24 / 1.666 : row.height());
+        // row.height((height >= 0) ? height : 0);
+        // excel.renderCurrentSheet();
+      }
+    }
+  };
+
+  onMouseMoveX = e => {
+    if (mouse.mouseDown) {
+      const {data} = this.props;
+      const {sheet} = data;
+      mouse.movement = e.movementX;
+      if (mouse.movementTarget[1] > 0 && mouse.movement != null) {
+        const col = sheet.column(mouse.movementTarget[1]);
+        const width = mouse.movement / 9.69 + (col.width() == null ? 80 / 9.69 : col.width());
+        col.width((width >= 0) ? width : 0);
+        excel.renderCurrentSheet();
+      }
+    }
+  };
+
+  onMouseMoveY = e => {
+    if (mouse.mouseDown) {
+      mouse.movement = e.movementY;
+      const {data} = this.props;
+      const {sheet} = data;
+      if (mouse.movementTarget[1] > 0 && mouse.movement != null) {
+        const row = sheet.row(mouse.movementTarget[1]);
+        const height = mouse.movement / 1.666 + (row.height() == null ? 24 / 1.666 : row.height());
+        row.height((height >= 0) ? height : 0);
+        excel.renderCurrentSheet();
+      }
+    }
+  };
+
   renderColumnHeader(index, style) {
-    const {selections} = this.props.data;
+    const {classes, data} = this.props;
+    const {selections} = data;
     let ref = Cell.colHeaders[index];
     if (!ref)
       ref = Cell.colHeaders[index] = React.createRef();
-    let className = 'sheet-header not-selectable';
+    let className = 'col-header ' + classes.notSelectable;
     if (selections.data[1] <= index && index <= selections.data[3])
       className += ' highlight';
 
     const value = ac.columnNumberToName(index);
     return (
-      <div ref={ref} style={style} className={className} onClick={() => {
+      <div ref={ref} style={style} className={className} onMouseUp={this.onMouseUp}
+           onMouseMove={this.onMouseMoveX} onClick={() => {
         console.log(`Clicked Column header ${value}`)
       }}>
         {value}
+        <span className={classes.columnResize} onMouseDown={this.onMouseDownX(index)}/>
       </div>
     )
   }
 
   renderRowHeader(index, style) {
-    const {selections} = this.props.data;
+    const {classes, data} = this.props;
+    const {selections} = data;
     let ref = Cell.rowHeaders[index];
     if (!ref)
       ref = Cell.rowHeaders[index] = React.createRef();
-    let className = 'sheet-header not-selectable';
+    let className = 'row-header ' + classes.notSelectable;
     if (selections.data[0] <= index && index <= selections.data[2])
       className += ' highlight';
     return (
-      <div ref={ref} style={style} className={className} onClick={() => {
+      <div ref={ref} style={style} className={className} onMouseUp={this.onMouseUp}
+           onMouseMove={this.onMouseMoveY} onClick={() => {
         console.log(`Clicked Row header ${index}`)
       }}>
         {index}
+        <span className={classes.rowResize} onMouseDown={this.onMouseDownY(index)}/>
       </div>
     )
   }
@@ -325,6 +422,8 @@ class Cell extends PureComponent {
     let rowHeight = cell.row().height;
     rowHeight = rowHeight ? 24 : rowHeight / 0.6;
     mergedStyle.textDecoration = undefined;
+    mergedStyle.textDecorationLine = undefined;
+    mergedStyle.textDecorationStyle = undefined;
     for (let i = 0; i < value.length; i++) {
       const fragment = value.get(i);
       const style = Cell.getFontStyles(fragment, rowHeight);

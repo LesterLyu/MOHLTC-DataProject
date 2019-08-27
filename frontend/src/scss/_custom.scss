@@ -14,21 +14,41 @@ button:focus {
   color: #4f4f4f;
 }
 
-.sheet-header {
+.row-header {
   text-align: center;
   overflow: hidden;
   background: rgb(247, 248, 249);
   color: rgb(87, 90, 95);
   border-right: 1px solid rgb(185, 185, 185);
-  border-bottom: 1px solid rgb(185, 185, 185);
+  //border-bottom: 1px solid rgb(185, 185, 185);
   font-size: 13px;
+  //transition: all 0.1s;
 }
 
-.sheet-header:hover {
+.col-header {
+  text-align: center;
+  overflow: hidden;
+  background: rgb(247, 248, 249);
+  color: rgb(87, 90, 95);
+  //border-right: 1px solid rgb(185, 185, 185);
+  border-bottom: 1px solid rgb(185, 185, 185);
+  font-size: 13px;
+  //transition: all 0.1s;
+}
+
+.col-header:hover {
   background: rgb(184, 226, 196);
 }
 
-.sheet-header.highlight {
+.row-header:hover {
+  background: rgb(184, 226, 196);
+}
+
+.col-header.highlight {
+  background: rgb(200, 200, 200);
+}
+
+.row-header.highlight {
   background: rgb(200, 200, 200);
 }
 
