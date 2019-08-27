@@ -43,6 +43,10 @@ class Hooks {
     this.hooks[hookName] = hook.filter(oldCb => oldCb !== cb);
   }
 
+  clear() {
+    this.hooks = {};
+  }
+
   /**
    * Call a hook.
    * @param {ExcelHooks|string} hookName

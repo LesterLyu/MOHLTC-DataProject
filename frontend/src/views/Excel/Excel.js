@@ -428,6 +428,12 @@ class Excel extends Component {
       || this.state.contextMenu !== nextState.contextMenu
   }
 
+  componentWillUnmount() {
+    hooks.clear();
+    window.excel = undefined;
+    window.Cell = undefined;
+  }
+
   common() {
     return (
       <>
