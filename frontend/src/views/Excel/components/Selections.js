@@ -69,6 +69,10 @@ export default class Selections {
     this._data = [1, 1, 1, 1];
   };
 
+  recalculateStyle = () => {
+    this.setSelections(this._data, undefined, false);
+  };
+
   setSelections = (selections, startCell, runHooks = true) => {
     if (startCell) this._startCell = startCell;
     if (!this._startCell && !startCell) this._startCell = [selections[0], selections[1]];

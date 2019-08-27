@@ -407,6 +407,7 @@ class Excel extends Component {
 
   renderCurrentSheet() {
     this.sheetContainerRef.current.resetAfterIndices({columnIndex: 0, rowIndex: 0});
+    this.sheetRef.current.selections.recalculateStyle();
   }
 
   onFileNameChange = (event) => {
@@ -425,6 +426,12 @@ class Excel extends Component {
       || this.state.openDataValidationDialog !== nextState.openDataValidationDialog
       || this.state.openEditor !== nextState.openEditor
       || this.state.contextMenu !== nextState.contextMenu
+  }
+
+  componentWillUnmount() {
+    hooks.clear();
+    window.excel = undefined;
+    window.Cell = undefined;
   }
 
   common() {

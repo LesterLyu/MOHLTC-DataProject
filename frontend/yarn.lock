@@ -13990,7 +13990,7 @@ ws@^6.0.0, ws@^6.1.2:
 
 "xlsx-populate@https://github.com/LesterLyu/xlsx-populate.git":
   version "1.19.1"
-  resolved "https://github.com/LesterLyu/xlsx-populate.git#63bd1c80fe725ace7cc1caaa7c1ae6e9d348f9b2"
+  resolved "https://github.com/LesterLyu/xlsx-populate.git#58f3205f18807705d88a03a5cab06a908036bafc"
   dependencies:
     cfb "^1.1.0"
     fast-formula-parser "git+https://github.com/LesterLyu/fast-formula-parser.git"

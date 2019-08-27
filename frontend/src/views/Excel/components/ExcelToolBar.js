@@ -54,8 +54,7 @@ class ExcelToolBar extends Component {
     for (let i = 0; i < fontSizeOptions.length; i++) {
       this.fontSizeOptions.push({value: fontSizeOptions[i], label: fontSizeOptions[i] + ''});
     }
-
-    hooks.add('afterSelection', (row, col, row2, col2) => {
+    this.afterSelection = (row, col, row2, col2) => {
       if (this.history.current.row === row && this.history.current.col === col) return;
       const cell = this.excel.workbook.sheet(this.excel.currentSheetIdx).cell(row, col);
       const style = {
@@ -71,7 +70,12 @@ class ExcelToolBar extends Component {
         selectedFontFamily: style.fontFamily ? style.fontFamily : 'Calibri',
       });
       this.history.current = {row, col}
-    });
+    };
+    hooks.add('afterSelection', this.afterSelection);
+  }
+
+  componentWillUnmount() {
+    hooks.remove('afterSelection', this.afterSelection);
   }
 
   shouldComponentUpdate(nextProps, nextState, nextContext) {
