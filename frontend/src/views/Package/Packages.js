@@ -82,7 +82,7 @@ export default function CreatePackage(props) {
     if (organizations.length === 0) {
       console.log('No organizations');
     } else if (organizations.length === 1) {
-      props.history.push('/admin/packages/' + pack.name + '/' + organizations[0]);
+      props.history.push('/admin/packages/view/' + pack.name + '/org/' + organizations[0]);
     } else {
       setValues(values => ({...values, organizations, picker: anchorEl, pickedPackage: pack}))
     }
@@ -131,7 +131,7 @@ export default function CreatePackage(props) {
   };
 
   const handlePick = (org) => {
-    props.history.push('/admin/packages/view/' + values.pickedPackage.name + '/' + org);
+    props.history.push('/admin/packages/view/' + values.pickedPackage.name + '/org/' + org);
   };
 
   return (

@@ -34,13 +34,11 @@ const routes = [
   {path: "/registrationRequest", exact:true, name:"Registration Request", component:userRequest},
 
   {path: '/users', exact: true, name: 'Users', component: Users},
-  {path: '/workbooks/fill', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'user'}},
-  {path: '/workbooks/fill/:name', exact: true, name: 'Fill Workbook', component: Excel, params: {mode: 'user edit'}},
   {path: '/workbooks/template', exact: true, name: 'Workbooks', component: Workbooks, params: {mode: 'admin'}},
 
   {path: '/workbooks/template/:name/', exact: true, name: 'Edit Workbook', component: Excel, params: {mode: 'admin edit'}},
   {path: '/workbooks/create', exact: true, name: 'Create Workbook', component: Excel, params: {mode: 'admin create'}},
-  {path: '/admin/packages/:packageName/:organizationName/:workbookName', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'admin view'}},
+  {path: '/admin/packages/view/:packageName/org/:organizationName/workbook/:workbookName', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'admin view'}},
 
   {path: '/workbooks/attributes', exact: true, name: 'Attributes', component: AttCat, params: {mode: 'att'}},
   {path: '/workbooks/categories', exact: true, name: 'Categories', component: AttCat, params: {mode: 'cat'}},
@@ -56,10 +54,10 @@ const routes = [
   {path: '/admin/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'admin'}},
   {path: '/packages', exact: true, name: 'My Packages', component: Packages,  params: {mode: 'user'}},
 
-  {path: '/admin/packages/view/:name/:organization', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'admin'}},
+  {path: '/admin/packages/view/:name/org/:organization', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'admin'}},
   {path: '/packages/:name', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'user'}},
 
-  {path: '/packages/:packageName/:name', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'user'}},
+  {path: '/packages/:packageName/workbook/:name', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'user'}},
 
   {path: '/admin/group', exact: true, name: 'Set Group Name', component: GroupName},
   {path: '/admin/organizations', exact: true, name: 'Organizations', component: Organizations},

@@ -48,6 +48,13 @@ export async function adminGetPackageOrganizations(packageName) {
   }
 }
 
+export async function adminEditPackage(name, pack) {
+  const response = await axios.put(config.server + '/api/v2/admin/packages/' + name, pack, axiosConfig);
+  if (check(response)) {
+    return response.data;
+  }
+}
+
 export async function adminDeletePackage(packageName) {
   const response = await axios.delete(config.server + '/api/v2/admin/packages/' + packageName, axiosConfig);
   if (check(response)) {

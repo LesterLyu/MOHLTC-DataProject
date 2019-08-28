@@ -57,9 +57,9 @@ export default function PackageView(props) {
 
   const onOpen = name => e => {
     if (admin) {
-      props.history.push('/admin/packages/' + packageName + '/' + organization + '/' + name);
+      props.history.push('/admin/packages/view/' + packageName + '/org/' + organization + '/workbook/' + name);
     } else {
-      props.history.push('/packages/' + packageName + '/' + name);
+      props.history.push('/packages/' + packageName + '/workbook/' + name);
     }
   };
 

@@ -8,7 +8,7 @@ import {
 } from '@material-ui/pickers';
 import Dropdown from "./components/Dropdown";
 import {getAllWorkbooksForAdmin} from "../../controller/workbookManager";
-import {editPackage, adminGetPackage} from "../../controller/package"
+import {adminEditPackage, adminGetPackage} from "../../controller/package"
 import {getOrganizationTypes} from "../../controller/system"
 
 
@@ -118,7 +118,7 @@ export default function EditPackage(props) {
     }
 
     try {
-      const data = await editPackage({
+      const data = await adminEditPackage(name, {
         name: values.name,
         startDate: values.startDate,
         endDate: values.endDate,
