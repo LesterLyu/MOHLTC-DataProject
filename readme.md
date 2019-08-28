@@ -21,11 +21,12 @@
 ## Purpose
 This is complicated.
 
-## Language
+## Stack
 The logic of this application is mainly done in Javascript. Tools used:
 - Server-side: *Node.js*, *Express*
   - User authentication: Passport
   - Database Driver: Mongoose
 - Front-end Library: *React.js*
-- Front-end Styling: [Coreui](https://github.com/coreui/coreui-react) & [Material-ui](https://github.com/mui-org/material-ui)
+- Front-end project template: [Coreui](https://github.com/coreui/coreui-react)
+- Front-end Styling: [Material-ui](https://github.com/mui-org/material-ui)
 - Database: MongoDB
