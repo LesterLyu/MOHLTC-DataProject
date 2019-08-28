@@ -8,6 +8,7 @@
     - [ ] User update profile. (email, passwords, ...) <sup>*3</sup>
     - [ ] User forget passeord. (send email to reset pasword) <sup>*3</sup>
     - [ ] User registration: managers should receive email of registration requests.<sup>*3</sup>
+    - [ ] Admin's "All Package" should display only the submitted packages.
     
     
   - Front-end Excel viewer
