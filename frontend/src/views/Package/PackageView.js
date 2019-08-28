@@ -59,7 +59,7 @@ export default function PackageView(props) {
     if (admin) {
       props.history.push('/admin/packages/view/' + packageName + '/org/' + organization + '/workbook/' + name);
     } else {
-      props.history.push('/packages/' + packageName + '/workbook/' + name);
+      props.history.push('/packages/' + packageName + '/' + organization + '/workbook/' + name);
     }
   };
 
@@ -71,7 +71,7 @@ export default function PackageView(props) {
 
   const submit = async () => {
     try {
-      const response = await userSubmitPackage(packageName, {userNotes: values.userNotes});
+      const response = await userSubmitPackage(packageName, organization, {userNotes: values.userNotes});
       props.showMessage(response.message, 'success');
     } catch (e) {
       props.showMessage(...buildErrorParams(e));

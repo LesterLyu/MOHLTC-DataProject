@@ -20,9 +20,9 @@ class WorkbookManager {
     return instance;
   }
 
-  getWorkbook(name, packageName, organizationName) {
+  getWorkbook(name, packageName, organizationName, admin) {
     const url = packageName === undefined ? '/api/v2/admin/workbook/' + name
-      : (organizationName === undefined ? '/api/v2/packages/' + packageName + '/' + name
+      : (!admin ? `/api/v2/packages/${packageName}/${organizationName}/${name}`
         : `/api/v2/admin/packages/${packageName}/${organizationName}/${name}`);
     return axios.get(config.server + url, axiosConfig)
       .then(response => {
@@ -38,9 +38,9 @@ class WorkbookManager {
     return XlsxPopulate.fromBlankAsync()
   }
 
-  async readWorkbookFromDatabase(fileName, packageName, organizationName) {
+  async readWorkbookFromDatabase(fileName, packageName, organizationName, admin) {
     try {
-      const response = await this.getWorkbook(fileName, packageName, organizationName);
+      const response = await this.getWorkbook(fileName, packageName, organizationName, admin);
       const {workbook, populate = {}} = response.data;
       const {file, name} = workbook;
       const wb = await XlsxPopulate.fromDataAsync(file, {base64: true});
@@ -185,9 +185,9 @@ class WorkbookManager {
     if (admin)
       return await axios.post(config.server + '/api/v2/admin/workbook', data, axiosConfig);
     else {
-      const {packageName} = excelInstance;
+      const {packageName, organizationName} = excelInstance;
       data.sheets = undefined;
-      return await userSaveWorkbook(packageName, fileName, data);
+      return await userSaveWorkbook(packageName, organizationName, fileName, data);
     }
 
   }

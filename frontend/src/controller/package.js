@@ -62,29 +62,29 @@ export async function adminDeletePackage(packageName) {
   }
 }
 
-export async function userGetPackages() {
-  const response = await axios.get(config.server + '/api/v2/packages', axiosConfig);
+export async function userGetPackages(org) {
+  const response = await axios.get(config.server + '/api/v2/packages/' + org, axiosConfig);
   if (check(response)) {
     return response.data.packages;
   }
 }
 
-export async function userGetPackage(packageName) {
-  const response = await axios.get(config.server + '/api/v2/packages/' + packageName, axiosConfig);
+export async function userGetPackage(packageName, org) {
+  const response = await axios.get(config.server + '/api/v2/packages/' + packageName + '/' + org, axiosConfig);
   if (check(response)) {
     return response.data.package;
   }
 }
 
-export async function userSaveWorkbook(packageName, workbookName, data) {
-  const response = await axios.put(config.server + `/api/v2/packages/${packageName}/${workbookName}`, data, axiosConfig);
+export async function userSaveWorkbook(packageName, organizationName, workbookName, data) {
+  const response = await axios.put(config.server + `/api/v2/packages/${packageName}/${organizationName}/${workbookName}`, data, axiosConfig);
   if (check(response)) {
     return response;
   }
 }
 
-export async function userSubmitPackage(packageName, {userNotes}) {
-  const response = await axios.post(config.server + `/api/v2/packages/${packageName}`, {userNotes}, axiosConfig);
+export async function userSubmitPackage(packageName, organization, {userNotes}) {
+  const response = await axios.post(config.server + `/api/v2/packages/${packageName}/${organization}`, {userNotes}, axiosConfig);
   if (check(response)) {
     return response.data;
   }

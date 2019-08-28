@@ -55,9 +55,9 @@ const routes = [
   {path: '/packages', exact: true, name: 'My Packages', component: Packages,  params: {mode: 'user'}},
 
   {path: '/admin/packages/view/:name/org/:organization', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'admin'}},
-  {path: '/packages/:name', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'user'}},
+  {path: '/packages/:name/:organization', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'user'}},
 
-  {path: '/packages/:packageName/workbook/:name', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'user'}},
+  {path: '/packages/:packageName/:organization/workbook/:name', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'user'}},
 
   {path: '/admin/group', exact: true, name: 'Set Group Name', component: GroupName},
   {path: '/admin/organizations', exact: true, name: 'Organizations', component: Organizations},

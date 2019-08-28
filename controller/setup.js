@@ -14,7 +14,7 @@ function isEmail(email) {
 module.exports = {
     // set up
     setup: async () => {
-        const orgCount = await Organization.count();
+        const orgCount = await Organization.countDocuments();
         if (orgCount === 0) {
             const organization = new Organization({
                 groupNumber: 0,
@@ -23,7 +23,7 @@ module.exports = {
             await organization.save();
         }
 
-        const groupCount = await Group.count();
+        const groupCount = await Group.countDocuments();
         if (groupCount === 0) {
             const group = new Group({
                 groupNumber: 0,
@@ -31,7 +31,7 @@ module.exports = {
             });
             await group.save();
         }
-        const userCount = User.count();
+        const userCount = User.countDocuments();
         config.firstTimeRun = userCount === 0;
     },
 

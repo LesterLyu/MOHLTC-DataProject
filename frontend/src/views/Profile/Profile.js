@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {getProfile} from "../../controller/userManager";
+import {getProfile, getCurrentUserOrganizations} from "../../controller/userManager";
 import {Fade, Chip, Typography, Card} from "@material-ui/core";
 import PropTypes from "prop-types";
 import {withStyles} from "@material-ui/core";
@@ -42,19 +42,31 @@ class Profile extends Component {
         groupNumber: '',
         validated: '',
         createDate: '',
-      }
+      },
+      organizations: [],
     };
     getProfile().then(profile => profile && this.setState({profile}));
+    getCurrentUserOrganizations().then(organizations => this.setState({organizations}))
   }
 
   permissions() {
     const permissions = [];
     this.state.profile.permissions.forEach((permission, idx) => {
       permissions.push(
-        <Chip key={idx} color={"primary"} label={permission} variant="outlined" className={this.props.classes.chip}/>
+        <Chip key={idx} color={"default"} label={permission} variant="outlined" className={this.props.classes.chip}/>
       )
     });
     return permissions;
+  }
+
+  organizations() {
+    const organizations = [];
+    this.state.organizations.forEach((organization, idx) => {
+      organizations.push(
+        <Chip key={idx} color="primary" label={organization} variant="outlined" className={this.props.classes.chip}/>
+      )
+    });
+    return organizations;
   }
 
   yesOrNoIcon(bool) {
@@ -93,6 +105,7 @@ class Profile extends Component {
             Validated: {this.yesOrNoIcon(profile.validated)}<br/>
             Active: {this.yesOrNoIcon(profile.active)}<br/>
             Permissions: {this.permissions()} <br/>
+            Organizations: {this.organizations()} <br/>
           </div>
         </Card>
       </Fade>

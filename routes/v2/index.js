@@ -7,4 +7,5 @@ module.exports = [
     require('./package'),
     require('./group'),
     require('./organization'),
+    require('./user'),
 ];

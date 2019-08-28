@@ -28,6 +28,7 @@ class Excel extends Component {
     super(props);
     this.mode = props.params.mode;
     this.packageName = this.props.match.params.packageName;
+    this.organizationName = this.props.match.params.organization;
     console.log('mode:', props.params.mode);
     // TODO: disable some cell editing for user (formula editing...)
     window.excel = this;
@@ -373,8 +374,8 @@ class Excel extends Component {
           });
         })
     } else if (this.mode === 'user') {
-      const {name, packageName} = this.props.match.params;
-      this.excelManager.readWorkbookFromDatabase(name, packageName)
+      const {name, packageName, organization} = this.props.match.params;
+      this.excelManager.readWorkbookFromDatabase(name, packageName, organization)
         .then(data => {
           if (!data) return;
           const {workbook, fileName} = data;
@@ -389,7 +390,7 @@ class Excel extends Component {
         })
     } else if (this.mode === 'admin view') {
       const {workbookName, packageName, organizationName} = this.props.match.params;
-      this.excelManager.readWorkbookFromDatabase(workbookName, packageName, organizationName)
+      this.excelManager.readWorkbookFromDatabase(workbookName, packageName, organizationName, true)
         .then(data => {
           if (!data) return;
           const {workbook, fileName} = data;

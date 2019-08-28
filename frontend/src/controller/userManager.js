@@ -121,7 +121,7 @@ export async function signUpLocal(setup, username, password, firstName, lastName
  * @return {Promise<void>}
  */
 export async function sendPasswordResetEmail(email) {
-
+  // TODO
 }
 
 /**
@@ -157,3 +157,9 @@ export async function getProfile() {
   const response = await axios.get(config.server + '/api/profile', axiosConfig);
   if (check(response)) return response.data.profile;
 }
+
+export async function getCurrentUserOrganizations() {
+  const response = await axios.get(config.server + '/api/v2/users/current/organizations', axiosConfig);
+  if (check(response)) return response.data.organizations;
+}
+

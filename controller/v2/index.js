@@ -5,6 +5,7 @@ module.exports = {
     packageController: require('./package'),
     groupController: require('./group'),
     organizationController: require('./organization'),
+    userController: require('./user'),
     ...require('./common'),
     ...require('./helpers')
 };
