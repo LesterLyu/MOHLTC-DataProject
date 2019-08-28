@@ -7,7 +7,7 @@
     
   - Front-end Excel viewer
     - [ ] Should be a way to modify row height and column width for hidden rows/columns.
-    - [ ] Support display excel comments.<sup>*1</sup>
+    - [ ] Support display excel comments.<sup>*2</sup>
     - [ ] Support worksheet protection, that prevents cell from editing.<sup>*2</sup>
     
   - [xlsx-populate](https://github.com/LesterLyu/xlsx-populate) (Excel library used in this project)
