@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const ObjectId = mongoose.Schema.Types.ObjectId;
 
+// not used.
 const packageGroupSchema = new mongoose.Schema({
     groupNumber: {type: Number, required: true},
 

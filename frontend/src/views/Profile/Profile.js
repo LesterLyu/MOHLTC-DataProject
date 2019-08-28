@@ -44,7 +44,7 @@ class Profile extends Component {
         createDate: '',
       }
     };
-    getProfile().then(profile => this.setState({profile}));
+    getProfile().then(profile => profile && this.setState({profile}));
   }
 
   permissions() {

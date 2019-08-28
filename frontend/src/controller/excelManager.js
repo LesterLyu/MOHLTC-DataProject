@@ -61,6 +61,8 @@ class WorkbookManager {
             }
           }
         }
+        // TODO: Re-calculate all formulas here... Make xlsx-populate support formula re-calculate
+
       }
       return this._readWorkbook(wb, null, name);
     } catch (err) {

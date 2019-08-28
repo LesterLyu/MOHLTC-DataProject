@@ -196,7 +196,7 @@ module.exports = {
             });
 
             // find organization values
-            const valueDocs = await Value.find({groupNumber, organizations: {$in: organizations}});
+            const valueDocs = await Value.find({groupNumber, organization: {$in: organizations}});
             for (const valueDoc of valueDocs) {
                 const {organization, values} = valueDoc;
                 // remove this organization in orgs
@@ -326,7 +326,7 @@ module.exports = {
             if (!result) return;
             let {workbook, pack, organizations} = result;
             workbook = await Workbook.findById(workbook._id).populate('sheets');
-            let doc = await PackageValue.findOne({groupNumber, organization: organizations[0]});
+            let doc = await PackageValue.findOne({groupNumber,  package: pack._id, organization: organizations[0]});
             if (!doc)
                 doc = new PackageValue({
                     groupNumber, package: pack._id, organization: organizations[0], values: {}
@@ -370,6 +370,7 @@ module.exports = {
                 values[catId][attId] = atts[attId];
             }
         }
+        valueDoc.markModified('values');
         await valueDoc.save();
         packageValue.histories.push({
             userNotes: userNotes,
