@@ -8,6 +8,7 @@
 - [Excel Indexed Colors](https://github.com/ClosedXML/ClosedXML/wiki/Excel-Indexed-Colors)
 - [Supported excel styles to display in front-end](documents/excel-display.md)
 - [Why this approach?](documents/Generic%20Data%20Project.pdf)
+- [Backlog](documents/backlog.md)
 
 ## Dependencies
 > The libraries you need to **maintain** if you are on this project.
