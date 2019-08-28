@@ -5,7 +5,7 @@ const {agent} = require('../config');
 
 const User = require('../../models/user');
 
-describe("Update a user's status. Used to disable or enable an account.", function () {
+describe.skip("Update a user's status. Used to disable or enable an account.", function () {
     const usernameTest = 'test';
     const passwordTest = 'test';
 
