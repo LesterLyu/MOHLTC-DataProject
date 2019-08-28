@@ -8,6 +8,7 @@ const {
 
 router.get('/api/v2/organizations/:mode?', getOrganizations);
 
+// TODO: write an API for approving a user
 router.post('/api/v2/organization/:name/:userId', OrgAddOneUser);
 
 router.post('/api/v2/organizations', updateOrganization);

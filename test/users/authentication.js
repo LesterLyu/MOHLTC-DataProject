@@ -21,12 +21,37 @@ describe('Local Authentication', function () {
             .send({
                 username: 'test',
                 email: 'email@mail.com',
+                active: true,
+                validated: true,
+                organization: 'IT Cluster',
                 groupNumber: 1, // can also be string
                 firstName: 'firstname',
                 lastName: 'lastName',
                 phoneNumber: '1212122',
                 password: 'test',
                 permissions: Object.values(globalConfig.permissions)
+            })
+            .then((res) => {
+                expect(res).to.have.status(200);
+                expect(res.body.success).to.be.true;
+                done();
+            })
+            .catch(function (err) {
+                throw err;
+            });
+    });
+
+    it('register second account to local server', (done) => {
+        requester.post('/api/signup/local')
+            .send({
+                username: 'manage of King Hospital',
+                email: 'manage@mail.com',
+                organization: 'King Hospital',
+                groupNumber: 1, // can also be string
+                firstName: 'firstname',
+                lastName: 'lastName',
+                phoneNumber: '1212122',
+                password: 'test',
             })
             .then((res) => {
                 expect(res).to.have.status(200);

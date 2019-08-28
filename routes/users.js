@@ -53,7 +53,11 @@ router.get('/validate/:token', user_controller.user_validate);
 // check authentication middleware
 router.use((req, res, next) => {
     if (!req.isAuthenticated()) {
-        return res.status(403).json({loginRequired: true, success: false, message: "Sorry, you don't have the permission."})
+        return res.status(403).json({
+            loginRequired: true,
+            success: false,
+            message: "Sorry, you don't have the permission."
+        })
     } else {
         next();
     }
@@ -63,6 +67,7 @@ router.use((req, res, next) => {
 router.get('/api/users/:username/active', user_controller.check_user_active);
 // Update a user's status. Used to disable or enable an account.
 router.put('/api/users/:username/active', user_controller.edit_user_active);
+
 router.put('/api/users/active/:username', user_controller.edit_user_active);
 
 router.put('/api/users/validated/:username', user_controller.edit_validated);

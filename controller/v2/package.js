@@ -234,6 +234,249 @@ module.exports = {
         }
     },
 
+    // TODO: Finish this!
+    adminEditPackage: async (req, res, next) => {
+        if (!checkPermission(req, Permission.WORKBOOK_TEMPLATE_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const groupNumber = req.session.user.groupNumber;
+        const {
+            name, published, organizationTypes, orgIds, workbookIds, startDate, endDate, adminNotes, adminFiles
+        } = req.body;
+
+        // Find the package to update from database
+        const queryPackageName = req.params.name; // old name
+        if (!queryPackageName) {
+            return next({status: 400, message: 'package must have a name.'});
+        }
+        if (!queryPackageName) {
+            return res.status(400).json({success: false, message: 'package name can not be empty.'});
+        }
+        const dbPackage = await Package.findOne({name: queryPackageName, groupNumber});
+        if (!dbPackage) {
+            return res.status(400).json({success: false, message: `Package (${queryPackageName}) does not exist.`});
+        }
+
+        // Validate parameters
+        if ((name + '').length === 0) {
+            return next({success: false, status: 400, message: `Package name cannot be empty`})
+        }
+        if ((await Package.count({name})) !== 0) {
+            return next({success: false, status: 400, message: `Package name (${name}) exists.`})
+        }
+        dbPackage.name = name;
+
+        if ((startDate && !endDate && startDate >= dbPackage.endDate)
+            || (!startDate && endDate && dbPackage.startDate >= endDate)
+            || (startDate && endDate && startDate >= endDate)) {
+            return res.status(400).json({success: false, message: 'startDate must be less than endDate.'});
+        }
+        if (organizationTypes) {
+            const results = await OrganizationType.find({'_id': {$in: organizationTypes}});
+            organizationTypes.lenght = 0;
+            if (results) {
+                results.forEach(r => organizationTypes.push(r._id));
+            }
+        }
+        if (orgIds) {
+            const results = await Organization.find({'_id': {$in: orgIds}});
+            orgIds.lenght = 0;
+            if (results) {
+                results.forEach(r => orgIds.push(r._id));
+            }
+        }
+        if (workbookIds) {
+            const results = await Workbook.find({'_id': {$in: workbookIds}});
+            workbookIds.lenght = 0;
+            if (results) {
+                results.forEach(r => workbookIds.push(r._id));
+            }
+        }
+
+        //FIXME: change the package values
+
+        let dbWorkbooks = [];
+        let queryDbWorkbookIds = [];
+        // validate from database
+        try {
+            // FIXME: if one of workbookIds does not exist, it can not throw error.
+            if (workbookIds[0]) {
+                dbWorkbooks = await Workbook.find({'_id': {$in: workbookIds}}).populate('sheets').exec();
+                if (!dbWorkbooks) {
+                    return res.status(400).json({success: false, message: 'dbWorkbooks do not exist'});
+                } else {
+                    for (let index in dbWorkbooks) {
+                        queryDbWorkbookIds.push(dbWorkbooks[index]._id);
+                    }
+                }
+            }
+        } catch (e) {
+            next(e);
+        }
+
+
+        const organizations = [], workbooks = []; // filtered
+        try {
+            // filter organizations
+            const orgDocs = await Organization.find({'_id': {$in: orgIds}}, '_id users').populate('users');
+            orgDocs.forEach(user => organizations.push(user._id));
+
+            // filter workbooks
+            const workbookDocs = await Workbook.find({'_id': {$in: workbookIds}});
+            workbookDocs.forEach(workbook => workbooks.push(workbook._id));
+        } catch (e) {
+            next(e);
+        }
+
+
+        const dbWorkbookIds = dbPackage.workbooks;
+
+        let newWorkbookIds = [];
+        for (let queryWorkbookIdKey in queryDbWorkbookIds) {
+            let isDuplicate = false;
+            for (let dbWorkbookIdKey in dbWorkbookIds) {
+                const newId = queryDbWorkbookIds[queryWorkbookIdKey].toString();
+                const oldId = dbWorkbookIds[dbWorkbookIdKey].toString();
+                if (newId === oldId) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                newWorkbookIds.push(queryDbWorkbookIds[queryWorkbookIdKey]);
+            }
+        }
+
+        let deleteWorkbookIds = [];
+        for (let dbWorkbookIdKey in dbWorkbookIds) {
+            let isDuplicate = false;
+            for (let queryWorkbookIdKey in queryDbWorkbookIds) {
+                const newId = queryDbWorkbookIds[queryWorkbookIdKey].toString();
+                const oldId = dbWorkbookIds[dbWorkbookIdKey].toString();
+                if (newId === oldId) {
+                    isDuplicate = true;
+                    break;
+                }
+            }
+            if (!isDuplicate) {
+                deleteWorkbookIds.push(dbWorkbookIds[dbWorkbookIdKey]);
+            }
+        }
+
+
+        // Add data
+        if (newWorkbookIds[0]) {
+            const newDbWorkbooks = await Workbook.find({'_id': {$in: newWorkbookIds}}).populate('sheets').exec();
+            const rowIds = [];
+            let columnIds = {};
+
+            if (newDbWorkbooks[0]) {
+                newDbWorkbooks.forEach(workbook => {
+                    workbook.sheets.forEach(sheet => {
+                        sheet.catIds.forEach(id => {
+                            rowIds.push(id);
+                        });
+                    });
+                });
+                newDbWorkbooks.forEach(workbook => {
+                    workbook.sheets.forEach(sheet => {
+                        const columnIdsArr = [];
+                        sheet.attIds.forEach(id => {
+                            columnIdsArr.push(id);
+                        });
+                        sheet.catIds.forEach(id => {
+                            columnIds[id] = columnIdsArr;
+                        });
+                    });
+                });
+
+                const newDbValues = await Value.findOne({groupNumber: groupNumber});
+                if (!newDbValues) {
+                    return res.status(400).json({success: false, message: 'values do not exist'});
+                }
+
+                if (rowIds[0] && columnIds) {
+                    for (let rowKey in newDbValues.data) {
+                        const rowValue = newDbValues.data[rowKey];
+                        let newValues = {};
+                        for (let i = 0; i < rowIds.length; i++) {
+                            if (rowIds[i].toString() === rowKey) {
+                                for (let columnKey in rowValue) {
+                                    for (let j = 0; j < columnIds[rowKey].length; j++) {
+                                        if (columnIds[rowKey][j].toString() === columnKey) {
+                                            newValues[columnKey] = rowValue[columnKey];
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        dbPackage.values.data[rowKey] = newValues;
+                    }
+                }
+            }
+        }
+
+        // Delete data
+        if (deleteWorkbookIds[0]) {
+            const deleteDbWorkbooks = await Workbook.find({'_id': {$in: deleteWorkbookIds}}).populate('sheets').exec();
+            const rowIds = [];
+            let columnIds = {};
+
+            if (deleteDbWorkbooks[0]) {
+                deleteDbWorkbooks.forEach(workbook => {
+                    workbook.sheets.forEach(sheet => {
+                        sheet.catIds.forEach(id => {
+                            rowIds.push(id);
+                        });
+                    });
+                });
+                deleteDbWorkbooks.forEach(workbook => {
+                    workbook.sheets.forEach(sheet => {
+                        const columnIdsArr = [];
+                        sheet.attIds.forEach(id => {
+                            columnIdsArr.push(id);
+                        });
+                        sheet.catIds.forEach(id => {
+                            columnIds[id] = columnIdsArr;
+                        });
+                    });
+                });
+
+                // remove the deleted item
+                if (rowIds[0] && columnIds) {
+                    for (let rowKey in dbPackage.values.data) {
+                        for (let i = 0; i < rowIds.length; i++) {
+                            if (rowIds[i].toString() === rowKey.toString()) {
+                                delete dbPackage.values.data[rowKey];
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+
+        // update the package in database
+        dbPackage.markModified('values.data');
+        try {
+            if (published !== undefined) {
+                dbPackage.published = published;
+            }
+            dbPackage.organizations = orgIds || dbPackage.organizations;
+            dbPackage.organizationTypes = organizationTypes || dbPackage.organizationTypes;
+            dbPackage.workbooks = workbookIds || dbPackage.workbooks;
+            dbPackage.startDate = startDate || dbPackage.startDate;
+            dbPackage.endDate = endDate || dbPackage.endDate;
+            dbPackage.adminNotes = adminNotes || dbPackage.adminNotes;
+            dbPackage.adminFiles = adminFiles || dbPackage.adminFiles;
+
+            await dbPackage.save();
+            return res.json({success: true, message: `package (${dbPackage.name}) updated.`, package: dbPackage});
+        } catch (e) {
+            next(e);
+        }
+    },
+
     userGetWorkbook: async (req, res, next) => {
         const {packageName, name} = req.params;
         const groupNumber = req.session.user.groupNumber;

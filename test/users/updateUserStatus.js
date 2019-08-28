@@ -8,9 +8,8 @@ const User = require('../../models/user');
 describe("Update a user's status. Used to disable or enable an account.", function () {
     const usernameTest = 'test';
     const passwordTest = 'test';
-    const oneActiveValue = true;
 
-    const secondUsername = 'lester02';
+    const secondUsername = 'manager of king hospital';
     const secondEmail = 'lester02@mail.com';
 
     before(async () => {
@@ -39,6 +38,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
                 active: false,
                 validated: false,
                 groupNumber: 1,
+                organization: 'King Hospital',
                 permissions: [
                     'CRUD-workbook-template',
                     'system-management',
@@ -50,24 +50,24 @@ describe("Update a user's status. Used to disable or enable an account.", functi
             .then(res => {
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
+                console.log(res.body);
             })
             .catch(function (err) {
                 throw err;
             });
     });
 
-    it("Check a user's status: active - true ", done => {
+    it("Check a user's status: active - success ", done => {
         this.timeout(10000);
         const urlStr = '/api/users/' + secondUsername + '/active/';
         agent
             .get(urlStr)
             .then(function (res) {
-                console.log(res);
+                console.log(res.body);
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
-                expect(res.body.message).to.deep.include(
-                    oneActiveValue.toString()
-                );
+                expect(res.body.message).not.to.be.null;
+                console.log(res.body.message);
                 done();
             })
             .catch(function (err) {
@@ -93,27 +93,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
     it("Update a user's status: active - true ", done => {
         this.timeout(10000);
         const activeValue = true;
-        const urlStr = '/api/users/' + secondUsername + '/active';
-        agent
-            .put(urlStr)
-            .send({active: activeValue})
-            .then(function (res) {
-                expect(res).to.have.status(200);
-                expect(res.body.success).to.be.true;
-                expect(res.body.message).to.deep.include(
-                    activeValue.toString()
-                );
-                done();
-            })
-            .catch(function (err) {
-                throw err;
-            });
-    });
-
-    xit("Update a user's status: active - false ", done => {
-        this.timeout(10000);
-        const activeValue = false;
-        const urlStr = '/api/users/' + secondUsername + '/active';
+        const urlStr = '/api/users/active/' + secondUsername;
         agent
             .put(urlStr)
             .send({active: activeValue})
@@ -133,8 +113,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
     it("Update a user's status: active - false ", done => {
         this.timeout(10000);
         const activeValue = false;
-
-        const urlStr = '/api/users/' + secondUsername + '/active';
+        const urlStr = '/api/users/active/' + secondUsername;
         agent
             .put(urlStr)
             .send({active: activeValue})
@@ -142,7 +121,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
                 expect(res).to.have.status(200);
                 expect(res.body.success).to.be.true;
                 expect(res.body.message).to.deep.include(
-                    secondUsername.toString()
+                    activeValue.toString()
                 );
                 done();
             })
@@ -151,11 +130,11 @@ describe("Update a user's status. Used to disable or enable an account.", functi
             });
     });
 
-    xit("Update a user's status: error - no user ", done => {
+    it("Update a user's status: error - no user ", done => {
         this.timeout(10000);
         const activeValue = false;
 
-        const urlStr = '/api/users/' + 'no user' + '/active';
+        const urlStr = '/api/users/active/' + 'no user';
         agent
             .put(urlStr)
             .send({active: activeValue})
@@ -163,6 +142,7 @@ describe("Update a user's status. Used to disable or enable an account.", functi
                 expect(res).to.have.status(400);
                 expect(res.body.success).to.be.false;
                 expect(res.body.message.errors).not.to.be.null;
+                console.log(res.body.message);
                 done();
             })
             .catch(function (err) {
@@ -170,12 +150,12 @@ describe("Update a user's status. Used to disable or enable an account.", functi
             });
     });
 
-    xit("Update a user's status: 400 Bad Request ", done => {
+    it("Update a user's status: 400 Bad Request ", done => {
         this.timeout(10000);
         const activeValue = '400 Bad Request';
         // Login firstly
 
-        const urlStr = '/api/users/' + secondUsername + '/active';
+        const urlStr = '/api/users/active/' + secondUsername;
         agent
             .put(urlStr)
             .send({active: activeValue})

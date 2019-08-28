@@ -57,10 +57,7 @@ module.exports = {
                     groupNumber: req.body.groupNumber,
                     phoneNumber: req.body.phoneNumber,
                     organization: req.body.organization,
-                    // FIXME: delete permissions when deploying
-                    permissions: req.body.permissions,
-                    validated: req.body.validated || false,
-                    type: 2, // system admin=0, form manager=1, user=2
+                    validated: false,
                     email: req.body.email,
                 });
                 // if (config.disableEmailValidation) {

@@ -10,7 +10,7 @@ module.exports = {
         const groupNumber = req.session.user.groupNumber;
         try {
             const group = await Group.findOne({groupNumber});
-            return res.json({name: group ? group.name: null});
+            return res.json({name: group ? group.name : null});
         } catch (e) {
             next(e);
         }
@@ -30,22 +30,27 @@ module.exports = {
         }
     },
 
-    // no login required, used for registration
-    getGroups: async (req, res, next) => {
+    // admin creating a group
+    // TODO: frontend
+    createGroup: async (req, res, next) => {
+        if (!checkPermission(req, Permission.SYSTEM_MANAGEMENT)) {
+            return next(error.api.NO_PERMISSION);
+        }
+        const {groupNumber, name} = req.body;
         try {
-            const groups = await Group.find({});
-            return res.json({groups})
+            const group = new Group({groupNumber, name});
+            const result = await group.save();
+            return res.json({result})
         } catch (e) {
             next(e);
         }
     },
 
-    createGroup: async (req, res, next) => {
-        const {groupNumber, name} =req.body;
+    // no login required, used for registration
+    getGroups: async (req, res, next) => {
         try {
-            const group = new Group({groupNumber, name});
-            const result = await  group.save();
-            return res.json({result})
+            const groups = await Group.find({});
+            return res.json({groups})
         } catch (e) {
             next(e);
         }

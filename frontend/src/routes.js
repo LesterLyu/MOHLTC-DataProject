@@ -17,6 +17,7 @@ const SystemInfo = React.lazy(() => import('./views/System' /* webpackChunkName:
 const ImportId = React.lazy(() => import('./views/Tools/Import' /* webpackChunkName: "importId" */));
 
 const CreatePackage = React.lazy(() => import('./views/Package/Create' /* webpackChunkName: "createPackage" */));
+const EditPackage = React.lazy(() => import('./views/Package/Edit' /* webpackChunkName: "EditPackage" */));
 const Packages = React.lazy(() => import('./views/Package/Packages' /* webpackChunkName: "Packages" */));
 const PackageView = React.lazy(() => import('./views/Package/PackageView' /* webpackChunkName: "PackageView" */));
 
@@ -51,10 +52,11 @@ const routes = [
   {path: '/import/id', exact: true, name: 'Import ID', component: ImportId},
 
   {path: '/admin/packages/create', exact: true, name: 'Create Package', component: CreatePackage},
+  {path: '/admin/packages/edit/:name', exact: true, name: 'Edit Package', component: EditPackage},
   {path: '/admin/packages', exact: true, name: 'All Packages', component: Packages,  params: {mode: 'admin'}},
   {path: '/packages', exact: true, name: 'My Packages', component: Packages,  params: {mode: 'user'}},
 
-  {path: '/admin/packages/:name/:organization', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'admin'}},
+  {path: '/admin/packages/view/:name/:organization', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'admin'}},
   {path: '/packages/:name', exact: true, name: 'View Package', component: PackageView,  params: {mode: 'user'}},
 
   {path: '/packages/:packageName/:name', exact: true, name: 'View Workbook', component: Excel,  params: {mode: 'user'}},

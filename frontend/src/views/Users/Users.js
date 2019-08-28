@@ -116,16 +116,28 @@ class Users extends Component {
   };
 
   //FIXME: delete this function when developing
-  clickValidatedButton = async (username, validated) => {
-    switchUserValidate(username, !validated)
-      .then((res) => {
-        return getAllUsers()
-          .then(users => {
-            this.setState({userList: users});
-            this.props.showMessage(username + '\'s validated is changed.', 'success');
-          })
-      })
-      .catch(e => this.props.showMessage(...buildErrorParams(e)))
+  clickValidatedButton = async (user) => {
+    try {
+      switchUserValidate(user, !user.validated)
+        .then((res) => {
+          getAllUsers()
+            .then(users => {
+              this.setState({userList: users});
+              // TODO: update backend to stop invalidate a user
+              if (user.organization && !user.validated) {
+                this.props.showMessage(user.username + ' has been added to ' + user.organization, 'success');
+              }
+              if (user.organization && user.validated) {
+                this.props.showMessage(user.username + ' has been subtracted from ' + user.organization, 'warning');
+              }
+            })
+            .catch(err => {
+              this.props.showMessage(err.response.data.message, 'error');
+            })
+        });
+    } catch (e) {
+      this.props.showMessage(...buildErrorParams(e))
+    }
   };
 
 
@@ -146,6 +158,7 @@ class Users extends Component {
                   //   return (<Link to={userLink}>{rowData.username}</Link>)
                   // }
                 },
+                // TODO: add organizations here
                 {title: 'email', field: 'email'},
                 {
                   title: 'Register Time', field: 'createDate', type: 'date',
@@ -167,22 +180,18 @@ class Users extends Component {
                   }
                 },
                 {
-                  // title: 'status', field: 'disabled',
                   title: 'active', field: 'active',
                   render: rowData => {
                     return (<Badge
-                      // color={rowData.validated === true ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
                       onClick={() => this.clickActiveButton(rowData.username, rowData.active)}
                       color={rowData.active === true ? 'success' : 'danger'}>{rowData.active ? 'active' : 'inactive'}</Badge>)
                   }
                 },
                 {
-                  // title: 'status', field: 'disabled',
                   title: 'validated', field: 'validated',
                   render: rowData => {
                     return (<Badge
-                      // color={rowData.validated === true ? 'success' : 'danger'}>{rowData.disabled ? 'disabled' : 'enabled'}</Badge>)
-                      onClick={() => this.clickValidatedButton(rowData.username, rowData.validated)}
+                      onClick={() => this.clickValidatedButton(rowData)}
                       color={rowData.validated === true ? 'success' : 'danger'}>{rowData.validated ? 'validated' : 'Invalidated'}</Badge>)
                   }
                 }

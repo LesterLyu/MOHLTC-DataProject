@@ -1,0 +1,1031 @@
+openapi: 3.0.1
+info:
+  title: MOHLTC-DataProject
+  description:  Restful APIs for MOHLTC-DataProject, mainly includes users management, data package management, and the manipulations related to the templates and the values of workbooks.
+  version: '0.1'
+servers:
+  - url: 'http://localhost:3000'
+  - url: 'http://ec2-3-13-195-83.us-east-2.compute.amazonaws.com/'
+paths:
+  # Register
+  /api/check/email/{email}:
+    get:
+      description: Returns warning message if the checking email exists in the database, otherwise return nothing
+      tags:
+        - register
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+          description: the email that will be checked
+          examples:
+            '0':
+              value: "email@mail.com"
+            '1':
+              value: "NoThisemail@mail.com"
+      responses:
+        '200':
+          description: Found the repeated email on the database
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '204':
+          description: No the identical email on the database.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/check/username/{username}:
+    get:
+      description: Returns warning message if the checking usename exists in the database, otherwise return nothing
+      tags:
+        - register
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+          description: the username that will be checked
+          examples:
+            '0':
+              value: "test"
+            '1':
+              value: "NoThisUser"
+      responses:
+        '200':
+          description: Found the repeated user name on the database
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '204':
+          description: No the identical user name on the database.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  # /api/v2/groups:
+  # /api/v2/organizations:
+  /api/signup/local:
+    post:
+      description: Returns redirect Url string and write this user into session if all the inputs are correct otherwise returns an error message
+      tags:
+        - register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                password:
+                  type: string
+                phoneNumber:
+                  type: string
+                organization:
+                  type: string
+                groupNumber:
+                  type: integer
+                email:
+                  type: string
+                username:
+                  type: string
+            examples:
+              '0':
+                value: >-
+                  {"username":"one111","password":"1","firstName":"one","lastName":"one","email":"one111@ontario.ca","phoneNumber":"1","groupNumber":1,"organization":"MOH-group1"}
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '400':
+          description: Failed operation, and Returns the error
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+
+  # Login
+  /api/logout:
+    get:
+      description: Logout
+      tags:
+        - login
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/isloggedin:
+    get:
+      description: Returns the true if the user is authenticated, otherwise false
+      tags:
+        - login
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: object
+              examples:
+                '0':
+                  value: {"isLoggedIn": true}
+                '1':
+                  value: {"isLoggedIn": false}
+
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/login/local:
+    post:
+      description: Returns redirect Url string and write the login user into session if the username and password are correct otherwise returns an error message
+      tags:
+        - login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                username:
+                  type: string
+            examples:
+              '0':
+                value: '{"username":"test","password":"test"}'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '400':
+          description: Login failed
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+
+  # Management
+  /api/profile:
+    get:
+      description: Returns the current login user's information
+      tags:
+        - user management
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/permissions:
+    get:
+      description: Returns the available permissions of the current user
+      tags:
+        - user management
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/user/permission:
+    post:
+      description: Update the user's permission
+      tags:
+        - user management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                permissions:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                      active:
+                        type: boolean
+                      username:
+                        type: string
+            examples:
+              '0':
+                value: >-
+                  {"permissions":[{"username":"manage of King
+                  Hospital","permissions":["create-delete-attribute-category"],"active":true}]}
+      responses:
+        '200':
+          description: Updated successful
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/user/details:
+    get:
+      description: Returns all the users on the database
+      tags:
+        - user management
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/users/validated/{username}:
+    put:
+      description: The validated and active both will be false if the requested validated is false; both will be true if true.
+      tags:
+        - user management
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+          description: the name of the user that you want to modify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                validated:
+                  type: boolean
+            examples:
+              '0':
+                value: |-
+                  {
+                      "validated": true
+                  }
+      responses:
+        '200':
+          description: Updated successful
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '400':
+          description: Wrong parameters, user name or validated value is empty, the user name is the current user
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/users/active/{username}:
+    put:
+      description: Set the active status of the user based on the value you passed.
+      tags:
+        - user management
+      parameters:
+        - in: path
+          name: username
+          required: true
+          schema:
+            type: string
+          description: the name of the user that you want to modify
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                active:
+                  type: boolean
+            examples:
+              '0':
+                value: |-
+                  {
+                      "active": true
+                  }
+      responses:
+        '200':
+          description: Updated successful
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '400':
+          description: Wrong parameters, user name or active value is empty, the user name is the current user
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '401':
+          description: unvalidated user can not modify the active status
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+
+  # Oragnization
+  /api/v2/organization/{groupname}/{userid}:
+    post:
+      description: Add one user into one organization when the passed validated is true, otherwise subtract
+      tags:
+        - Oragnization
+      parameters:
+        - name: groupname
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'MOH-group1'
+        - name: userid
+          in: path
+          required: true
+          schema:
+            type: string
+          example: '5d602d87efe8603c346ddd54'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                validated:
+                  type: boolean
+            examples:
+              '0':
+                value: '{"validated":true}'
+              '1':
+                value: '{"validated":false}'
+      responses:
+        '200':
+          description: Updated successful
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '204':
+          description: Nothing happened, for the updating value equals the value on the database
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/orgtypes:
+    get:
+      description: Returns all organizations on the database
+      tags:
+        - Oragnization
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+    post:
+      description: Creates or Update one organization type that can have one or more oranizations
+      tags:
+        - Oragnization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                organizations:
+                  type: array
+                  items:
+                    type: string
+            examples:
+              '0':
+                value: >-
+                  {"name":"OrganizationTypeWillBeDeleted"}
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '400':
+          description: Failed operation, and Returns the error message
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/orgtypes/{name}:
+    delete:
+      description: Delete the organization type
+      tags:
+        - Oragnization
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'OrganizationTypeWillBeDeleted'
+      responses:
+        '200':
+          description: successful deleted
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/organizations:
+    get:
+      description: Returns all the organizations whose group is the same as the queried group
+      tags:
+        - Oragnization
+      parameters:
+        - name: groupNumber
+          in: query
+          schema:
+            type: string
+          example: '1'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+    post:
+      description: Add or update an organization for current group
+      tags:
+        - Oragnization
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                types:
+                  type: array
+                  items:
+                    type: string
+                name:
+                  type: string
+                users:
+                  type: array
+                  items:
+                    type: string
+                managers:
+                  type: array
+                  items:
+                    type: string
+            examples:
+              '0':
+                value: >-
+                  {"name":"OrganizationWillBeDeleted","users":["5d5eafbcc3b85c1c5cc81dc8"],"managers":["5d5eafbcc3b85c1c5cc81dc8"],"types":["5d603977d7ac99d4a4f4d0ce"]}
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/organizations/{organizationName}:
+    delete:
+      description: Delete one organization based on it's name
+      tags:
+        - Oragnization
+      parameters:
+        - name: organizationName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'OrganizationWillBeDeleted'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/groups:
+    get:
+      description: Returns all the groups information including group number and name
+      tags:
+        - Group
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+    post:
+      description: Create one group
+      tags:
+        - Group
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+            examples:
+              '0':
+                value: '{"name":"group 104"}'
+      responses:
+        '200':
+          description: Created successful
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '400':
+          description: Failed, maybe the name has been used.
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+
+  # Package
+  /api/admin/packages/{packageName}:
+    get:
+      description: Returns one package
+      tags:
+        - Package
+      parameters:
+        - name: packageName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'firstpackage'
+      responses:
+        '400':
+          description: package not found
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+    put:
+      description: Returen the updated the package
+      tags:
+        - Package
+      parameters:
+        - name: packageName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'firstpackage'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationTypes:
+                  type: array
+                  items:
+                    type: string
+                adminNotes:
+                  type: string
+                workbooks:
+                  type: array
+                  items:
+                    type: string
+                endDate:
+                  type: string
+                organizations:
+                  type: array
+                  items:
+                    type: string
+                name:
+                  type: string
+                published:
+                  type: boolean
+                _id:
+                  type: string
+                startDate:
+                  type: string
+            examples:
+              '0':
+                value: |-
+                  {
+                              "published": false,
+                              "organizations": [
+                                  "5d653701adffa653832f1969"
+                              ],
+                              "organizationTypes": [
+                                  "5d653701adffa653832f1969"
+                              ],
+                              "workbooks": [
+                                  "5d5eb072d7ac99d4a4f473b8"
+                              ],
+                              "_id": "5d65380b04dbe131405f4b38",
+                              "name": "firstpackage",
+                              "startDate": "2019-08-27T14:02:21.360Z",
+                              "endDate": "2019-09-03T14:02:21.360Z",
+                              "adminNotes": "updated"
+                          }
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+  /api/admin/{userName}/packages/{packageName}:
+    get:
+      description: Returns the packages based on the user name and package name
+      tags:
+        - Package
+      parameters:
+        - name: userName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'test'
+        - name: packageName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'firstpackage'
+
+      responses:
+        '400':
+          description: failed operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/admin/packages:
+    get:
+      description: Returns all packages on the database
+      tags:
+        - Package
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    post:
+      description: Create one pakcage
+      tags:
+        - Package
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationTypes:
+                  type: array
+                  items:
+                    type: string
+                adminNotes:
+                  type: string
+                workbooks:
+                  type: array
+                  items:
+                    type: string
+                endDate:
+                  type: string
+                adminFiles:
+                  type: array
+                  items:
+                    type: string
+                organizations:
+                  type: array
+                  items:
+                    type: string
+                name:
+                  type: string
+                published:
+                  type: boolean
+                groupNumber:
+                  type: integer
+                startDate:
+                  type: string
+            examples:
+              '0':
+                value: |-
+                  {
+                              "published": true,
+                              "organizations": [],
+                              "organizationTypes": [],
+                              "workbooks": [
+                                  "5d5eb072d7ac99d4a4f473b8",
+                                  "5d5eb0b8d7ac99d4a4f473f0"
+                              ],
+                              "name": "packageWillBeDeleted",
+                              "startDate": "2019-08-22T15:12:31.541Z",
+                              "endDate": "2019-08-29T15:12:31.541Z",
+                              "adminNotes": "with two workbooks",
+                              "adminFiles": [],
+                              "groupNumber": 1
+                  }
+      responses:
+        '200':
+          description: Created successfully
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/admin/packages/{packageName}:
+    delete:
+      description: Returns one package from database
+      tags:
+        - Package
+      parameters:
+        - name: packageName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'packageWillBeDeleted'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  # Workbook
+  /api/v2/admin/workbooks:
+    get:
+      description: Returns all workbook belonging to the current user group
+      tags:
+        - Workbook
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+
+  /api/v2/admin/workbook/{workbookName}:
+    get:
+      description: Returns one workbook from database
+      tags:
+        - Workbook
+      parameters:
+        - name: workbookName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'firstWorkbook'
+      responses:
+        '200':
+          description: successful operation
+        '400':
+          description: workbook not found
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/admin/workbook:
+    post:
+      description: Creates one workbook and adds related sheets, values
+      tags:
+        - Workbook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workbook:
+                  type: object
+                  properties:
+                    file:
+                      type: string
+                    name:
+                      type: string
+                sheets:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      col2Att:
+                        type: object
+                        properties: {}
+                      name:
+                        type: string
+                      attIds:
+                        type: array
+                        items:
+                          type: string
+                      row2Cat:
+                        type: object
+                        properties: {}
+                      catIds:
+                        type: array
+                        items:
+                          type: string
+                values:
+                  type: object
+                  properties: {}
+            examples:
+              '0':
+                value: '{"workbook":{"name":"workWillBeDeleted","file":"A"},"sheets":[{"col2Att":{},"row2Cat":{},"name":"Sheet1","attIds":[],"catIds":[]},{"col2Att":{},"row2Cat":{},"name":"Sheet2","attIds":[],"catIds":[]},{"col2Att":{},"row2Cat":{},"name":"Sheet3","attIds":[],"catIds":[]}],"values":{}}'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'
+  /api/v2/admin/workbooks/{workbookName}:
+    delete:
+      description: Delete one workbook
+      tags:
+        - Workbook
+      parameters:
+        - name: workbookName
+          in: path
+          required: true
+          schema:
+            type: string
+          example: 'workWillBeDeleted'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json; charset=utf-8:
+              schema:
+                type: string
+              examples: {}
+      servers:
+        - url: 'http://localhost:3000'
+    servers:
+      - url: 'http://localhost:3000'

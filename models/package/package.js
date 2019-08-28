@@ -13,6 +13,7 @@ const packageSchema = new mongoose.Schema({
     // Organizations this package is assigned to, could be many.
     // reference to User._id
     organizations: [{type: ObjectId, ref: 'Organization'}],
+    organizationTypes: [{type: ObjectId, ref: 'OrganizationType'}],
 
     // Workbooks this package includes.
     // reference to Workbook._id

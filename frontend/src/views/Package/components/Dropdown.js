@@ -75,7 +75,8 @@ export default function Dropdown(props) {
 
   useEffect(() => {
     if (options) setValues(values => ({...values, filteredOptions: [...options]}));
-  }, [options]);
+    if (defaultValues)  setValues(values => ({...values, selected: defaultValues}));
+  }, [options, defaultValues]);
 
   const handleItemClick = (value) => () => {
     const index = values.selected.indexOf(value);

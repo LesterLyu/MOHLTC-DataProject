@@ -4,7 +4,7 @@ const expect = chai.expect;
 const {agent} = require('../config');
 
 describe('group', function () {
-    it('Get All groups - success', async() => {
+    xit('Get All groups - success', async() => {
         this.timeout(10000);
         const result = await agent.get('/api/v2/groups');
         console.table(result.body.groups);

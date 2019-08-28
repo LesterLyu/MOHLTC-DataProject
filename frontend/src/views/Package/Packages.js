@@ -131,7 +131,7 @@ export default function CreatePackage(props) {
   };
 
   const handlePick = (org) => {
-    props.history.push('/admin/packages/' + values.pickedPackage.name + '/' + org);
+    props.history.push('/admin/packages/view/' + values.pickedPackage.name + '/' + org);
   };
 
   return (

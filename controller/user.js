@@ -57,7 +57,7 @@ module.exports = {
             if (user) {
                 return res.json({message: email + ' already in use.'});
             }
-            return res.json();
+            return res.status(204).json();
         });
     },
 
@@ -67,7 +67,7 @@ module.exports = {
             if (user) {
                 return res.json({message: username + ' already in use.'});
             }
-            return res.json();
+            return res.status(204).json();
         });
     },
 
@@ -123,56 +123,58 @@ module.exports = {
         });
     },
 
-    edit_user_active: (req, res) => {
+    edit_user_active: async (req, res) => {
         if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
         if (req.params.username === req.session.user.username) {
             return res.status(400).json({success: false, message: 'Can not set the active value by yourself'});
         }
-        const updatingUsername = req.params.username;
-        const updatingActive = req.body.active;
-        User.findOne({username: updatingUsername}, (err, dbUser) => {
-            if (err) {
-                console.log(err);
-                return res.status(500).json({success: false, message: err});
+        if (!req.params.username) {
+            return res.status(400).json({success: false, message: 'user name can not be empty!'})
+        }
+        if (req.body.active === undefined) {
+            return res.status(400).json({success: false, message: 'active value can not be empty!'})
+        }
+
+        try {
+            const dbUser = await User.findOne({username: req.params.username});
+
+            if (!dbUser) {
+                return res.status(400).json({success: false, message: req.params.username + ' does not exist.'});
             }
 
-            if (dbUser) {
-                dbUser.active = updatingActive;
-                dbUser.save((err, updatedUser) => {
-                    if (err) {
-                        return res.status(500).json({success: false, message: err});
-                    }
-                    return res.json({
-                        success: true,
-                        message: updatedUser.username + ' now is ' + updatedUser.active
-                    })
+            if (!dbUser.validated) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'unvalidated user can not modify the active status.'
                 });
-
-            } else {
-                return res.status(400).json({success: false, message: updatingUsername + ' does not exist.'});
             }
-
-        });
+            dbUser.active = req.body.active;
+            const updatedUser = await dbUser.save();
+            return res.status(200).json({success: true, message: 'updated!', user: updatedUser});
+        } catch (e) {
+            return res.status(500).json({success: false, message: e});
+        }
     },
 
     edit_validated: async (req, res, next) => {
         if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
             return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
         }
-        if (!req.params.username && req.body.validated) {
-            return res.status(400).json({success: false, message: 'user name and validated value can not be empty!'})
+        if (!req.params.username && req.body.organization) {
+            return res.status(400).json({success: false, message: 'user name and organization value can not be empty!'})
         }
-        if (req.params.username === req.session.user.username) {
-            return res.status(400).json({success: false, message: 'Can not set the active value by yourself'});
-        }
+
         try {
             const filter = {
                 username: req.params.username,
                 groupNumber: req.session.user.groupNumber
             };
-            const update = {validated: req.body.validated};
+            let update;
+            if (req.body.organization) {
+                update = {validated: req.body.organization};
+            }
             const result = await User.findOneAndUpdate(filter, update, {
                 new: true
             });
@@ -181,6 +183,38 @@ module.exports = {
             next(e);
         }
     },
+
+    edit_user_validated:
+        async (req, res, next) => {
+            if (!req.session.user.permissions.includes(config.permissions.USER_MANAGEMENT)) {
+                return res.status(403).json({success: false, message: error.api.NO_PERMISSION})
+            }
+            if (!req.params.username) {
+                return res.status(400).json({success: false, message: 'user name can not be empty!'})
+            }
+            if (req.body.validated === undefined) {
+                return res.status(400).json({success: false, message: 'validated value can not be empty!'})
+            }
+            if (req.params.username === req.session.user.username) {
+                return res.status(400).json({success: false, message: 'Can not set the active value by yourself'});
+            }
+            try {
+                const filter = {
+                    username: req.params.username,
+                    groupNumber: req.session.user.groupNumber
+                };
+                const update = {
+                    validated: req.body.validated,
+                    active: req.body.validated
+                };
+                const result = await User.findOneAndUpdate(filter, update, {
+                    new: true
+                });
+                return res.status(200).json({success: true, message: 'updated!', user: result});
+            } catch (e) {
+                next(e);
+            }
+        },
 
     change_password: (req, res, next) => {
         var oldPassword = req.body.oldPassword;
