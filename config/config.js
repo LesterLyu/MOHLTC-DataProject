@@ -38,6 +38,4 @@ module.exports = {
     },
     disableEmailValidation: true,
     disableLdap: true,
-    organizations: [],
-    maxGroupNumber: 0,
 };

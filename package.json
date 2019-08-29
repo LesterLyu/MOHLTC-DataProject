@@ -39,6 +39,7 @@
     "grunt-contrib-clean": "^2.0.0",
     "grunt-contrib-compress": "^1.5.0",
     "grunt-contrib-copy": "^1.0.0",
+    "grunt-env": "^1.0.1",
     "grunt-run": "^0.8.1",
     "mocha": "^6.2.0",
     "mochawesome": "^4.0.0"
@@ -46,15 +47,12 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development node app.js",
     "test": "mocha test/main.js test/users test/ --recursive --exit --check-leaks -R mochawesome",
-    "test:david": "nodemon --exec mocha --recursive --timeout 5000 -R min",
-    "build": "grunt",
-    "build:frontend": "cd ./frontend/ && npm run build:aws",
-    "watch": "grunt watch",
-    "prod": "grunt prod",
+    "build:frontend": "cd ./frontend/ && npm run build",
     "aws": "NODE_ENV=production node app.js",
-    "build:frontend-pivotal": "cd ./frontend/ && npm run build:pivotal",
     "pivotal:build": "grunt pivotal:build",
     "pivotal:publish": "grunt pivotal:publish",
+    "build:aws": "grunt build:aws",
+    "build:pivotal": "grunt build:pivotal",
     "pivotal": "grunt pivotal"
   },
   "repository": {

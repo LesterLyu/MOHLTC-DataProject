@@ -1,8 +1,11 @@
+const {pivotal, aws} = require('./config/cloud');
+
 module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-compress');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-run');
+    grunt.loadNpmTasks('grunt-env');
 
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -69,16 +72,26 @@ module.exports = function (grunt) {
                 exec: '"./node_modules/.bin/mocha" ./test/main.js ./test/ --recursive --exit --check-leaks -R mochawesome'
             },
             buildFrontend: {
-                exec: 'npm run build:frontend'
+                exec: 'yarn run build:frontend'
             },
 
-            'buildFrontend-pivotal': {
-                exec: 'npm run build:frontend-pivotal'
-            },
             pivotal: {
-                exec: 'cd ./build/zip && cf push mohltc -c "node app.js"'
+                exec: `cd ./build/zip && cf push ${pivotal.appName} -c "node app.js"`
             }
         },
+
+        env: {
+            aws: {
+                NODE_ENV: 'production',
+                SERVER_URL: aws.serverUrl,
+                PUBLIC_URL: aws.frontendUrl,
+            },
+            pivotal: {
+                NODE_ENV: 'production',
+                SERVER_URL: pivotal.serverUrl,
+                PUBLIC_URL: pivotal.frontendUrl,
+            }
+        }
 
     });
 
@@ -89,13 +102,9 @@ module.exports = function (grunt) {
         grunt.file.mkdir('build/zip/public/react');
     });
 
-    grunt.registerTask("prod", ["clean", "run:report", "run:buildFrontend",
-        "mkdir", "copy:main", "compress"]);
-    grunt.registerTask("aws", ["clean"]);
+    grunt.registerTask("build:aws", ["clean", "run:report", "env:aws", "run:buildFrontend", "mkdir", "copy:main", "compress"]);
 
-    grunt.registerTask("pivotal:build", ["clean", "run:buildFrontend-pivotal",
-        "mkdir", "copy:main"]);
-
+    grunt.registerTask("pivotal:build", ["clean", "run:report", "env:pivotal", "run:buildFrontend", "mkdir", "copy:main"]);
     grunt.registerTask("pivotal:publish", ["run:pivotal"]);
-    grunt.registerTask("pivotal", ["pivotal:build", "pivotal:publish"]);
+    grunt.registerTask("build:pivotal", ["pivotal:build", "pivotal:publish"]);
 };
