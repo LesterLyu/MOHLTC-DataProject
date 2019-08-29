@@ -1,4 +1,4 @@
-// config for pivotal
+// config for pivotal cloud
 const pivotal = {
     appName: 'mohltc', // your pivotal app name
     serverUrl: 'https://mohltc.cfapps.io', // the route for this app

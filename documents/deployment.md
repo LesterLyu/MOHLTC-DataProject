@@ -70,7 +70,7 @@
  - An Pivotal account.
     > Can be government issued account or personal account. Ask Tony for details.
  - Install [Cloud Foundry](https://console.run.pivotal.io/tools) (cf cli)
- - Login to cd: `cf login`
+ - Login to cf: `cf login`
 ### Procedure of First Time Deployment
  1. Clone [Data-Project-Config](https://github.com/LesterLyu/Data-Project-Config)
     and put it in the parent directory of [MOHLTC-DataProject](https://github.com/LesterLyu/MOHLTC-DataProject)
@@ -92,7 +92,7 @@
     ```
  1. Modify configuration in `MOHLTC-DataProject/config/cloud.js`
     ```js
-    // config for amazon cloud
+    // config for pivotal cloud
     const pivotal = {
         appName: 'mohltc', // your pivotal app name
         serverUrl: 'https://mohltc.cfapps.io', // the route for this app
