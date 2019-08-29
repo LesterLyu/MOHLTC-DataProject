@@ -17,14 +17,14 @@
    - Node command: `npm run aws`
 ### Procedure of Generating `release-beta.zip`
  1. Clone [Data-Project-Config](https://github.com/LesterLyu/Data-Project-Config)
-    and put it in the same directory as [MOHLTC-DataProject](https://github.com/LesterLyu/MOHLTC-DataProject)
+    and put it in the parent directory of [MOHLTC-DataProject](https://github.com/LesterLyu/MOHLTC-DataProject)
     ```
     Some Folder
     ├── MOHLTC-DataProject
     │   ├── README.md
     │   ├── node_modules
     │   ├── ...
-    └──  Data-Project-Config
+    └── Data-Project-Config
         ├── .ebextensions
         ├── config
         └── README.md
@@ -46,4 +46,17 @@
     ```
     This will take 1 to 3 minutes, depends on the computer performance.
     `release-beta.zip` will be generated on the project folder once it finished.
+ 1. Upload to Elastic Beanstalk: Navigate to Elastic Beanstalk console and
+    upload `release-beta.zip`.
     
+### Update code to the Amazon Cloud
+ 1. Run script to generate `release-beta.zip`.
+    ```sh
+    yarn run build:aws
+    ```
+ 1. Upload to Elastic Beanstalk: Navigate to Elastic Beanstalk console and
+    upload `release-beta.zip`
+    
+----
+## Deploy to Pivotal Cloud
+
