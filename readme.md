@@ -4,6 +4,7 @@
 ## Documents
 > Please ignore the documents that is not listed here.
 - [First Time Setup for Developers](documents/setup.md)
+- [How to Deploy to AWS and Pivotal](documents/deployment.md)
 - [Restful API Documents (TODO)](documents/API)
 - [Excel Indexed Colors](https://github.com/ClosedXML/ClosedXML/wiki/Excel-Indexed-Colors)
 - [Supported excel styles to display in front-end](documents/excel-display.md)
