@@ -4,12 +4,12 @@
   - Overall
     - [ ] Front-end permissions: hide the items in navigation menu that user does not have the permission to.<sup>*4</sup>
     - [ ] User role: Group permiossion into a user role and set the role to some users. i.e. Admin should have all permissions.<sup>*3</sup> 
-    - [ ] User should choose which organization's packages he wants to view. <sup>*3</sup>
+    - [x] User should choose which organization's packages he wants to view. <sup>*3</sup>
     - [ ] User update profile. (email, passwords, ...) <sup>*3</sup>
     - [ ] User forget passeord. (send email to reset pasword) <sup>*3</sup>
     - [ ] User registration: managers should receive email of registration requests.<sup>*3</sup>
     - [ ] Admin's "All Package" should display only the submitted packages.
-    
+    - [ ] Fix bugs in Registration request.
     
   - Front-end Excel viewer
     - [ ] Should be a way to modify row height and column width for hidden rows/columns.
