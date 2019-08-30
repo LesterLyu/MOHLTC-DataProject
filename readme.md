@@ -11,6 +11,7 @@
 - [**Backlog**](documents/backlog.md)
 - [Why this approach?](documents/Generic%20Data%20Project.pdf)
 - [Summary of Technologies](documents/Summary%20of%20Technology.pdf)
+- [Open XML Spec](http://officeopenxml.com/anatomyofOOXML-xlsx.php)
 
 ## Dependencies
 > The libraries you need to **maintain** if you are on this project.
