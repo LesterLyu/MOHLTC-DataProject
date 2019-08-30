@@ -8,8 +8,9 @@
 - [Restful API Documents (TODO)](documents/API)
 - [Excel Indexed Colors](https://github.com/ClosedXML/ClosedXML/wiki/Excel-Indexed-Colors)
 - [Supported excel styles to display in front-end](documents/excel-display.md)
+- [**Backlog**](documents/backlog.md)
 - [Why this approach?](documents/Generic%20Data%20Project.pdf)
-- [Backlog](documents/backlog.md)
+- [Summary of Technologies](documents/Summary%20of%20Technology.pdf)
 
 ## Dependencies
 > The libraries you need to **maintain** if you are on this project.
@@ -18,7 +19,6 @@
 - [react-window](https://github.com/LesterLyu/react-window)
 - [SSF (Spreadsheet Formatting)](https://github.com/LesterLyu/fast-formula-parser/blob/master/ssf/ssf.js)
 - [Data-Project-Config](https://github.com/LesterLyu/Data-Project-Config) (permission required, this stores all secrets.)
-
 ## Purpose
 This is complicated.
 

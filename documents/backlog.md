@@ -10,6 +10,7 @@
     - [ ] User registration: managers should receive email of registration requests.<sup>*3</sup>
     - [ ] Admin's "All Package" should display only the submitted packages.
     - [ ] Fix bugs in Registration request.
+    - [ ] Package name end with space will likely cause bug. <sup>*4</sup>
     
   - Front-end Excel viewer
     - [ ] Should be a way to modify row height and column width for hidden rows/columns.
