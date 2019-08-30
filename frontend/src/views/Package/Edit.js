@@ -132,7 +132,7 @@ export default function EditPackage(props) {
     } catch (e) {
       props.showMessage(e.toString() + '\nDetails: ' + e.response.data.message, 'error')
     }
-  }, [values, props]);
+  }, [values, props, name]);
 
   const renderDates = useMemo(() => (<MuiPickersUtilsProvider utils={DateFnsUtils}>
     <Grid container justify={"flex-start"} spacing={4}>

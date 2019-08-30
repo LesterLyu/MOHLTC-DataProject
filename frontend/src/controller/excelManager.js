@@ -26,7 +26,6 @@ class WorkbookManager {
         : `/api/v2/admin/packages/${packageName}/${organizationName}/${name}`);
     return axios.get(config.server + url, axiosConfig)
       .then(response => {
-        console.log(response);
         if (check(response)) {
           return response;
         }
@@ -181,7 +180,6 @@ class WorkbookManager {
       sheetData.attIds = Object.values(col2Att);
       sheetData.catIds = Object.values(row2Cat);
     });
-    console.log(data);
     if (admin)
       return await axios.post(config.server + '/api/v2/admin/workbook', data, axiosConfig);
     else {

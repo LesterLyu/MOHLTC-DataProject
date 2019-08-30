@@ -59,8 +59,6 @@ const supported = {
   }
 };
 
-let excel;
-
 const mouse = {
   mouseDown: false, movement: null, movementTarget: null
 };
@@ -71,7 +69,7 @@ class Cell extends PureComponent {
 
   constructor(props) {
     super(props);
-    excel = window.excel;
+    this.excel = window.excel;
     this.mouseDown = false;
   }
 
@@ -284,8 +282,6 @@ class Cell extends PureComponent {
 
   onMouseUp = () => {
     if (mouse.mouseDown) {
-      const {data} = this.props;
-      const {sheet} = data;
       mouse.mouseDown = false;
       console.log(mouse.movement, mouse.movementTarget);
       if (mouse.movementTarget[0] === 'x' && mouse.movementTarget[1] > 0 && mouse.movement != null) {
@@ -311,7 +307,7 @@ class Cell extends PureComponent {
         const col = sheet.column(mouse.movementTarget[1]);
         const width = mouse.movement / 9.69 + (col.width() == null ? 80 / 9.69 : col.width());
         col.width((width >= 0) ? width : 0);
-        excel.renderCurrentSheet();
+        this.excel.renderCurrentSheet();
       }
     }
   };
@@ -325,7 +321,7 @@ class Cell extends PureComponent {
         const row = sheet.row(mouse.movementTarget[1]);
         const height = mouse.movement / 1.666 + (row.height() == null ? 24 / 1.666 : row.height());
         row.height((height >= 0) ? height : 0);
-        excel.renderCurrentSheet();
+        this.excel.renderCurrentSheet();
       }
     }
   };
@@ -379,7 +375,7 @@ class Cell extends PureComponent {
       <div>
         {value}
         <div className={"dropdownArrow"} style={{top: style.height / 2 - 5}}
-             onClick={event => excel.showDropdown(event, cell)}>
+             onClick={event => this.excel.showDropdown(event, cell)}>
           {String.fromCharCode(9660)}
         </div>
       </div>
@@ -396,7 +392,7 @@ class Cell extends PureComponent {
       <div style={innerStyle} onClick={() => {
         const sheet = cell.sheet()._hyperlinks.parse(location).sheet;
         if (sheet)
-          excel.switchSheet(sheet);
+          this.excel.switchSheet(sheet);
       }}>
         {value}
       </div>

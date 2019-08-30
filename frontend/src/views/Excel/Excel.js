@@ -433,6 +433,8 @@ class Excel extends Component {
     hooks.clear();
     window.excel = undefined;
     window.Cell = undefined;
+    window.sheet = undefined;
+    init(undefined);
   }
 
   common() {

@@ -99,7 +99,6 @@ class ExcelToolBar extends Component {
 
   uploadWorkbook = () => {
     this.excel.excelManager.readWorkbookLocal((workbook) => {
-      console.log(workbook);
       this.excel.workbook = workbook;
       this.excel.currentSheetIdx = 0;
       this.excel.forceUpdate();
